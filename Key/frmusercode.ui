@@ -32,7 +32,7 @@
     </font>
   </property>
   <property name="text">
-    <string>v1.10k</string>
+    <string>v1.10.k</string>
   </property>
 </widget>
   <widget class="QGroupBox" name="grpKeypad">
