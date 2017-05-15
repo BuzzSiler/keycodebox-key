@@ -53,8 +53,8 @@ QJsonObject& CAdminRec::jsonRecord(QJsonObject &json)
     json.insert(fstart, QJsonValue(default_report_start.toString("yyyy-MM-dd HH:mm:ss")));    // DATETIME,
     json.insert(fpassword, QJsonValue(password.c_str()));    // text,
     json.insert(faccesscd, QJsonValue(access_code.c_str())); // text
-    json.insert(fassistpassword, QJsonValue(assist_password.c_str()())); //text
-    json.insert(fassistcode, QJsonValue(assist_code.c_str()())); //text
+    json.insert(fassistpassword, QJsonValue(assist_password.c_str())); //text
+    json.insert(fassistcode, QJsonValue(assist_code.c_str())); //text
     json.insert(fshowFingerprint, QJsonValue(show_fingerprint));
     json.insert(fpredictivecode, QJsonValue(use_predictive_access_code));
     json.insert(fpredkey, QJsonValue(pred_key.c_str()));
