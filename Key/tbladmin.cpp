@@ -455,27 +455,30 @@ void CTblAdmin::addAdmin()
 }
 
 bool CTblAdmin::updateAdminClear(std::string name, std::string email, std::string phone,
-                 bool emailReportActive, QDateTime repFreq, QDateTime startReport,
-                 std::string passwordClear, std::string accessCdClear,
-                 bool usePredictive, std::string predKey, int predRes,
-                 uint32_t nMaxLocks,
-                 std::string smtpserver, int smtpport, int smtptype,
-                 std::string smtpusername, std::string smtppassword,
-		 int vncport, std::string vncpassword,
-                 bool bReportToEmail, bool bReportToFile, std::string reportDirectory)
+                bool emailReportActive, QDateTime repFreq, QDateTime startReport,
+                std::string passwordClear, std::string accessCdClear,
+                std::string assistPasswordClear, std::string assistCodeClear,
+                bool showFingerprint,
+                bool usePredictive, std::string predKey, int predRes,
+                uint32_t nMaxLocks,
+                std::string smtpserver, int smtpport, int smtptype,
+                std::string smtpusername, std::string smtppassword,
+                int vncport, std::string vncpassword,
+                bool bReportToEmail, bool bReportToFile, std::string reportDirectory)
 {
     std::string encPW = CEncryption::encryptString(passwordClear.c_str()).toStdString();
     std::string encCode = CEncryption::encryptString(accessCdClear.c_str()).toStdString();
+    std::string encAssistPw = CEncryption::encryptString(assistPasswordClear.c_str()).toStdString();
+    std::string encAssistCode = CEncryption::encryptString(assistCodeClear.c_str()).toStdString();
     std::string encSMTPPW = CEncryption::encryptString(smtppassword.c_str()).toStdString();
     qDebug() << "pw:" << encPW.c_str() << " code:" << encCode.c_str();
 
     std::string encVNCPW = CEncryption::encryptString(vncpassword.c_str()).toStdString();
     
-    return updateAdmin(name, email, phone, emailReportActive, repFreq, startReport, encPW, encCode, usePredictive, predKey, predRes,
-                       nMaxLocks,
-                       smtpserver, smtpport, smtptype, smtpusername, encSMTPPW,
-		       vncport, encVNCPW,
-                       bReportToEmail, bReportToFile, reportDirectory);
+    return updateAdmin(name, email, phone, emailReportActive, repFreq, startReport, encPW, encCode,
+                       encAssistPw, encAssistCode, showFingerprint, usePredictive, predKey, predRes,
+                       nMaxLocks, smtpserver, smtpport, smtptype, smtpusername, encSMTPPW, vncport,
+                       encVNCPW, bReportToEmail, bReportToFile, reportDirectory);
 }
 
 bool CTblAdmin::updateAdmin(std::string name, std::string email, std::string phone,
