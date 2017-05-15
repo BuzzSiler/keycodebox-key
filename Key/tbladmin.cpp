@@ -520,8 +520,8 @@ bool CTblAdmin::updateAdmin(std::string name, std::string email, std::string pho
 
     qry.bindValue(":pw", passwordEnc.c_str());
     qry.bindValue(":code", accessCdEnc.c_str());
-    qry.bindValue(":assistpw", assistPasswordEnc);
-    qry.bindValue(":assistcode", assistCodeEnc);
+    qry.bindValue(":assistpw", assistPasswordEnc.c_str());
+    qry.bindValue(":assistcode", assistCodeEnc.c_str());
     qry.bindValue(":showFingerprint", showFingerprint);
     qry.bindValue(":usePred", usePredictive);
     qry.bindValue(":pKey", predKey.c_str());
