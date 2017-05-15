@@ -1034,6 +1034,9 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
     _tmpAdminRec.setEmailReportActive(bNever);
     _tmpAdminRec.setPassword(ui->lblPassword->text().toStdString());
     _tmpAdminRec.setAccessCode(ui->lblAccessCode->text().toStdString());
+    _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text().toStdString());
+    _tmpAdminRec.setAssistCode(ui->lblAssistCode->text().toStdString());
+    _tmpAdminRec.setShowFingerprint(ui->chkShowFingerprint->isChecked());
     _tmpAdminRec.setUsePredictiveAccessCode(ui->chkUsePredictive->isChecked());
     _tmpAdminRec.setPredictiveKey(ui->lblKey->text().toStdString());
     _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
@@ -1081,6 +1084,9 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setEmailReportActive(bNever);
     _tmpAdminRec.setPassword(ui->lblPassword->text().toStdString());
     _tmpAdminRec.setAccessCode(ui->lblAccessCode->text().toStdString());
+    _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text().toStdString());
+    _tmpAdminRec.setAssistCode(ui->lblAssistCode->text().toStdString());
+    _tmpAdminRec.setShowFingerprint(ui->chkShowFingerprint->isChecked());
     _tmpAdminRec.setUsePredictiveAccessCode(ui->chkUsePredictive->isChecked());
     _tmpAdminRec.setPredictiveKey(ui->lblKey->text().toStdString());
     _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
@@ -1200,6 +1206,8 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->lblPhone->setText(adminInfo->getAdminPhone().c_str());
         ui->lblAccessCode->setText(adminInfo->getAccessCode().c_str());
         ui->lblPassword->setText(adminInfo->getPassword().c_str());
+        ui->lblAssistCode->setText(adminInfo->getAssistCode().c_str());
+        ui->lblAssistPassword->setText(adminInfo->getAssistPassword().c_str());
 
         QString sFreq;
         QDateTime dtFreq = adminInfo->getDefaultReportFreq();

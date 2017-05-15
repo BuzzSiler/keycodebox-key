@@ -64,14 +64,15 @@ void CModelSecurity::OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTi
 void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 {
     bool bSuccess = _ptblAdmin->updateAdminClear(adminInfo->getAdminName(), adminInfo->getAdminEmail(), adminInfo->getAdminPhone(),
-                                 adminInfo->getEmailReportActive(), adminInfo->getDefaultReportFreq(),
-                                 adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
-                                 adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
-                                 adminInfo->getMaxLocks(),
-                                 adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
-                                 adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
-				 adminInfo->getVNCPort(), adminInfo->getVNCPassword(),
-                                 adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory());
+                                adminInfo->getEmailReportActive(), adminInfo->getDefaultReportFreq(),
+                                adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
+                                adminInfo->getAssistPassword(), adminInfo->getAssistCode(), adminInfo->getShowFingerprint(),
+                                adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
+                                adminInfo->getMaxLocks(),
+                                adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
+                                adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
+                                adminInfo->getVNCPort(), adminInfo->getVNCPassword(),
+                                adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory());
     emit __OnUpdatedCurrentAdmin(bSuccess);
 }
 

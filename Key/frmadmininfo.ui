@@ -958,12 +958,12 @@
       <string>Load bulk codes list</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="chkShowFingerprint">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>20</y>
-       <width>200</width>
+       <width>250</width>
        <height>28</height>
       </rect>
      </property>

@@ -11,7 +11,6 @@
 #include "encryption.h"
 #include <exception>
 
-
 const char *fid = "ids";
 const char *fname = "admin_name";
 const char *femail = "admin_email";
@@ -21,6 +20,9 @@ const char *ffreq = "default_report_freq";
 const char *fstart = "default_report_start";
 const char *fpassword = "password";
 const char *faccesscd = "access_code";
+const char *fassistpassword = "assist_password";
+const char *fassistcode = "assist_code";
+const char *fshowFingerprint = "show_fingerprint";
 const char *fpredictivecode = "use_predictive_access_code";
 const char *fpredkey = "predictive_key";
 const char *fpredres = "predictive_resolution";
@@ -51,6 +53,9 @@ QJsonObject& CAdminRec::jsonRecord(QJsonObject &json)
     json.insert(fstart, QJsonValue(default_report_start.toString("yyyy-MM-dd HH:mm:ss")));    // DATETIME,
     json.insert(fpassword, QJsonValue(password.c_str()));    // text,
     json.insert(faccesscd, QJsonValue(access_code.c_str())); // text
+    json.insert(fassistpassword, QJsonValue(assist_password.c_str()())); //text
+    json.insert(fassistcode, QJsonValue(assist_code.c_str()())); //text
+    json.insert(fshowFingerprint, QJsonValue(show_fingerprint));
     json.insert(fpredictivecode, QJsonValue(use_predictive_access_code));
     json.insert(fpredkey, QJsonValue(pred_key.c_str()));
     json.insert(fpredres, QJsonValue(pred_resolution));
@@ -102,6 +107,14 @@ bool CAdminRec::setFromJsonObject(QJsonObject jsonObj)
             password = jsonObj.value(fpassword).toString().toStdString();
         if(!jsonObj.value(faccesscd).isUndefined())
             access_code = jsonObj.value(faccesscd).toString().toStdString();
+
+        if(!jsonObj.value(fassistpassword).isUndefined())
+            assist_password = jsonObj.value(fassistpassword).toString().toStdString();
+        if(!jsonObj.value(fassistcode).isUndefined())
+            assist_code = jsonObj.value(fassistcode).toString().toStdString();
+        if(!jsonObj.value(fshowFingerprint).isUndefined())
+            show_fingerprint = jsonObj.value(fshowFingerprint).toBool();
+
         if(!jsonObj.value(fpredictivecode).isUndefined())
             use_predictive_access_code = jsonObj.value(fpredictivecode).toBool();
         if(!jsonObj.value(fpredkey).isUndefined())
@@ -177,10 +190,10 @@ bool CTblAdmin::isAccessCode(QString code)
     //quit code
     std::string quit_code = "123456789987654321";
     if(boost::iequals(in_access_code, quit_code))
-      {
-	qDebug() << "CTblAdmin::isAccessCode(): shutting down!";
-	QCoreApplication::quit();
-      }
+    {
+        qDebug() << "CTblAdmin::isAccessCode(): shutting down!";
+        QCoreApplication::quit();
+    }
     
     if(boost::iequals(in_access_code, access_code) || boost::iequals(in_access_code, access_code_old))
     {
@@ -211,13 +224,15 @@ bool CTblAdmin::createTable()
         QString sql = "CREATE TABLE IF NOT EXISTS " + QString(TABLENAME.c_str()) +
                 "(ids integer primary key unique, admin_name text,"
                 " admin_email text, admin_phone text, email_report_active bool,"
-                "default_report_freq DATETIME,"
-                            " default_report_start DATETIME, password text, "
-                            " access_code text, use_predictive_access_code bool, "
+                " default_report_freq DATETIME,"
+                " default_report_start DATETIME, password text, "
+                " access_code text,"
+                " assist_password, assist_code, show_fingerprint, "
+                " use_predictive_access_code bool, "
                 " predictive_key text, predictive_resolution integer,"
                 " max_locks,"
                 " smtp_server, smtp_port, smtp_type, smtp_username, smtp_password,"
-	        " vnc_port, vnc_password,"
+                " vnc_port, vnc_password,"
                 " report_via_email, report_to_file, report_directory)";
 
         qry.prepare( sql );
@@ -261,17 +276,20 @@ bool CTblAdmin::createAdminDefault()
     QSqlQuery qry(*_pDB);
     QString sql = QString("INSERT OR IGNORE INTO ") + QString(TABLENAME.c_str()) +
                     QString("(admin_name,"\
-                  "admin_email, admin_phone, email_report_active, default_report_freq,"\
-                  "default_report_start, password, access_code, use_predictive_access_code,"
-                            "predictive_key, predictive_resolution, max_locks,"
-                            "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password,"
-                            "report_via_email, report_to_file, report_directory,"
+                            "admin_email, admin_phone, email_report_active, default_report_freq, "\
+                            "default_report_start, password, access_code, "
+                            "assist_password, assist_code, show_fingerprint, "
+                            "use_predictive_access_code, "
+                            "predictive_key, predictive_resolution, max_locks, "
+                            "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
+                            "report_via_email, report_to_file, report_directory, "
                             "vnc_port, vnc_password)"    
-                  " VALUES ('admin', 'admin@email.com', '555.555.5555', 1, :freq,"\
-                          ":start, :pw, :code, :use_pred, :pred_key, :pred_res, 32,"
+                  " VALUES ('admin', 'admin@email.com', '555.555.5555', 1, :freq, "\
+                            ":start, :pw, :code, :assistpw, :assistCode, :showFingerprint, "
+                            ":use_pred, :pred_key, :pred_res, 32, "
                             "'', 0, 0, '', '', "
                             "1, 0, '', "
-			    "5900, 'vnc_password')");
+                            "5900, 'vnc_password')");
     qry.prepare(sql);
 
     QString sTime;
@@ -287,11 +305,17 @@ bool CTblAdmin::createAdminDefault()
 
     std::string encPW = CEncryption::encryptString("").toStdString();
     std::string encCode = CEncryption::encryptString("112233").toStdString();
+    std::string encAssistPw = CEncryption::encryptString("").toStdString();
+    std::string encAssistCode = CEncryption::encryptString("332211").toStdString();
 
     qDebug() << "pw:" << encPW.c_str() << " code:" << encCode.c_str();
 
     qry.bindValue(":pw", encPW.c_str());
     qry.bindValue(":code", encCode.c_str());
+    qry.bindValue(":assistpw", encAssistPw.c_str());
+    qry.bindValue(":assistCode", encAssistCode.c_str());
+    qry.bindValue(":showFingerprint", QVariant(false));
+
     qry.bindValue(":use_pred", QVariant(true));
     qry.bindValue(":pred_key", QVariant("\*phzNZ2'od:9g\"J]Yc%1_m6Y51NpHImY8dz3,VVXU|jp7B]HG8@SxuC\od9;_>"));
     qry.bindValue(":pred_res", QVariant(10));
@@ -315,10 +339,12 @@ bool CTblAdmin::readAdmin()
 
     QSqlQuery query(*_pDB);
     QString sql = "SELECT admin_name, admin_email, admin_phone, default_report_freq," \
-                      "default_report_start, password, access_code, use_predictive_access_code, "
-            "predictive_key, predictive_resolution, max_locks,"
-            "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password,"
-            "vnc_port,vnc_password,"
+                  "default_report_start, password, access_code, "
+                  "assist_password, assist_code, show_fingerprint, "
+                  "use_predictive_access_code, "
+                  "predictive_key, predictive_resolution, max_locks, "
+                  "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
+                  "vnc_port,vnc_password, "
                   "report_via_email, report_to_file, report_directory"
                   " FROM ";
     sql += QString(TABLENAME.c_str());
@@ -332,6 +358,9 @@ bool CTblAdmin::readAdmin()
         int fldReport_start = query.record().indexOf(fstart);
         int fldPassword = query.record().indexOf(fpassword);
         int fldCode = query.record().indexOf(faccesscd);
+        int fldAssistPassword = query.record().indexOf(fassistpassword);
+        int fldAssistCode = query.record().indexOf(fassistcode);
+        int fldShowFingerprint = query.record().indexOf(fshowFingerprint);
         int fldPredictive = query.record().indexOf(fpredictivecode);
         int fldPredKey = query.record().indexOf(fpredkey);
         int fldPredRes = query.record().indexOf(fpredres);
@@ -341,8 +370,8 @@ bool CTblAdmin::readAdmin()
         int fldSMTPType = query.record().indexOf(fsmtptype);
         int fldSMTPUsername = query.record().indexOf(fsmtpusername);
         int fldSMTPPassword = query.record().indexOf(fsmtppassword);
-	int fldVNCPort = query.record().indexOf(fvncport);
-	int fldVNCPassword = query.record().indexOf(fvncpassword);
+        int fldVNCPort = query.record().indexOf(fvncport);
+        int fldVNCPassword = query.record().indexOf(fvncpassword);
         int fldReportToEmail = query.record().indexOf(freportviaemail);
         int fldReportToFile = query.record().indexOf(freporttofile);
         int fldReportDirectory = query.record().indexOf(freportdirectory);
@@ -361,19 +390,29 @@ bool CTblAdmin::readAdmin()
 
             std::string accessCode = query.value(fldCode).toString().toStdString();
             std::string accessCodeOld = accessCode;
-
             qDebug() << "CTblAdmin::readAdmin():code before encryptDecrypt():" << accessCode.c_str();
 
+            accessCodeOld = CEncryption::encryptDecryptOld(accessCodeOld.size(), accessCodeOld);  // Old version
+
             accessCode = CEncryption::decryptString(accessCode.c_str()).toStdString();
+
             std::string password = query.value(fldPassword).toString().toStdString();
             password = CEncryption::decryptString(password.c_str()).toStdString();
 
-            accessCodeOld = CEncryption::encryptDecryptOld(accessCodeOld.size(), accessCodeOld);  // Old version
+            std::string assistCode = query.value(fldAssistCode).toString().toStdString();
+            assistCode = CEncryption::decryptString(assistCode.c_str()).toStdString();
+
+            std::string assistPassword = query.value(fldAssistPassword).toString().toStdString();
+            assistPassword = CEncryption::decryptString(assistPassword.c_str()).toStdString();
 
             // Unencrypted in currentAdmin
             _currentAdmin.setPassword(password);
             _currentAdmin.setAccessCode(accessCode);
+            _currentAdmin.setAssistPassword(assistPassword);
+            _currentAdmin.setAssistCode(assistCode);
             _currentAdmin.setAccessCodeOld(accessCodeOld);
+
+            _currentAdmin.setShowFingerprint(query.value(fldShowFingerprint).toBool());
             _currentAdmin.setUsePredictiveAccessCode(query.value(fldPredictive).toBool());
             _currentAdmin.setPredictiveKey(query.value(fldPredKey).toString().toStdString());
             _currentAdmin.setPredictiveResolution(query.value(fldPredRes).toInt());
@@ -388,10 +427,10 @@ bool CTblAdmin::readAdmin()
             smtppw = CEncryption::decryptString(smtppw.c_str()).toStdString();
             _currentAdmin.setSMTPPassword(smtppw);
 
-	    _currentAdmin.setVNCPort(query.value(fldVNCPort).toInt());
-	    std::string vncpw = query.value(fldVNCPassword).toString().toStdString();
-	    vncpw = CEncryption::decryptString(vncpw.c_str()).toStdString();
-	    _currentAdmin.setVNCPassword(vncpw);
+            _currentAdmin.setVNCPort(query.value(fldVNCPort).toInt());
+            std::string vncpw = query.value(fldVNCPassword).toString().toStdString();
+            vncpw = CEncryption::decryptString(vncpw.c_str()).toStdString();
+            _currentAdmin.setVNCPassword(vncpw);
 	    
             _currentAdmin.setReportViaEmail(query.value(fldReportToEmail).toBool());
             _currentAdmin.setReportToFile(query.value(fldReportToFile).toBool());
@@ -440,28 +479,31 @@ bool CTblAdmin::updateAdminClear(std::string name, std::string email, std::strin
 }
 
 bool CTblAdmin::updateAdmin(std::string name, std::string email, std::string phone,
-                 bool emailReportActive, QDateTime repFreq, QDateTime startReport,
-                 std::string passwordEnc, std::string accessCdEnc,
-                 bool usePredictive, std::string predKey, int predRes,
-                 uint32_t nMaxLocks,
-                 std::string smtpserver, int smtpport, int smtptype,
-                 std::string smtpusername, std::string smtppassword,
-		 int vncport, std::string vncpassword,
-                 bool bReportToEmail, bool bReportToFile, std::string reportDirectory)
+                bool emailReportActive, QDateTime repFreq, QDateTime startReport,
+                std::string passwordEnc, std::string accessCdEnc,
+                std::string assistPasswordEnc, std::string assistCodeEnc,
+                bool showFingerprint,
+                bool usePredictive, std::string predKey, int predRes,
+                uint32_t nMaxLocks,
+                std::string smtpserver, int smtpport, int smtptype,
+                std::string smtpusername, std::string smtppassword,
+                int vncport, std::string vncpassword,
+                bool bReportToEmail, bool bReportToFile, std::string reportDirectory)
 {
     qDebug() << "CTblAdmin::updateAdminDefault()";
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
-                   " SET " + QString("admin_name=:name,"\
+                  " SET " + QString("admin_name=:name,"\
                   "admin_email=:email, admin_phone=:phone, email_report_active=:active, "
-                  "default_report_freq=:freq,"
-                  "default_report_start=:start, password=:pw, access_code=:code,"
+                  "default_report_freq=:freq, "
+                  "default_report_start=:start, password=:pw, access_code=:code, "
+                  "assist_passwrod=:assistpw, assist_code=:assistcode, show_fingerprint=:showFingerprint, "
                   "use_predictive_access_code=:usePred, predictive_key=:pKey, predictive_resolution=:pRes,"
-                  "max_locks=:maxLocks,"
-                  "smtp_server=:smtpserver, smtp_port=:smtpport, smtp_type=:smtptype,"
-                  "smtp_username=:smtpusername, smtp_password=:smtppassword,"
-		  "vnc_port=:vncport, vnc_password=:vncpassword,"
+                  "max_locks=:maxLocks, "
+                  "smtp_server=:smtpserver, smtp_port=:smtpport, smtp_type=:smtptype, "
+                  "smtp_username=:smtpusername, smtp_password=:smtppassword, "
+                  "vnc_port=:vncport, vnc_password=:vncpassword, "
                   "report_via_email=:reportViaEmail, report_to_file=:reportToFile, report_directory=:reportDir"
                   " WHERE 1;");
     qry.prepare(sql);
@@ -478,6 +520,9 @@ bool CTblAdmin::updateAdmin(std::string name, std::string email, std::string pho
 
     qry.bindValue(":pw", passwordEnc.c_str());
     qry.bindValue(":code", accessCdEnc.c_str());
+    qry.bindValue(":assistpw", assistPasswordEnc);
+    qry.bindValue(":assistcode", assistCodeEnc);
+    qry.bindValue(":showFingerprint", showFingerprint);
     qry.bindValue(":usePred", usePredictive);
     qry.bindValue(":pKey", predKey.c_str());
     qry.bindValue(":pRes", predRes);
@@ -520,13 +565,15 @@ bool CTblAdmin::updateAdmin(std::string name, std::string email, std::string pho
 bool CTblAdmin::updateAdmin(CAdminRec &rec)
 {
     return updateAdmin(rec.getAdminName(), rec.getAdminEmail(), rec.getAdminPhone(),
-                     rec.getEmailReportActive(), rec.getDefaultReportFreq(), rec.getDefaultReportStart(),
-                     rec.getPassword(), rec.getAccessCode(), rec.getUsePredictiveAccessCode(),
+                       rec.getEmailReportActive(), rec.getDefaultReportFreq(), rec.getDefaultReportStart(),
+                       rec.getPassword(), rec.getAccessCode(),
+                       rec.getAssistPassword(), rec.getAssistCode(), rec.getShowFingerprint(),
+                       rec.getUsePredictiveAccessCode(),
                        rec.getPredictiveKey(), rec.getPredictiveResolution(),
                        rec.getMaxLocks(),
                        rec.getSMTPServer(), rec.getSMTPPort(), rec.getSMTPType(),
                        rec.getSMTPUsername(), rec.getSMTPPassword(),
-		       rec.getVNCPort(), rec.getVNCPassword(),
+                       rec.getVNCPort(), rec.getVNCPassword(),
                        rec.getReportViaEmail(), rec.getReportToFile(), rec.getReportDirectory());
 }
 
@@ -541,8 +588,8 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     bool active;
     QDateTime freq;
     QDateTime start;
-    std::string pw, accessCd;
-    bool usePredictive;
+    std::string pw, accessCd, assistpw, assistCode;
+    bool showFingerprint, usePredictive;
     std::string predKey;
     int predResolution;    
     uint32_t unMaxLocks;
@@ -560,6 +607,9 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
             adminObj.value(fstart).isUndefined() ||
             adminObj.value(fpassword).isUndefined() ||
             adminObj.value(faccesscd).isUndefined() ||
+            adminObj.value(fassistpassword).isUndefined() ||
+            adminObj.value(fassistcode).isUndefined() ||
+            adminObj.value(fshowFingerprint).isUndefined() ||
             adminObj.value(fpredictivecode).isUndefined() ||
             adminObj.value(fpredkey).isUndefined() ||
             adminObj.value(fpredres).isUndefined() ||
@@ -569,8 +619,8 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
             adminObj.value(fsmtptype).isUndefined() ||
             adminObj.value(fsmtpusername).isUndefined() ||
             adminObj.value(fsmtppassword).isUndefined() ||
-	    adminObj.value(fvncport).isUndefined() ||
-	    adminObj.value(fvncpassword).isUndefined() ||
+            adminObj.value(fvncport).isUndefined() ||
+            adminObj.value(fvncpassword).isUndefined() ||
             adminObj.value(freportviaemail).isUndefined() ||
             adminObj.value(freporttofile).isUndefined() ||
             adminObj.value(freportdirectory).isUndefined()
@@ -587,6 +637,9 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     start.fromString(adminObj.value(fstart).toString(), "yyyy-MM-dd HH:mm:ss");
     pw = adminObj.value(fpassword).toString().toStdString();
     accessCd = adminObj.value(faccesscd).toString().toStdString();
+    assistpw = adminObj.value(fassistpassword).toString().toStdString();
+    assistCode = adminObj.value(fassistcode).toString().toStdString();
+    showFingerprint = adminObj.value(fshowFingerprint).toBool();
     usePredictive = adminObj.value(fpredictivecode).toBool();
     predKey = adminObj.value(fpredkey).toString().toStdString();
     predResolution = adminObj.value(fpredres).toInt();
@@ -635,10 +688,9 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     bReportToFile= adminObj.value(freporttofile).toBool();
     reportDir = adminObj.value(freportdirectory).toString().toStdString();
 
-    return updateAdminClear(name, email, phone, active, freq, start, pw, accessCd, usePredictive, predKey, predResolution,
-                            unMaxLocks, smtpserver, smtpport, smtptype, smtpusername, smtppassword,
-			    vncport, vncpassword,
-                            bReportToEmail, bReportToFile, reportDir);
+    return updateAdminClear(name, email, phone, active, freq, start, pw, accessCd, assistpw, assistCode, showFingerprint,
+                            usePredictive, predKey, predResolution, unMaxLocks, smtpserver, smtpport, smtptype,
+                            smtpusername, smtppassword, vncport, vncpassword, bReportToEmail, bReportToFile, reportDir);
 }
 
 
