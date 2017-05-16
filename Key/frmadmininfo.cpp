@@ -1054,7 +1054,6 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
 
 void CFrmAdminInfo::on_btnDone_clicked()
 {
-
     QDateTime   freq;
     bool    bNever = false;
     QString sFreq = ui->cbReportFreq->currentText();
@@ -1208,6 +1207,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->lblPassword->setText(adminInfo->getPassword().c_str());
         ui->lblAssistCode->setText(adminInfo->getAssistCode().c_str());
         ui->lblAssistPassword->setText(adminInfo->getAssistPassword().c_str());
+        ui->chkShowFingerprint->setChecked(adminInfo->getShowFingerprint());
 
         QString sFreq;
         QDateTime dtFreq = adminInfo->getDefaultReportFreq();
@@ -1243,16 +1243,14 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->spinCodeGenResolution->setValue(adminInfo->getPredictiveResolution());
         ui->spinMaxLocks->setValue(adminInfo->getMaxLocks());
 
-	qDebug() << "PRINT REPORT PRESSED";
-	qDebug() << adminInfo->getReportViaEmail();
-	qDebug() << adminInfo->getReportToFile();
+        qDebug() << "PRINT REPORT PRESSED";
+        qDebug() << adminInfo->getReportViaEmail();
+        qDebug() << adminInfo->getReportToFile();
 	
         if(adminInfo->getReportViaEmail())
             ui->cbReportViaEmail->setChecked(true);
         if(adminInfo->getReportToFile())
             ui->cbReportToFile->setChecked(true);
-
-
     } else {
         qDebug() << "Admin Info received is blank.";
     }
