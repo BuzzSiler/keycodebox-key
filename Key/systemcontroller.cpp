@@ -45,15 +45,15 @@ void CSystemController::initialize(QThread *pthread)
     }
 
     
-    qDebug() << "Starting up KeyCodeBox Alpha v1.2b";
+    qDebug() << "Starting up KeyCodeBox Alpha v1.10k";
     
     initializeSecurityConnections();
     initializeLockController();
     initializeReportController();
     initializeReaders();
 
+    __OnEnableShowFingerprint(_padminInfo->show_fingerprint);
 }
-
 
 void CSystemController::TrigEnrollFingerprint(QString sCode){
 
@@ -62,7 +62,6 @@ void CSystemController::TrigEnrollFingerprint(QString sCode){
     _fingerprintReader->initEnrollment(sCode);
   startTimeoutTimer(15000);
 }
-
 
 void CSystemController::EnrollFingerprintDialogCancel()
 {
@@ -161,15 +160,15 @@ void CSystemController::initializeReaders()
     // Fingerprint Reader
     _fingerprintReader = new CFingerprintReader();
 
-    if( _fingerprintReader->initFingerprintReader() )
-      {
-	qDebug() << "Fingerprint reader found and started";
-	connect(_fingerprintReader, SIGNAL(__onFingerprintStageComplete(int, int, QString)), this, SLOT(OnFingerprintStageComplete(int, int, QString)));
-	connect(_fingerprintReader, SIGNAL(__onVerifyFingerprintComplete(bool, QString)), this, SLOT(OnFingerprintVerifyComplete(bool, QString)));
-	connect(&_securityController, SIGNAL(__TrigEnrollFingerprint(QString)), this, SLOT(TrigEnrollFingerprint(QString)));
- 	connect(&_securityController, SIGNAL(__TrigEnrollFingerprintDialog(QString)), this, SLOT(TrigEnrollFingerprintDialog(QString)));
-	connect(_fingerprintReader, SIGNAL(__onIdentifiedFingerprint(QString,QString)), this, SLOT(OnIdentifiedFingerprint(QString,QString)));
-      }
+    if( _fingerprintReader->initFingerprintReader())
+    {
+        qDebug() << "Fingerprint reader found and started";
+        connect(_fingerprintReader, SIGNAL(__onFingerprintStageComplete(int, int, QString)), this, SLOT(OnFingerprintStageComplete(int, int, QString)));
+        connect(_fingerprintReader, SIGNAL(__onVerifyFingerprintComplete(bool, QString)), this, SLOT(OnFingerprintVerifyComplete(bool, QString)));
+        connect(&_securityController, SIGNAL(__TrigEnrollFingerprint(QString)), this, SLOT(TrigEnrollFingerprint(QString)));
+        connect(&_securityController, SIGNAL(__TrigEnrollFingerprintDialog(QString)), this, SLOT(TrigEnrollFingerprintDialog(QString)));
+        connect(_fingerprintReader, SIGNAL(__onIdentifiedFingerprint(QString,QString)), this, SLOT(OnIdentifiedFingerprint(QString,QString)));
+    }
     else
       _fingerprintReader = 0;
 	
@@ -178,6 +177,7 @@ void CSystemController::initializeReaders()
     connect(this, SIGNAL(__onQuestionUser(int,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(int,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserAnswers(int,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(int,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserCancel()), &_securityController, SLOT(OnQuestionUserCancel()));
+    connect(this, SIGNAL(__OnEnableShowFingerprint(QString)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool))); //THIS ONE
 }
 
 // On a card swipe. If the first code is empty, then use the 2nd code.
@@ -797,7 +797,7 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
         QCoreApplication::processEvents();
         nCount++;
     }
-    if(_bCurrentAdminRetrieved && pLockHistory)
+    if( && pLockHistory)
     {
         qDebug() << "OnLastSuccessfulLoginRequest()";
 

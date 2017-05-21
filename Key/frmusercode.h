@@ -51,6 +51,8 @@ public slots:
 
     void OnSwipeCode(QString sCode);
 
+    void OnEnableShowFingerprint(bool showFingerprint);
+
 private slots:
     void ResetPlaceholderText();
 

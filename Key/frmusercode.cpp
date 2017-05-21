@@ -23,9 +23,11 @@ CFrmUserCode::~CFrmUserCode()
 
 void CFrmUserCode::initialize()
 {
+    // bool showFingerprint = true;
+    // ui->btnIdentifyFingerPrint->setVisible(showFingerprint);
     _dtTimer.setInterval(1000);
     _dtTimer.connect(&_dtTimer, SIGNAL(timeout()), this, SLOT(OnDateTimeTimerTimeout()));
-    _dtTimer.start();    
+    _dtTimer.start();
 }
 
 void CFrmUserCode::OnDateTimeTimerTimeout()
@@ -139,8 +141,10 @@ void CFrmUserCode::OnSwipeCode(QString sCode)
     }
 }
 
-
-
+void CFrmUserCode::OnEnableShowFingerprint(bool showFingerprint)
+{
+    ui->btnIdentifyFingerPrint->setVisible(showFingerprint);
+}
 
 void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
 {

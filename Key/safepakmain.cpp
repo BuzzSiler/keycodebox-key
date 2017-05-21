@@ -260,22 +260,22 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
       connect(_pfUsercode, SIGNAL(__onVerifyFingerprint()), psysController, SLOT(OnVerifyFingerprint()));
       connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
       connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
-      
+
       if( !_pdFingerprint )
-	{
-	  _pdFingerprint = new CDlgFingerprint();
-	  connect(_pdFingerprint, SIGNAL(__onEnrollFingerprintDialogCancel()), psysController, SLOT(EnrollFingerprintDialogCancel()));
-	  connect(psysController, SIGNAL(__onUpdateEnrollFingerprintDialog(int, int, QString)), _pdFingerprint, SLOT(OnUpdateEnrollFingerprintDialog(int, int, QString)));
-	  _pdFingerprint->hide();
-	}
+      {
+        _pdFingerprint = new CDlgFingerprint();
+        connect(_pdFingerprint, SIGNAL(__onEnrollFingerprintDialogCancel()), psysController, SLOT(EnrollFingerprintDialogCancel()));
+        connect(psysController, SIGNAL(__onUpdateEnrollFingerprintDialog(int, int, QString)), _pdFingerprint, SLOT(OnUpdateEnrollFingerprintDialog(int, int, QString)));
+        _pdFingerprint->hide();
+      }
 
       if( !_pdFingerprintVerify )
-	{
-	  _pdFingerprintVerify = new CDlgFingerprintVerify();
-	  connect(_pdFingerprintVerify, SIGNAL(__onVerifyFingerprintDialogCancel()), psysController, SLOT(OnVerifyFingerprintDialogCancel()));
-	  connect(psysController, SIGNAL(__onUpdateVerifyFingerprintDialog(bool, QString)), _pdFingerprintVerify, SLOT(OnUpdateVerifyFingerprintDialog(bool, QString)));
-	  _pdFingerprintVerify->hide();
-	}
+      {
+        _pdFingerprintVerify = new CDlgFingerprintVerify();
+        connect(_pdFingerprintVerify, SIGNAL(__onVerifyFingerprintDialogCancel()), psysController, SLOT(OnVerifyFingerprintDialogCancel()));
+        connect(psysController, SIGNAL(__onUpdateVerifyFingerprintDialog(bool, QString)), _pdFingerprintVerify, SLOT(OnUpdateVerifyFingerprintDialog(bool, QString)));
+        _pdFingerprintVerify->hide();
+      }
 
       if( !_pQuestions )
 	{
