@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>CFrmUserCode</class>
+ <class>CFrmUserCode</class>
  <widget class="QDialog" name="CFrmUserCode">
   <property name="geometry">
    <rect>
@@ -16,25 +16,24 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-    
-<widget class="QLabel" name="lVersion">
-  <property name="geometry">
+  <widget class="QLabel" name="lVersion">
+   <property name="geometry">
     <rect>
-      <x>760</x>
-      <y>460</y>
-      <width>60</width>
-      <height>20</height>
+     <x>760</x>
+     <y>460</y>
+     <width>60</width>
+     <height>20</height>
     </rect>
-  </property>  
-  <property name="font">
+   </property>
+   <property name="font">
     <font>
-      <pointsize>10</pointsize>
+     <pointsize>10</pointsize>
     </font>
-  </property>
-  <property name="text">
+   </property>
+   <property name="text">
     <string>v1.10.k</string>
-  </property>
-</widget>
+   </property>
+  </widget>
   <widget class="QGroupBox" name="grpKeypad">
    <property name="enabled">
     <bool>true</bool>
@@ -970,8 +969,7 @@
   <zorder>grpKeypad</zorder>
   <zorder>btnShowPassword</zorder>
   <zorder>lblDateTime</zorder>
-</widget>
-       
+ </widget>
  <resources/>
  <connections/>
 </ui>

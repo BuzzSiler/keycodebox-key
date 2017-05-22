@@ -104,6 +104,7 @@ signals:
     void __OnFoundNewStorageDevice(QString device0, QString device1);
     
     void __OnLockStatusUpdated(CLocksStatus *locksStatus);
+    void __OnEnableShowFingerprint(bool);
 
     void __onUserCodeOne(QString sCode1);
     void __onUserCodeTwo(QString sCode2);
