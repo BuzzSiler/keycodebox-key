@@ -62,7 +62,6 @@ signals:
     void __onCode(QString sCode);
 
     void __onFingerprintCode(QString sCode);
-    void __OnEnableShowFingerprint(bool);
 
     void __onCodes(QString sCode1, QString sCode2);
     void __onFingerprintEnrollment(int code);
