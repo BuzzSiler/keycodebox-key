@@ -797,7 +797,7 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
         QCoreApplication::processEvents();
         nCount++;
     }
-    if( && pLockHistory)
+    if(_bCurrentAdminRetrieved && pLockHistory)
     {
         qDebug() << "OnLastSuccessfulLoginRequest()";
 
