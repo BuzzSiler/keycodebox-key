@@ -177,7 +177,7 @@ void CSystemController::initializeReaders()
     connect(this, SIGNAL(__onQuestionUser(int,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(int,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserAnswers(int,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(int,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserCancel()), &_securityController, SLOT(OnQuestionUserCancel()));
-    connect(this, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool))); //THIS ONE
+    // connect(this, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool)));
 }
 
 // On a card swipe. If the first code is empty, then use the 2nd code.
