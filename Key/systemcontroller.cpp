@@ -53,6 +53,7 @@ void CSystemController::initialize(QThread *pthread)
     initializeReaders();
 
     // emit __OnEnableShowFingerprint(_padminInfo->getShowFingerprint());
+    emit __OnEnableShowFingerprint(false);
 }
 
 void CSystemController::TrigEnrollFingerprint(QString sCode)
