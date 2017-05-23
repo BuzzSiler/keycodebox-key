@@ -132,8 +132,8 @@ signals:
     void __onQuestionUserCancel();
     
 public slots:
-  
-  void TrigQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(doorNum, question1, question2, question3);}
+
+    void TrigQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(doorNum, question1, question2, question3);}
     
     void TrigQuestionUser(int doorNum, QString question1, QString question2, QString question3);
     void QuestionUserCancel();
@@ -183,7 +183,7 @@ private slots:
 
     void OnFingerprintCodeEntered(QString sCode);
     void OnFingerprintCodeEnteredTwo(QString sCode);
-         
+
     void OnCodeEnteredTwo(QString sCode);
     void OnAdminPasswordEntered(QString sPW);
     void OnRequestedCurrentAdmin(CAdminRec *adminInfo);

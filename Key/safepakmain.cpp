@@ -47,89 +47,89 @@ MainWindow::MainWindow(QWidget *parent) :
     setAttribute(Qt::WA_AcceptTouchEvents, true);
     
     // Remove the transparent for input flag
-//    setWindowFlags(windowFlags() & (0xFFFFFFFF ^ Qt::WindowTransparentForInput));
+    //    setWindowFlags(windowFlags() & (0xFFFFFFFF ^ Qt::WindowTransparentForInput));
 
     _pscene = new QGraphicsScene(this);
     ui->graphicsView->setScene(_pscene);
     _pPixmap = new QPixmap("/home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg");
 
     if( _pPixmap->isNull() )
-      {
-	qDebug() << "Failed to load image, loading backup!";
-	
-	_pPixmap = new QPixmap("/home/pi/dev/keycodebox/alpha/images/alpha_logo_touch.jpg");
-	if(_pPixmap->isNull()) {
-	  qDebug() << "Failed to load image!";
-	}
-      }
+    {
+        qDebug() << "Failed to load image, loading backup!";
+
+        _pPixmap = new QPixmap("/home/pi/dev/keycodebox/alpha/images/alpha_logo_touch.jpg");
+        if(_pPixmap->isNull()) {
+            qDebug() << "Failed to load image!";
+        }
+    }
     
     // Scale the image...
     _pPixmapItem = new CClickableGraphicsItem(_pPixmap->scaled(760, 390));
-//    _pPixmapItem->setAcceptTouchEvents(true);
+    //    _pPixmapItem->setAcceptTouchEvents(true);
     _pscene->addItem(_pPixmapItem);
     ui->graphicsView->show();
 
-//    ui->graphicsView->setClickedFunc(&(MainWindow::OnImageClicked) );
+    //    ui->graphicsView->setClickedFunc(&(MainWindow::OnImageClicked) );
     ui->graphicsView->setClickedFunc(&(this->OnImageClicked) );
 
-//    connect(ui->graphicsView, SIGNAL(clicked()), this, SLOT(OnScreenClicked()));
+    //    connect(ui->graphicsView, SIGNAL(clicked()), this, SLOT(OnScreenClicked()));
     
     QDateTime currdt = QDateTime::currentDateTime();
     QDateTime dt = CEncryption::roundDateTime(10, currdt);
 
-//    CUSBController   serialCtrl;
+    //    CUSBController   serialCtrl;
     //serialCtrl.RescanPorts();
-//    CCrystalFontzController lcd;
+    //    CCrystalFontzController lcd;
 
-//    lcd.setUSBController(serialCtrl);
-//    lcd.setup();
+    //    lcd.setUSBController(serialCtrl);
+    //    lcd.setup();
 
-//    CLockController lockBd;
-//    lockBd.setUSBController(serialCtrl);
+    //    CLockController lockBd;
+    //    lockBd.setUSBController(serialCtrl);
 
-//    CMagTekCardReader *cardRead = new CMagTekCardReader();
-//    if(cardRead) {
-//        cardRead->initMagTekCardReader();
-//        cardRead->testOne();
-//        delete cardRead;
-//    }
-//    _pmagTekReader = new CMagTekCardReader();
-//    _pmagTekReader->initMagTekCardReader(); // hardcoded VID & PID
+    //    CMagTekCardReader *cardRead = new CMagTekCardReader();
+    //    if(cardRead) {
+    //        cardRead->initMagTekCardReader();
+    //        cardRead->testOne();
+    //        delete cardRead;
+    //    }
+    //    _pmagTekReader = new CMagTekCardReader();
+    //    _pmagTekReader->initMagTekCardReader(); // hardcoded VID & PID
 
-//      CHIDReader hidReader;
-//      if(hidReader.initHIDReader(0x076b, 0x5428))
-////      if(hidReader.initHIDReader(0x04d8, 0x0055))
-//      {
-//        hidReader.testOne(); //.TestTwo();
-//      }
+    //      CHIDReader hidReader;
+    //      if(hidReader.initHIDReader(0x076b, 0x5428))
+    ////      if(hidReader.initHIDReader(0x04d8, 0x0055))
+    //      {
+    //        hidReader.testOne(); //.TestTwo();
+    //      }
 
-      //    _phidReader = new CHIDReader();
-//    _phidReader->initHIDReader(0x04d8, 0x0055);
+    //    _phidReader = new CHIDReader();
+    //    _phidReader->initHIDReader(0x04d8, 0x0055);
 
-//    connect(pmagTekReader, SIGNAL(__onCardSwipe(std::string,std::string)), this, SLOT(__onCardSwipe(std::string,std::string)));
+    //    connect(pmagTekReader, SIGNAL(__onCardSwipe(std::string,std::string)), this, SLOT(__onCardSwipe(std::string,std::string)));
 
-//    CUSBHWKeypad    *phwKeypad = new CUSBHWKeypad();
-//    phwKeypad->initHWKeyboard();
-//    phwKeypad->readHWKeyboardLoop();
+    //    CUSBHWKeypad    *phwKeypad = new CUSBHWKeypad();
+    //    phwKeypad->initHWKeyboard();
+    //    phwKeypad->readHWKeyboardLoop();
 
-//    std::cout << "Going to initialize Magtek reader\n";
-//    try {
-//        pmagTekReader->initMagTekCardReader();
-//     } catch (const std::exception &e)
-//    {
-//        std::cout << "Error:" << e.what() << "\n";
-//    }
+    //    std::cout << "Going to initialize Magtek reader\n";
+    //    try {
+    //        pmagTekReader->initMagTekCardReader();
+    //     } catch (const std::exception &e)
+    //    {
+    //        std::cout << "Error:" << e.what() << "\n";
+    //    }
 
-//    std::cout << "Going to test MagTekReader.\n";
-//    pmagTekReader->testOne();
-//    pmagTekReader->readMagTekCardReader();
+    //    std::cout << "Going to test MagTekReader.\n";
+    //    pmagTekReader->testOne();
+    //    pmagTekReader->readMagTekCardReader();
 
-//    obj.moveToThread(&myObjThread);
+    //    obj.moveToThread(&myObjThread);
 
-//    thread.setCardReader(pmagTekReader);
-//    pmagTekReader->moveToThread(&thread);
+    //    thread.setCardReader(pmagTekReader);
+    //    pmagTekReader->moveToThread(&thread);
 
-//    std::cout << "Going to test HWKeypad";
+    //    std::cout << "Going to test HWKeypad";
     connect(_psystemController, SIGNAL(__OnDisplayCodeDialog(QObject*)), this, SLOT(OnDisplayCodeDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayUserCodeTwoDialog(QObject*)), this, SLOT(OnDisplayUserCodeTwoDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayAdminPasswordDialog(QObject*)), this, SLOT(OnDisplayAdminPasswordDialog(QObject*)));
@@ -159,27 +159,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
 bool MainWindow::isInternetTime()
 {
-  FILE *pF;
-  std::string sOutput = "";
-  QString flagListCmd = "ls /home/pi/run/* | grep 'flag'";
+    FILE *pF;
+    std::string sOutput = "";
+    QString flagListCmd = "ls /home/pi/run/* | grep 'flag'";
 
-  pF = popen(flagListCmd.toStdString().c_str(), "r");
-  if(!pF)
+    pF = popen(flagListCmd.toStdString().c_str(), "r");
+    if(!pF)
     {
-      qDebug() << "failed to list system flags";
+        qDebug() << "failed to list system flags";
     }
 
-  ExtractCommandOutput(pF, sOutput);
-  fclose(pF);
-  
-  qDebug() << "MainWindow::isInternetTime(), " << QString::fromStdString(sOutput);
-  qDebug() << "MainWindow::isInternetTime(), " << QString::number(sOutput.find("internetTime"));
-  
-  if( sOutput.find("internetTime") != std::string::npos )
-    return true;
+    ExtractCommandOutput(pF, sOutput);
+    fclose(pF);
 
-  qDebug() << "MainWindow::isInternetTime(), internetTime FALSE";
-  return false;
+    qDebug() << "MainWindow::isInternetTime(), " << QString::fromStdString(sOutput);
+    qDebug() << "MainWindow::isInternetTime(), " << QString::number(sOutput.find("internetTime"));
+
+    if( sOutput.find("internetTime") != std::string::npos )
+        return true;
+
+    qDebug() << "MainWindow::isInternetTime(), internetTime FALSE";
+    return false;
 }
 
 void MainWindow::initialize() {
@@ -193,15 +193,15 @@ void MainWindow::initialize() {
     QApplication::setOverrideCursor(Qt::BlankCursor);
 
     if( isInternetTime() )
-      {
-	qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp ON";
-	std::system("sudo /etc/init.d/ntp stop");
-	
-	QCoreApplication::processEvents();
-	qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntpd -s";
-	std::system("sudo ntpd -s");
-	qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp OFF";
-      }
+    {
+        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp ON";
+        std::system("sudo /etc/init.d/ntp stop");
+
+        QCoreApplication::processEvents();
+        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntpd -s";
+        std::system("sudo ntpd -s");
+        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp OFF";
+    }
 }
 
 MainWindow::~MainWindow()
@@ -229,80 +229,81 @@ void MainWindow::OnDisplayTimeoutScreen()
         _pfAdminInfo->hide();
     }
     if(_pdFingerprint) {
-      _pdFingerprint->hide();
+        _pdFingerprint->hide();
     }
     if(_pdFingerprintVerify) {
-      _pdFingerprintVerify->hide();
+        _pdFingerprintVerify->hide();
     }
     if(_pQuestions) {
-      _pQuestions->hide();
+        _pQuestions->hide();
     }
 }
 
 void MainWindow::OnDisplayCodeDialog(QObject *psysController)
 {
-  if(!_pfUsercode)
+    if(!_pfUsercode)
     {
-      qDebug() << "MainWindow::OnDisplayCodeDialog(): new CFrmUserCode";
-      _pfUsercode = new CFrmUserCode();
-      connect(psysController, SIGNAL(__OnNewMessage(QString)), _pfUsercode, SLOT(OnNewMessage(QString)));
-      connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
-      connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
-      connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
-      connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
-      connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
-      connect(this, SIGNAL(__onCode(QString)), _pfUsercode, SLOT(OnSwipeCode(QString)));
-      connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
-      
-      connect(psysController, SIGNAL(__onEnrollFingerprintDialog(QString)), this, SLOT(OnEnrollFingerprintDialog(QString)));
-      connect(psysController, SIGNAL(__onQuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
+        qDebug() << "MainWindow::OnDisplayCodeDialog(): new CFrmUserCode";
+        _pfUsercode = new CFrmUserCode();
+        connect(psysController, SIGNAL(__OnNewMessage(QString)), _pfUsercode, SLOT(OnNewMessage(QString)));
+        connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
+        connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
+        connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
+        connect(psysController, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool))); //BING
 
-      connect(_pfUsercode, SIGNAL(__onVerifyFingerprint()), psysController, SLOT(OnVerifyFingerprint()));
-      connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
-      connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
-      connect(psysController, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool)));
+        connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
+        connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
+        connect(this, SIGNAL(__onCode(QString)), _pfUsercode, SLOT(OnSwipeCode(QString)));
+        connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
 
-      if( !_pdFingerprint )
-      {
-        _pdFingerprint = new CDlgFingerprint();
-        connect(_pdFingerprint, SIGNAL(__onEnrollFingerprintDialogCancel()), psysController, SLOT(EnrollFingerprintDialogCancel()));
-        connect(psysController, SIGNAL(__onUpdateEnrollFingerprintDialog(int, int, QString)), _pdFingerprint, SLOT(OnUpdateEnrollFingerprintDialog(int, int, QString)));
-        _pdFingerprint->hide();
-      }
+        connect(psysController, SIGNAL(__onEnrollFingerprintDialog(QString)), this, SLOT(OnEnrollFingerprintDialog(QString)));
+        connect(psysController, SIGNAL(__onQuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
 
-      if( !_pdFingerprintVerify )
-      {
-        _pdFingerprintVerify = new CDlgFingerprintVerify();
-        connect(_pdFingerprintVerify, SIGNAL(__onVerifyFingerprintDialogCancel()), psysController, SLOT(OnVerifyFingerprintDialogCancel()));
-        connect(psysController, SIGNAL(__onUpdateVerifyFingerprintDialog(bool, QString)), _pdFingerprintVerify, SLOT(OnUpdateVerifyFingerprintDialog(bool, QString)));
-        _pdFingerprintVerify->hide();
-      }
+        connect(_pfUsercode, SIGNAL(__onVerifyFingerprint()), psysController, SLOT(OnVerifyFingerprint()));
+        connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
+        connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
 
-      if( !_pQuestions )
-	{
-	  _pQuestions = new CDlgQuestions();
-	  _pQuestions->hide();
-	  connect(psysController, SIGNAL(__onQuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
-	  connect(_pQuestions, SIGNAL(__OnQuestionsCancel()), psysController, SLOT(QuestionUserCancel()));
-	  connect(_pQuestions, SIGNAL(__OnQuestionsSave(int,QString,QString,QString)), psysController, SLOT(AnswerUserSave(int,QString,QString,QString)));
-	  connect(_pQuestions, SIGNAL(__OnQuestionsClose()), this, SLOT(OnQuestionUserDialogClose()));
-      
-	}
+        if( !_pdFingerprint )
+        {
+            _pdFingerprint = new CDlgFingerprint();
+            connect(_pdFingerprint, SIGNAL(__onEnrollFingerprintDialogCancel()), psysController, SLOT(EnrollFingerprintDialogCancel()));
+            connect(psysController, SIGNAL(__onUpdateEnrollFingerprintDialog(int, int, QString)), _pdFingerprint, SLOT(OnUpdateEnrollFingerprintDialog(int, int, QString)));
+            _pdFingerprint->hide();
+        }
+
+        if( !_pdFingerprintVerify )
+        {
+            _pdFingerprintVerify = new CDlgFingerprintVerify();
+            connect(_pdFingerprintVerify, SIGNAL(__onVerifyFingerprintDialogCancel()), psysController, SLOT(OnVerifyFingerprintDialogCancel()));
+            connect(psysController, SIGNAL(__onUpdateVerifyFingerprintDialog(bool, QString)), _pdFingerprintVerify, SLOT(OnUpdateVerifyFingerprintDialog(bool, QString)));
+            _pdFingerprintVerify->hide();
+        }
+
+        if( !_pQuestions )
+        {
+            _pQuestions = new CDlgQuestions();
+            _pQuestions->hide();
+            connect(psysController, SIGNAL(__onQuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
+            connect(_pQuestions, SIGNAL(__OnQuestionsCancel()), psysController, SLOT(QuestionUserCancel()));
+            connect(_pQuestions, SIGNAL(__OnQuestionsSave(int,QString,QString,QString)), psysController, SLOT(AnswerUserSave(int,QString,QString,QString)));
+            connect(_pQuestions, SIGNAL(__OnQuestionsClose()), this, SLOT(OnQuestionUserDialogClose()));
+
+        }
     }
-  else
+    else
     {
-      hideFormsExcept(_pfUsercode);
-      
-      disconnect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, 0);
-      connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
+        hideFormsExcept(_pfUsercode);
 
-      disconnect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, 0);
-      connect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
-      
-      qDebug() << "MainWindow::OnDisplayCodeDialog()";
-      
-      _pfUsercode->OnEnableKeyboard(true);
-	_pfUsercode->show();
+        disconnect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, 0);
+        connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
+
+        disconnect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, 0);
+        connect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
+
+        qDebug() << "MainWindow::OnDisplayCodeDialog()";
+
+        _pfUsercode->OnEnableKeyboard(true);
+        _pfUsercode->show();
     }
 }
 
@@ -315,10 +316,12 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
+        connect(psysController, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool))); //BING
+
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
         connect(this, SIGNAL(__onCode(QString)), _pfUsercode, SLOT(OnSwipeCode(QString)));
-	connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEnteredTwo(QString)));
+        connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEnteredTwo(QString)));
     }
     hideFormsExcept(_pfUsercode);
 
@@ -331,7 +334,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 
     _pfUsercode->OnEnableKeyboard(true);
     _pfUsercode->show();
-//    _pfUsercode->__NewMessage("Enter Second Code");
+    //    _pfUsercode->__NewMessage("Enter Second Code");
 }
 
 void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
@@ -433,31 +436,31 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 void MainWindow::OnEnrollFingerprintDialog(QString sCode)
 {
-  qDebug() << "MainWindow::OnEnrollFingerprintDialog()";
-  
-  _pdFingerprint->show();
-  _pdFingerprint->setDefaultStage(1);
-  _pdFingerprint->setMessage("");
-  _pdFingerprint->setOkDisabled(true);
-  
+    qDebug() << "MainWindow::OnEnrollFingerprintDialog()";
+
+    _pdFingerprint->show();
+    _pdFingerprint->setDefaultStage(1);
+    _pdFingerprint->setMessage("");
+    _pdFingerprint->setOkDisabled(true);
+
 }
 
 void MainWindow::OnQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3)
 {
-  qDebug() << "MainWindow::OnQuestionUserDialog()";
-  _pQuestions->setValues(doorNum, question1, question2, question3);
-  _pQuestions->show();  
+    qDebug() << "MainWindow::OnQuestionUserDialog()";
+    _pQuestions->setValues(doorNum, question1, question2, question3);
+    _pQuestions->show();
 }
 
 void MainWindow::OnQuestionUserDialogClose()
 {
-  _pQuestions->hide();
+    _pQuestions->hide();
 }
- 
+
 void MainWindow::OnVerifyFingerprintDialog()
 {
-  qDebug() << "MainWindow::OnVerifyFingerprintDialog()";
-  
-  _pdFingerprintVerify->show();
-  _pdFingerprintVerify->setMessage("");
+    qDebug() << "MainWindow::OnVerifyFingerprintDialog()";
+
+    _pdFingerprintVerify->show();
+    _pdFingerprintVerify->setMessage("");
 }

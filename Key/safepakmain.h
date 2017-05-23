@@ -28,7 +28,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-//    QThread myObjThread;
+    //    QThread myObjThread;
     CSystemControllerThread     _sysControlThread;
     QGraphicsWidget     *_pGWidget;
     CSystemController   *_psystemController;
@@ -37,7 +37,7 @@ private:
     CFrmAdminPassword   *_pfAdminPW;
     CFrmAdminInfo       *_pfAdminInfo;
 
-    CDlgFingerprint *_pdFingerprint;       
+    CDlgFingerprint *_pdFingerprint;
     CDlgFingerprintVerify *_pdFingerprintVerify;
 
     CDlgQuestions *_pQuestions;
@@ -94,7 +94,7 @@ private slots:
     void OnQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3);
     void OnQuestionUserDialogClose();
     
- private:
+private:
     Ui::MainWindow *ui;
     void initialize();
     void hideFormsExcept(QDialog *pfrm);

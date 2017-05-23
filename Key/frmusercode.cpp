@@ -23,8 +23,6 @@ CFrmUserCode::~CFrmUserCode()
 
 void CFrmUserCode::initialize()
 {
-    // bool showFingerprint = true;
-    // ui->btnIdentifyFingerPrint->setVisible(showFingerprint);
     _dtTimer.setInterval(1000);
     _dtTimer.connect(&_dtTimer, SIGNAL(timeout()), this, SLOT(OnDateTimeTimerTimeout()));
     _dtTimer.start();
