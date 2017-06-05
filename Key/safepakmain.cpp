@@ -202,7 +202,7 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
         connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
 
-        _pfUsercode->OnEnableShowFingerprint(((CSystemController)psysController)->getShowFingerprint());
+        _pfUsercode->OnEnableShowFingerprint(_psystemController->getShowFingerprint());
 
         if( !_pdFingerprint )
         {
