@@ -74,7 +74,11 @@ public:
         return pLabelCurrentlyBeingEdited;
     }
 
-    void setLabelText(QString newValue);
+    void setLabelText(QString newValue)
+    {
+        labelText = newValue;
+        pLabelTitle->setText(labelText);
+    }
 
     void setLineToBeEdited(QLineEdit *pLine)
     {
