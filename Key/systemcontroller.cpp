@@ -1,4 +1,3 @@
-
 #include <QDebug>
 #include <QThread>
 #include <QCoreApplication>
@@ -11,7 +10,6 @@
 #include "lockcontroller.h"
 #include "lockhistoryrec.h"
 #include "lockstate.h"
-
 
 CSystemController::CSystemController(QObject *parent)
 {
@@ -463,15 +461,12 @@ void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateT
     _ReportController.processImmediateReport(dtReportStart, dtReportEnd, nLockNum);
 }
 
-
 void CSystemController::OnReadLockStatus()
 {
     _un64Locks = _LockController.inquireLockStatus(4);
 
     emit __OnLockStatusUpdated(_LockController.getLockStatus());
 }
-
-
 
 void CSystemController::OnSecurityCheckSuccess(int lockNum)
 {
@@ -514,7 +509,6 @@ void CSystemController::OnSecurityCheckTimedOut()
     emit __OnClearEntry();
 }
 
-
 void CSystemController::resetToTimeoutScreen()
 {
     qDebug() << "CSystemController::resetToTimeoutScreen()";
@@ -533,9 +527,15 @@ void CSystemController::OnRequestCurrentAdmin()
     _securityController.OnRequestCurrentAdmin();
 }
 
+bool CSystemController::getShowFingerprint()
+{
+    return _padminInfo->getShowFingerprint();
+}
 
-CFrmUserCode* CSystemController::getUserCodeOne() {
-    if(!_pfUsercode) {
+CFrmUserCode* CSystemController::getUserCodeOne()
+{
+    if(!_pfUsercode)
+    {
     }
 }
 
@@ -693,7 +693,6 @@ void CSystemController::looprun()
             emit __OnDisplayCodeDialog(this);
             emit __OnNewMessage("Enter Code #1");
             emit __OnEnableKeypad(true);
-            emit __OnEnableShowFingerprint(false);
 
             startTimeoutTimer(30000);
         }
@@ -745,7 +744,6 @@ void CSystemController::looprun()
         }
     }
 }
-
 
 void CSystemController::stopTimeoutTimer()
 {

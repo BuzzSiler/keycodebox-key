@@ -21,7 +21,6 @@
 
 MainWindow      *gpmainWindow;
 
-
 void MainWindow::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 {
     char cChar = '\0';
@@ -46,9 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setAttribute(Qt::WA_AcceptTouchEvents, true);
     
-    // Remove the transparent for input flag
-    //    setWindowFlags(windowFlags() & (0xFFFFFFFF ^ Qt::WindowTransparentForInput));
-
     _pscene = new QGraphicsScene(this);
     ui->graphicsView->setScene(_pscene);
     _pPixmap = new QPixmap("/home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg");
@@ -65,71 +61,14 @@ MainWindow::MainWindow(QWidget *parent) :
     
     // Scale the image...
     _pPixmapItem = new CClickableGraphicsItem(_pPixmap->scaled(760, 390));
-    //    _pPixmapItem->setAcceptTouchEvents(true);
     _pscene->addItem(_pPixmapItem);
     ui->graphicsView->show();
 
-    //    ui->graphicsView->setClickedFunc(&(MainWindow::OnImageClicked) );
     ui->graphicsView->setClickedFunc(&(this->OnImageClicked) );
 
-    //    connect(ui->graphicsView, SIGNAL(clicked()), this, SLOT(OnScreenClicked()));
-    
     QDateTime currdt = QDateTime::currentDateTime();
     QDateTime dt = CEncryption::roundDateTime(10, currdt);
 
-    //    CUSBController   serialCtrl;
-    //serialCtrl.RescanPorts();
-    //    CCrystalFontzController lcd;
-
-    //    lcd.setUSBController(serialCtrl);
-    //    lcd.setup();
-
-    //    CLockController lockBd;
-    //    lockBd.setUSBController(serialCtrl);
-
-    //    CMagTekCardReader *cardRead = new CMagTekCardReader();
-    //    if(cardRead) {
-    //        cardRead->initMagTekCardReader();
-    //        cardRead->testOne();
-    //        delete cardRead;
-    //    }
-    //    _pmagTekReader = new CMagTekCardReader();
-    //    _pmagTekReader->initMagTekCardReader(); // hardcoded VID & PID
-
-    //      CHIDReader hidReader;
-    //      if(hidReader.initHIDReader(0x076b, 0x5428))
-    ////      if(hidReader.initHIDReader(0x04d8, 0x0055))
-    //      {
-    //        hidReader.testOne(); //.TestTwo();
-    //      }
-
-    //    _phidReader = new CHIDReader();
-    //    _phidReader->initHIDReader(0x04d8, 0x0055);
-
-    //    connect(pmagTekReader, SIGNAL(__onCardSwipe(std::string,std::string)), this, SLOT(__onCardSwipe(std::string,std::string)));
-
-    //    CUSBHWKeypad    *phwKeypad = new CUSBHWKeypad();
-    //    phwKeypad->initHWKeyboard();
-    //    phwKeypad->readHWKeyboardLoop();
-
-    //    std::cout << "Going to initialize Magtek reader\n";
-    //    try {
-    //        pmagTekReader->initMagTekCardReader();
-    //     } catch (const std::exception &e)
-    //    {
-    //        std::cout << "Error:" << e.what() << "\n";
-    //    }
-
-    //    std::cout << "Going to test MagTekReader.\n";
-    //    pmagTekReader->testOne();
-    //    pmagTekReader->readMagTekCardReader();
-
-    //    obj.moveToThread(&myObjThread);
-
-    //    thread.setCardReader(pmagTekReader);
-    //    pmagTekReader->moveToThread(&thread);
-
-    //    std::cout << "Going to test HWKeypad";
     connect(_psystemController, SIGNAL(__OnDisplayCodeDialog(QObject*)), this, SLOT(OnDisplayCodeDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayUserCodeTwoDialog(QObject*)), this, SLOT(OnDisplayUserCodeTwoDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayAdminPasswordDialog(QObject*)), this, SLOT(OnDisplayAdminPasswordDialog(QObject*)));
@@ -249,7 +188,7 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
-        connect(psysController, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool))); //BING
+        connect(this, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool)));
 
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
@@ -262,6 +201,8 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprint()), psysController, SLOT(OnVerifyFingerprint()));
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
         connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
+
+        _pfUsercode->OnEnableShowFingerprint(psysController->getShowFingerprint());
 
         if( !_pdFingerprint )
         {
@@ -287,7 +228,6 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
             connect(_pQuestions, SIGNAL(__OnQuestionsCancel()), psysController, SLOT(QuestionUserCancel()));
             connect(_pQuestions, SIGNAL(__OnQuestionsSave(int,QString,QString,QString)), psysController, SLOT(AnswerUserSave(int,QString,QString,QString)));
             connect(_pQuestions, SIGNAL(__OnQuestionsClose()), this, SLOT(OnQuestionUserDialogClose()));
-
         }
     }
     else
@@ -334,7 +274,6 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 
     _pfUsercode->OnEnableKeyboard(true);
     _pfUsercode->show();
-    //    _pfUsercode->__NewMessage("Enter Second Code");
 }
 
 void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
@@ -393,7 +332,6 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
     hideFormsExcept(_pfAdminInfo);
 
     _pfAdminInfo->show();
-
 }
 
 void MainWindow::OnAdminPasswordCancel()
@@ -431,7 +369,6 @@ void MainWindow::OnUserFingerprintCodeTwo(QString sCode2)
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
-    //
 }
 
 void MainWindow::OnEnrollFingerprintDialog(QString sCode)
@@ -442,7 +379,6 @@ void MainWindow::OnEnrollFingerprintDialog(QString sCode)
     _pdFingerprint->setDefaultStage(1);
     _pdFingerprint->setMessage("");
     _pdFingerprint->setOkDisabled(true);
-
 }
 
 void MainWindow::OnQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3)

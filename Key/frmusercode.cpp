@@ -14,6 +14,7 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     ui->setupUi(this);
     CFrmUserCode::showFullScreen();
     initialize();
+    // OnEnableShowFingerprint(false);
 }
 
 CFrmUserCode::~CFrmUserCode()
@@ -31,7 +32,6 @@ void CFrmUserCode::initialize()
 void CFrmUserCode::OnDateTimeTimerTimeout()
 {
     QDateTime   dt = QDateTime::currentDateTime();
-
     ui->lblDateTime->setText(dt.toString("MM/dd/yyyy HH:mm:ss"));
 }
 
@@ -45,30 +45,29 @@ void CFrmUserCode::onButtonClick(char key) {
     // Central button handling.
     // Process local
     switch(key) {
-        case 0x00:  // This is clear
-            OnClearCodeDisplay();
-            break;
-        case 0x0D:  // Enter pressed
-            onCodeEntered();
-            break;
-        case 0x08:  // Del (destructive backspace) pressed
-            onBackSpace();
-            break;
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            sCurrKey = ui->edCode->text() + qkey;
-            ui->edCode->setText(sCurrKey);
+    case 0x00:  // This is clear
+        OnClearCodeDisplay();
+        break;
+    case 0x0D:  // Enter pressed
+        onCodeEntered();
+        break;
+    case 0x08:  // Del (destructive backspace) pressed
+        onBackSpace();
+        break;
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+        sCurrKey = ui->edCode->text() + qkey;
+        ui->edCode->setText(sCurrKey);
         break;
     default:    // Any
-
         break;
     }
 
@@ -82,8 +81,8 @@ void CFrmUserCode::onCodeEntered()
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
     if(sCode.length() > 0 ) {
-      this->enableKeypad(false);      // disable the keypad (momentarily)
-      emit __CodeEntered(sCode);     // Signal that the code was entered.
+        this->enableKeypad(false);      // disable the keypad (momentarily)
+        emit __CodeEntered(sCode);     // Signal that the code was entered.
     }
 }
 
@@ -100,8 +99,12 @@ void CFrmUserCode::onBackSpace()
 
 void CFrmUserCode::enableKeypad(bool bEnable)
 {
-  //ui->grpKeypad->setEnabled(bEnable);
     ui->edCode->setFocus();
+}
+
+void CFrmUserCode::OnEnableShowFingerprint(bool showFingerprint)
+{
+    ui->btnIdentifyFingerPrint->setVisible(showFingerprint);
 }
 
 void CFrmUserCode::OnEnableKeyboard(bool bEnable)
@@ -112,7 +115,7 @@ void CFrmUserCode::OnEnableKeyboard(bool bEnable)
 void CFrmUserCode::OnNewMessage(QString sMsg)
 {
     //TODO: Disabled for now. The lblMessage has been removed but this SLOT is still called.
-//   ui->lblMessage->setText(sMsg);
+    //   ui->lblMessage->setText(sMsg);
 }
 
 void CFrmUserCode::OnClearCodeDisplay()
@@ -134,14 +137,9 @@ void CFrmUserCode::OnSwipeCode(QString sCode)
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
     if(sCode.size() > 0 ) {
-      //this->enableKeypad(false);      // disable the keypad (momentarily)
+        //this->enableKeypad(false);      // disable the keypad (momentarily)
         emit __CodeEntered(sCode);     // Signal that the code was entered.
     }
-}
-
-void CFrmUserCode::OnEnableShowFingerprint(bool showFingerprint)
-{
-    ui->btnIdentifyFingerPrint->setVisible(showFingerprint);
 }
 
 void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
@@ -224,7 +222,6 @@ void CFrmUserCode::on_btn_Clear_clicked()
 
 void CFrmUserCode::on_btnShowPassword_clicked(bool checked)
 {
-    //
     if(checked) {
         ui->edCode->setEchoMode(QLineEdit::Normal);
         ui->btnShowPassword->setText("Hide");
@@ -236,16 +233,14 @@ void CFrmUserCode::on_btnShowPassword_clicked(bool checked)
 
 void CFrmUserCode::on_btn_Cancel_clicked()
 {
-    //
     emit __OnUserCodeCancel();
 }
 
 void CFrmUserCode::on_btnIdentifyFingerPrint_clicked()
 {
-  int i;
-  qDebug() << "CFrmUserCode::on_IdentifyFingerPrint_clicked()";
+    int i;
+    qDebug() << "CFrmUserCode::on_IdentifyFingerPrint_clicked()";
 
-  emit __onVerifyFingerprintDialog();
-  emit __onVerifyFingerprint();
-  
+    emit __onVerifyFingerprintDialog();
+    emit __onVerifyFingerprint();
 }
