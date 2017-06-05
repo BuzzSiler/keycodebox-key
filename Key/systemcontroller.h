@@ -63,6 +63,7 @@ public:
     void initialize(QThread *pthread);
     SystemState getSystemState() { return _systemState; }
     SystemState getSystemStateDisplay() { return _systemStateDisplay; }
+    bool getShowFingerprint();
 
     void setMainWindow(QMainWindow *mw) { _pmainWindow = mw; }
 
@@ -204,12 +205,10 @@ private slots:
 public slots:
     void DisplayUserCodeDialog()
     {
-
     }
 
     void AccessCodeVerification(QString verification)
     {
-
     }      // Just one check at a time right now.
 
     // Security Controller connections
@@ -231,6 +230,5 @@ public slots:
     void start();
     void OnAdminPasswordCancel();
 };
-
 
 #endif // CSYSTEMCONTROLLER_H
