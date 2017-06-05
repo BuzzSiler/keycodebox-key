@@ -26,9 +26,6 @@
 #include "usbcontroller.h"
 
 #define MAX_STR 255
-#define VID     0x0801
-#define PID     0x0002
-
 
 #define BITS_PER_LONG (sizeof(long) * 8)
 #define NBITS(x) ((((x)-1)/BITS_PER_LONG)+1)

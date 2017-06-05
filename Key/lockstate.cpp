@@ -1,4 +1,3 @@
-
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonDocument>
@@ -7,14 +6,11 @@
 #include "lockstate.h"
 #include "tblcodes.h"
 
-
-
 CLockState::CLockState(QObject *parent) : QObject(parent)
 {
     _bModified = false;
     _bMarkForDeletion = false;
 }
-
 
 QJsonObject &CLockState::jsonRecord(QJsonObject &json)
 {
@@ -45,7 +41,6 @@ QJsonObject &CLockState::jsonRecord(QJsonObject &json)
     json.insert(fquestion3, QJsonValue(_question3.c_str()));
     
     return json;
-
 }
 
 QString CLockState::jsonRecordAsString()
@@ -59,7 +54,6 @@ QString CLockState::jsonRecordAsString()
 
 bool CLockState::setFromJsonObject(QJsonObject jsonObj)
 {
-    //
     try {
         if(!jsonObj.value(fids).isUndefined())
             _ids = jsonObj.value(fids).toInt();
@@ -105,7 +99,6 @@ bool CLockState::setFromJsonObject(QJsonObject jsonObj)
             _question2 = jsonObj.value(fquestion2).toString().toStdString();
         if(!jsonObj.value(fquestion3).isUndefined())
             _question3 = jsonObj.value(fquestion3).toString().toStdString();
-	
     } catch(std::exception &e) {
         qDebug() << "CLockState::setFromJsonObject():" << e.what();
         return false;
@@ -138,6 +131,3 @@ bool CLockState::setFromJsonString(std::string strJson)
     }
     return true;
 }
-
-
-

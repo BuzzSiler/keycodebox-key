@@ -8,7 +8,6 @@
 #include <QLineEdit>
 #include <QIntValidator>
 
-
 class CCurrentEdit : public QObject
 {
     Q_OBJECT
@@ -16,7 +15,7 @@ private:
     bool _bNumbersOnly = false;
 
 public:
-    explicit CCurrentEdit(QObject *parent = 0)
+    explicit CCurrentEdit()
     {
         pregExpNums = new QRegExpValidator(QRegExp("[0-9]*$"));
 
@@ -45,39 +44,46 @@ public:
     QLineEdit           *_pLineCurrentlyBeingEdited;
 
     bool isNumbersOnly() { return _bNumbersOnly; }
-    bool setNumbersOnly(bool bNumsOnly) { _bNumbersOnly = bNumsOnly; }
+    bool setNumbersOnly(bool bNumsOnly) { return _bNumbersOnly == bNumsOnly; }
 
-    void setKeyboardEditLine(QLineEdit *pEd) {
+    void setKeyboardEditLine(QLineEdit *pEd)
+    {
         pEditLine = pEd;
-//        pEditLine->setInputMask(_sInputMask);
-        if( _bNumbersOnly ) {
+        if( _bNumbersOnly )
+        {
             pEditLine->setValidator(pregExpNums);
-        } else {
+        } else
+        {
             pEditLine->setValidator(NULL);
         }
     }
 
-    void setKeyboardLabel(QLabel *pLabel) {
+    void setKeyboardLabel(QLabel *pLabel)
+    {
         pLabelTitle = pLabel;
     }
 
-    void setLabelToBeEdited(QLabel *pLabel) {
+    void setLabelToBeEdited(QLabel *pLabel)
+    {
         _pLineCurrentlyBeingEdited = NULL;      // Clear the label object
         pLabelCurrentlyBeingEdited = pLabel;
     }
-    QLabel *getLabelBeingEdited() {
+
+    QLabel *getLabelBeingEdited()
+    {
         return pLabelCurrentlyBeingEdited;
     }
-    void setLabelText(QString newValue)
+
+    void setLabelText(QString newValue);
+
+    void setLineToBeEdited(QLineEdit *pLine)
     {
-        labelText = newValue;
-        pLabelTitle->setText(labelText);
-    }
-    void setLineToBeEdited(QLineEdit *pLine) {
         pLabelCurrentlyBeingEdited = NULL;      // Clear the line edit object
         _pLineCurrentlyBeingEdited = pLine;
     }
-    QLineEdit* getLineBeingEdited() {
+
+    QLineEdit* getLineBeingEdited()
+    {
         return _pLineCurrentlyBeingEdited;
     }
 
@@ -89,32 +95,34 @@ public:
         pEditLine->setText(originalText);
     }
 
-    QString setNewText(QString text) { newText = text; }
+    void setNewText(QString text) { newText = text; }
+
     QString getNewText() { return newText; }
+
     QString retrieveEditedText() { newText = pEditLine->text(); return newText; }
 
-    void clearInputMasks() {
+    void clearInputMasks()
+    {
         _sInputMask = "";
         _bNumbersOnly = false;
         emit __onNumbersOnly(false);
     }
-    void setNumbersOnly() {
-//            pEditLine->setValidator( pregExpNums );
-//        pEditLine->setInputMask("000000000000000000");
-//        _sInputMask = "000000000000000000";
-//        _bNumbersOnly = true;
-//        emit __onNumbersOnly(true);
 
-    }
-    void setEmailFilter() {
-//            pEditLine->setValidator( pregExpEmail );
+    void setNumbersOnly()
+    {
     }
 
-    void setMaxLength(int nLen) {
+    void setEmailFilter()
+    {
+    }
+
+    void setMaxLength(int nLen)
+    {
         pEditLine->setMaxLength(nLen);
     }
 
-    void stopEdit() {
+    void stopEdit()
+    {
     }
 
 signals:
@@ -122,7 +130,6 @@ signals:
 
 public slots:
     void OnStringEntry(QString newValue);
-
 };
 
 #endif // CCURRENTEDIT_H

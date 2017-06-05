@@ -207,7 +207,7 @@ public slots:
     {
     }
 
-    void AccessCodeVerification(QString verification)
+    void AccessCodeVerification()
     {
     }      // Just one check at a time right now.
 

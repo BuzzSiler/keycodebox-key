@@ -13,8 +13,6 @@
 #include "usbcontroller.h"
 
 #define MAX_STR 255
-#define VID     0x04d8
-#define PID     0x0055
 
 #define VID2    0x076B
 #define PID2    0x5427

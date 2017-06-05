@@ -51,30 +51,6 @@ protected:
     
 public:
     explicit CLockState(QObject *parent = 0);
-    CLockState(const CLockState&newLockState) {
-        _ids = newLockState._ids;            // Record id // integer primary key unique, (if -1 then this is a new record)
-        _sequence = newLockState._sequence;    // Sequence // text,
-        _sequence_order = newLockState._sequence_order;  // integer,
-        _lock_num = newLockState._lock_num;    // integer,
-        _description = newLockState._description;    // text,
-        _code1 = newLockState._code1;  // text,
-        _code2 = newLockState._code2;  // text,
-        _starttime = newLockState._starttime;   // DATETIME,
-        _endtime = newLockState._endtime; // DATETIME,
-        _status = newLockState._status;  // text,
-        _access_count = newLockState._access_count;   // integer,
-        _retry_count = newLockState._retry_count; // integer,
-        _max_access = newLockState._max_access; // integer,
-        _max_retry = newLockState._max_retry;  // integer)
-        _bModified = newLockState._bModified;
-        _bMarkForDeletion = newLockState._bMarkForDeletion;
-	_bFingerprint1 = newLockState._bFingerprint1;
-	_bFingerprint2 = newLockState._bFingerprint2;
-	_bAskQuestions = newLockState._bAskQuestions; //bool
-	_question1 = newLockState._question1; //text
-    	_question2 = newLockState._question2; //text
-    	_question3 = newLockState._question3; //text
-    }
 
 protected:
     int             _ids;            // Record id // integer primary key unique, (if -1 then this is a new record)
