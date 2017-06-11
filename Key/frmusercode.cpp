@@ -14,6 +14,7 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     ui->setupUi(this);
     CFrmUserCode::showFullScreen();
     initialize();
+    // OnEnableShowFingerprint(false);
 }
 
 CFrmUserCode::~CFrmUserCode()
