@@ -197,7 +197,7 @@ QString CTblAdmin::isAccessCode(QString code)
 
     if(boost::iequals(in_access_code, access_code) || boost::iequals(in_access_code, access_code_old))
     {
-        return "Admin;
+        return "Admin";
     }
     else if(boost::iequals(in_access_code, assist_code)){
         return "Assist";

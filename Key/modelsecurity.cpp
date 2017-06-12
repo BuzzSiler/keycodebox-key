@@ -181,7 +181,7 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 
     qDebug() << "CModelSecurity::OnVerifyCodeOne. Code:" << code;
 
-    _type = _ptblAdmin->isAccessCode();
+    _type = _ptblAdmin->isAccessCode(code);
     if(_type == "Admin" || _type == "Assist")
     {
         emit __OnRequireAdminPassword();
