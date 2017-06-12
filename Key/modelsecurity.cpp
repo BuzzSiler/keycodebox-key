@@ -24,8 +24,6 @@ void CModelSecurity::openDatabase()
     }
 }
 
-
-
 CModelSecurity::CModelSecurity(QObject *parent) : QObject(parent)
 {
     initialize();
@@ -64,23 +62,23 @@ void CModelSecurity::OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTi
 void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 {
     bool bSuccess = _ptblAdmin->updateAdminClear(adminInfo->getAdminName(), adminInfo->getAdminEmail(), adminInfo->getAdminPhone(),
-                                adminInfo->getEmailReportActive(), adminInfo->getDefaultReportFreq(),
-                                adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
-                                adminInfo->getAssistPassword(), adminInfo->getAssistCode(), adminInfo->getShowFingerprint(),
-                                adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
-                                adminInfo->getMaxLocks(),
-                                adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
-                                adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
-                                adminInfo->getVNCPort(), adminInfo->getVNCPassword(),
-                                adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory());
+                                                 adminInfo->getEmailReportActive(), adminInfo->getDefaultReportFreq(),
+                                                 adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
+                                                 adminInfo->getAssistPassword(), adminInfo->getAssistCode(), adminInfo->getShowFingerprint(),
+                                                 adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
+                                                 adminInfo->getMaxLocks(),
+                                                 adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
+                                                 adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
+                                                 adminInfo->getVNCPort(), adminInfo->getVNCPassword(),
+                                                 adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory());
     emit __OnUpdatedCurrentAdmin(bSuccess);
 }
 
 void CModelSecurity::OnUpdateCodeState(CLockState *rec)
 {
-     bool bSuccess = _ptblCodes->updateCode(rec);
+    bool bSuccess = _ptblCodes->updateCode(rec);
 
-     emit __OnUpdatedCodeState(bSuccess);
+    emit __OnUpdatedCodeState(bSuccess);
 }
 
 void CModelSecurity::initialize()
@@ -137,7 +135,6 @@ void CModelSecurity::setupTables()
     }
 }
 
-
 bool CModelSecurity::CheckPredictiveAccessCode(QString code, int &nLockNum)
 {
     nLockNum = 0;
@@ -173,7 +170,6 @@ bool CModelSecurity::CheckPredictiveAccessCode(QString code, int &nLockNum)
     return false;
 }
 
-
 /**
  * @brief CModelSecurity::OnVerifyCodeOne
  * @param code - encrypted
@@ -181,135 +177,121 @@ bool CModelSecurity::CheckPredictiveAccessCode(QString code, int &nLockNum)
 void CModelSecurity::OnVerifyCodeOne(QString code)
 {
     // Check the DB
-    _type = "";  // "User" or "Admin" or ""
+    _type = "";  // "User" or "Admin" or "Assist" or ""
 
     qDebug() << "CModelSecurity::OnVerifyCodeOne. Code:" << code;
 
-//    _timer.moveToThread(this->thread());
-//    _timer.start();
+    _type = _ptblAdmin->isAccessCode();
+    if(_type == "Admin" || _type == "Assist")
     {
-        if( _ptblAdmin->isAccessCode(code) ) {
-            _type = "Admin";
-            emit __OnRequireAdminPassword();
-        } else {
-            bool bSecondCodeRequired;
-	    bool bFingerprintRequired = false;
-            int nDoorNum;
+        emit __OnRequireAdminPassword();
+    }
+    else
+    {
+        bool bSecondCodeRequired;
+        bool bFingerprintRequired = false;
+        int nDoorNum;
 
-            if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
+        if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
+        {
+            qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
+
+            if( CheckPredictiveAccessCode(code, nDoorNum) )
             {
-                //        qDebug() << "Use Predictive";
-//                QString sCodeEnc = QString(CEncryption::encryptDecrypt(code.size(), code.toStdString()).c_str());
-                qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
+                // Check again to see if we match a second code existing in the codes table
+                QString sCodeEnc = CEncryption::encryptString(code);
 
-		if( CheckPredictiveAccessCode(code, nDoorNum) )
-		  {
+                nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
+                if( nDoorNum > 0 )
+                {
+                    // need to check if fingerprint security is enabled
+                    // if so, check for existence of existing fingerprints
+                    // if fingerprints do not exist, open up enroll dialog
+                    // (otherwise let user know fingerprints are enrolled?
+                    //  or emit __OnSecurityCheckFailed()
 
-		    // Check again to see if we match a second code existing in the codes table
-		    
-		    //QString sCodeEnc = QString(CEncryption::encryptDecrypt(code.size(), code.toStdString()).c_str());
-		    QString sCodeEnc = CEncryption::encryptString(code);
-		    
-		    //                qDebug() << "CModelSecurity::OnVerifyCode() Check Code One:" << sCodeEnc;
-		    nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
-		    if( nDoorNum > 0 )
-		      {
-			_type = "User";
-			
-			// need to check if fingerprint security is enabled
-			// if so, check for existence of existing fingerprints
-			// if fingerprints do not exist, open up enroll dialog
-			// (otherwise let user know fingerprints are enrolled?
-			//  or emit __OnSecurityCheckFailed()
-			
-			// this is probably a good time to mention,
-			// fingerprints for a second code are stored like:
-			//   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-			// single code are of course stored like:
-			//   /home/pi/run/prints/<codeOne>/<codeOne>
-			
-			// need to do check again for code 2
-			
-			if( bSecondCodeRequired )
-			  {
-			    emit __OnRequireCodeTwo(); 
-			  }
-			else
-			  {
-			    if( bFingerprintRequired == true)
-			      {
-				//we need to check if a fingerprint directory already exists,
-				// if they do, do not attempt enrollment
-				if( !QDir("/home/pi/run/prints/" + code).exists() )
-				  {
-				    emit __EnrollFingerprintDialog(code);
-				    emit __EnrollFingerprint(code);
-				  }
-				else
-				  emit __OnSecurityCheckedFailed();
-				return;
-			      }      
-			    emit __OnSecurityCheckSuccess(nDoorNum);
-			    emit __OnCreateHistoryRecordFromLastPredictiveLogin(nDoorNum, code);
-			  }
-		      } else {
-		      emit __OnSecurityCheckedFailed();
-		    }
-		  }
+                    // this is probably a good time to mention,
+                    // fingerprints for a second code are stored like:
+                    //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
+                    // single code are of course stored like:
+                    //   /home/pi/run/prints/<codeOne>/<codeOne>
 
-	    } else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
-	      {
-		// Store AnyAccessCode = code
-		// Enter Secondary code - Verify against DB (second access code?)
-	      }
-	    else
-	      {
-		//QString sCodeEnc = QString(CEncryption::encryptDecrypt(code.size(), code.toStdString()).c_str());
-		QString sCodeEnc = CEncryption::encryptString(code);
-		
-		//                qDebug() << "CModelSecurity::OnVerifyCode() Check Code One:" << sCodeEnc;
-		nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
-		if( nDoorNum > 0 )
-		  {
-		    _type = "User";
-		    
-		    // need to check if fingerprint security is enabled
-		    // if so, check for existence of existing fingerprints
-		    // if fingerprints do not exist, open up enroll dialog
-		    // (otherwise let user know fingerprints are enrolled?
-		    //  or emit __OnSecurityCheckFailed()
-		    
-		    // this is probably a good time to mention,
-		    // fingerprints for a second code are stored like:
-		    //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-		    // single code are of course stored like:
-		    //   /home/pi/run/prints/<codeOne>/<codeOne>
-		    
-		    // need to do check again for code 2
-		    
-		    if( bSecondCodeRequired ) {
-		      emit __OnRequireCodeTwo(); 
-		    } else {
-		      if( bFingerprintRequired == true)
-			{
-			  //we need to check if a fingerprint directory already exists,
-			  // if they do, do not attempt enrollment
-			  if( !QDir("/home/pi/run/prints/" + code).exists() )
-			    {
-			      emit __EnrollFingerprintDialog(code);
-			      emit __EnrollFingerprint(code);
-			    }
-			  else
-			    emit __OnSecurityCheckedFailed();
-			  return;
-			}      
-		      emit __OnSecurityCheckSuccess(nDoorNum);
-		    }
-		  } else {
-		  emit __OnSecurityCheckedFailed();
-		}
-	      }
-	}
+                    // need to do check again for code 2
+
+                    if( bSecondCodeRequired )
+                    {
+                        emit __OnRequireCodeTwo();
+                    }
+                    else
+                    {
+                        if( bFingerprintRequired == true)
+                        {
+                            //we need to check if a fingerprint directory already exists,
+                            // if they do, do not attempt enrollment
+                            if( !QDir("/home/pi/run/prints/" + code).exists() )
+                            {
+                                emit __EnrollFingerprintDialog(code);
+                                emit __EnrollFingerprint(code);
+                            }
+                            else
+                                emit __OnSecurityCheckedFailed();
+                            return;
+                        }
+                        emit __OnSecurityCheckSuccess(nDoorNum);
+                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(nDoorNum, code);
+                    }
+                } else {
+                    emit __OnSecurityCheckedFailed();
+                }
+            }
+        } else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
+        {
+            // Store AnyAccessCode = code
+            // Enter Secondary code - Verify against DB (second access code?)
+        }
+        else
+        {
+            QString sCodeEnc = CEncryption::encryptString(code);
+
+            nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
+            if( nDoorNum > 0 )
+            {
+                // need to check if fingerprint security is enabled
+                // if so, check for existence of existing fingerprints
+                // if fingerprints do not exist, open up enroll dialog
+                // (otherwise let user know fingerprints are enrolled?
+                //  or emit __OnSecurityCheckFailed()
+
+                // this is probably a good time to mention,
+                // fingerprints for a second code are stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
+                // single code are of course stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>
+
+                // need to do check again for code 2
+
+                if( bSecondCodeRequired ) {
+                    emit __OnRequireCodeTwo();
+                } else {
+                    if( bFingerprintRequired == true)
+                    {
+                        //we need to check if a fingerprint directory already exists,
+                        // if they do, do not attempt enrollment
+                        if( !QDir("/home/pi/run/prints/" + code).exists() )
+                        {
+                            emit __EnrollFingerprintDialog(code);
+                            emit __EnrollFingerprint(code);
+                        }
+                        else
+                            emit __OnSecurityCheckedFailed();
+                        return;
+                    }
+                    emit __OnSecurityCheckSuccess(nDoorNum);
+                }
+            } else {
+                emit __OnSecurityCheckedFailed();
+            }
+        }
     }
 }
 
@@ -324,61 +306,54 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 
     qDebug() << "CModelSecurity::OnVerifyFingerprintCodeOne. Code:" << code;
 
-//    _timer.moveToThread(this->thread());
-//    _timer.start();
+    _type = _ptblAdmin->isAccessCode(code);
+    if(_type == "Admin" || _type == "Assist") {
+        emit __OnRequireAdminPassword();
+    }
+    else
     {
-        if( _ptblAdmin->isAccessCode(code) ) {
-            _type = "Admin";
-            emit __OnRequireAdminPassword();
-        } else {
-            bool bSecondCodeRequired;
-	    bool bFingerprintRequired = false;
-            int nDoorNum;
+        bool bSecondCodeRequired;
+        bool bFingerprintRequired = false;
+        int nDoorNum;
 
-            if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
+        if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
+        {
+            qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
+            CheckPredictiveAccessCode(code, nDoorNum);
+
+        } else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
+        {
+            // Store AnyAccessCode = code
+            // Enter Secondary code - Verify against DB (second access code?)
+        }
+        else
+        {
+            QString sCodeEnc = CEncryption::encryptString(code);
+
+            nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
+            if( nDoorNum > 0 )
             {
-                //        qDebug() << "Use Predictive";
-//                QString sCodeEnc = QString(CEncryption::encryptDecrypt(code.size(), code.toStdString()).c_str());
-                qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
-                CheckPredictiveAccessCode(code, nDoorNum);
+                // need to check if fingerprint security is enabled
+                // if so, check for existence of existing fingerprints
+                // if fingerprints do not exist, open up enroll dialog
+                // (otherwise let user know fingerprints are enrolled?
+                //  or emit __OnSecurityCheckFailed()
 
-            } else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
-            {
-                // Store AnyAccessCode = code
-                // Enter Secondary code - Verify against DB (second access code?)
-            }
-            else {
-                //QString sCodeEnc = QString(CEncryption::encryptDecrypt(code.size(), code.toStdString()).c_str());
-                QString sCodeEnc = CEncryption::encryptString(code);
+                // this is probably a good time to mention,
+                // fingerprints for a second code are stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
+                // single code are of course stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>
 
-//                qDebug() << "CModelSecurity::OnVerifyCode() Check Code One:" << sCodeEnc;
-                nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
-                if( nDoorNum > 0 )
-                {
-                    _type = "User";
+                // need to do check again for code 2
 
-		    // need to check if fingerprint security is enabled
-		    // if so, check for existence of existing fingerprints
-		    // if fingerprints do not exist, open up enroll dialog
-		    // (otherwise let user know fingerprints are enrolled?
-		    //  or emit __OnSecurityCheckFailed()
-
-		    // this is probably a good time to mention,
-		    // fingerprints for a second code are stored like:
-		    //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-		    // single code are of course stored like:
-		    //   /home/pi/run/prints/<codeOne>/<codeOne>
-		    
-		    // need to do check again for code 2
-		    
-                    if( bSecondCodeRequired ) {
-                        emit __OnRequireCodeTwo(); 
-                    } else {
-		      emit __OnSecurityCheckSuccess(nDoorNum);
-                    }
+                if( bSecondCodeRequired ) {
+                    emit __OnRequireCodeTwo();
                 } else {
-                    emit __OnSecurityCheckedFailed();
+                    emit __OnSecurityCheckSuccess(nDoorNum);
                 }
+            } else {
+                emit __OnSecurityCheckedFailed();
             }
         }
     }
@@ -386,108 +361,120 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 
 void CModelSecurity::OnVerifyCodeTwo(QString code)
 {
-//    _timer.stop();
-  bool bFingerprintRequired = false;
-  bool bQuestionsRequired = false;
-  std::string codeOne;
-  bool bAskQuestions = false;
-  QString question1 = "";
-  QString question2 = "";
-  QString question3 = "";
+    bool bFingerprintRequired = false;
+    bool bQuestionsRequired = false;
+    std::string codeOne;
+    bool bAskQuestions = false;
+    QString question1 = "";
+    QString question2 = "";
+    QString question3 = "";
 
-  _updateCodeLockboxState = false;
-    if( _type == "Admin" ) {
-        if( _ptblAdmin->isPassword(code) ) {
+    _updateCodeLockboxState = false;
+    if(_type == "Admin" || _type == "Assist") {
+        if( _ptblAdmin->isPassword(code, _type) )
+        {
             emit __OnAdminSecurityCheckOk();
-        } else {
+        }
+        else
+        {
             emit __OnAdminSecurityCheckFailed();
         }
-    } else if( _type == "User" ) {
+    }
+    else if( _type == "User" )
+    {
         int nDoorNum = -1;
         if( _ptblCodes->checkCodeTwo(code.toStdString(), bFingerprintRequired, bQuestionsRequired, codeOne, nDoorNum, bAskQuestions, question1, question2, question3) > 0 )
         {
-	  //we need to check if a fingerprint directory already exists,
-	  // if they do, do not attempt enrollmesnt
-	  if( bFingerprintRequired == true)
-	    {
-	      // this is probably a good time to mention,
-	      // fingerprints for a second code are stored like:
-	      //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-	      // single code are of course stored like:
-	      //   /home/pi/run/prints/<codeOne>/<codeOne>
-	      
-	      if( !QDir(QString::fromStdString("/home/pi/run/prints/" + codeOne + "." + code.toStdString())).exists() )
-		{
-		  emit __EnrollFingerprintDialog(QString::fromStdString(codeOne + "." + code.toStdString()));
-		  emit __EnrollFingerprint(QString::fromStdString(codeOne + "." + code.toStdString()));
-		}
-	      else
-		emit __OnSecurityCheckedFailed();
-	      
-	      return;
-	    }
-	  
-	  if( bQuestionsRequired == true)
-	    {
-	      qDebug() << "ASK_QUESTIONS: " << QString::number(bAskQuestions);
-	      qDebug() << "QUESTION1: " << question1;
-	      qDebug() << "QUESTION2: " << question2;
-	      qDebug() << "QUESTION3: " << question3;
+            //we need to check if a fingerprint directory already exists,
+            // if they do, do not attempt enrollmesnt
+            if( bFingerprintRequired == true)
+            {
+                // this is probably a good time to mention,
+                // fingerprints for a second code are stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
+                // single code are of course stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>
 
-	      emit __QuestionUserDialog(nDoorNum,question1,question2,question3);
-	    }
-	  else
-	    emit __OnSecurityCheckSuccess(nDoorNum);
-	  
-        } else {
+                if( !QDir(QString::fromStdString("/home/pi/run/prints/" + codeOne + "." + code.toStdString())).exists() )
+                {
+                    emit __EnrollFingerprintDialog(QString::fromStdString(codeOne + "." + code.toStdString()));
+                    emit __EnrollFingerprint(QString::fromStdString(codeOne + "." + code.toStdString()));
+                }
+                else
+                    emit __OnSecurityCheckedFailed();
+
+                return;
+            }
+
+            if( bQuestionsRequired == true)
+            {
+                qDebug() << "ASK_QUESTIONS: " << QString::number(bAskQuestions);
+                qDebug() << "QUESTION1: " << question1;
+                qDebug() << "QUESTION2: " << question2;
+                qDebug() << "QUESTION3: " << question3;
+
+                emit __QuestionUserDialog(nDoorNum,question1,question2,question3);
+            }
+            else
+                emit __OnSecurityCheckSuccess(nDoorNum);
+
+        }
+        else
+        {
             emit __OnSecurityCheckedFailed();
         }
-    } else {
-        // Might have timed out and cleared the _type
     }
+    // Might have timed out and cleared the _type
 }
 
 void CModelSecurity::OnSuccessfulQuestionUsersAnswers(int doorNum, QString answer1, QString answer2, QString answer3)
 {
-  qDebug() << "CModelSecurity::OnSuccessfulQuestionUsersAnswers()";
-  emit __OnSecurityCheckSuccessWithAnswers(doorNum, answer1, answer2, answer3);
+    qDebug() << "CModelSecurity::OnSuccessfulQuestionUsersAnswers()";
+    emit __OnSecurityCheckSuccessWithAnswers(doorNum, answer1, answer2, answer3);
 }
 
 void CModelSecurity::OnQuestionUserCancelled()
 {
-  qDebug() << "CModelSecurity::OnQuestionUserCancelled()";
-  //emit __OnSecurityCheckedFailed();
-  _ptblCodes->updateLockboxState(_ptblCodes->_lastIDS, true);
+    qDebug() << "CModelSecurity::OnQuestionUserCancelled()";
+    //emit __OnSecurityCheckedFailed();
+    _ptblCodes->updateLockboxState(_ptblCodes->_lastIDS, true);
 }
 
 void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
 {
-//    _timer.stop();
-  bool bFingerprintRequired = false;
-  bool bQuestionsRequired = false;
-  std::string codeOne;
-  bool bAskQuestions = false;
-  QString question1 = "";
-  QString question2 = "";
-  QString question3 = "";
-  
-    if( _type == "Admin" ) {
-        if( _ptblAdmin->isPassword(code) ) {
+    //    _timer.stop();
+    bool bFingerprintRequired = false;
+    bool bQuestionsRequired = false;
+    std::string codeOne;
+    bool bAskQuestions = false;
+    QString question1 = "";
+    QString question2 = "";
+    QString question3 = "";
+
+    if(_type == "Admin" || _type == "Assist")
+    {
+        if(_ptblAdmin->isPassword(code, _type))
+        {
             emit __OnAdminSecurityCheckOk();
-        } else {
+        }
+        else
+        {
             emit __OnAdminSecurityCheckFailed();
         }
-    } else if( _type == "User" ) {
+    }
+    else if( _type == "User" )
+    {
         int nDoorNum = -1;
         if( _ptblCodes->checkCodeTwo(code.toStdString(), bFingerprintRequired, bQuestionsRequired, codeOne, nDoorNum, bAskQuestions, question1, question2, question3) > 0 )
         {
-	  emit __OnSecurityCheckSuccess(nDoorNum);
-        } else {
+            emit __OnSecurityCheckSuccess(nDoorNum);
+        }
+        else
+        {
             emit __OnSecurityCheckedFailed();
         }
-    } else {
-        // Might have timed out and cleared the _type
     }
+    // Might have timed out and cleared the _type
 }
 
 void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(int nLockNum, QString code)
@@ -624,18 +611,18 @@ void CModelSecurity::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTi
 
 void CModelSecurity::OnVerifyAdminPassword(QString code)
 {
-//    _timer.stop();
-
-    if( _type == "Admin" ) {
-        if( _ptblAdmin->isPassword(code) ) {
+    if(_type == "Admin" || _type == "Assist")
+    {
+        if(_ptblAdmin->isPassword(code, _type))
+        {
             emit __OnAdminSecurityCheckOk();
-        } else {
+        }
+        else
+        {
             emit __OnAdminSecurityCheckFailed();
         }
     }
-    else {
-        // Might have timed out and cleared the _type
-    }
+    // Might have timed out and cleared the _type
 }
 
 void CModelSecurity::OnRequestCurrentAdmin()

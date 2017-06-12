@@ -285,8 +285,8 @@ public:
     time_t  getReportStartTime();
     time_t  getReportFrequency();
 
-    bool isAccessCode(QString code);        // Numeric
-    bool isPassword(QString password);
+    QString isAccessCode(QString code);     // Numeric
+    bool isPassword(QString password, QString type);
 
     CAdminRec &getCurrentAdmin() { return _currentAdmin; }
 };

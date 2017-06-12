@@ -309,12 +309,6 @@ void CSystemController::OnCodeEntered(QString sCode)
 {
     qDebug() << "SystemController::OnCodeEntered:" << sCode;
 
-    //if( _securityController.CheckAccessCodeOneFingerprint() )
-    //  check to see ifi the directory exists with fingerprintreader class
-    //  if it doesn't:
-    //  emit fingerprint dialog for enrollment, else do nothing
-    // else
-    
     //force enrollment step count reset
     EnrollFingerprintResetStageCount();
 
