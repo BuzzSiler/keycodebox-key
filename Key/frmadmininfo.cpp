@@ -81,8 +81,8 @@ void CFrmAdminInfo::initializeConnections()
 {
     if(_psysController->getSystemState() == CSystemController::EAssistMain)
     {
-        ui->tabUtilities->isVisible(false);
-        ui->gpAdminInfo->isVisible(false);
+        ui->tabUtilities->setVisible(false);
+        ui->gpAdminInfo->setVisible(false);
     }
 
     connect(this, SIGNAL(__OnRequestCurrentAdmin()), _psysController, SLOT(OnRequestCurrentAdmin()));
