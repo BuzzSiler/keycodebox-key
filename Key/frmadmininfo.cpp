@@ -79,12 +79,6 @@ CFrmAdminInfo::~CFrmAdminInfo()
 
 void CFrmAdminInfo::initializeConnections()
 {
-    if(_psysController->getSystemState() == CSystemController::EAssistMain)
-    {
-        ui->tabUtilities->setVisible(false);
-        ui->gpAdminInfo->setVisible(false);
-    }
-
     connect(this, SIGNAL(__OnRequestCurrentAdmin()), _psysController, SLOT(OnRequestCurrentAdmin()));
 
     connect(_psysController, SIGNAL(__OnRequestedCurrentAdmin(CAdminRec*)), this, SLOT(OnRequestedCurrentAdmin(CAdminRec*)));
@@ -179,6 +173,12 @@ void CFrmAdminInfo::initialize()
         ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
         ui->dtSystemTime->setDisabled(true);
         ui->cbInternetTime->setChecked(true);
+    }
+
+    if(_psysController->getSystemState() == CSystemController::EAssistMain)
+    {
+        ui->tabUtilities->setVisible(false);
+        ui->gpAdminInfo->setVisible(false);
     }
 
     ui->btnCopyToggleSource->setText("Source #1");
