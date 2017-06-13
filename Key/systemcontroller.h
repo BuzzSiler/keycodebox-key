@@ -97,7 +97,7 @@ signals:
     void __OnDisplayUserCodeTwoDialog(QObject *obj);
     void __OnDisplayThankYouDialog(QObject *obj);
     void __OnDisplayAdminPasswordDialog(QObject *obj);
-    void __OnDisplayAdminMainDialog(QObject *obj, QString type);
+    void __OnDisplayAdminMainDialog(QObject *obj);
 
     void __OnRequestCurrentAdmin();
     void __OnRequestedCurrentAdmin(CAdminRec *adminInfo);
