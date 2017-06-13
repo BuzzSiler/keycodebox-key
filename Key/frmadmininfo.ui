@@ -67,220 +67,6 @@
       <string>Save and Close</string>
      </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>12</x>
-       <y>10</y>
-       <width>221</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLabel" name="lName">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Administrator</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lEmail">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Email</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lPhone">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Phone</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lAccessCd">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Admin Code</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lPassword">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Admin Password</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lAssistCode">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Assist Code</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lAssistPassword">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Assist Password</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>235</x>
-       <y>10</y>
-       <width>521</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="CClickableLabel" name="lblName">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="mouseTracking">
-         <bool>false</bool>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="textInteractionFlags">
-         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="CClickableLabel" name="lblEmail">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="mouseTracking">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="CClickableLabel" name="lblPhone">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="mouseTracking">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="CClickableLabel" name="lblAccessCode">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="CClickableLabel" name="lblPassword">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="CClickableLabel" name="lblAssistCode">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="CClickableLabel" name="lblAssistPassword">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
     <widget class="QLabel" name="lKey">
      <property name="geometry">
       <rect>
@@ -303,7 +89,7 @@
      <property name="geometry">
       <rect>
        <x>16</x>
-       <y>237</y>
+       <y>250</y>
        <width>301</width>
        <height>26</height>
       </rect>
@@ -343,7 +129,7 @@
      <property name="geometry">
       <rect>
        <x>360</x>
-       <y>237</y>
+       <y>250</y>
        <width>201</width>
        <height>21</height>
       </rect>
@@ -361,7 +147,7 @@
      <property name="geometry">
       <rect>
        <x>590</x>
-       <y>228</y>
+       <y>241</y>
        <width>171</width>
        <height>41</height>
       </rect>
@@ -374,32 +160,6 @@
      </property>
      <property name="singleStep">
       <number>5</number>
-     </property>
-    </widget>
-    <widget class="Line" name="line">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>213</y>
-       <width>761</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="Line" name="line_2">
-     <property name="geometry">
-      <rect>
-       <x>221</x>
-       <y>0</y>
-       <width>20</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
      </property>
     </widget>
     <widget class="Line" name="line_3">
@@ -479,6 +239,9 @@
        <pointsize>12</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::WheelFocus</enum>
+     </property>
      <property name="text">
       <string>Internet Time</string>
      </property>
@@ -521,6 +284,276 @@
       </property>
      </item>
     </widget>
+    <widget class="QGroupBox" name="gpAdminInfo">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>771</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>Admin Info</string>
+     </property>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>221</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="lName">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Administrator</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lEmail">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Email</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lPhone">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Phone</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lAccessCd">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Admin Code</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lPassword">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Admin Password</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lAssistCode">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Assist Code</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lAssistPassword">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Assist Password</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="Line" name="line_2">
+      <property name="geometry">
+       <rect>
+        <x>226</x>
+        <y>20</y>
+        <width>20</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>20</y>
+        <width>521</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="CClickableLabel" name="lblName">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <underline>true</underline>
+          </font>
+         </property>
+         <property name="mouseTracking">
+          <bool>false</bool>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="CClickableLabel" name="lblEmail">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <underline>true</underline>
+          </font>
+         </property>
+         <property name="mouseTracking">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="CClickableLabel" name="lblPhone">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <underline>true</underline>
+          </font>
+         </property>
+         <property name="mouseTracking">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="CClickableLabel" name="lblAccessCode">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <underline>true</underline>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="CClickableLabel" name="lblPassword">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <underline>true</underline>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="CClickableLabel" name="lblAssistCode">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <underline>true</underline>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="CClickableLabel" name="lblAssistPassword">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <underline>true</underline>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>230</y>
+        <width>761</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </widget>
+    <zorder>gpAdminInfo</zorder>
+    <zorder>btnDone</zorder>
+    <zorder>lKey</zorder>
+    <zorder>chkUsePredictive</zorder>
+    <zorder>lblKey</zorder>
+    <zorder>lPredictiveCodeGenResolution</zorder>
+    <zorder>spinCodeGenResolution</zorder>
+    <zorder>line_3</zorder>
+    <zorder>dtSystemTime</zorder>
+    <zorder>cbInternetTime</zorder>
+    <zorder>btnSetTime</zorder>
+    <zorder>cbTimeZone</zorder>
    </widget>
    <widget class="QWidget" name="tabUtilities">
     <attribute name="title">
@@ -5029,6 +5062,79 @@
        <bool>false</bool>
       </property>
      </widget>
+     <zorder>btnA</zorder>
+     <zorder>btnB</zorder>
+     <zorder>btnC</zorder>
+     <zorder>btnD</zorder>
+     <zorder>btnG</zorder>
+     <zorder>btnE</zorder>
+     <zorder>btnF</zorder>
+     <zorder>btnH</zorder>
+     <zorder>btnJ</zorder>
+     <zorder>btnI</zorder>
+     <zorder>btnM</zorder>
+     <zorder>btnK</zorder>
+     <zorder>btnL</zorder>
+     <zorder>btnP</zorder>
+     <zorder>btnR</zorder>
+     <zorder>btnN</zorder>
+     <zorder>btnS</zorder>
+     <zorder>btnO</zorder>
+     <zorder>btnT</zorder>
+     <zorder>btnQ</zorder>
+     <zorder>btnW</zorder>
+     <zorder>btn_At</zorder>
+     <zorder>btnX</zorder>
+     <zorder>btnU</zorder>
+     <zorder>btnY</zorder>
+     <zorder>btn_Dash</zorder>
+     <zorder>btnPeriod</zorder>
+     <zorder>btnZ</zorder>
+     <zorder>btnV</zorder>
+     <zorder>btn_Underscore</zorder>
+     <zorder>btn_Semicolon</zorder>
+     <zorder>btn_Ampersand</zorder>
+     <zorder>btn_Dollar</zorder>
+     <zorder>btn_Plus</zorder>
+     <zorder>btn_Colon</zorder>
+     <zorder>btn_Apostrophe</zorder>
+     <zorder>btn_Quote</zorder>
+     <zorder>btn_QuestionMark</zorder>
+     <zorder>btn_Slash</zorder>
+     <zorder>btn_Splat</zorder>
+     <zorder>btn_LeftParen</zorder>
+     <zorder>btn_Exclamation</zorder>
+     <zorder>btn_Pound</zorder>
+     <zorder>btn_Percent</zorder>
+     <zorder>btn_RightParen</zorder>
+     <zorder>btn_Caret</zorder>
+     <zorder>btn_0</zorder>
+     <zorder>btn_7</zorder>
+     <zorder>btn_Space</zorder>
+     <zorder>btn_9</zorder>
+     <zorder>btn_5</zorder>
+     <zorder>btn_1</zorder>
+     <zorder>btn_3</zorder>
+     <zorder>btn_6</zorder>
+     <zorder>btn_Return</zorder>
+     <zorder>btn_8</zorder>
+     <zorder>btn_2</zorder>
+     <zorder>btn_4</zorder>
+     <zorder>btn_Back</zorder>
+     <zorder>btn_Del</zorder>
+     <zorder>btn_Close</zorder>
+     <zorder>btn_Clear</zorder>
+     <zorder>btn_LeftSquare</zorder>
+     <zorder>btn_LeftCurly</zorder>
+     <zorder>btn_RightSquare</zorder>
+     <zorder>btn_Back_Slash</zorder>
+     <zorder>btn_LeftAngle</zorder>
+     <zorder>btn_Tilde</zorder>
+     <zorder>btn_RightAngle</zorder>
+     <zorder>btn_RightCurly</zorder>
+     <zorder>btn_OpenApost</zorder>
+     <zorder>btn_Upper_Lower</zorder>
+     <zorder>tabWidget</zorder>
     </widget>
    </widget>
    <widget class="QLabel" name="lblCurrentEditFieldName">

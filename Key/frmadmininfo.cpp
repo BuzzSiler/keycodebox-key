@@ -1,4 +1,3 @@
-
 #include "frmadmininfo.h"
 #include "ui_frmadmininfo.h"
 
@@ -43,12 +42,12 @@ void CFrmAdminInfo::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 
 CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::CFrmAdminInfo),_pworkingSet(0)
+    ui(new Ui::CFrmAdminInfo), _pworkingSet(0)
 {
     ui->setupUi(this);
     CFrmAdminInfo::showFullScreen();
     _pcurrentLabelEdit = 0;
-    
+
     initialize();
 
     setAttribute(Qt::WA_AcceptTouchEvents, true);
@@ -80,20 +79,25 @@ CFrmAdminInfo::~CFrmAdminInfo()
 
 void CFrmAdminInfo::initializeConnections()
 {
+    if(_psysController->getSystemState() == CSystemController::EAssistMain)
+    {
+        ui->tabUtilities->isVisible(false);
+        ui->gpAdminInfo->isVisible(false);
+    }
 
     connect(this, SIGNAL(__OnRequestCurrentAdmin()), _psysController, SLOT(OnRequestCurrentAdmin()));
 
     connect(_psysController, SIGNAL(__OnRequestedCurrentAdmin(CAdminRec*)), this, SLOT(OnRequestedCurrentAdmin(CAdminRec*)));
     connect(this, SIGNAL(__UpdateCurrentAdmin(CAdminRec*)), _psysController, SLOT(OnUpdateCurrentAdmin(CAdminRec*)));
     connect(_psysController, SIGNAL(__OnUpdatedCurrentAdmin(bool)), this, SLOT(OnUpdatedCurrentAdmin(bool)));
-    
+
     connect(this, SIGNAL(__OnCloseFrmAdmin()), _psysController, SLOT(OnAdminDialogClosed()));
 
     connect(this, SIGNAL(__OnBrightnessChanged(int)), _psysController, SLOT(OnBrightnessChanged(int)));
     connect(this, SIGNAL(__OnReadLockSet(int,QDateTime,QDateTime)), _psysController, SLOT(OnReadLockSet(int,QDateTime,QDateTime)));
     connect(_psysController, SIGNAL(__OnLockSet(CLockSet*)), this, SLOT(OnLockSet(CLockSet*)));
 
-    
+
     connect(this, SIGNAL(__OnReadLockHistorySet(int,QDateTime,QDateTime)), _psysController, SLOT(OnReadLockHistorySet(int,QDateTime,QDateTime)));
     connect(_psysController, SIGNAL(__OnLockHistorySet(CLockHistorySet*)), this, SLOT(OnLockHistorySet(CLockHistorySet*)));
     connect(this, SIGNAL(__OnImmediateReportRequest(QDateTime,QDateTime,int)), _psysController, SLOT(OnImmediateReportRequest(QDateTime,QDateTime,int)));
@@ -111,9 +115,8 @@ void CFrmAdminInfo::initializeConnections()
     connect(ui->tblCodesList, SIGNAL( cellClicked (int, int) ), this, SLOT( codeCellSelected( int, int ) ) );
 
     connect(ui->cbTimeZone, SIGNAL(currentIndexChanged(QString)), this, SLOT(setTimeZone()));
-    
-    connect(_psysController, SIGNAL(__OnFoundNewStorageDevice(QString, QString)), this, SLOT(OnFoundNewStorageDevice(QString, QString)));
 
+    connect(_psysController, SIGNAL(__OnFoundNewStorageDevice(QString, QString)), this, SLOT(OnFoundNewStorageDevice(QString, QString)));
 }
 
 void CFrmAdminInfo::setSystemController(CSystemController *psysController)
@@ -127,26 +130,26 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 
 bool CFrmAdminInfo::isInternetTime()
 {
-  FILE *pF;
-  std::string sOutput = "";
-  QString flagListCmd = "ls /home/pi/run/* | grep 'flag'";
+    FILE *pF;
+    std::string sOutput = "";
+    QString flagListCmd = "ls /home/pi/run/* | grep 'flag'";
 
-  pF = popen(flagListCmd.toStdString().c_str(), "r");
-  if(!pF)
+    pF = popen(flagListCmd.toStdString().c_str(), "r");
+    if(!pF)
     {
-      qDebug() << "failed to list system flags";
+        qDebug() << "failed to list system flags";
     }
 
-  ExtractCommandOutput(pF, sOutput);
-  fclose(pF);
-  
-  qDebug() << "CFrmAdminInfo::isInternetTime(), " << QString::fromStdString(sOutput);
-  qDebug() << "CFrmAdminInfo::isInternetTime(), " << QString::number(sOutput.find("internetTime"));
-  
-  if( sOutput.find("internetTime") != std::string::npos )
-    return true;
-      
-  return false;
+    ExtractCommandOutput(pF, sOutput);
+    fclose(pF);
+
+    qDebug() << "CFrmAdminInfo::isInternetTime(), " << QString::fromStdString(sOutput);
+    qDebug() << "CFrmAdminInfo::isInternetTime(), " << QString::number(sOutput.find("internetTime"));
+
+    if( sOutput.find("internetTime") != std::string::npos )
+        return true;
+
+    return false;
 }
 
 void CFrmAdminInfo::initialize()
@@ -156,7 +159,7 @@ void CFrmAdminInfo::initialize()
     _bClose = false;
     ui->widgetEdit->setVisible(false);
     ui->widgetImmediateReport->setVisible(true);
-    
+
     populateTimeZoneSelection(ui->cbTimeZone);
     populateCodeLockSelection();
     populateCodeLockHistorySelection();
@@ -172,33 +175,32 @@ void CFrmAdminInfo::initialize()
     //ui->tblCodesList->installEventFilter(this);
 
     if( isInternetTime() )
-      {
-	ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
-	ui->dtSystemTime->setDisabled(true);
-	ui->cbInternetTime->setChecked(true);
-      }
-    
-    ui->btnCopyToggleSource->setText("Source #1");
-    
-    connect(this, SIGNAL(__OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString)),
-	    this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString)));
+    {
+        ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
+        ui->dtSystemTime->setDisabled(true);
+        ui->cbInternetTime->setChecked(true);
+    }
 
-    
+    ui->btnCopyToggleSource->setText("Source #1");
+
+    connect(this, SIGNAL(__OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString)),
+            this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString)));
+
     ui->btnCopyFileBrandingImageReset->setEnabled(true);
 }
 
 
 int CFrmAdminInfo::nthSubstr(int n, const std::string& s, const std::string& p) {
-  std::string::size_type i = s.find(p);     // Find the first occurrence
+    std::string::size_type i = s.find(p);     // Find the first occurrence
 
-  int j;
-  for (j = 1; j < n && i != std::string::npos; ++j)
-    i = s.find(p, i+1); // Find the next occurrence
+    int j;
+    for (j = 1; j < n && i != std::string::npos; ++j)
+        i = s.find(p, i+1); // Find the next occurrence
 
-  if (j == n)
-    return(i);
-  else
-    return(-1);
+    if (j == n)
+        return(i);
+    else
+        return(-1);
 }
 
 void CFrmAdminInfo::getSystemIPAddressAndStatus()
@@ -213,70 +215,70 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
 
     if ( !ifaces.isEmpty() )
     {
-      for(int i=0; i < ifaces.size(); i++)
-      {
-        unsigned int flags = ifaces[i].flags();
-        bool isLoopback = (bool)(flags & QNetworkInterface::IsLoopBack);
-        bool isP2P = (bool)(flags & QNetworkInterface::IsPointToPoint);
-        bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
-	bool checkSuccessful = false;
-	QString pingAddress = "";
-	QString parameter = "-r0 -t 50";
-	
-        // If this interface isn't running, we don't care about it
-        if ( !isRunning ) continue;
-        // We only want valid interfaces that aren't loopback/virtual and not point to point
-        if ( !ifaces[i].isValid() || isLoopback || isP2P ) continue;
-        QList<QHostAddress> addresses = ifaces[i].allAddresses();
-        for(int a=0; a < addresses.size(); a++)
+        for(int i=0; i < ifaces.size(); i++)
         {
-          // Ignore local host
-          if ( addresses[a] == QHostAddress::LocalHost ) continue;
+            unsigned int flags = ifaces[i].flags();
+            bool isLoopback = (bool)(flags & QNetworkInterface::IsLoopBack);
+            bool isP2P = (bool)(flags & QNetworkInterface::IsPointToPoint);
+            bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
+            bool checkSuccessful = false;
+            QString pingAddress = "";
+            QString parameter = "-r0 -t 50";
 
-          // Ignore non-ipv4 addresses
-          if ( !addresses[a].toIPv4Address() ) continue;
-
-          QString ip = addresses[a].toString();
-          if ( ip.isEmpty() ) continue;
-          bool foundMatch = false;
-          for (int j=0; j < possibleMatches.size(); j++) if ( ip == possibleMatches[j] ) { foundMatch = true; break; }
-          if ( !foundMatch ) { possibleMatches.push_back( ip );
-              qDebug() << "possible address: " << ifaces[i].humanReadableName() << "->" << ip; }
-            ui->lblIPAddress->setText(ip);
-           if((bool)(flags & QNetworkInterface::IsUp))
+            // If this interface isn't running, we don't care about it
+            if ( !isRunning ) continue;
+            // We only want valid interfaces that aren't loopback/virtual and not point to point
+            if ( !ifaces[i].isValid() || isLoopback || isP2P ) continue;
+            QList<QHostAddress> addresses = ifaces[i].allAddresses();
+            for(int a=0; a < addresses.size(); a++)
             {
-                if((bool)(flags & QNetworkInterface::CanMulticast))
+                // Ignore local host
+                if ( addresses[a] == QHostAddress::LocalHost ) continue;
+
+                // Ignore non-ipv4 addresses
+                if ( !addresses[a].toIPv4Address() ) continue;
+
+                QString ip = addresses[a].toString();
+                if ( ip.isEmpty() ) continue;
+                bool foundMatch = false;
+                for (int j=0; j < possibleMatches.size(); j++) if ( ip == possibleMatches[j] ) { foundMatch = true; break; }
+                if ( !foundMatch ) { possibleMatches.push_back( ip );
+                    qDebug() << "possible address: " << ifaces[i].humanReadableName() << "->" << ip; }
+                ui->lblIPAddress->setText(ip);
+                if((bool)(flags & QNetworkInterface::IsUp))
                 {
-                    ui->lblIPAddress->setStyleSheet("QLabel { background-color : rgb(60,179,113); color : blue; }");
-                } else {
-                    ui->lblIPAddress->setStyleSheet("QLabel { background-color : rgb(60,179,113): color : white; }");
+                    if((bool)(flags & QNetworkInterface::CanMulticast))
+                    {
+                        ui->lblIPAddress->setStyleSheet("QLabel { background-color : rgb(60,179,113); color : blue; }");
+                    } else {
+                        ui->lblIPAddress->setStyleSheet("QLabel { background-color : rgb(60,179,113): color : white; }");
+                    }
+
+                    QString period = ".";
+                    int findN = nthSubstr(3, ip.toStdString(), period.toStdString());
+                    qDebug() << "CFrmAdminInfo::getSystemIPAddressAndState(), findN: " << QString::number(findN);
+                    if( findN != std::string::npos )
+                    {
+                        pingAddress = ip.mid(0, findN);
+                        if( pingAddress.at( pingAddress.length() - 1) != '.' )
+                            pingAddress += ".1";
+                        else
+                            pingAddress += "1";
+
+                        int exitCode = QProcess::execute("fping", QStringList() << parameter << pingAddress);
+                        if( exitCode == 0 )
+                            checkSuccessful = true;
+                        else
+                            ui->lblIPAddress->setVisible(false);
+                    }
                 }
 
-		QString period = ".";
-		int findN = nthSubstr(3, ip.toStdString(), period.toStdString());
-		qDebug() << "CFrmAdminInfo::getSystemIPAddressAndState(), findN: " << QString::number(findN);
-		if( findN != std::string::npos )
-		  {
-		    pingAddress = ip.mid(0, findN);
-		    if( pingAddress.at( pingAddress.length() - 1) != '.' )
-		      pingAddress += ".1";
-		    else
-		      pingAddress += "1";
-
-		    int exitCode = QProcess::execute("fping", QStringList() << parameter << pingAddress);
-		    if( exitCode == 0 )
-		      checkSuccessful = true;
-		    else
-		      ui->lblIPAddress->setVisible(false);
-		  }
+                if( !checkSuccessful )
+                    ui->lblIPAddress->setStyleSheet(red);
+                else
+                    ui->lblIPAddress->setVisible(true);
             }
-
-	   if( !checkSuccessful )
-	     ui->lblIPAddress->setStyleSheet(red);
-	   else
-	     ui->lblIPAddress->setVisible(true);
         }
-      }
     }
 }
 
@@ -298,78 +300,78 @@ void CFrmAdminInfo::OnMediaCheckTimeout()
 
 // trim from end
 std::string CFrmAdminInfo::rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(),
-		       std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-  return s;
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
 }
 
 void CFrmAdminInfo::populateTimeZoneSelection(QComboBox *cbox)
 {
-  FILE *pF;
-  std::string sOutput = "";
-  std::string sTimeZone = "";
-  std::string parsedString = "";
-  
-  cbox->clear();
-  // Fill in combo box.
-  QList<QByteArray> ids = QTimeZone::availableTimeZoneIds();
-  foreach (QByteArray id, ids) {    
-    cbox->addItem(id);
-  }
+    FILE *pF;
+    std::string sOutput = "";
+    std::string sTimeZone = "";
+    std::string parsedString = "";
 
-  qDebug() << "DFrmAdminInfo::populateTimeZoneSelection(...): setting current timezone";
-  QString parseString = "readlink /etc/localtime";
-  
-  pF = popen(parseString.toStdString().c_str(), "r");
-  if(!pF)
-    {
-      qDebug() << "failed to parse timezone string";
+    cbox->clear();
+    // Fill in combo box.
+    QList<QByteArray> ids = QTimeZone::availableTimeZoneIds();
+    foreach (QByteArray id, ids) {
+        cbox->addItem(id);
     }
 
-  ExtractCommandOutput(pF, sOutput);
-  fclose(pF);
-  
-  sTimeZone = sOutput.substr(20);
-  
-  if( sOutput.length() == 0)
-    sTimeZone = "America/New_York";
-  
-  qDebug() << "sOutput: " << QString::fromStdString(sTimeZone);
+    qDebug() << "DFrmAdminInfo::populateTimeZoneSelection(...): setting current timezone";
+    QString parseString = "readlink /etc/localtime";
 
-  if( strcmp(sTimeZone.c_str(), "") )
+    pF = popen(parseString.toStdString().c_str(), "r");
+    if(!pF)
     {
-      char *tokString = strtok(const_cast<char*> (sTimeZone.c_str()), "\n");
-      parsedString = tokString;
-      qDebug() << "parsedString: " << QString::fromStdString(parsedString);
-      
-      int index = cbox->findText(QString::fromStdString(parsedString.c_str()));
-      if (index != -1) {
-	cbox->setCurrentIndex(index);
-      }
+        qDebug() << "failed to parse timezone string";
     }
-  ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
-  _currentTime = QDateTime().currentDateTime();
+
+    ExtractCommandOutput(pF, sOutput);
+    fclose(pF);
+
+    sTimeZone = sOutput.substr(20);
+
+    if( sOutput.length() == 0)
+        sTimeZone = "America/New_York";
+
+    qDebug() << "sOutput: " << QString::fromStdString(sTimeZone);
+
+    if( strcmp(sTimeZone.c_str(), "") )
+    {
+        char *tokString = strtok(const_cast<char*> (sTimeZone.c_str()), "\n");
+        parsedString = tokString;
+        qDebug() << "parsedString: " << QString::fromStdString(parsedString);
+
+        int index = cbox->findText(QString::fromStdString(parsedString.c_str()));
+        if (index != -1) {
+            cbox->setCurrentIndex(index);
+        }
+    }
+    ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
+    _currentTime = QDateTime().currentDateTime();
 }
 
 void CFrmAdminInfo::setTimeZone()
 {
-  qDebug() << "CFrmAdminInfo::setTimeZone()";
-  qDebug() << ui->cbTimeZone->currentText();
- 
-  // setTimeZone
+    qDebug() << "CFrmAdminInfo::setTimeZone()";
+    qDebug() << ui->cbTimeZone->currentText();
 
-  QString unlink = QString("sudo unlink /etc/localtime");
-  QString link = QString("sudo ln -s /usr/share/zoneinfo/") + ui->cbTimeZone->currentText() + QString(" /etc/localtime");
-  
-  qDebug() << "timezone change: ";
-  qDebug() << unlink;
-  qDebug() << link;
-  
-  std::system(unlink.toStdString().c_str());
-  std::system(link.toStdString().c_str());
+    // setTimeZone
 
-  if(ui->cbInternetTime->isChecked())
-    ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
+    QString unlink = QString("sudo unlink /etc/localtime");
+    QString link = QString("sudo ln -s /usr/share/zoneinfo/") + ui->cbTimeZone->currentText() + QString(" /etc/localtime");
+
+    qDebug() << "timezone change: ";
+    qDebug() << unlink;
+    qDebug() << link;
+
+    std::system(unlink.toStdString().c_str());
+    std::system(link.toStdString().c_str());
+
+    if(ui->cbInternetTime->isChecked())
+        ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
 }
 
 void CFrmAdminInfo::populateBoxListSelection(QComboBox *cbox)
@@ -397,22 +399,22 @@ void CFrmAdminInfo::populateFileWidget(QString sDirectory, QString sFilter)
     QString rp = "/media/pi";
 
     if(_pmodel) {
-      delete _pmodel;
-      _pmodel = 0;
+        delete _pmodel;
+        _pmodel = 0;
     }
-    
+
     if(!_pmodel)
-      _pmodel = new QFileSystemModel();
+        _pmodel = new QFileSystemModel();
 
     QStringList list;
     list << sDirectory << "KeycodeboxReports";
-    
+
     _pmodel->setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
     _pmodel->setNameFilters(list);
     _pmodel->setNameFilterDisables(false);
     // Enable modifying file system
     _pmodel->setReadOnly(true);
-    
+
     connect(_pmodel,
             SIGNAL(directoryLoaded(QString)),
             this,
@@ -434,7 +436,6 @@ void CFrmAdminInfo::populateFileWidget(QString sDirectory, QString sFilter)
     resizeTreeViewColumns();
 }
 
-
 void CFrmAdminInfo::onRootPathChanged(QString path)
 {
     qDebug() << "Root path loaded" << path;
@@ -448,12 +449,11 @@ void CFrmAdminInfo::onModelDirectoryLoaded(QString path)
 
 void CFrmAdminInfo::on_treeView_clicked(const QModelIndex &index)
 {
-//    qDebug() << "Save to File" << path;
+    //    qDebug() << "Save to File" << path;
     _reportDirectory = _pmodel->rootPath() + "/" + index.data(Qt::DisplayRole).toString() + "/KeycodeboxReports";
     _tmpAdminRec.setReportDirectory(_reportDirectory.toStdString());
     qDebug() << "Save to Directory" << _tmpAdminRec.getReportDirectory().c_str();
     QMessageBox::information(this, "Save Directory Set", _tmpAdminRec.getReportDirectory().c_str());
-
 }
 
 void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
@@ -461,13 +461,13 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
     QString rp = "/media/pi";
 
     if(_pcopymodel) {
-      delete _pcopymodel;
-      _pcopymodel = 0;
+        delete _pcopymodel;
+        _pcopymodel = 0;
     }
-      
+
     if(!_pcopymodel)
-      _pcopymodel = new QFileSystemModel();    
-    
+        _pcopymodel = new QFileSystemModel();
+
     QStringList list;
     list << sDirectory << "Alpha*" << "*.xml" << "*.jpg" << "*.jpeg";
 
@@ -477,12 +477,11 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
     _pcopymodel->setNameFilters(list);
     _pcopymodel->setNameFilterDisables(false);
 
-    
     connect(_pcopymodel,
             SIGNAL(directoryLoaded(QString)),
             this,
             SLOT(onCopyModelDirectoryLoaded(QString)));
-    
+
     connect(_pcopymodel,
             SIGNAL(rootPathChanged(QString)),
             this,
@@ -493,7 +492,7 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
     // Reimplemented from QAbstractItemView::setModel()
     ui->treeViewCopy->setModel(_pcopymodel);
     ui->treeViewCopy->collapseAll();
-    
+
     _pcopymodel->setRootPath(rp);
     ui->treeViewCopy->setRootIndex(_pcopymodel->setRootPath(rp));
 
@@ -515,27 +514,24 @@ void CFrmAdminInfo::onCopyModelDirectoryLoaded(QString path)
 
 void CFrmAdminInfo::on_btnCopyToggleSource_clicked(bool checked)
 {
-  
-  //static_cast<QTreeView*>(ui->treeViewCopy)->selectionModel()->clearSelection();
-  //ui->treeViewCopy->collapseAll();
-  if(checked)
+    //static_cast<QTreeView*>(ui->treeViewCopy)->selectionModel()->clearSelection();
+    //ui->treeViewCopy->collapseAll();
+    if(checked)
     {
-      qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, checked, " << usbDevice1 << ", " << usbDevice0;
-      populateFileCopyWidget(usbDevice1, usbDevice0);
-      ui->btnCopyToggleSource->setText("Source #2");
+        qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, checked, " << usbDevice1 << ", " << usbDevice0;
+        populateFileCopyWidget(usbDevice1, usbDevice0);
+        ui->btnCopyToggleSource->setText("Source #2");
     }
-  else
+    else
     {
-      qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, unchecked, " << usbDevice0 << ", " << usbDevice1;
-      populateFileCopyWidget(usbDevice0, usbDevice1);
-      ui->btnCopyToggleSource->setText("Source #1");
-  }
+        qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, unchecked, " << usbDevice0 << ", " << usbDevice1;
+        populateFileCopyWidget(usbDevice0, usbDevice1);
+        ui->btnCopyToggleSource->setText("Source #1");
+    }
 }
 
 void CFrmAdminInfo::resizeTreeViewColumns()
 {
-    // Resize Name column
-    //ui->treeViewCopy->resizeColumnToContents(0);
 }
 
 void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
@@ -545,14 +541,14 @@ void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
 
     if( QFileInfo(_copyDirectory).isFile())
     {
-      ui->btnCopyFileBrandingImage->setEnabled(true);
-      
-      ui->btnCopyFileLoadCodes->setEnabled(true);
-      ui->btnCopyFile->setEnabled(true);
+        ui->btnCopyFileBrandingImage->setEnabled(true);
+
+        ui->btnCopyFileLoadCodes->setEnabled(true);
+        ui->btnCopyFile->setEnabled(true);
     } else {
-      ui->btnCopyFileBrandingImage->setEnabled(false);    
-      ui->btnCopyFileLoadCodes->setEnabled(false);
-      ui->btnCopyFile->setEnabled(false);
+        ui->btnCopyFileBrandingImage->setEnabled(false);
+        ui->btnCopyFileLoadCodes->setEnabled(false);
+        ui->btnCopyFile->setEnabled(false);
     }
 
     //ui->treeViewCopy->setRootIndex(_pcopymodel->setRootPath(QString("/media/pi/")));
@@ -560,7 +556,6 @@ void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
 
     resizeTreeViewColumns();
 }
-
 
 void CFrmAdminInfo::on_btnCopyFile_clicked()
 {
@@ -573,180 +568,177 @@ void CFrmAdminInfo::on_btnCopyFile_clicked()
     QMessageBox::information(this, "File Copied", tr("New SafePak application copied.\nSystem requires reboot to run."));
 }
 
-
 void CFrmAdminInfo::printElementNames(xmlNode *aNode)
 {
-  xmlNode *curNode = NULL;
-  const char *tempChar = NULL;
+    xmlNode *curNode = NULL;
+    const char *tempChar = NULL;
 
-  /*
+    /*
     <?xml version="1.0"?>
-<codeListing title="20161213 Codes">
-  <code>
-    <lock>4</lock>
-    <code1>88888888</code1>
-    <code2>999999999</code2>
-    <user>This is an exciting code!</user>
-    <startDT>2008-10-31T15:07:38.6875000-05:00</startDT>
-    <endDT>2008-10-31T15:07:38.6875000-05:00</endDT>
-  </code>
-  <code>
-    <lock>5</lock>
-    <code1>88888888</code1>
-    <code2>999999999</code2>
-    <user>This is another exciting code!</user>
-    <startDT>2008-10-31T15:07:38.6875000-05:00</startDT>
-    <endDT>2008-10-31T15:07:38.6875000-05:00</endDT>
-  </code>
-</codeListing>
+    <codeListing title="20161213 Codes">
+      <code>
+        <lock>4</lock>
+        <code1>88888888</code1>
+        <code2>999999999</code2>
+        <user>This is an exciting code!</user>
+        <startDT>2008-10-31T15:07:38.6875000-05:00</startDT>
+        <endDT>2008-10-31T15:07:38.6875000-05:00</endDT>
+      </code>
+      <code>
+        <lock>5</lock>
+        <code1>88888888</code1>
+        <code2>999999999</code2>
+        <user>This is another exciting code!</user>
+        <startDT>2008-10-31T15:07:38.6875000-05:00</startDT>
+        <endDT>2008-10-31T15:07:38.6875000-05:00</endDT>
+      </code>
+    </codeListing>
    */
 
-  int nLockNum = 0;
-  QString sAccessCode = "";
-  QString sSecondCode = "";
-  QString description = "";
-  QString question1 = "";
-  QString question2 = "";
-  QString question3 = "";
-  QDateTime dtStart;
-  QDateTime dtEnd;
-  
-  for (curNode = aNode; curNode; curNode=curNode->next)
+    int nLockNum = 0;
+    QString sAccessCode = "";
+    QString sSecondCode = "";
+    QString description = "";
+    QString question1 = "";
+    QString question2 = "";
+    QString question3 = "";
+    QDateTime dtStart;
+    QDateTime dtEnd;
+
+    for (curNode = aNode; curNode; curNode=curNode->next)
     {
-      if (curNode->type == XML_ELEMENT_NODE)
-	{
-	  if( !strcmp((char *)curNode->name, "lock") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording lock'";
-	      nLockNum = atoi((char *)xmlNodeGetContent(curNode));
-	      qDebug() << nLockNum;
-	    }
-	  if( !strcmp((char *)curNode->name, "code1") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording code1'";
-	      sAccessCode = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-	      qDebug() << sAccessCode;
-	    }
-	  if( !strcmp((char *)curNode->name, "code2") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording code2'";
-	      sSecondCode = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-	      qDebug() << sSecondCode;
-	    }
-	  if( !strcmp((char *)curNode->name, "username") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording user'";
-	      description = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-	      qDebug() << description;
-	    }
-	  if( !strcmp((char *)curNode->name, "question1") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording question1'";
-	      question1 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-	      qDebug() << question1;
-	    }
-	  if( !strcmp((char *)curNode->name, "question2") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording question2'";
-	      question2 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-	      qDebug() << question2;
-	    }
-	  if( !strcmp((char *)curNode->name, "question3") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording question3'";
-	      question3 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-	      qDebug() << question3;
-	    }
-	  
-	  if( !strcmp((char *)curNode->name, "startDT") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording start daytime'";
-	      dtStart = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(curNode)),Qt::ISODate);
-	      qDebug() << dtStart.toString();
-	    }
-	  if( !strcmp((char *)curNode->name, "endDT") )
-	    {
-	      qDebug() << "CFrmAdminInfo::printElementNames(), recording end daytime'";
-	      dtEnd = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(curNode)),Qt::ISODate);
-	      qDebug() << dtEnd.toString();
+        if (curNode->type == XML_ELEMENT_NODE)
+        {
+            if( !strcmp((char *)curNode->name, "lock") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording lock'";
+                nLockNum = atoi((char *)xmlNodeGetContent(curNode));
+                qDebug() << nLockNum;
+            }
+            if( !strcmp((char *)curNode->name, "code1") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording code1'";
+                sAccessCode = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
+                qDebug() << sAccessCode;
+            }
+            if( !strcmp((char *)curNode->name, "code2") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording code2'";
+                sSecondCode = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
+                qDebug() << sSecondCode;
+            }
+            if( !strcmp((char *)curNode->name, "username") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording user'";
+                description = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
+                qDebug() << description;
+            }
+            if( !strcmp((char *)curNode->name, "question1") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording question1'";
+                question1 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
+                qDebug() << question1;
+            }
+            if( !strcmp((char *)curNode->name, "question2") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording question2'";
+                question2 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
+                qDebug() << question2;
+            }
+            if( !strcmp((char *)curNode->name, "question3") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording question3'";
+                question3 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
+                qDebug() << question3;
+            }
 
-	      
-	      _pState = createNewLockState();
-	      if(!_pworkingSet) {
-		_pworkingSet = new CLockSet();
-	      }
-	      qDebug() << "CFrmAdminInfo::printElementNames(), ADD CODE";
+            if( !strcmp((char *)curNode->name, "startDT") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording start daytime'";
+                dtStart = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(curNode)),Qt::ISODate);
+                qDebug() << dtStart.toString();
+            }
+            if( !strcmp((char *)curNode->name, "endDT") )
+            {
+                qDebug() << "CFrmAdminInfo::printElementNames(), recording end daytime'";
+                dtEnd = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(curNode)),Qt::ISODate);
+                qDebug() << dtEnd.toString();
 
-	      // NEED TO ADD XML PARSING FOR QUESTIONS
-	      
-	      emit(__OnDoneSave(-1, -1, nLockNum, sAccessCode, sSecondCode,
-			      description, dtStart, dtEnd,
-				false, false, false, question1, question2, question3));
-	    }
-	}
-      printElementNames(curNode->children);
+
+                _pState = createNewLockState();
+                if(!_pworkingSet) {
+                    _pworkingSet = new CLockSet();
+                }
+                qDebug() << "CFrmAdminInfo::printElementNames(), ADD CODE";
+
+                // NEED TO ADD XML PARSING FOR QUESTIONS
+
+                emit(__OnDoneSave(-1, -1, nLockNum, sAccessCode, sSecondCode,
+                                  description, dtStart, dtEnd,
+                                  false, false, false, question1, question2, question3));
+            }
+        }
+        printElementNames(curNode->children);
     }
 }
 
 void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
 {
-  qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()";
-  
-  xmlDoc *doc = NULL;
-  xmlNode *rootElement = NULL;
+    qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()";
 
-  if( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
+    xmlDoc *doc = NULL;
+    xmlNode *rootElement = NULL;
+
+    if( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
     {
-      int nRC = QMessageBox::warning(this, tr("XML Parsing Failed"),
-				     tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
-				     QMessageBox::Ok);
-     qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked(), can't parse XML file: " << _copyDirectory;
-      return;
+        int nRC = QMessageBox::warning(this, tr("XML Parsing Failed"),
+                                       tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
+                                       QMessageBox::Ok);
+        qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked(), can't parse XML file: " << _copyDirectory;
+        return;
     }
 
     rootElement = xmlDocGetRootElement(doc);
     printElementNames(rootElement);
     xmlFreeDoc(doc);
     xmlCleanupParser();
-    
+
     int nRC = QMessageBox::warning(this, tr("Bulk Code Upload Complete"),
                                    tr("Please check the 'Codes' tab to see that your codes were added successfully."),
                                    QMessageBox::Ok);
 }
 
-
 void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
 {
-  qDebug() << "CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()";
+    qDebug() << "CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()";
 
-  QString createCmd = " cp '";
-  int nRC = QMessageBox::warning(this, tr("Set New Branding Image"),
-				 tr("The new branding image will be set to the selected file and scaled to 760x390.\nDo you want to continue?"),
-				 QMessageBox::Yes, QMessageBox::Cancel);
-  if(nRC == QMessageBox::Yes) {
-    sync();
-    createCmd += _copyDirectory;
-    createCmd += "' /home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg";
-    std::system(createCmd.toStdString().c_str());
-  }
+    QString createCmd = " cp '";
+    int nRC = QMessageBox::warning(this, tr("Set New Branding Image"),
+                                   tr("The new branding image will be set to the selected file and scaled to 760x390.\nDo you want to continue?"),
+                                   QMessageBox::Yes, QMessageBox::Cancel);
+    if(nRC == QMessageBox::Yes) {
+        sync();
+        createCmd += _copyDirectory;
+        createCmd += "' /home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg";
+        std::system(createCmd.toStdString().c_str());
+    }
 }
 
 void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
 {
-  qDebug() << "CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()";
-  int nRC = QMessageBox::warning(this, tr("Verify Branding Image Reset"),
-				 tr("The branding image will be reset to the default.\nDo you want to continue?"),
-				 QMessageBox::Yes, QMessageBox::Cancel);
-  if(nRC == QMessageBox::Yes) {
-    sync();
-   std::system("cp /home/pi/dev/keycodebox/alpha/images/alpha_logo_touch.jpg /home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg");
-  }
+    qDebug() << "CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()";
+    int nRC = QMessageBox::warning(this, tr("Verify Branding Image Reset"),
+                                   tr("The branding image will be reset to the default.\nDo you want to continue?"),
+                                   QMessageBox::Yes, QMessageBox::Cancel);
+    if(nRC == QMessageBox::Yes) {
+        sync();
+        std::system("cp /home/pi/dev/keycodebox/alpha/images/alpha_logo_touch.jpg /home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg");
+    }
 }
-
 
 void CFrmAdminInfo::open_single_door(int nLockNum)
 {
-  emit __OnOpenLockRequest(nLockNum);
+    emit __OnOpenLockRequest(nLockNum);
 }
 
 void CFrmAdminInfo::populateAvailableDoors() {
@@ -756,7 +748,7 @@ void CFrmAdminInfo::populateAvailableDoors() {
     QList<QPushButton*>::Iterator   itor;
     lstWidgets = ui->tabWidget->findChildren<QPushButton *>();
     int nLockNum = 0;
-    
+
     for(itor = lstWidgets.begin(); itor != lstWidgets.end(); itor++)
     {
         pb = (QPushButton*)(*itor);
@@ -766,7 +758,7 @@ void CFrmAdminInfo::populateAvailableDoors() {
 
         if((QString(pb->metaObject()->className()) == QString("QPushButton")) &&
                 (pb->objectName().mid(0, 5) == "cbBox"))
-	  qDebug() << "cbBox";
+            qDebug() << "cbBox";
         {
             nLockNum = parseLockNumFromObjectName(pb->objectName());
             if(_pLocksStatus->isLock(nLockNum)) {
@@ -796,14 +788,11 @@ void CFrmAdminInfo::createLockMenus()
     {
         pb = (QPushButton*)(*itor);
 
-//        qDebug() << "Widget Classname:" << pb->metaObject()->className();
-//        qDebug() << "objectName:" << pb->objectName();
-
         if((QString(pb->metaObject()->className()) == QString("QPushButton")) &&
                 (pb->objectName().mid(0, 5) == "cbBox"))
         {
-	    qDebug() << "createLockMenus cbBox";
-	    return;
+            qDebug() << "createLockMenus cbBox";
+            return;
 
             if(pb->menu() == NULL) {
                 QMenu* pmenu = new QMenu();
@@ -880,23 +869,23 @@ void CFrmAdminInfo::menuSelection(QAction *action)
     {
         qDebug() << "Open Lock Num:" << QVariant(nLockNum).toString();
         emit __OnOpenLockRequest(nLockNum);
-     } else if(action->text() == QString("Codes")) {
+    } else if(action->text() == QString("Codes")) {
         emit __LocalOnReadLockSet(nLockNum,
-                QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"),
-                QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"));
+                                  QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"),
+                                  QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"));
         // Switch tabs
         ui->tabWidget->setCurrentIndex(3);
     } else if(action->text() == QString("History")) {
         emit __LocalOnReadLockHistorySet(nLockNum,
-                QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"),
-                QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"));
+                                         QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"),
+                                         QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"));
         ui->tabWidget->setCurrentIndex(4);
     }
 }
 
 void CFrmAdminInfo::onStartEditLabel(QLabel* pLabel, QString sLabelText)
 {
-//    ui->tabWidget->hide();
+    //    ui->tabWidget->hide();
     if(!_pKeyboard) {
         _pKeyboard = new CDlgFullKeyboard();
         connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*,CCurrentEdit*)),
@@ -926,8 +915,6 @@ void CFrmAdminInfo::onStopEdit()
     ui->tabWidget->show();
     ui->widgetEdit->hide();
 }
-
-
 
 void CFrmAdminInfo::checkAndCreateCurrentLabelEdit()
 {
@@ -1004,7 +991,7 @@ void CFrmAdminInfo::on_lblKey_clicked()
 
 void CFrmAdminInfo::on_btnSaveSettings_clicked()
 {
-  qDebug() << "on_btnSaveSettings_clicked()";
+    qDebug() << "on_btnSaveSettings_clicked()";
     QDateTime   freq;
     bool    bNever = false;
     QString sFreq = ui->cbReportFreq->currentText();
@@ -1045,7 +1032,6 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
 
     _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
     _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
-//    ui->treeWidget
     _tmpAdminRec.setReportDirectory(_reportDirectory.toStdString());
 
     _bClose = false;
@@ -1094,93 +1080,15 @@ void CFrmAdminInfo::on_btnDone_clicked()
 
     _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
     _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
-//    ui->treeWidget
     _tmpAdminRec.setReportDirectory(_reportDirectory.toStdString());
 
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
 }
 
-/*
-void CFrmAdminInfo::on_btnDone_2_clicked()
-{
-    //on_btnDone_clicked();
-    // Close the app all together
-    // Copy the shell startup files out of the way of systemd so it won't continue to restart
-//    std::system("mv safepak.sh _safepak.sh");
-    std::system("mv ./SafePak/SafePak ./SafePak/_SafePak");
-    QCoreApplication::quit();
-}
-*/
-
-
-//void CFrmAdminInfo::onButtonClick(char key) {
-//    QString qkey(key);
-//    QString sCurrKey;
-//    // Central button handling.
-//    // Process local
-//    switch(key) {
-//        case 0x00:  // This is clear
-//            OnClearCodeDisplay();
-//            break;
-//        case 0x0D:  // Enter pressed
-//            onTextEntered();
-//            break;
-//        case 0x08:  // Del (destructive backspace) pressed
-//            onBackSpace();
-//            break;
-//        case 0x7F:  // Del Forware
-//            onDelete();
-//            break;
-
-//        case '0':
-//        case '1':
-//        case '2':
-//        case '3':
-//        case '4':
-//        case '5':
-//        case '6':
-//        case '7':
-//        case '8':
-//        case '9':
-//            sCurrKey = ui->edText->text() + qkey;
-//            ui->edText->setText(sCurrKey);
-//        break;
-//    default:    // Any
-//        sCurrKey = ui->edText->text() + qkey;
-//        ui->edText->setText(sCurrKey);
-
-//        break;
-//    }
-
-//    // Process through controller
-//    this->__KeyPressed(key);
-//}
-
 void CFrmAdminInfo::hideKeyboard(bool bHide) {
     ui->widgetEdit->setVisible(bHide);
 }
-
-//void CFrmAdminInfo::onTextEntered(CDlgFullKeyboard *pKeyBoard, CCurrentEdit *pCurrEdit)
-//{
-//    qDebug() << "onTextEntered(): " << pCurrEdit->getNewText();
-//    _pcurrentLabelEdit->stopEdit();
-//    QString sText = ui->edText->text();
-//    emit __OnCloseWidgetEdit();
-//    emit __TextEntered(sText);     // Signal that the code was entered.
-//    pKeyBoard->hide();
-//}
-
-//void CFrmAdminInfo::onBackSpace()
-//{
-//    // Destructive Backspace
-//    QString sCode = ui->edText->text();
-//    int nLen = sCode.length();
-//    if( nLen > 0 ) {
-//        sCode = sCode.left(nLen - 1);
-//        this->ui->edText->setText(sCode);
-//    }
-//}
 
 /**
  * @brief CFrmAdminInfo::onDelete
@@ -1246,7 +1154,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         qDebug() << "PRINT REPORT PRESSED";
         qDebug() << adminInfo->getReportViaEmail();
         qDebug() << adminInfo->getReportToFile();
-	
+
         if(adminInfo->getReportViaEmail())
             ui->cbReportViaEmail->setChecked(true);
         if(adminInfo->getReportToFile())
@@ -1274,26 +1182,26 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
 
 void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
 {
-  _pcopymodel = 0;
-  qDebug() << "CFrmAdminInfo::OnFoundNewStorageDevice()";
-  qDebug() << device0;
-  qDebug() << device1;
-  usbDevice0 = QString(device0);
-  usbDevice1 = QString(device1);
-  qDebug() << usbDevice0;
-  qDebug() << usbDevice1;
+    _pcopymodel = 0;
+    qDebug() << "CFrmAdminInfo::OnFoundNewStorageDevice()";
+    qDebug() << device0;
+    qDebug() << device1;
+    usbDevice0 = QString(device0);
+    usbDevice1 = QString(device1);
+    qDebug() << usbDevice0;
+    qDebug() << usbDevice1;
 
-  ui->btnCopyToggleSource->setText("Source #1");
-  
-  if( !ui->btnCopyToggleSource->text().compare("Source #1") )
+    ui->btnCopyToggleSource->setText("Source #1");
+
+    if( !ui->btnCopyToggleSource->text().compare("Source #1") )
     {
-      populateFileCopyWidget(usbDevice0, usbDevice1);
-      populateFileWidget(usbDevice0, usbDevice1);
+        populateFileCopyWidget(usbDevice0, usbDevice1);
+        populateFileWidget(usbDevice0, usbDevice1);
     }
-  if( !ui->btnCopyToggleSource->text().compare("Source #2") )
+    if( !ui->btnCopyToggleSource->text().compare("Source #2") )
     {
-      populateFileCopyWidget(usbDevice1, usbDevice0);
-      populateFileWidget(usbDevice1, usbDevice0);
+        populateFileCopyWidget(usbDevice1, usbDevice0);
+        populateFileWidget(usbDevice1, usbDevice0);
     }
 }
 
@@ -1304,12 +1212,12 @@ void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
         _pState->clearModified();
         if(_pFrmCodeEdit)
         {
-	  /*
+            /*
             _pFrmCodeEdit->close();
             delete _pFrmCodeEdit;
             _pFrmCodeEdit = 0;
-	  */
-	  _pFrmCodeEdit->hide();
+      */
+            _pFrmCodeEdit->hide();
         }
         displayInTable(_pworkingSet);
     } else {
@@ -1320,44 +1228,43 @@ void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
 
 void CFrmAdminInfo::on_cbInternetTime_clicked()
 {
-  // Internet time set checked
-  if(ui->cbInternetTime->isChecked())
+    // Internet time set checked
+    if(ui->cbInternetTime->isChecked())
     {
-      //we check this flag in safepakmain.cpp
-      std::system("touch /home/pi/run/internetTime.flag");
-      
-      setTimeZone();
-      ui->dtSystemTime->setDisabled(true);
-      // update system time here
-      qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp ON";
-      std::system("sudo /etc/init.d/ntp stop");
-      
-      QCoreApplication::processEvents();
-      qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntpd -s";
-      std::system("sudo ntpd -s");
-      qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp OFF";
-      
+        //we check this flag in safepakmain.cpp
+        std::system("touch /home/pi/run/internetTime.flag");
+
+        setTimeZone();
+        ui->dtSystemTime->setDisabled(true);
+        // update system time here
+        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp ON";
+        std::system("sudo /etc/init.d/ntp stop");
+
         QCoreApplication::processEvents();
-	
-      std::system("sudo /etc/init.d/ntp start");
-      qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), setting datetime text";
-      ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
+        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntpd -s";
+        std::system("sudo ntpd -s");
+        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp OFF";
+
+        QCoreApplication::processEvents();
+
+        std::system("sudo /etc/init.d/ntp start");
+        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), setting datetime text";
+        ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
     }
-  else
+    else
     {
-      std::system("rm -rf /home/pi/run/internetTime.flag");
-      ui->dtSystemTime->setDisabled(false);
-      ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
+        std::system("rm -rf /home/pi/run/internetTime.flag");
+        ui->dtSystemTime->setDisabled(false);
+        ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
     }
 }
 
 void CFrmAdminInfo::on_btnSetTime_clicked()
 {
-  
-  if( !isInternetTime() )
+    if( !isInternetTime() )
     {
-      setTime();
-      setTimeZone();
+        setTime();
+        setTimeZone();
     }
 }
 
@@ -1369,462 +1276,459 @@ void CFrmAdminInfo::on_btnOpenDoor_clicked()
 {
     // Open selected door
     // cbOpenDoorNum
-//    ui->cbOpenDoorNum->currentText();
+    //    ui->cbOpenDoorNum->currentText();
 }
 
 void CFrmAdminInfo::on_cbBox1_clicked()
 {
-  qDebug() << "on_cbBox1_clicked()";
-  
-  emit __OnOpenLockRequest(1);
+    qDebug() << "on_cbBox1_clicked()";
+
+    emit __OnOpenLockRequest(1);
 }
 
 void CFrmAdminInfo::on_cbBox2_clicked()
 {
-  qDebug() << "on_cbBox2_clicked()";
-  
-  emit __OnOpenLockRequest(2);
+    qDebug() << "on_cbBox2_clicked()";
+
+    emit __OnOpenLockRequest(2);
 }
 
 void CFrmAdminInfo::on_cbBox3_clicked()
 {
-  qDebug() << "on_cbBox3_clicked()";
-  
-  emit __OnOpenLockRequest(3);
+    qDebug() << "on_cbBox3_clicked()";
+
+    emit __OnOpenLockRequest(3);
 }
 
 void CFrmAdminInfo::on_cbBox4_clicked()
 {
-  qDebug() << "on_cbBox4_clicked()";
-  
-  emit __OnOpenLockRequest(4);
+    qDebug() << "on_cbBox4_clicked()";
+
+    emit __OnOpenLockRequest(4);
 }
 
 void CFrmAdminInfo::on_cbBox5_clicked()
 {
-  qDebug() << "on_cbBox1_clicked()";
-  
-  emit __OnOpenLockRequest(5);
+    qDebug() << "on_cbBox1_clicked()";
+
+    emit __OnOpenLockRequest(5);
 }
 
 void CFrmAdminInfo::on_cbBox6_clicked()
 {
-  qDebug() << "on_cbBox6_clicked()";
-  
-  emit __OnOpenLockRequest(6);
+    qDebug() << "on_cbBox6_clicked()";
+
+    emit __OnOpenLockRequest(6);
 }
 
 void CFrmAdminInfo::on_cbBox7_clicked()
 {
-  qDebug() << "on_cbBox7_clicked()";
-  
-  emit __OnOpenLockRequest(7);
+    qDebug() << "on_cbBox7_clicked()";
+
+    emit __OnOpenLockRequest(7);
 }
 
 void CFrmAdminInfo::on_cbBox8_clicked()
 {
-  qDebug() << "on_cbBox8_clicked()";
-  
-  emit __OnOpenLockRequest(8);
+    qDebug() << "on_cbBox8_clicked()";
+
+    emit __OnOpenLockRequest(8);
 }
 
 void CFrmAdminInfo::on_cbBox9_clicked()
 {
-  qDebug() << "on_cbBox9_clicked()";
-  
-  emit __OnOpenLockRequest(9);
+    qDebug() << "on_cbBox9_clicked()";
+
+    emit __OnOpenLockRequest(9);
 }
 
 void CFrmAdminInfo::on_cbBox10_clicked()
 {
-  qDebug() << "on_cbBox10_clicked()";
-  
-  emit __OnOpenLockRequest(10);
+    qDebug() << "on_cbBox10_clicked()";
+
+    emit __OnOpenLockRequest(10);
 }
 
 void CFrmAdminInfo::on_cbBox11_clicked()
 {
-  qDebug() << "on_cbBox11_clicked()";
-  
-  emit __OnOpenLockRequest(11);
+    qDebug() << "on_cbBox11_clicked()";
+
+    emit __OnOpenLockRequest(11);
 }
 
 void CFrmAdminInfo::on_cbBox12_clicked()
 {
-  qDebug() << "on_cbBox12_clicked()";
-  
-  emit __OnOpenLockRequest(12);
+    qDebug() << "on_cbBox12_clicked()";
+
+    emit __OnOpenLockRequest(12);
 }
 
 void CFrmAdminInfo::on_cbBox13_clicked()
 {
-  qDebug() << "on_cbBox13_clicked()";
-  
-  emit __OnOpenLockRequest(13);
+    qDebug() << "on_cbBox13_clicked()";
+
+    emit __OnOpenLockRequest(13);
 }
 
 void CFrmAdminInfo::on_cbBox14_clicked()
 {
-  qDebug() << "on_cbBox14_clicked()";
-  
-  emit __OnOpenLockRequest(14);
+    qDebug() << "on_cbBox14_clicked()";
+
+    emit __OnOpenLockRequest(14);
 }
 
 void CFrmAdminInfo::on_cbBox15_clicked()
 {
-  qDebug() << "on_cbBox15_clicked()";
-  
-  emit __OnOpenLockRequest(15);
+    qDebug() << "on_cbBox15_clicked()";
+
+    emit __OnOpenLockRequest(15);
 }
 
 void CFrmAdminInfo::on_cbBox16_clicked()
 {
-  qDebug() << "on_cbBox16_clicked()";
-  
-  emit __OnOpenLockRequest(16);
+    qDebug() << "on_cbBox16_clicked()";
+
+    emit __OnOpenLockRequest(16);
 }
 
 void CFrmAdminInfo::on_cbBox17_clicked()
 {
-  qDebug() << "on_cbBox17_clicked()";
-  
-  emit __OnOpenLockRequest(17);
+    qDebug() << "on_cbBox17_clicked()";
+
+    emit __OnOpenLockRequest(17);
 }
 
 void CFrmAdminInfo::on_cbBox18_clicked()
 {
-  qDebug() << "on_cbBox18_clicked()";
-  
-  emit __OnOpenLockRequest(18);
+    qDebug() << "on_cbBox18_clicked()";
+
+    emit __OnOpenLockRequest(18);
 }
 
 void CFrmAdminInfo::on_cbBox19_clicked()
 {
-  qDebug() << "on_cbBox19_clicked()";
-  
-  emit __OnOpenLockRequest(19);
+    qDebug() << "on_cbBox19_clicked()";
+
+    emit __OnOpenLockRequest(19);
 }
 
 void CFrmAdminInfo::on_cbBox20_clicked()
 {
-  qDebug() << "on_cbBox20_clicked()";
-  
-  emit __OnOpenLockRequest(20);
+    qDebug() << "on_cbBox20_clicked()";
+
+    emit __OnOpenLockRequest(20);
 }
 
 void CFrmAdminInfo::on_cbBox21_clicked()
 {
-  qDebug() << "on_cbBox21_clicked()";
-  
-  emit __OnOpenLockRequest(21);
+    qDebug() << "on_cbBox21_clicked()";
+
+    emit __OnOpenLockRequest(21);
 }
 
 void CFrmAdminInfo::on_cbBox22_clicked()
 {
-  qDebug() << "on_cbBox22_clicked()";
-  
-  emit __OnOpenLockRequest(22);
+    qDebug() << "on_cbBox22_clicked()";
+
+    emit __OnOpenLockRequest(22);
 }
 
 void CFrmAdminInfo::on_cbBox23_clicked()
 {
-  qDebug() << "on_cbBox23_clicked()";
-  
-  emit __OnOpenLockRequest(23);
+    qDebug() << "on_cbBox23_clicked()";
+
+    emit __OnOpenLockRequest(23);
 }
 
 void CFrmAdminInfo::on_cbBox24_clicked()
 {
-  qDebug() << "on_cbBox24_clicked()";
-  
-  emit __OnOpenLockRequest(24);
+    qDebug() << "on_cbBox24_clicked()";
+
+    emit __OnOpenLockRequest(24);
 }
 
 void CFrmAdminInfo::on_cbBox25_clicked()
 {
-  qDebug() << "on_cbBox25_clicked()";
-  
-  emit __OnOpenLockRequest(25);
+    qDebug() << "on_cbBox25_clicked()";
+
+    emit __OnOpenLockRequest(25);
 }
 
 void CFrmAdminInfo::on_cbBox26_clicked()
 {
-  qDebug() << "on_cbBox26_clicked()";
-  
-  emit __OnOpenLockRequest(26);
+    qDebug() << "on_cbBox26_clicked()";
+
+    emit __OnOpenLockRequest(26);
 }
 
 void CFrmAdminInfo::on_cbBox27_clicked()
 {
-  qDebug() << "on_cbBox27_clicked()";
-  
-  emit __OnOpenLockRequest(27);
+    qDebug() << "on_cbBox27_clicked()";
+
+    emit __OnOpenLockRequest(27);
 }
 
 void CFrmAdminInfo::on_cbBox28_clicked()
 {
-  qDebug() << "on_cbBox28_clicked()";
-  
-  emit __OnOpenLockRequest(28);
+    qDebug() << "on_cbBox28_clicked()";
+
+    emit __OnOpenLockRequest(28);
 }
 
 void CFrmAdminInfo::on_cbBox29_clicked()
 {
-  qDebug() << "on_cbBox29_clicked()";
-  
-  emit __OnOpenLockRequest(29);
+    qDebug() << "on_cbBox29_clicked()";
+
+    emit __OnOpenLockRequest(29);
 }
 
 void CFrmAdminInfo::on_cbBox30_clicked()
 {
-  qDebug() << "on_cbBox30_clicked()";
-  
-  emit __OnOpenLockRequest(30);
+    qDebug() << "on_cbBox30_clicked()";
+
+    emit __OnOpenLockRequest(30);
 }
 
 void CFrmAdminInfo::on_cbBox31_clicked()
 {
-  qDebug() << "on_cbBox31_clicked()";
-  
-  emit __OnOpenLockRequest(31);
+    qDebug() << "on_cbBox31_clicked()";
+
+    emit __OnOpenLockRequest(31);
 }
 
 void CFrmAdminInfo::on_cbBox32_clicked()
 {
-  qDebug() << "on_cbBox32_clicked()";
-  
-  emit __OnOpenLockRequest(32);
+    qDebug() << "on_cbBox32_clicked()";
+
+    emit __OnOpenLockRequest(32);
 }
 
 void CFrmAdminInfo::on_cbBox33_clicked()
 {
-  qDebug() << "on_cbBox33_clicked()";
-  
-  emit __OnOpenLockRequest(33);
+    qDebug() << "on_cbBox33_clicked()";
+
+    emit __OnOpenLockRequest(33);
 }
 
 void CFrmAdminInfo::on_cbBox34_clicked()
 {
-  qDebug() << "on_cbBox34_clicked()";
-  
-  emit __OnOpenLockRequest(34);
+    qDebug() << "on_cbBox34_clicked()";
+
+    emit __OnOpenLockRequest(34);
 }
 
 void CFrmAdminInfo::on_cbBox35_clicked()
 {
-  qDebug() << "on_cbBox35_clicked()";
-  
-  emit __OnOpenLockRequest(35);
+    qDebug() << "on_cbBox35_clicked()";
+
+    emit __OnOpenLockRequest(35);
 }
 
 void CFrmAdminInfo::on_cbBox36_clicked()
 {
-  qDebug() << "on_cbBox36_clicked()";
-  
-  emit __OnOpenLockRequest(36);
+    qDebug() << "on_cbBox36_clicked()";
+
+    emit __OnOpenLockRequest(36);
 }
 
 void CFrmAdminInfo::on_cbBox37_clicked()
 {
-  qDebug() << "on_cbBox37_clicked()";
-  
-  emit __OnOpenLockRequest(37);
+    qDebug() << "on_cbBox37_clicked()";
+
+    emit __OnOpenLockRequest(37);
 }
 
 void CFrmAdminInfo::on_cbBox38_clicked()
 {
-  qDebug() << "on_cbBox38_clicked()";
-  
-  emit __OnOpenLockRequest(38);
+    qDebug() << "on_cbBox38_clicked()";
+
+    emit __OnOpenLockRequest(38);
 }
 
 void CFrmAdminInfo::on_cbBox39_clicked()
 {
-  qDebug() << "on_cbBox39_clicked()";
-  
-  emit __OnOpenLockRequest(39);
+    qDebug() << "on_cbBox39_clicked()";
+
+    emit __OnOpenLockRequest(39);
 }
 
 void CFrmAdminInfo::on_cbBox40_clicked()
 {
-  qDebug() << "on_cbBox40_clicked()";
-  
-  emit __OnOpenLockRequest(40);
+    qDebug() << "on_cbBox40_clicked()";
+
+    emit __OnOpenLockRequest(40);
 }
 
 void CFrmAdminInfo::on_cbBox41_clicked()
 {
-  qDebug() << "on_cbBox41_clicked()";
-  
-  emit __OnOpenLockRequest(41);
+    qDebug() << "on_cbBox41_clicked()";
+
+    emit __OnOpenLockRequest(41);
 }
 
 void CFrmAdminInfo::on_cbBox42_clicked()
 {
-  qDebug() << "on_cbBox42_clicked()";
-  
-  emit __OnOpenLockRequest(42);
+    qDebug() << "on_cbBox42_clicked()";
+
+    emit __OnOpenLockRequest(42);
 }
 
 void CFrmAdminInfo::on_cbBox43_clicked()
 {
-  qDebug() << "on_cbBox43_clicked()";
-  
-  emit __OnOpenLockRequest(43);
+    qDebug() << "on_cbBox43_clicked()";
+
+    emit __OnOpenLockRequest(43);
 }
 
 void CFrmAdminInfo::on_cbBox44_clicked()
 {
-  qDebug() << "on_cbBox44_clicked()";
-  
-  emit __OnOpenLockRequest(44);
+    qDebug() << "on_cbBox44_clicked()";
+
+    emit __OnOpenLockRequest(44);
 }
 
 void CFrmAdminInfo::on_cbBox45_clicked()
 {
-  qDebug() << "on_cbBox45_clicked()";
-  
-  emit __OnOpenLockRequest(45);
+    qDebug() << "on_cbBox45_clicked()";
+
+    emit __OnOpenLockRequest(45);
 }
 
 void CFrmAdminInfo::on_cbBox46_clicked()
 {
-  qDebug() << "on_cbBox46_clicked()";
-  
-  emit __OnOpenLockRequest(46);
+    qDebug() << "on_cbBox46_clicked()";
+
+    emit __OnOpenLockRequest(46);
 }
 
 void CFrmAdminInfo::on_cbBox47_clicked()
 {
-  qDebug() << "on_cbBox47_clicked()";
-  
-  emit __OnOpenLockRequest(47);
+    qDebug() << "on_cbBox47_clicked()";
+
+    emit __OnOpenLockRequest(47);
 }
 
 void CFrmAdminInfo::on_cbBox48_clicked()
 {
-  qDebug() << "on_cbBox48_clicked()";
-  
-  emit __OnOpenLockRequest(48);
+    qDebug() << "on_cbBox48_clicked()";
+
+    emit __OnOpenLockRequest(48);
 }
 
 void CFrmAdminInfo::on_cbBox49_clicked()
 {
-  qDebug() << "on_cbBox49_clicked()";
-  
-  emit __OnOpenLockRequest(49);
+    qDebug() << "on_cbBox49_clicked()";
+
+    emit __OnOpenLockRequest(49);
 }
 
 void CFrmAdminInfo::on_cbBox50_clicked()
 {
-  qDebug() << "on_cbBox50_clicked()";
-  
-  emit __OnOpenLockRequest(50);
+    qDebug() << "on_cbBox50_clicked()";
+
+    emit __OnOpenLockRequest(50);
 }
 
 void CFrmAdminInfo::on_cbBox51_clicked()
 {
-  qDebug() << "on_cbBox51_clicked()";
-  
-  emit __OnOpenLockRequest(51);
+    qDebug() << "on_cbBox51_clicked()";
+
+    emit __OnOpenLockRequest(51);
 }
 
 void CFrmAdminInfo::on_cbBox52_clicked()
 {
-  qDebug() << "on_cbBox52_clicked()";
-  
-  emit __OnOpenLockRequest(52);
+    qDebug() << "on_cbBox52_clicked()";
+
+    emit __OnOpenLockRequest(52);
 }
 
 void CFrmAdminInfo::on_cbBox53_clicked()
 {
-  qDebug() << "on_cbBox53_clicked()";
-  
-  emit __OnOpenLockRequest(53);
+    qDebug() << "on_cbBox53_clicked()";
+
+    emit __OnOpenLockRequest(53);
 }
 
 void CFrmAdminInfo::on_cbBox54_clicked()
 {
-  qDebug() << "on_cbBox54_clicked()";
-  
-  emit __OnOpenLockRequest(54);
+    qDebug() << "on_cbBox54_clicked()";
+
+    emit __OnOpenLockRequest(54);
 }
 
 void CFrmAdminInfo::on_cbBox55_clicked()
 {
-  qDebug() << "on_cbBox55_clicked()";
-  
-  emit __OnOpenLockRequest(55);
+    qDebug() << "on_cbBox55_clicked()";
+
+    emit __OnOpenLockRequest(55);
 }
 
 void CFrmAdminInfo::on_cbBox56_clicked()
 {
-  qDebug() << "on_cbBox56_clicked()";
-  
-  emit __OnOpenLockRequest(56);
+    qDebug() << "on_cbBox56_clicked()";
+
+    emit __OnOpenLockRequest(56);
 }
 
 void CFrmAdminInfo::on_cbBox57_clicked()
 {
-  qDebug() << "on_cbBox57_clicked()";
-  
-  emit __OnOpenLockRequest(57);
+    qDebug() << "on_cbBox57_clicked()";
+
+    emit __OnOpenLockRequest(57);
 }
 
 void CFrmAdminInfo::on_cbBox58_clicked()
 {
-  qDebug() << "on_cbBox58_clicked()";
-  
-  emit __OnOpenLockRequest(58);
+    qDebug() << "on_cbBox58_clicked()";
+
+    emit __OnOpenLockRequest(58);
 }
 
 void CFrmAdminInfo::on_cbBox59_clicked()
 {
-  qDebug() << "on_cbBox59_clicked()";
-  
-  emit __OnOpenLockRequest(59);
+    qDebug() << "on_cbBox59_clicked()";
+
+    emit __OnOpenLockRequest(59);
 }
 
 void CFrmAdminInfo::on_cbBox60_clicked()
 {
-  qDebug() << "on_cbBox60_clicked()";
-  
-  emit __OnOpenLockRequest(60);
+    qDebug() << "on_cbBox60_clicked()";
+
+    emit __OnOpenLockRequest(60);
 }
 
 void CFrmAdminInfo::on_cbBox61_clicked()
 {
-  qDebug() << "on_cbBox61_clicked()";
-  
-  emit __OnOpenLockRequest(61);
+    qDebug() << "on_cbBox61_clicked()";
+
+    emit __OnOpenLockRequest(61);
 }
 
 void CFrmAdminInfo::on_cbBox62_clicked()
 {
-  qDebug() << "on_cbBox62_clicked()";
-  
-  emit __OnOpenLockRequest(62);
+    qDebug() << "on_cbBox62_clicked()";
+
+    emit __OnOpenLockRequest(62);
 }
 
 void CFrmAdminInfo::on_cbBox63_clicked()
 {
-  qDebug() << "on_cbBox63_clicked()";
-  
-  emit __OnOpenLockRequest(63);
+    qDebug() << "on_cbBox63_clicked()";
+
+    emit __OnOpenLockRequest(63);
 }
 
 void CFrmAdminInfo::on_cbBox64_clicked()
 {
-  qDebug() << "on_cbBox64_clicked()";
-  
-  emit __OnOpenLockRequest(64);
+    qDebug() << "on_cbBox64_clicked()";
+
+    emit __OnOpenLockRequest(64);
 }
 
 void CFrmAdminInfo::on_btnReadDoorLocks_2_clicked()
 {
-    //
-//    ui->btnReadDoorLocks_2->setEnabled(false);
-//    emit __OnReadDoorLocksState();
 }
 
 void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
@@ -1832,18 +1736,9 @@ void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
     qDebug() << "CFrmAdminInfo::OnLockStatusUpdate()";
     _pLocksStatus = locksStatus;
 
-//    ui->btnReadDoorLocks_2->setEnabled(true);
-
-//    QString sText;
-//    for(int i=1; i< 65; i++)
-//    {
-//        sText << "cbBox" << i;
-//        qDebug() << sText;
-//    }
     // Update the view
     // Populate the Available doors combobox
     populateAvailableDoors();
-    //createLockMenus();
 }
 
 void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
@@ -1874,8 +1769,6 @@ const int fEnd = 5;
 */
 void CFrmAdminInfo::codeTableCellSelected(int nRow, int nCol)
 {
-//    QMessageBox::information(this, "", "Cell at row " + QString::number(nRow) + " column " + QString::number(nCol) + " was double clicked.");
-
     if(_pworkingSet)
     {
         CLockSet::Iterator itor;
@@ -1892,8 +1785,6 @@ void CFrmAdminInfo::codeTableCellSelected(int nRow, int nCol)
 
 void CFrmAdminInfo::codeHistoryTableCellSelected(int nRow, int nCol)
 {
-//    QMessageBox::information(this, "", "Cell at row " + QString::number(nRow) + " column " + QString::number(nCol) + " was double clicked.");
-
     if(_pworkingSet)
     {
         CLockSet::Iterator itor;
@@ -1907,7 +1798,6 @@ void CFrmAdminInfo::codeHistoryTableCellSelected(int nRow, int nCol)
         // Pull up code entry for edit
     }
 }
-
 
 void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 {
@@ -1936,19 +1826,12 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     CLockSet::Iterator itor;
     CLockState  *pState;
 
-    // if(_pworkingSet && _pworkingSet != pSet) {
-    //    _pworkingSet->clearSet();
-    //    delete _pworkingSet;
-    //    _pworkingSet = 0;
-    //}
-
     _pworkingSet = pSet;    // Hold onto the set for additional work.
 
     connect( table, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT( codeTableCellSelected( int, int ) ) );
 
     table->setStyleSheet("QTableView {selection-background-color: gray;}");
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-//    table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
 
     int nRow = 0;
@@ -1957,7 +1840,7 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
     QDateTime alwaysActiveStart = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
     QDateTime alwaysActiveEnd = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
-    
+
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
@@ -1968,41 +1851,30 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getDescription().c_str()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode1().c_str()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2().c_str()));
-	
-	if( (pState->getStartTime().secsTo(alwaysActiveStart) == 0) && (pState->getEndTime().secsTo(alwaysActiveEnd) == 0) )
-	  {
-	    table->setItem(nRow, nCol++, new QTableWidgetItem("ALWAYS"));
-	    table->setItem(nRow, nCol++, new QTableWidgetItem("ACTIVE"));
-	  }
-	else
-	  { 
-	    table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getStartTime().toString("MMM dd yyyy hh:mm:ss AP")));
-	    table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getEndTime().toString("MMM dd yyyy hh:mm:ss AP")));
-	  }
-	nRow++;
+
+        if( (pState->getStartTime().secsTo(alwaysActiveStart) == 0) && (pState->getEndTime().secsTo(alwaysActiveEnd) == 0) )
+        {
+            table->setItem(nRow, nCol++, new QTableWidgetItem("ALWAYS"));
+            table->setItem(nRow, nCol++, new QTableWidgetItem("ACTIVE"));
+        }
+        else
+        {
+            table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getStartTime().toString("MMM dd yyyy hh:mm:ss AP")));
+            table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getEndTime().toString("MMM dd yyyy hh:mm:ss AP")));
+        }
+        nRow++;
     }
 }
 
-
 void CFrmAdminInfo::setupCodeTableContextMenu() {
     QTableWidget    *table = ui->tblCodesList;
-//    QAction *pActionDel, *pActionEdit, *pActionAdd;
-//    pActionDel = new QAction("Delete Selected");
-//    pActionAdd = new QAction("Add Code");
-//    pActionEdit = new QAction("Edit Code");
-//    table->addAction(pActionDel);
-//    table->addAction(pActionAdd);
-//    table->addAction(pActionEdit);
-//    connect(pActionDel, SIGNAL(triggered(bool)), this, SLOT(codeDeleteSelection(bool)));
-//    connect(pActionAdd, SIGNAL(triggered(bool)), this, SLOT(codeAddNew(bool)));
-//    connect(pActionEdit, SIGNAL(triggered(bool)), this, SLOT(codeEditSelection(bool)));
 
     _pTableMenu = new QMenu(table);
     _pTableMenu->addAction("Edit Code", this, SLOT(codeEditSelection()));
     _pTableMenu->addAction("Add Code", this, SLOT(codeInitNew()));
     _pTableMenu->addAction("Delete", this, SLOT(codeDeleteSelection()));
     connect(table,SIGNAL(cellClicked(int,int)),this,SLOT(OnRowSelected(int, int)));
-    
+
     _pTableMenuAdd = new QMenu(table);
     _pTableMenuAdd->addAction("Add Code", this, SLOT(codeInitNew()));
     connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnHeaderSelected(int)));
@@ -2038,8 +1910,6 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
 
     table->setStyleSheet("QTableView {selection-background-color: lightblue;}");
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-//    table->setSelectionBehavior(QAbstractItemView::SelectRows);
-//    table->setSelectionMode(QAbstractItemView::SingleSelection);
 
     int nRow = 0;
     int nCol = 0;
@@ -2060,7 +1930,6 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getAccessTime().toString("yyyy-MM-dd HH:mm:ss AP")));
         nRow++;
     }
-
 }
 
 void CFrmAdminInfo::codeDeleteSelection()
@@ -2084,11 +1953,11 @@ void CFrmAdminInfo::codeAddNew()
 void CFrmAdminInfo::codeInitNew()
 {
     qDebug() << "codeInitNew";
-    
+
     int nLock = ui->cbLockNum->currentIndex();
     qDebug() << " " << QString::number(nLock) << "\n";
     if( nLock == -1 )
-      nLock = 1;
+        nLock = 1;
     addCodeByRow(nLock);
 }
 
@@ -2113,15 +1982,7 @@ void CFrmAdminInfo::codeCellSelected( int row, int col) {
             // itor is our man!
             pState = itor.value();
         }
-//        qDebug() << "Adding row of Lock State - Codes. Lock Num:" << QVariant(pState->getLockNum()).toString();
-//        nCol = 0;
-//        table->setItem(nRow, nCol++, new QTableWidgetItem(QVariant(pState->getLockNum()).toString()));
-//        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getDescription().c_str()));
-//        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode1().c_str()));
-//        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2().c_str()));
-//        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getStartTime().toString("yyyy-MM-dd HH:mm:ss")));
-//        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getEndTime().toString("yyyy-MM-dd HH:mm:ss")));
-//        nRow++;
+
         nRow++;
     }
 }
@@ -2144,8 +2005,6 @@ int CFrmAdminInfo::isLock(uint16_t nLockNum)
         return 0;
     }
 }
-
-
 
 void CFrmAdminInfo::openAllDoors()
 {
@@ -2184,7 +2043,6 @@ void CFrmAdminInfo::on_dialBright_valueChanged(int value)
 
 void CFrmAdminInfo::on_btnReadCodes_clicked()
 {
-    //
     QDateTime dtStart = ui->dtStartCodeList->dateTime();
     QDateTime dtEnd = ui->dtEndCodeList->dateTime();
     int nLock = ui->cbLockNum->currentIndex();
@@ -2195,7 +2053,7 @@ void CFrmAdminInfo::on_btnReadCodes_clicked()
 }
 
 void CFrmAdminInfo::LocalReadLockSet(int nLock, QDateTime dtStart, QDateTime dtEnd)
-{    
+{
     ui->cbLockNum->setCurrentIndex( nLock );
     ui->dtStartCodeList->setDateTime(dtStart);
     ui->dtEndCodeList->setDateTime(dtEnd);
@@ -2224,8 +2082,7 @@ void CFrmAdminInfo::on_btnReadCodes_2_clicked()
 
 void CFrmAdminInfo::onSMTPDialogComplete(CDlgSMTP *dlg)
 {
-  
-   _bClose = false;
+    _bClose = false;
     // Save
     QString smtpserver, smtpusername, smtppassword;
     int smtpport, smtptype;
@@ -2247,7 +2104,7 @@ void CFrmAdminInfo::onVNCDialogComplete(CDlgVNC *dlg)
     // Save
     _bClose = false;
     qDebug() << "onVNCDialogComplete";
-  
+
     QString vncpassword = "KEYCODEBOXDEFAULT";
     int vncport = 5900;
 
@@ -2259,7 +2116,6 @@ void CFrmAdminInfo::onVNCDialogComplete(CDlgVNC *dlg)
     _tmpAdminRec.setVNCPort(vncport);
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
 
-    
     FILE *pF;
     std::string sOutput = "";
     QString createCmd = "echo '|";
@@ -2270,10 +2126,10 @@ void CFrmAdminInfo::onVNCDialogComplete(CDlgVNC *dlg)
 
     pF = popen(createCmd.toStdString().c_str(), "r");
     if(!pF)
-      {
-	qDebug() << "failed to create vnc file";
-      }
-    
+    {
+        qDebug() << "failed to create vnc file";
+    }
+
     ExtractCommandOutput(pF, sOutput);
     fclose(pF);
 }
@@ -2290,18 +2146,6 @@ void CFrmAdminInfo::on_btnSetupSMTP_clicked()
     connect(dlgSMTP, SIGNAL(__onSMTPDialogComplete(CDlgSMTP *)), this, SLOT(onSMTPDialogComplete(CDlgSMTP *)));
     dlgSMTP->show();
     this->setEnabled(true);
-
-//    // Save
-//    QString smtpserver, smtpusername, smtppassword;
-//    int smtpport;
-
-//    qDebug() << "Getting SMTP Values to save";
-//    dlgSMTP->getValues(smtpservesmtppassword);
-//    _tmpAdminRec.setSMTPServer(smtpserver.toStdString());
-//    _tmpAdminRec.setSMTPPort(smtpport);
-//    _tmpAdminRec.setSMTPUsername(smtpusername.toStdString());
-//    _tmpAdminRec.setSMTPPassword(smtppassword.toStdString());
-//    emit __UpdateCurrentAdmin(&_tmpAdminRec);
 }
 
 void CFrmAdminInfo::on_btnSetupVNC_clicked()
@@ -2315,18 +2159,6 @@ void CFrmAdminInfo::on_btnSetupVNC_clicked()
     connect(dlgVNC, SIGNAL(__onVNCDialogComplete(CDlgVNC *)), this, SLOT(onVNCDialogComplete(CDlgVNC *)));
     dlgVNC->show();
     this->setEnabled(true);
-
-//    // Save
-//    QString vncserver, vncusername, vncpassword;
-//    int vncport;
-
-//    qDebug() << "Getting VNC Values to save";
-//    dlgVNC->getValues(vncserver, vncport, vncusername, vncpassword);
-//    _tmpAdminRec.setVNCServer(vncserver.toStdString());
-//    _tmpAdminRec.setVNCPort(vncport);
-//    _tmpAdminRec.setVNCUsername(vncusername.toStdString());
-//    _tmpAdminRec.setVNCPassword(vncpassword.toStdString());
-//    emit __UpdateCurrentAdmin(&_tmpAdminRec);
 }
 
 void CFrmAdminInfo::on_btnPrintReport_clicked()
@@ -2340,11 +2172,9 @@ void CFrmAdminInfo::on_btnPrintReport_clicked()
     _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
     _bClose = false;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
-    
+
     emit __OnImmediateReportRequest(dtStart, dtEnd, -1);
 }
-
-
 
 void CFrmAdminInfo::on_btnOpenAllDoors_2_clicked(bool checked)
 {
@@ -2362,10 +2192,10 @@ void CFrmAdminInfo::on_btnOpenAllDoors_2_clicked(bool checked)
 void CFrmAdminInfo::on_btnToggleSource_clicked(bool checked)
 {
     if(checked) {
-      populateFileWidget(usbDevice1, usbDevice0);
+        populateFileWidget(usbDevice1, usbDevice0);
         ui->btnToggleSource->setText("Source #2");
     } else {
-      populateFileWidget(usbDevice0, usbDevice1);
+        populateFileWidget(usbDevice0, usbDevice1);
         ui->btnToggleSource->setText("Source #1");
     }
 }
@@ -2385,117 +2215,30 @@ void CFrmAdminInfo::setTime()
 
 void CFrmAdminInfo::on_tblCodesList_doubleClicked(const QModelIndex &index)
 {
-//    _pState = createNewLockState();
-//    if(!_pworkingSet) {
-//        _pworkingSet = new CLockSet();
-//    }
-//    _pworkingSet->addToSet(_pState);
-
-//    if(!_pFrmCodeEdit) {
-//        _pFrmCodeEdit = new CFrmCodeEdit(this);
-//        _pFrmCodeEdit->setMaxLocks(_tmpAdminRec.getMaxLocks());
-//        connect(_pFrmCodeEdit, SIGNAL(OnClose()), this, SLOT(OnCodeEditClose()));
-//        connect(_pFrmCodeEdit, SIGNAL(OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime)),
-//                this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime)));
-//    }
-
-//    _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(),
-//                             _pState->getStartTime(), _pState->getEndTime());
-//    _pFrmCodeEdit->setEditingRow(-1);
-//    _pFrmCodeEdit->show();
 }
-
 
 void CFrmAdminInfo::on_tblCodesList_cellDoubleClicked(int row, int column)
 {
-//    qDebug() << "CFrmAdminInfo::on_tblCodesList_cellDoubleClicked";
-//    //
-//    _nRowSelected = row;
-//    if(column == 1) {
-//        if(!_pFrmCodeEdit) {
-//            _pFrmCodeEdit = new CFrmCodeEdit(this);
-//            _pFrmCodeEdit->setMaxLocks(_tmpAdminRec.getMaxLocks());
-//            connect(_pFrmCodeEdit, SIGNAL(OnClose()), this, SLOT(OnCodeEditClose()));
-//            connect(_pFrmCodeEdit, SIGNAL(OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime)),
-//                    this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime)));
-//        }
-//        // Get line values
-//        CLockSet::Iterator itor;
-//        _pState = 0;
-//        int nRow = 0;
-//        QTableWidget    *table = ui->tblCodesList;
-
-//        qDebug() << "before loop iterator cellClicked";
-
-//        itor = _pworkingSet->begin();
-//        if(itor == _pworkingSet->end()) {
-//            qDebug() << " working set must be empty.";
-//        }
-//        else {
-//            qDebug() << " working set isn't at the end";
-//        }
-//        for(; itor != _pworkingSet->end(); itor++)
-//        {
-//            qDebug() << "looping...cellClicked";
-//            if(nRow == row) {
-//                // itor is our man!
-//                qDebug() << "cell Clicked: Found 1. Row:" << QVariant(nRow).toString();
-//                _pState = itor.value();
-//                break;
-//            }
-//            nRow++;
-//        }
-
-//        if(_pState) {
-//            _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(),
-//                                     _pState->getStartTime(), _pState->getEndTime());
-//            _pFrmCodeEdit->setEditingRow(row);
-//            _pFrmCodeEdit->show();
-//        }
-//        else {
-//            _pState = createNewLockState();
-//            _pworkingSet->addToSet(_pState);
-
-//            _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(),
-//                                     _pState->getStartTime(), _pState->getEndTime());
-//            _pFrmCodeEdit->setEditingRow(-1);
-//            _pFrmCodeEdit->show();
-//        }
-//    }
 }
 
 // Add a new code
 void CFrmAdminInfo::on_tblCodesList_clicked(const QModelIndex &index)
 {
-//    qDebug() << "CFrmAdminInfo::on_tblCodesList_clicked";
-//    //
-//    if(!_pFrmCodeEdit) {
-//        _pFrmCodeEdit = new CFrmCodeEdit(this);
-//        _pFrmCodeEdit->setMaxLocks(_tmpAdminRec.getMaxLocks());
-//    }
-//    _pFrmCodeEdit->setValues(-1, 1, "", "", "", QDateTime(), QDateTime());
-//    _pFrmCodeEdit->show();
 }
 
 void CFrmAdminInfo::OnCodeEditClose() {
     //
     if(_pFrmCodeEdit)
     {
-      /*
-        _pFrmCodeEdit->close();
-        delete _pFrmCodeEdit;
-        _pFrmCodeEdit = 0;
-      */
-      _pFrmCodeEdit->hide();
+        _pFrmCodeEdit->hide();
     }
 }
 
 void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum, QString sAccessCode,
-				       QString sSecondCode, QString sDescription, QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2,
-				       bool askQuestions, QString question1, QString question2, QString question3)
+                                       QString sSecondCode, QString sDescription, QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2,
+                                       bool askQuestions, QString question1, QString question2, QString question3)
 {
-
-  qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave(), nRow: " << QString::number(nRow) << " nId: " << QString::number(nId); 
+    qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave(), nRow: " << QString::number(nRow) << " nId: " << QString::number(nId);
     _pState->setLockNum(nLockNum);
     _pState->setCode1(sAccessCode.toStdString());
     _pState->setCode2(sSecondCode.toStdString());
@@ -2504,22 +2247,19 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum, QString 
     _pState->setEndTime(dtEnd);
 
     if(fingerprint1)
-      _pState->setFingerprint1();
+        _pState->setFingerprint1();
     else
-      _pState->clearFingerprint1();
+        _pState->clearFingerprint1();
 
+    qDebug() << "------------------------QUESTION 1: " << question1;
+    qDebug() << "------------------------QUESTION 2: " << question2;
+    qDebug() << "------------------------QUESTION 3: " << question3;
 
-      qDebug() << "------------------------QUESTION 1: " << question1;
-      
-      qDebug() << "------------------------QUESTION 2: " << question2;
-      
-      qDebug() << "------------------------QUESTION 3: " << question3;
-    
     _pState->setAskQuestions(askQuestions);
     _pState->setQuestion1(question1.toStdString());
     _pState->setQuestion2(question2.toStdString());
     _pState->setQuestion3(question3.toStdString());
-    
+
     if(_pState->isNew())
     {
         if(_pworkingSet)
@@ -2545,7 +2285,7 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum, QString 
             item->setText(dtStart.toString("MMM dd yyyy hh:mm AP"));
             item = table->item(nRow, nCol++);
             item->setText(dtEnd.toString("MMM dd yyyy hh:mm AP"));
-	    item=table->item(nRow, nCol++);
+            item=table->item(nRow, nCol++);
         }
         _pState->setModified();
         emit __OnUpdateCodeState(_pState);
@@ -2554,10 +2294,10 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum, QString 
 
 CLockState* CFrmAdminInfo::createNewLockState()
 {
-  int lockNum = ui->cbLockNum->currentIndex();
-  if( lockNum == -1 )
-    lockNum = 1;
-  
+    int lockNum = ui->cbLockNum->currentIndex();
+    if( lockNum == -1 )
+        lockNum = 1;
+
     CLockState  *pState;
     pState = new CLockState();
     pState->setID(-1);
@@ -2570,7 +2310,7 @@ CLockState* CFrmAdminInfo::createNewLockState()
 
     pState->clearFingerprint1();
     pState->clearFingerprint2();
-    
+
     pState->setNew();
     pState->clearMarkForDeletion();
     pState->clearModified();
@@ -2587,7 +2327,7 @@ void CFrmAdminInfo::OnRowSelected(int row, int column) {
     _nRowSelected = row;
     qDebug() << "Row Selected:" << QVariant(_nRowSelected).toString();
     _pTableMenu->show();
-    
+
     //MANUAL GEOMETRY
     QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
     _pTableMenu->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenu->width(), _pTableMenu->height());
@@ -2596,22 +2336,21 @@ void CFrmAdminInfo::OnRowSelected(int row, int column) {
 
 bool CFrmAdminInfo::eventFilter(QObject *target, QEvent *event)
 {
-  qDebug() << "eventFilter. Event type:" << QVariant(event->type()).toString();
+    qDebug() << "eventFilter. Event type:" << QVariant(event->type()).toString();
     if(event->type() == QEvent::TouchBegin )
-      {
+    {
         qDebug() << "TouchBegin";
         touchEvent(static_cast<QTouchEvent*>(event));
-	
+
         if(ui->tblCodesList->rowCount() == 0 )
-	  return true;
-      }
-    
+            return true;
+    }
+
     return QDialog::eventFilter(target, event);
 }
 
 void CFrmAdminInfo::OnCodes(QString code1, QString code2)
 {
-    //
     QString str = code1;
     if( code2.size() > 0 )
     {
@@ -2621,7 +2360,6 @@ void CFrmAdminInfo::OnCodes(QString code1, QString code2)
 
     emit __OnAdminInfoCodes(code1, code2);
 }
-
 
 void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 {
@@ -2639,17 +2377,16 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
             qDebug() << "Show Menu";
             _pTableMenuAdd->show();
             setTableMenuLocation(_pTableMenuAdd);
-	    
         }
-	
-	if(ui->tblCodesList->rowCount() > 0 )
+
+        if(ui->tblCodesList->rowCount() > 0 )
         {
             qDebug() << "Show Menu";
             _pTableMenu->show();
             setTableMenuLocation(_pTableMenu);
         }
         break;
-	
+
     case QEvent::TouchEnd:
         qDebug() << "TouchEnd rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString();
         if(ui->tblCodesList->rowCount() >= 0 )
@@ -2665,12 +2402,10 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) {
     _pTableMenuAdd->show();
-    
+
     //MANUAL GEOMETRY
     QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
     _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenu->width(), _pTableMenu->height());
-    
-    //setTableMenuLocation(_pTableMenuAdd);
 }
 
 void CFrmAdminInfo::checkAndCreateCodeEditForm()
@@ -2698,8 +2433,6 @@ void CFrmAdminInfo::addCodeByRow(int row)
     if(!_pworkingSet) {
         _pworkingSet = new CLockSet();
     }
-//    if(_pworkingSet)
-//        _pworkingSet->addToSet(_pState);
 
     _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(), _pState->getStartTime(), _pState->getEndTime(), false, false, _pState->getAskQuestions(), _pState->getQuestion1(), _pState->getQuestion2(), _pState->getQuestion3());
     _pFrmCodeEdit->setEditingRow(-1);
@@ -2716,7 +2449,6 @@ void CFrmAdminInfo::editCodeByRow(int row)
     int nRow = 0;
 
     qDebug() << "before loop iterator cellClicked";
-
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
@@ -2744,7 +2476,7 @@ void CFrmAdminInfo::editCodeByRow(int row)
         _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(),
                                  _pState->getStartTime(), _pState->getEndTime(), false, false, _pState->getAskQuestions(), _pState->getQuestion1(), _pState->getQuestion2(), _pState->getQuestion3());
         _pFrmCodeEdit->setEditingRow(-1);
-        _pFrmCodeEdit->show(); 
+        _pFrmCodeEdit->show();
     }
 }
 
@@ -2772,55 +2504,53 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
     if(_pState)
     {
         _pState->setMarkForDeletion();
-	
-	QString printDirectory = "/home/pi/run/prints/";
-	printDirectory += _pState->getCode1().c_str();
 
-	qDebug() << "CFrmAdminInfo::deleteCodeByRow(), printDirectory: " << printDirectory;
-	
-	if( QDir(printDirectory).exists() )
-	  std::system( ("sudo rm -rf " + printDirectory.toStdString()).c_str());
+        QString printDirectory = "/home/pi/run/prints/";
+        printDirectory += _pState->getCode1().c_str();
+
+        qDebug() << "CFrmAdminInfo::deleteCodeByRow(), printDirectory: " << printDirectory;
+
+        if( QDir(printDirectory).exists() )
+            std::system( ("sudo rm -rf " + printDirectory.toStdString()).c_str());
         emit __OnUpdateCodeState(_pState);
     }
 }
 
 void CFrmAdminInfo::purgeCodes()
 {
+    // Removes all codes
+    qDebug() << "CFrmAdminInfo::purgeCodes()";
 
-  // Removes all codes
+    // Get line values
+    CLockSet::Iterator itor;
+    _pState = 0;
+    int nRow = 0;
 
-  qDebug() << "CFrmAdminInfo::purgeCodes()";
-  
-  // Get line values
-  CLockSet::Iterator itor;
-  _pState = 0;
-  int nRow = 0;
-  
-  if(!_pworkingSet) {
-    _pworkingSet = new CLockSet();
-  }
-  
-  on_btnReadCodes_clicked();
-  displayInTable(_pworkingSet);
-  
-  qDebug() << "before loop iterator cellClicked";
-  
-  for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
-    {
-      // itor is our man!
-      _pState = itor.value();
-      
-      if(_pState)
-	{
-	  _pState->setMarkForDeletion();
-	  emit __OnUpdateCodeState(_pState);
-	}
-      nRow++;
+    if(!_pworkingSet) {
+        _pworkingSet = new CLockSet();
     }
-  
-  QString printDirectory = "/home/pi/run/prints/*";
-  
-  qDebug() << "CFrmAdminInfo::purgeCodes(), printDirectory: " << printDirectory;
+
+    on_btnReadCodes_clicked();
+    displayInTable(_pworkingSet);
+
+    qDebug() << "before loop iterator cellClicked";
+
+    for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
+    {
+        // itor is our man!
+        _pState = itor.value();
+
+        if(_pState)
+        {
+            _pState->setMarkForDeletion();
+            emit __OnUpdateCodeState(_pState);
+        }
+        nRow++;
+    }
+
+    QString printDirectory = "/home/pi/run/prints/*";
+
+    qDebug() << "CFrmAdminInfo::purgeCodes(), printDirectory: " << printDirectory;
     std::system( ("sudo rm -rf " + printDirectory.toStdString()).c_str());
 }
 
@@ -2831,12 +2561,7 @@ void CFrmAdminInfo::on_tblCodesList_cellClicked(int row, int column)
     //
     _nRowSelected = row;
     qDebug() << "Row Selected:" << QVariant(_nRowSelected).toString();
-
-    //editCodeByRow(row);
-
 }
-
-
 
 void CFrmAdminInfo::on_btnRebootSystem_clicked()
 {
@@ -2851,22 +2576,22 @@ void CFrmAdminInfo::on_btnRebootSystem_clicked()
 
 void CFrmAdminInfo::on_btnPurgeCodes_clicked()
 {
-  qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
-
-  on_btnReadCodes_clicked();
-  
-  int nRC = QMessageBox::warning(this, tr("Verify Remove All Codes"),
-				 tr("All access codes will be removed from the system\nDo you want to continue?"),
-				 QMessageBox::Yes, QMessageBox::Cancel);
-  if(nRC == QMessageBox::Yes) {
     qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
-    purgeCodes();
-    usleep(50000);
-  
+
     on_btnReadCodes_clicked();
-    
-    nRC = QMessageBox::warning(this, tr("Code Removal Success"),
-			       tr("Code Removal is successful!!\nPlease give the codes list a moment to update."),
-			       QMessageBox::Ok);
-  }
+
+    int nRC = QMessageBox::warning(this, tr("Verify Remove All Codes"),
+                                   tr("All access codes will be removed from the system\nDo you want to continue?"),
+                                   QMessageBox::Yes, QMessageBox::Cancel);
+    if(nRC == QMessageBox::Yes) {
+        qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
+        purgeCodes();
+        usleep(50000);
+
+        on_btnReadCodes_clicked();
+
+        nRC = QMessageBox::warning(this, tr("Code Removal Success"),
+                                   tr("Code Removal is successful!!\nPlease give the codes list a moment to update."),
+                                   QMessageBox::Ok);
+    }
 }

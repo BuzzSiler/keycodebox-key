@@ -362,7 +362,6 @@ void CSystemController::OnAdminPasswordEntered(QString sPW)
 
 void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
-    //
     _padminInfo = adminInfo;
     _bCurrentAdminRetrieved = true;
 
@@ -388,10 +387,17 @@ void CSystemController::OnRequireCodeTwo()
     _systemState = EUserCodeTwo;
 }
 
-void CSystemController::OnAdminSecurityCheckOk()
+void CSystemController::OnAdminSecurityCheckOk(QString type)
 {
     qDebug() << "SystemController.OnAdminSecuritCheckOk()";
-    _systemState = EAdminMain;
+    if(type == "Assist")
+    {
+        _systemState = EAssistMain;
+    }
+    if(type == "Admin")
+    {
+        _systemState = EAdminMain;
+    }
     emit __OnClearEntry();
 }
 
@@ -730,9 +736,9 @@ void CSystemController::looprun()
             startTimeoutTimer(5000);
         }
     }
-    else if( _systemState == EAdminMain) {
-        if( _systemStateDisplay != EAdminMain) {
-            _systemStateDisplay = EAdminMain;
+    else if(_systemState == EAdminMain || _systemState == EAssistMain) {
+        if( _systemStateDisplay != _systemState) {
+            _systemStateDisplay = _systemState;
             stopTimeoutTimer();
             emit __OnDisplayAdminMainDialog(this);
         }
@@ -771,7 +777,6 @@ void CSystemController::RequestLastSuccessfulLogin()
 
 void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
-    //
     int nCount = 0;
     while(!_bCurrentAdminRetrieved && nCount < 25) {
         usleep(100000);

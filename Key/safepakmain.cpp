@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_psystemController, SIGNAL(__OnDisplayCodeDialog(QObject*)), this, SLOT(OnDisplayCodeDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayUserCodeTwoDialog(QObject*)), this, SLOT(OnDisplayUserCodeTwoDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayAdminPasswordDialog(QObject*)), this, SLOT(OnDisplayAdminPasswordDialog(QObject*)));
-    connect(_psystemController, SIGNAL(__OnDisplayAdminMainDialog(QObject*)), this, SLOT(OnDisplayAdminMainDialog(QObject*)));
+    connect(_psystemController, SIGNAL(__OnDisplayAdminMainDialog(QObject*, QString)), this, SLOT(OnDisplayAdminMainDialog(QObject*, QString)));
 
     connect(&_sysControlThread, SIGNAL(started()), _psystemController, SLOT(start()));
 

@@ -371,7 +371,7 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
 
     _updateCodeLockboxState = false;
     if(_type == "Admin" || _type == "Assist") {
-        if( _ptblAdmin->isPassword(code, _type) )
+        if(_ptblAdmin->isPassword(code, _type))
         {
             emit __OnAdminSecurityCheckOk();
         }

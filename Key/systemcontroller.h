@@ -21,8 +21,12 @@ public:
     explicit CSystemController(QObject *parent = 0);
     ~CSystemController();
 
-    enum SystemState {ENone, ETimeoutScreen, EUserCodeOne, EUserCodeTwo, EAdminPassword, EPasswordFailed,
-                      EPasswordTimeout, EAdminPasswordFailed, EThankYou, EAdminMain};
+    enum SystemState
+    {
+        ENone, ETimeoutScreen, EUserCodeOne, EUserCodeTwo,
+        EAdminPassword, EPasswordFailed, EPasswordTimeout,
+        EAdminPasswordFailed, EThankYou, EAdminMain, EAssistMain
+    };
 
 private:
     QThread                 *_pInitThread;
@@ -93,7 +97,7 @@ signals:
     void __OnDisplayUserCodeTwoDialog(QObject *obj);
     void __OnDisplayThankYouDialog(QObject *obj);
     void __OnDisplayAdminPasswordDialog(QObject *obj);
-    void __OnDisplayAdminMainDialog(QObject *obj);
+    void __OnDisplayAdminMainDialog(QObject *obj, QString type);
 
     void __OnRequestCurrentAdmin();
     void __OnRequestedCurrentAdmin(CAdminRec *adminInfo);

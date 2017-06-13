@@ -75,7 +75,7 @@ private slots:
     void OnDisplayUserCodeTwoDialog(QObject *psysController);
     void OnDisplayThankYouDialog(QObject *psysController);
     void OnDisplayAdminPasswordDialog(QObject *psysController);
-    void OnDisplayAdminMainDialog(QObject *psysController);
+    void OnDisplayAdminMainDialog(QObject *psysController, QString type);
 
     void OnAdminPasswordCancel();
 
