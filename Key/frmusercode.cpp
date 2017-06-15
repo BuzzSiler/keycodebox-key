@@ -114,8 +114,7 @@ void CFrmUserCode::OnEnableKeyboard(bool bEnable)
 
 void CFrmUserCode::OnNewMessage(QString sMsg)
 {
-    //TODO: Disabled for now. The lblMessage has been removed but this SLOT is still called.
-    //   ui->lblMessage->setText(sMsg);
+    // TODO: Disabled for now. The lblMessage has been removed but this SLOT is still called.
 }
 
 void CFrmUserCode::OnClearCodeDisplay()
@@ -137,7 +136,6 @@ void CFrmUserCode::OnSwipeCode(QString sCode)
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
     if(sCode.size() > 0 ) {
-        //this->enableKeypad(false);      // disable the keypad (momentarily)
         emit __CodeEntered(sCode);     // Signal that the code was entered.
     }
 }

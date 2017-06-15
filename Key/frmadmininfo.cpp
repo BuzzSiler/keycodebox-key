@@ -91,7 +91,6 @@ void CFrmAdminInfo::initializeConnections()
     connect(this, SIGNAL(__OnReadLockSet(int,QDateTime,QDateTime)), _psysController, SLOT(OnReadLockSet(int,QDateTime,QDateTime)));
     connect(_psysController, SIGNAL(__OnLockSet(CLockSet*)), this, SLOT(OnLockSet(CLockSet*)));
 
-
     connect(this, SIGNAL(__OnReadLockHistorySet(int,QDateTime,QDateTime)), _psysController, SLOT(OnReadLockHistorySet(int,QDateTime,QDateTime)));
     connect(_psysController, SIGNAL(__OnLockHistorySet(CLockHistorySet*)), this, SLOT(OnLockHistorySet(CLockHistorySet*)));
     connect(this, SIGNAL(__OnImmediateReportRequest(QDateTime,QDateTime,int)), _psysController, SLOT(OnImmediateReportRequest(QDateTime,QDateTime,int)));
@@ -117,16 +116,16 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 {
     _psysController = psysController;
 
-    if(_psysController->getSystemState() == CSystemController::EAssistMain)
-    {
-        ui->tabUtilities->setVisible(false);
-        ui->gpAdminInfo->setVisible(false);
-    }
-
     initializeConnections();
     qDebug() << "CFrmAdminInfo::setSystemController() -> emit __OnRequestCurrentAdmin()";
     emit __OnRequestCurrentAdmin();
     emit __OnReadDoorLocksState();
+
+    if(psysController->getSystemState() == CSystemController::EAssistMain)
+    {
+        ui->tabUtilities->setVisible(false);
+        ui->gpAdminInfo->setVisible(false);
+    }
 }
 
 bool CFrmAdminInfo::isInternetTime()
@@ -499,7 +498,6 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
     ui->treeViewCopy->expandAll();
     resizeTreeViewColumns();
 }
-
 
 void CFrmAdminInfo::onCopyRootPathChanged(QString path)
 {
@@ -1212,11 +1210,6 @@ void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
         _pState->clearModified();
         if(_pFrmCodeEdit)
         {
-            /*
-            _pFrmCodeEdit->close();
-            delete _pFrmCodeEdit;
-            _pFrmCodeEdit = 0;
-      */
             _pFrmCodeEdit->hide();
         }
         displayInTable(_pworkingSet);
@@ -1275,8 +1268,6 @@ void CFrmAdminInfo::OnCloseAdmin() {
 void CFrmAdminInfo::on_btnOpenDoor_clicked()
 {
     // Open selected door
-    // cbOpenDoorNum
-    //    ui->cbOpenDoorNum->currentText();
 }
 
 void CFrmAdminInfo::on_cbBox1_clicked()
@@ -1757,7 +1748,6 @@ void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
     displayInHistoryTable(pSet);
     pSet = NULL;
 }
-
 
 /*
  * const int fLockNum = 0;
@@ -2331,7 +2321,6 @@ void CFrmAdminInfo::OnRowSelected(int row, int column) {
     //MANUAL GEOMETRY
     QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
     _pTableMenu->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenu->width(), _pTableMenu->height());
-    //setTableMenuLocation(_pTableMenu);
 }
 
 bool CFrmAdminInfo::eventFilter(QObject *target, QEvent *event)
