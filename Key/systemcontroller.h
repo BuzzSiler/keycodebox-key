@@ -42,7 +42,7 @@ private:
     CMagTekCardReader   *_pmagTekReader = 0;
     CHWKeyboardReader          *_phidReader = 0;
     CFingerprintReader *_fingerprintReader = 0;
-
+    
     uint32_t        _lockNum;
     SystemState     _systemState;
     SystemState     _systemStateDisplay;
@@ -107,18 +107,18 @@ signals:
     void __OnUpdatedCodeState(bool bSuccess);
 
     void __OnFoundNewStorageDevice(QString device0, QString device1);
-
+    
     void __OnLockStatusUpdated(CLocksStatus *locksStatus);
     // void __OnEnableShowFingerprint(bool);
 
     void __onUserCodeOne(QString sCode1);
     void __onUserCodeTwo(QString sCode2);
-
+    
     void __onUserFingerprintCodeOne(QString sCode1);
     void __onUserFingerprintCodeTwo(QString sCode2);
 
     void __onUserCodes(QString sCode1, QString sCode2);
-
+    
 signals:
     void __OnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
     void __OnLockSet(CLockSet *pLockSet);
@@ -135,18 +135,18 @@ signals:
     void __onQuestionUser(int doorNum, QString question1, QString question2, QString question3);
     void __onQuestionUserAnswers(int doorNum, QString answer1, QString answer2, QString answer3);
     void __onQuestionUserCancel();
-
+    
 public slots:
 
     void TrigQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(doorNum, question1, question2, question3);}
-
+    
     void TrigQuestionUser(int doorNum, QString question1, QString question2, QString question3);
     void QuestionUserCancel();
     void AnswerUserSave(int doorNum, QString question1, QString question2, QString question3);
-
+    
     void TrigEnrollFingerprint(QString sCode);
     void TrigEnrollFingerprintDialog(QString sCode) { emit __onEnrollFingerprintDialog(sCode); }
-
+    
     void EnrollFingerprintDialogCancel();
     void EnrollFingerprintResetStageCount();
     void OnFingerprintStageComplete(int current, int total, QString message) {  emit __onUpdateEnrollFingerprintDialog(current, total, message); };
@@ -154,15 +154,15 @@ public slots:
     void OnVerifyFingerprint();
     void OnVerifyFingerprintDialogCancel();
     void OnFingerprintVerifyComplete(bool result, QString message) { emit __onUpdateVerifyFingerprintDialog(result, message); };
-
+    
     void OnReadLockSet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockSet(nLockNum, start, end); }
     void OnLockSet(CLockSet *pSet) { emit __OnLockSet(pSet); }
     void OnIdentifiedFingerprint(QString sCode, QString sCode2);
-
+    
 signals:
     void __OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
     void __OnLockHistorySet(CLockHistorySet *pLockSet);
-
+    
 public slots:
     void OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(nLockNum, start, end); }
     void OnLockHistorySet(CLockHistorySet *pSet) { emit __OnLockHistorySet(pSet); }
@@ -200,6 +200,7 @@ private slots:
     void OnOpenLockRequest(int nLockNum);
     void OnReadLockStatus();
 
+
     void OnTouchScreenTouched();
     void resetCodeMessage();
     void OnCardSwipe(QString sCode1, QString sCode2);
@@ -217,7 +218,7 @@ public slots:
     // Security Controller connections
     void    OnRequireAdminPassword();
     void    OnRequireCodeTwo();
-    void    OnAdminSecurityCheckOk(QString type);
+    void    OnAdminSecurityCheckOk();
     void    OnAdminSecurityCheckFailed();
     void    OnSecurityCheckSuccess(int doorNum);
     void    OnSecurityCheckedFailed();
@@ -229,7 +230,7 @@ public slots:
 
     void ExtractCommandOutput(FILE *pF, std::string &rtnStr);
     int watchUSBStorageDevices(char mountedDevices[2][40], int mountedDeviceCount);
-
+    
     void start();
     void OnAdminPasswordCancel();
 };

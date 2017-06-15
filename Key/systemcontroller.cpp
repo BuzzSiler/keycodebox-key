@@ -35,16 +35,16 @@ void CSystemController::initialize(QThread *pthread)
     _pfUsercode = 0;
 
     _fingerprintReader = 0;
-
+    
     if( _LCDGraphicsController.isLCDAttached() ) {
         qDebug() << "CSystemController::initialize moveToThread.";
         //        _LCDGraphicsController.moveToThread(_pInitThread);
         _LCDGraphicsController.setBrightness(75);
     }
 
-
+    
     qDebug() << "Starting up KeyCodeBox Alpha v1.10k";
-
+    
     initializeSecurityConnections();
     initializeLockController();
     initializeReportController();
@@ -253,7 +253,7 @@ void CSystemController::initializeSecurityConnections()
 
     connect(&_securityController, SIGNAL(__OnRequireAdminPassword()), this, SLOT(OnRequireAdminPassword()));
     connect(&_securityController, SIGNAL(__OnRequireCodeTwo()), this, SLOT(OnRequireCodeTwo()));
-    connect(&_securityController, SIGNAL(__OnAdminSecurityCheckOk(QString)), this, SLOT(OnAdminSecurityCheckOk(QString)));
+    connect(&_securityController, SIGNAL(__OnAdminSecurityCheckOk()), this, SLOT(OnAdminSecurityCheckOk()));
     connect(&_securityController, SIGNAL(__OnAdminSecurityCheckFailed()), this, SLOT(OnAdminSecurityCheckFailed()));
     connect(&_securityController, SIGNAL(__OnSecurityCheckSuccess(int)), this, SLOT(OnSecurityCheckSuccess(int)));
     connect(&_securityController, SIGNAL(__OnSecurityCheckedFailed()), this, SLOT(OnSecurityCheckedFailed()));
@@ -282,7 +282,7 @@ void CSystemController::initializeSecurityConnections()
 
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), &_securityController, SLOT(OnUpdateCodeState(CLockState*)));
     connect(&_securityController, SIGNAL(__OnUpdatedCodeState(bool)), this, SLOT(OnUpdatedCodeState(bool)));
-
+    
     emit __OnRequestCurrentAdmin();
 }
 
@@ -337,7 +337,7 @@ void CSystemController::OnFingerprintCodeEntered(QString sCode)
     //  if it doesn't:
     //  emit fingerprint dialog for enrollment, else do nothing
     // else
-
+    
     _securityController.CheckFingerprintAccessCodeOne(sCode);
 }
 
@@ -362,6 +362,7 @@ void CSystemController::OnAdminPasswordEntered(QString sPW)
 
 void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
+    //
     _padminInfo = adminInfo;
     _bCurrentAdminRetrieved = true;
 
@@ -387,17 +388,10 @@ void CSystemController::OnRequireCodeTwo()
     _systemState = EUserCodeTwo;
 }
 
-void CSystemController::OnAdminSecurityCheckOk(QString type)
+void CSystemController::OnAdminSecurityCheckOk()
 {
     qDebug() << "SystemController.OnAdminSecuritCheckOk()";
-    if(type == "Assist")
-    {
-        _systemState = EAssistMain;
-    }
-    if(type == "Admin")
-    {
-        _systemState = EAdminMain;
-    }
+    _systemState = EAdminMain;
     emit __OnClearEntry();
 }
 
@@ -514,7 +508,7 @@ void CSystemController::resetToTimeoutScreen()
     qDebug() << "CSystemController::resetToTimeoutScreen()";
     stopTimeoutTimer();
     _systemState = ETimeoutScreen;
-
+    
     if(_fingerprintReader)
         _fingerprintReader->cancelEnrollment();
     if(_fingerprintReader)
@@ -671,14 +665,14 @@ void CSystemController::OnTouchScreenTouched() {
 
 void CSystemController::looprun()
 {
-    if(_systemState == ETimeoutScreen) {
-        if(_systemStateDisplay != ETimeoutScreen) {
+    if( _systemState == ETimeoutScreen ) {
+        if( _systemStateDisplay != ETimeoutScreen ) {
             _systemStateDisplay = ETimeoutScreen;
             emit __OnDisplayTimeoutScreen();
         }
     }
-    if(_systemState == EUserCodeOne) {
-        if(_systemStateDisplay != EUserCodeOne) {
+    if( _systemState == EUserCodeOne ) {
+        if( _systemStateDisplay != EUserCodeOne ) {
             _systemStateDisplay = EUserCodeOne;
 
             stopTimeoutTimer();
@@ -696,8 +690,8 @@ void CSystemController::looprun()
 
             startTimeoutTimer(30000);
         }
-    } else if(_systemState == EUserCodeTwo) {
-        if(_systemStateDisplay != EUserCodeTwo) {
+    } else if( _systemState == EUserCodeTwo) {
+        if( _systemStateDisplay != EUserCodeTwo ) {
             _systemStateDisplay = EUserCodeTwo;
 
             stopTimeoutTimer();
@@ -711,8 +705,8 @@ void CSystemController::looprun()
             startTimeoutTimer(20000);
         }
     }
-    else if(_systemState == EAdminPassword) {
-        if(_systemStateDisplay != EAdminPassword) {
+    else if( _systemState == EAdminPassword) {
+        if( _systemStateDisplay != EAdminPassword ) {
             _systemStateDisplay = EAdminPassword;
             stopTimeoutTimer();
             emit __OnCodeMessage("<Enter Admin Password>");
@@ -723,8 +717,8 @@ void CSystemController::looprun()
             startTimeoutTimer(30000);
         }
     }
-    else if(_systemState == EThankYou) {
-        if(_systemStateDisplay != EThankYou) {
+    else if( _systemState == EThankYou) {
+        if( _systemStateDisplay != EThankYou) {
             _systemStateDisplay = EThankYou;
             stopTimeoutTimer();
 
@@ -736,16 +730,9 @@ void CSystemController::looprun()
             startTimeoutTimer(5000);
         }
     }
-    else if(_systemState == EAdminMain) {
-        if(_systemStateDisplay != EAdminMain) {
+    else if( _systemState == EAdminMain) {
+        if( _systemStateDisplay != EAdminMain) {
             _systemStateDisplay = EAdminMain;
-            stopTimeoutTimer();
-            emit __OnDisplayAdminMainDialog(this);
-        }
-    }
-    else if(_systemState == EAssistMain) {
-        if(_systemStateDisplay != EAssistMain) {
-            _systemStateDisplay = EAssistMain;
             stopTimeoutTimer();
             emit __OnDisplayAdminMainDialog(this);
         }
@@ -784,6 +771,7 @@ void CSystemController::RequestLastSuccessfulLogin()
 
 void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
+    //
     int nCount = 0;
     while(!_bCurrentAdminRetrieved && nCount < 25) {
         usleep(100000);
