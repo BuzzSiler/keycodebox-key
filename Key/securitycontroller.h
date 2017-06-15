@@ -150,7 +150,7 @@ public slots:
     // CModelSecurity signals
     void OnRequireAdminPassword();
     void OnRequireCodeTwo();
-    void OnAdminSecurityCheckOk();
+    void OnAdminSecurityCheckOk(QString type);
     void OnAdminSecurityCheckFailed();
     void OnSecurityCheckSuccess(int doorNum);
     void OnSecurityCheckSuccessWithAnswers(int doorNum, QString answer1, QString answer2, QString answer3);

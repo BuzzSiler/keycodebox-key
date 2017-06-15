@@ -247,7 +247,7 @@ void CSecurityController::OnRequireCodeTwo()
 
 void CSecurityController::OnAdminSecurityCheckOk(QString type)
 {
-    qDebug() << "CSecurityController::OnAdminSecurityCheckOk()";
+    qDebug() << "CSecurityController::OnAdminSecurityCheckOk(QString type)";
     emit __OnAdminSecurityCheckOk(type);
 }
 
