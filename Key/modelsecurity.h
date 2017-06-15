@@ -54,7 +54,7 @@ signals:
     
     void __OnRequireAdminPassword();
     void __OnRequireCodeTwo();
-    void __OnAdminSecurityCheckOk();
+    void __OnAdminSecurityCheckOk(QString type);
     void __OnAdminSecurityCheckFailed();
     void __OnSecurityCheckSuccess(int doorNum);
     void __OnSecurityCheckSuccessWithAnswers(int doorNum, QString answer1, QString answer2, QString answer3);

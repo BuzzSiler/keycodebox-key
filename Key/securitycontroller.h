@@ -45,7 +45,7 @@ signals:
     // These are to signal upstream to the systemcontroller
     void    __OnRequireAdminPassword();
     void    __OnRequireCodeTwo();
-    void    __OnAdminSecurityCheckOk();
+    void    __OnAdminSecurityCheckOk(QString type);
     void    __OnAdminSecurityCheckFailed();
     void    __OnSecurityCheckSuccess(int doorNum);
 

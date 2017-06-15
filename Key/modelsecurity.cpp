@@ -373,7 +373,7 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     if(_type == "Admin" || _type == "Assist") {
         if(_ptblAdmin->isPassword(code, _type))
         {
-            emit __OnAdminSecurityCheckOk();
+            emit __OnAdminSecurityCheckOk(_type);
         }
         else
         {
@@ -455,7 +455,7 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
     {
         if(_ptblAdmin->isPassword(code, _type))
         {
-            emit __OnAdminSecurityCheckOk();
+            emit __OnAdminSecurityCheckOk(_type);
         }
         else
         {
@@ -615,7 +615,7 @@ void CModelSecurity::OnVerifyAdminPassword(QString code)
     {
         if(_ptblAdmin->isPassword(code, _type))
         {
-            emit __OnAdminSecurityCheckOk();
+            emit __OnAdminSecurityCheckOk(_type);
         }
         else
         {

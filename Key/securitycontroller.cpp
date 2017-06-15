@@ -19,7 +19,7 @@ void CSecurityController::initializeSignals()
 {
     connect(&_modelSecurity, SIGNAL(__OnRequireAdminPassword()), this, SLOT(OnRequireAdminPassword()));
     connect(&_modelSecurity, SIGNAL(__OnRequireCodeTwo()), this, SLOT(OnRequireCodeTwo()));
-    connect(&_modelSecurity, SIGNAL(__OnAdminSecurityCheckOk()), this, SLOT(OnAdminSecurityCheckOk()));
+    connect(&_modelSecurity, SIGNAL(__OnAdminSecurityCheckOk(QString)), this, SLOT(OnAdminSecurityCheckOk(QString)));
     connect(&_modelSecurity, SIGNAL(__OnAdminSecurityCheckFailed()), this, SLOT(OnAdminSecurityCheckFailed()));
     connect(&_modelSecurity, SIGNAL(__OnSecurityCheckSuccess(int)), this, SLOT(OnSecurityCheckSuccess(int)));
 
@@ -245,10 +245,10 @@ void CSecurityController::OnRequireCodeTwo()
     emit __OnRequireCodeTwo();
 }
 
-void CSecurityController::OnAdminSecurityCheckOk()
+void CSecurityController::OnAdminSecurityCheckOk(QString type)
 {
     qDebug() << "CSecurityController::OnAdminSecurityCheckOk()";
-    emit __OnAdminSecurityCheckOk();
+    emit __OnAdminSecurityCheckOk(type);
 }
 
 void CSecurityController::OnAdminSecurityCheckFailed()
