@@ -121,7 +121,12 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
     emit __OnRequestCurrentAdmin();
     emit __OnReadDoorLocksState();
 
-    ui->lblTestValue->setText(psysController->getSystemStateDisplay());
+    // TEST CODE
+    QMetaObject obj = CSystemController::EAssistMain;
+    QMetaEnum enm   = obj.enumerator(0);
+    QString value = QLatin1String(enm.valueToKey(psysController->getSystemStateDisplay()));
+    ui->lblTestValue->setText(value);
+    // END TEST CODE
 
     if(psysController->getSystemStateDisplay() == CSystemController::EAssistMain)
     {
