@@ -121,6 +121,8 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
     emit __OnRequestCurrentAdmin();
     emit __OnReadDoorLocksState();
 
+    ui->lblTestValue->setText(psysController->getSystemStateDisplay());
+
     if(psysController->getSystemStateDisplay() == CSystemController::EAssistMain)
     {
         ui->tabUtilities->setVisible(false);
