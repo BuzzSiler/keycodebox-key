@@ -122,7 +122,7 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
     emit __OnReadDoorLocksState();
 
     // TEST CODE
-    QMetaObject obj = CSystemController::EAssistMain;
+    QMetaObject obj = CSystemController::staticMetaObject;
     QMetaEnum enm   = obj.enumerator(0);
     QString value = QLatin1String(enm.valueToKey(psysController->getSystemStateDisplay()));
     ui->lblTestValue->setText(value);
