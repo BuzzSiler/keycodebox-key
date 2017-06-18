@@ -745,8 +745,8 @@ void CSystemController::looprun()
         // TEST CODE
         int index = metaObject()->indexOfEnumerator("SystemState");
         QMetaEnum mEnum = metaObject()->enumerator(index);
-        qDebug() << "the _systemState value is: " + mEnum.valueToKey(_systemState);
-        qDebug() << "the _systemStateDisplay value is: " + mEnum.valueToKey(_systemStateDisplay);
+        qDebug() << "the _systemState value is: " + QLatin1String(mEnum.valueToKey(_systemState));
+        qDebug() << "the _systemStateDisplay value is: " + QLatin1String(mEnum.valueToKey(_systemStateDisplay));
 //        QMetaObject obj = CSystemController::staticMetaObject;
 //        QMetaEnum enm   = obj.enumerator(0);
 //        QString value1 = QLatin1String(enm.valueToKey(_systemStateDisplay));
@@ -765,8 +765,8 @@ void CSystemController::looprun()
         // TEST CODE
         int index = metaObject()->indexOfEnumerator("SystemState");
         QMetaEnum mEnum = metaObject()->enumerator(index);
-        qDebug() << "the _systemState value is: " + mEnum.valueToKey(_systemState);
-        qDebug() << "the _systemStateDisplay value is: " + mEnum.valueToKey(_systemStateDisplay);
+        qDebug() << "the _systemState value is: " + QLatin1String(mEnum.valueToKey(_systemState));
+        qDebug() << "the _systemStateDisplay value is: " + QLatin1String(mEnum.valueToKey(_systemStateDisplay));
         // END TEST CODE
 
         if(_systemStateDisplay != EAssistMain) {
