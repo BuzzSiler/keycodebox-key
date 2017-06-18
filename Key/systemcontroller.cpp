@@ -671,6 +671,17 @@ void CSystemController::OnTouchScreenTouched() {
 
 void CSystemController::looprun()
 {
+
+    // TEST CODE
+    QMetaObject obj = CSystemController::staticMetaObject;
+    QMetaEnum enm   = obj.enumerator(0);
+    QString value1 = QLatin1String(enm.valueToKey(_systemStateDisplay));
+    QString value2 = QLatin1String(enm.valueToKey(_systemState));
+    ui->lblTestValue->setText(value1);
+    qDebug() << "the _systemStateDisplay value is: " + value1;
+    qDebug() << "the _systemState value is: " + value2;
+    // END TEST CODE
+
     if(_systemState == ETimeoutScreen) {
         if(_systemStateDisplay != ETimeoutScreen) {
             _systemStateDisplay = ETimeoutScreen;
