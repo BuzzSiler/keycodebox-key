@@ -3,6 +3,11 @@
 #include <QCoreApplication>
 #include <QTimer>
 
+#include <QString>
+#include <QAbstractSocket>
+#include <QMetaEnum>
+#include <iostream>
+
 #include "systemcontroller.h"
 #include "frmusercode.h"
 #include "encryption.h"
@@ -738,12 +743,16 @@ void CSystemController::looprun()
     }
     else if(_systemState == EAdminMain) {
         // TEST CODE
-        QMetaObject obj = CSystemController::staticMetaObject;
-        QMetaEnum enm   = obj.enumerator(0);
-        QString value1 = QLatin1String(enm.valueToKey(_systemStateDisplay));
-        QString value2 = QLatin1String(enm.valueToKey(_systemState));
-        qDebug() << "the _systemStateDisplay value is: " + value1;
-        qDebug() << "the _systemState value is: " + value2;
+        int index = metaObject()->indexOfEnumerator("SystemState");
+        QMetaEnum mEnum = metaObject()->enumerator(index);
+        qDebug() << "the _systemState value is: " + mEnum.valueToKey(_systemState);
+        qDebug() << "the _systemStateDisplay value is: " + mEnum.valueToKey(_systemStateDisplay);
+//        QMetaObject obj = CSystemController::staticMetaObject;
+//        QMetaEnum enm   = obj.enumerator(0);
+//        QString value1 = QLatin1String(enm.valueToKey(_systemStateDisplay));
+//        QString value2 = QLatin1String(enm.valueToKey(_systemState));
+//        qDebug() << "the _systemStateDisplay value is: " + value1;
+//        qDebug() << "the _systemState value is: " + value2;
         // END TEST CODE
 
         if(_systemStateDisplay != EAdminMain) {
@@ -754,12 +763,10 @@ void CSystemController::looprun()
     }
     else if(_systemState == EAssistMain) {
         // TEST CODE
-        QMetaObject obj = CSystemController::staticMetaObject;
-        QMetaEnum enm   = obj.enumerator(0);
-        QString value1 = QLatin1String(enm.valueToKey(_systemStateDisplay));
-        QString value2 = QLatin1String(enm.valueToKey(_systemState));
-        qDebug() << "the _systemStateDisplay value is: " + value1;
-        qDebug() << "the _systemState value is: " + value2;
+        int index = metaObject()->indexOfEnumerator("SystemState");
+        QMetaEnum mEnum = metaObject()->enumerator(index);
+        qDebug() << "the _systemState value is: " + mEnum.valueToKey(_systemState);
+        qDebug() << "the _systemStateDisplay value is: " + mEnum.valueToKey(_systemStateDisplay);
         // END TEST CODE
 
         if(_systemStateDisplay != EAssistMain) {
