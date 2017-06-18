@@ -118,14 +118,23 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 
     initializeConnections();
     qDebug() << "CFrmAdminInfo::setSystemController() -> emit __OnRequestCurrentAdmin()";
-    qDebug() << "Admin type is: " + psysController->getAdminType();
     emit __OnRequestCurrentAdmin();
     emit __OnReadDoorLocksState();
+}
 
+void CFrmAdminInfo::show()
+{
+    QDialog::show();
+    qDebug() << "Admin type is: " + psysController->getAdminType();
     if(psysController->getAdminType() == "Assist")
     {
         ui->tabUtilities->setVisible(false);
         ui->gpAdminInfo->setVisible(false);
+    }
+    else if(psysController->getAdminType() == "Admin")
+    {
+        ui->tabUtilities->setVisible(true);
+        ui->gpAdminInfo->setVisible(true);
     }
 }
 
@@ -188,7 +197,6 @@ void CFrmAdminInfo::initialize()
 
     ui->btnCopyFileBrandingImageReset->setEnabled(true);
 }
-
 
 int CFrmAdminInfo::nthSubstr(int n, const std::string& s, const std::string& p) {
     std::string::size_type i = s.find(p);     // Find the first occurrence
