@@ -124,8 +124,11 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
     // TEST CODE
     QMetaObject obj = CSystemController::staticMetaObject;
     QMetaEnum enm   = obj.enumerator(0);
-    QString value = QLatin1String(enm.valueToKey(psysController->getSystemStateDisplay()));
-    ui->lblTestValue->setText(value);
+    QString value1 = QLatin1String(enm.valueToKey(psysController->getSystemStateDisplay()));
+    QString value2 = QLatin1String(enm.valueToKey(psysController->getSystemState()));
+    ui->lblTestValue->setText(value1);
+    qDebug() << "the value is: " + value1;
+    qDebug() << "the value is: " + value2;
     // END TEST CODE
 
     if(psysController->getSystemStateDisplay() == CSystemController::EAssistMain)
