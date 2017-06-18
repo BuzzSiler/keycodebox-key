@@ -118,20 +118,11 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 
     initializeConnections();
     qDebug() << "CFrmAdminInfo::setSystemController() -> emit __OnRequestCurrentAdmin()";
+    qDebug() << "Admin type is: " + psysController->getAdminType();
     emit __OnRequestCurrentAdmin();
     emit __OnReadDoorLocksState();
 
-    // TEST CODE
-    QMetaObject obj = CSystemController::staticMetaObject;
-    QMetaEnum enm   = obj.enumerator(0);
-    QString value1 = QLatin1String(enm.valueToKey(psysController->getSystemStateDisplay()));
-    QString value2 = QLatin1String(enm.valueToKey(psysController->getSystemState()));
-    ui->lblTestValue->setText(value1);
-    qDebug() << "the value is: " + value1;
-    qDebug() << "the value is: " + value2;
-    // END TEST CODE
-
-    if(psysController->getSystemStateDisplay() == CSystemController::EAssistMain)
+    if(psysController->getAdminType() == "Assist")
     {
         ui->tabUtilities->setVisible(false);
         ui->gpAdminInfo->setVisible(false);

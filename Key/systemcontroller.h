@@ -38,10 +38,11 @@ private:
     CLockController         _LockController;
     CReportController       _ReportController;
     QMainWindow             *_pmainWindow;
+    QString                 _adminType;
 
-    CMagTekCardReader   *_pmagTekReader = 0;
-    CHWKeyboardReader          *_phidReader = 0;
-    CFingerprintReader *_fingerprintReader = 0;
+    CMagTekCardReader       *_pmagTekReader = 0;
+    CHWKeyboardReader       *_phidReader = 0;
+    CFingerprintReader      *_fingerprintReader = 0;
 
     uint32_t        _lockNum;
     SystemState     _systemState;
@@ -68,6 +69,7 @@ public:
     SystemState getSystemState() { return _systemState; }
     SystemState getSystemStateDisplay() { return _systemStateDisplay; }
     bool getShowFingerprint();
+    QString getAdminType() { return _adminType; }
 
     void setMainWindow(QMainWindow *mw) { _pmainWindow = mw; }
 

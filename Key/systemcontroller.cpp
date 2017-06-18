@@ -742,35 +742,17 @@ void CSystemController::looprun()
         }
     }
     else if(_systemState == EAdminMain) {
-        // TEST CODE
-        int index = metaObject()->indexOfEnumerator("SystemState");
-        QMetaEnum mEnum = metaObject()->enumerator(index);
-        qDebug() << "the _systemState value is: " + QLatin1String(mEnum.valueToKey(_systemState));
-        qDebug() << "the _systemStateDisplay value is: " + QLatin1String(mEnum.valueToKey(_systemStateDisplay));
-//        QMetaObject obj = CSystemController::staticMetaObject;
-//        QMetaEnum enm   = obj.enumerator(0);
-//        QString value1 = QLatin1String(enm.valueToKey(_systemStateDisplay));
-//        QString value2 = QLatin1String(enm.valueToKey(_systemState));
-//        qDebug() << "the _systemStateDisplay value is: " + value1;
-//        qDebug() << "the _systemState value is: " + value2;
-        // END TEST CODE
-
         if(_systemStateDisplay != EAdminMain) {
             _systemStateDisplay = EAdminMain;
+            _adminType = "Admin";
             stopTimeoutTimer();
             emit __OnDisplayAdminMainDialog(this);
         }
     }
     else if(_systemState == EAssistMain) {
-        // TEST CODE
-        int index = metaObject()->indexOfEnumerator("SystemState");
-        QMetaEnum mEnum = metaObject()->enumerator(index);
-        qDebug() << "the _systemState value is: " + QLatin1String(mEnum.valueToKey(_systemState));
-        qDebug() << "the _systemStateDisplay value is: " + QLatin1String(mEnum.valueToKey(_systemStateDisplay));
-        // END TEST CODE
-
         if(_systemStateDisplay != EAssistMain) {
             _systemStateDisplay = EAssistMain;
+            _adminType = "Assist";
             stopTimeoutTimer();
             emit __OnDisplayAdminMainDialog(this);
         }
