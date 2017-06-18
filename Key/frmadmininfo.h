@@ -44,16 +44,14 @@ public:
 
     void setSystemController(CSystemController *psysController); // { _psysController = psysController; }
     void getSysControllerLockSettings();
-
     void checkAndCreateCurrentLabelEdit();
-    
+
     CLockState* createNewLockState();
 
     void editCodeByRow(int row);
-
     void checkAndCreateCodeEditForm();
-
     void resizeTreeViewColumns();
+    void show();
 
 private:
     Ui::CFrmAdminInfo   *ui;
@@ -85,12 +83,12 @@ private:
     const bool fQuestion1 = 9;
     const bool fQuestion2 = 10;
     const bool fQuestion3 = 11;
-    
+
     QString usbDevice0;
     QString usbDevice1;
-    
+
     QDateTime _currentTime;
-    
+
     QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
 
     CAdminRec           _tmpAdminRec;
@@ -151,11 +149,9 @@ private:
     
 public slots:
     void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
-//    void onTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
     void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
 
 signals:
-    
     void __OnDoneSave(int nRow, int nId, int nLockNum, QString sAccessCode, QString sSecondCode, QString sDescription, QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2, bool askQuestions, QString question1, QString question2, QString question3);
     void __OnCloseFrmAdmin();
     void __TextEntered(QString sText);
@@ -309,7 +305,6 @@ private slots:
     void on_cbBox63_clicked();
     void on_cbBox64_clicked();
 
-
     void on_dialBright_valueChanged(int value);
     void on_btnReadCodes_clicked();
     void codeTableCellSelected(int nRow, int nCol);
@@ -327,7 +322,7 @@ private slots:
 
     //timezone info
     void populateTimeZoneSelection(QComboBox *cbox);
-    
+
     void OnCloseAdmin();
     void on_btnPrintReport_clicked();
     void on_treeView_clicked(const QModelIndex &index);

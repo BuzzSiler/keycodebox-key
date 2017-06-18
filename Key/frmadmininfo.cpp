@@ -125,15 +125,17 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 void CFrmAdminInfo::show()
 {
     QDialog::show();
-    qDebug() << "Admin type is: " + psysController->getAdminType();
-    if(psysController->getAdminType() == "Assist")
+    qDebug() << "Admin type is: " + _psysController->getAdminType();
+    if(_psysController->getAdminType() == "Assist")
     {
-        ui->tabUtilities->setVisible(false);
+        ui->tabUtilities->setEnabled(false);
+        ui->tabWidget->setTabEnabled(1, false);
         ui->gpAdminInfo->setVisible(false);
     }
-    else if(psysController->getAdminType() == "Admin")
+    else if(_psysController->getAdminType() == "Admin")
     {
-        ui->tabUtilities->setVisible(true);
+        ui->tabUtilities->setEnabled(true);
+        ui->tabWidget->setTabEnabled(1, true);
         ui->gpAdminInfo->setVisible(true);
     }
 }

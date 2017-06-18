@@ -580,6 +580,9 @@
     <zorder>lblTestValue</zorder>
    </widget>
    <widget class="QWidget" name="tabUtilities">
+    <property name="styleSheet">
+     <string notr="true">QTabWidget::tab:disabled { width: 0; height: 0; margin: 0; padding: 0; border: none; }</string>
+    </property>
     <attribute name="title">
      <string>Utilities</string>
     </attribute>
