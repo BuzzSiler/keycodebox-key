@@ -223,7 +223,7 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
     static const QString med_sea_green("color: rgb(60,179,113);");
     static const QString white("color: rgb(255, 255, 255);");
 
-    if ( !ifaces.isEmpty() )
+    if (!ifaces.isEmpty())
     {
         for(int i=0; i < ifaces.size(); i++)
         {
@@ -265,9 +265,9 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
                     }
 
                     QString period = ".";
-                    int findN = nthSubstr(3, ip.toStdString(), period.toStdString());
+                    uint findN = nthSubstr(3, ip.toStdString(), period.toStdString());
                     qDebug() << "CFrmAdminInfo::getSystemIPAddressAndState(), findN: " << QString::number(findN);
-                    if( findN != std::string::npos )
+                    if(findN != std::string::npos)
                     {
                         pingAddress = ip.mid(0, findN);
                         if( pingAddress.at( pingAddress.length() - 1) != '.' )
@@ -580,7 +580,6 @@ void CFrmAdminInfo::on_btnCopyFile_clicked()
 void CFrmAdminInfo::printElementNames(xmlNode *aNode)
 {
     xmlNode *curNode = NULL;
-    const char *tempChar = NULL;
 
     /*
     <?xml version="1.0"?>
@@ -700,9 +699,6 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
 
     if( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
     {
-        int nRC = QMessageBox::warning(this, tr("XML Parsing Failed"),
-                                       tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
-                                       QMessageBox::Ok);
         qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked(), can't parse XML file: " << _copyDirectory;
         return;
     }
@@ -711,10 +707,6 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
     printElementNames(rootElement);
     xmlFreeDoc(doc);
     xmlCleanupParser();
-
-    int nRC = QMessageBox::warning(this, tr("Bulk Code Upload Complete"),
-                                   tr("Please check the 'Codes' tab to see that your codes were added successfully."),
-                                   QMessageBox::Ok);
 }
 
 void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
@@ -1775,7 +1767,7 @@ void CFrmAdminInfo::codeTableCellSelected(int nRow, int nCol)
         CLockSet::Iterator itor;
         CLockState  *pState;
         itor = _pworkingSet->begin();
-        for(int i=0;i<nRow;i++,itor++) {
+        for(int i=0; i<nRow; i++, itor++) {
         }
 
         pState = itor.value();  // This should be the correct state
@@ -1837,7 +1829,6 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
     int nRow = 0;
     int nCol = 0;
-    bool alwaysActive = false;
 
     QDateTime alwaysActiveStart = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
     QDateTime alwaysActiveEnd = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
@@ -2010,9 +2001,9 @@ int CFrmAdminInfo::isLock(uint16_t nLockNum)
 void CFrmAdminInfo::openAllDoors()
 {
     qDebug() << "CFrmAdminInfo::openAllDoors()";
-    // Loop to open all doors
 
-    for(int i=1; i<=_tmpAdminRec.getMaxLocks() && !_bStopOpen;i++)
+    // Loop to open all doors
+    for(uint i = 1; i <= _tmpAdminRec.getMaxLocks() && !_bStopOpen; i++)
     {
         while(!_bContinueOpenLoop && !_bStopOpen) {
             QCoreApplication::processEvents();
@@ -2386,7 +2377,6 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
             setTableMenuLocation(_pTableMenu);
         }
         break;
-
     case QEvent::TouchEnd:
         qDebug() << "TouchEnd rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString();
         if(ui->tblCodesList->rowCount() >= 0 )
@@ -2395,7 +2385,7 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
             setTableMenuLocation(_pTableMenuAdd);
         }
         break;
-    case QEvent::TouchUpdate:
+    default:
         break;
     }
 }
@@ -2574,24 +2564,12 @@ void CFrmAdminInfo::on_btnRebootSystem_clicked()
     }
 }
 
-void CFrmAdminInfo::on_btnPurgeCodes_clicked()
-{
-    qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
-
-    on_btnReadCodes_clicked();
-
-    int nRC = QMessageBox::warning(this, tr("Verify Remove All Codes"),
-                                   tr("All access codes will be removed from the system\nDo you want to continue?"),
-                                   QMessageBox::Yes, QMessageBox::Cancel);
-    if(nRC == QMessageBox::Yes) {
-        qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
-        purgeCodes();
-        usleep(50000);
-
-        on_btnReadCodes_clicked();
-
-        nRC = QMessageBox::warning(this, tr("Code Removal Success"),
-                                   tr("Code Removal is successful!!\nPlease give the codes list a moment to update."),
-                                   QMessageBox::Ok);
-    }
-}
+void CFrmAdminInfo::on_btnPurgeCodes_clicked() { qDebug() <<
+                                                             "CFrmAdminInfo::on_btnPurgeCodes_clicked()"; on_btnReadCodes_clicked(); int nRC
+            = QMessageBox::warning(this, tr("Verify Remove All Codes"), tr("All access
+                                                                           codes will be removed from the system\nDo you want to continue?"),
+                                                                                                                                          QMessageBox::Yes, QMessageBox::Cancel); if(nRC == QMessageBox::Yes) { qDebug()
+            << "CFrmAdminInfo::on_btnPurgeCodes_clicked()"; purgeCodes(); usleep(50000);
+            on_btnReadCodes_clicked(); nRC = QMessageBox::warning(this, tr("Code Removal
+                                                                           Success"), tr("Code Removal is successful!!\nPlease give the codes list a
+                                                                           moment to update."), QMessageBox::Ok); } }

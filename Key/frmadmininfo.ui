@@ -301,7 +301,7 @@
      <property name="title">
       <string>Admin Info</string>
      </property>
-     <widget class="QWidget" name="layoutWidget">
+     <widget class="QWidget" name="layoutWidget1">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -410,7 +410,7 @@
        <enum>Qt::Vertical</enum>
       </property>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
+     <widget class="QWidget" name="layoutWidget2">
       <property name="geometry">
        <rect>
         <x>240</x>
@@ -542,29 +542,6 @@
       </property>
      </widget>
     </widget>
-    <widget class="QLabel" name="lblTestValue">
-     <property name="geometry">
-      <rect>
-       <x>706</x>
-       <y>320</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>XX</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
     <zorder>gpAdminInfo</zorder>
     <zorder>btnDone</zorder>
     <zorder>lKey</zorder>
@@ -577,7 +554,6 @@
     <zorder>cbInternetTime</zorder>
     <zorder>btnSetTime</zorder>
     <zorder>cbTimeZone</zorder>
-    <zorder>lblTestValue</zorder>
    </widget>
    <widget class="QWidget" name="tabUtilities">
     <property name="styleSheet">
@@ -676,7 +652,7 @@
       <string>Remote Desktop Settings</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="lblBrightness">
      <property name="geometry">
       <rect>
        <x>650</x>
@@ -694,7 +670,7 @@
       <string>Brightness</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label1">
+    <widget class="QLabel" name="lblIpAddress">
      <property name="geometry">
       <rect>
        <x>21</x>
@@ -826,7 +802,7 @@
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label1_3">
+    <widget class="QLabel" name="lblBrandingImage">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -948,44 +924,12 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="Line" name="line_5">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>160</y>
-       <width>20</width>
-       <height>271</height>
-      </rect>
-     </property>
-     <property name="visible">
-      <bool>false</bool>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-    <widget class="Line" name="line_6">
-     <property name="geometry">
-      <rect>
-       <x>450</x>
-       <y>161</y>
-       <width>20</width>
-       <height>271</height>
-      </rect>
-     </property>
-     <property name="visible">
-      <bool>false</bool>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label1_2">
+    <widget class="QLabel" name="lblInstallNewApp">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>160</y>
-       <width>331</width>
+       <width>271</width>
        <height>28</height>
       </rect>
      </property>
@@ -999,12 +943,12 @@
       <string>Install new KeyCodeBox App</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label1_2">
+    <widget class="QLabel" name="lblLoadBulkCodes">
      <property name="geometry">
       <rect>
        <x>300</x>
        <y>160</y>
-       <width>300</width>
+       <width>171</width>
        <height>28</height>
       </rect>
      </property>
@@ -1280,7 +1224,7 @@
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_7">
+     <widget class="QLabel" name="lblPrintImmediate">
       <property name="geometry">
        <rect>
         <x>150</x>
@@ -1298,7 +1242,7 @@
        <string>Print an immediate report</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_8">
+     <widget class="QLabel" name="lblStarting">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1316,7 +1260,7 @@
        <string>Starting</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_9">
+     <widget class="QLabel" name="lblEnding">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -3062,7 +3006,7 @@
       <number>32</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_6">
+    <widget class="QLabel" name="lblMaxLock">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -3170,7 +3114,7 @@
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="lblCodeFrom">
      <property name="geometry">
       <rect>
        <x>135</x>
@@ -3183,7 +3127,7 @@
       <string>From</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="lblCodeTo">
      <property name="geometry">
       <rect>
        <x>442</x>
@@ -3304,7 +3248,7 @@
     <attribute name="title">
      <string>History</string>
     </attribute>
-    <widget class="QPushButton" name="btnReadCodes_2">
+    <widget class="QPushButton" name="btnRead">
      <property name="geometry">
       <rect>
        <x>720</x>
@@ -3317,7 +3261,7 @@
       <string>Read</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="lblHistoryTo">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -3330,7 +3274,7 @@
       <string>To</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_5">
+    <widget class="QLabel" name="lblHistoryFrom">
      <property name="geometry">
       <rect>
        <x>140</x>

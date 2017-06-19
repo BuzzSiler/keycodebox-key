@@ -77,7 +77,7 @@ private:
     const int fEnd = 5;
 
     const bool fFingerprint1 = 6;
-    const bool fFingerprint2 = 7; 
+    const bool fFingerprint2 = 7;
 
     const bool fAskQuestions = 8;
     const bool fQuestion1 = 9;
@@ -118,7 +118,7 @@ private:
 
     void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
     std::string rtrim(std::string &s);
-    
+
     void initialize();
     bool isInternetTime();
     void onButtonClick(char key);
@@ -146,7 +146,7 @@ private:
     void getSystemIPAddressAndStatus();
     void populateFileCopyWidget(QString sDirectory, QString sFilter);
     void purgeCodes();
-    
+
 public slots:
     void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
     void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
@@ -199,7 +199,7 @@ public slots:
     void OnUpdatedCodeState(bool bSuccess);
 
     void OnFoundNewStorageDevice(QString device0, QString device1);
-    
+
     void onStartEditLabel(QLabel* pLabel, QString sLabelText);
 
     void onStopEdit();
@@ -223,7 +223,7 @@ private slots:
 
     void on_btnDone_clicked();
     void on_btnSaveSettings_clicked();
-    
+
     void on_lblName_clicked();
     void on_lblEmail_clicked();
     void on_lblPhone_clicked();
@@ -237,7 +237,7 @@ private slots:
     void setTimeZone();
     void on_cbInternetTime_clicked();
     void on_btnSetTime_clicked();
-    
+
     void on_btnOpenDoor_clicked();
 
     void on_cbBox1_clicked();
