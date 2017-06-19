@@ -71,7 +71,7 @@
      <property name="geometry">
       <rect>
        <x>12</x>
-       <y>308</y>
+       <y>316</y>
        <width>201</width>
        <height>31</height>
       </rect>
@@ -110,7 +110,7 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>309</y>
+       <y>317</y>
        <width>551</width>
        <height>31</height>
       </rect>
@@ -149,8 +149,11 @@
        <x>610</x>
        <y>275</y>
        <width>171</width>
-       <height>31</height>
+       <height>41</height>
       </rect>
+     </property>
+     <property name="suffix">
+       <string> mins</string>
      </property>
      <property name="minimum">
       <number>5</number>
@@ -166,7 +169,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>330</y>
+       <y>338</y>
        <width>771</width>
        <height>16</height>
       </rect>
