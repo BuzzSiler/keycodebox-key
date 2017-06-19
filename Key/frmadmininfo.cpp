@@ -699,6 +699,9 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
 
     if( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
     {
+        int nRC = QMessageBox::warning(this, tr("XML Parsing Failed"),
+                                       tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
+                                       QMessageBox::Ok);
         qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked(), can't parse XML file: " << _copyDirectory;
         return;
     }
@@ -707,6 +710,10 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
     printElementNames(rootElement);
     xmlFreeDoc(doc);
     xmlCleanupParser();
+
+    int nRC = QMessageBox::warning(this, tr("Bulk Code Upload Complete"),
+                                   tr("Please check the 'Codes' tab to see that your codes were added successfully."),
+                                   QMessageBox::Ok);
 }
 
 void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
@@ -2564,12 +2571,24 @@ void CFrmAdminInfo::on_btnRebootSystem_clicked()
     }
 }
 
-void CFrmAdminInfo::on_btnPurgeCodes_clicked() { qDebug() <<
-                                                             "CFrmAdminInfo::on_btnPurgeCodes_clicked()"; on_btnReadCodes_clicked(); int nRC
-            = QMessageBox::warning(this, tr("Verify Remove All Codes"), tr("All access
-                                                                           codes will be removed from the system\nDo you want to continue?"),
-                                                                                                                                          QMessageBox::Yes, QMessageBox::Cancel); if(nRC == QMessageBox::Yes) { qDebug()
-            << "CFrmAdminInfo::on_btnPurgeCodes_clicked()"; purgeCodes(); usleep(50000);
-            on_btnReadCodes_clicked(); nRC = QMessageBox::warning(this, tr("Code Removal
-                                                                           Success"), tr("Code Removal is successful!!\nPlease give the codes list a
-                                                                           moment to update."), QMessageBox::Ok); } }
+void CFrmAdminInfo::on_btnPurgeCodes_clicked()
+{
+    qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
+
+    on_btnReadCodes_clicked();
+
+    int nRC = QMessageBox::warning(this, tr("Verify Remove All Codes"),
+                                   tr("All access codes will be removed from the system\nDo you want to continue?"),
+                                   QMessageBox::Yes, QMessageBox::Cancel);
+    if(nRC == QMessageBox::Yes) {
+        qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
+        purgeCodes();
+        usleep(50000);
+
+        on_btnReadCodes_clicked();
+
+        nRC = QMessageBox::warning(this, tr("Code Removal Success"),
+                                   tr("Code Removal is successful!!\nPlease give the codes list a moment to update."),
+                                   QMessageBox::Ok);
+    }
+}
