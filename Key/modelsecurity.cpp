@@ -270,24 +270,24 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 
                 // need to do check again for code 2
 
-                if( bSecondCodeRequired ) {
-                    emit __OnRequireCodeTwo();
-                } else {
-                    if( bFingerprintRequired == true)
+//                if( bSecondCodeRequired ) {
+//                    emit __OnRequireCodeTwo();
+//                } else {
+                if( bFingerprintRequired == true)
+                {
+                    //we need to check if a fingerprint directory already exists,
+                    // if they do, do not attempt enrollment
+                    if( !QDir("/home/pi/run/prints/" + code).exists() )
                     {
-                        //we need to check if a fingerprint directory already exists,
-                        // if they do, do not attempt enrollment
-                        if( !QDir("/home/pi/run/prints/" + code).exists() )
-                        {
-                            emit __EnrollFingerprintDialog(code);
-                            emit __EnrollFingerprint(code);
-                        }
-                        else
-                            emit __OnSecurityCheckedFailed();
-                        return;
+                        emit __EnrollFingerprintDialog(code);
+                        emit __EnrollFingerprint(code);
                     }
-                    emit __OnSecurityCheckSuccess(nDoorNum);
+                    else
+                        emit __OnSecurityCheckedFailed();
+                    return;
                 }
+                emit __OnSecurityCheckSuccess(nDoorNum);
+//                }
             } else {
                 emit __OnSecurityCheckedFailed();
             }
@@ -631,3 +631,4 @@ void CModelSecurity::OnRequestCurrentAdmin()
 
     emit __OnRequestedCurrentAdmin(&_ptblAdmin->getCurrentAdmin());
 }
+
