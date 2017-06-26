@@ -113,7 +113,6 @@ void CSecurityController::OnUpdateCodeState(CLockState *rec)
     emit __OnUpdateCodeState(rec);
 }
 
-
 std::string CSecurityController::GetPredictiveAccessCode(QString code, int nLockNum)
 {
     QDateTime datetime = QDateTime::currentDateTime();

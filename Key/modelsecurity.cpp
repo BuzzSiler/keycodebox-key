@@ -302,7 +302,7 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 {
     // Check the DB
-    _type = "";  // "User" or "Admin" or ""
+    _type = "";  // "User" or "Admin" or "Assist"
 
     qDebug() << "CModelSecurity::OnVerifyFingerprintCodeOne. Code:" << code;
 

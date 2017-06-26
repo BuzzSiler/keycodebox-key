@@ -116,9 +116,6 @@ public slots:
     void OnVerifyAdminPassword(QString code);
 
     void OnRequestCurrentAdmin();
-
-
 };
-
 
 #endif // CMODELSECURITY_H
