@@ -167,5 +167,4 @@ public slots:
 private slots:
 };
 
-
 #endif // CSECURITYCONTROLLER_H

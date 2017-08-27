@@ -233,7 +233,7 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
             bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
             bool checkSuccessful = false;
             QString pingAddress = "";
-            QString parameter = "-r0 -t 50";
+            QString parameter = "-r 0 -t 50";
 
             // If this interface isn't running, we don't care about it
             if ( !isRunning ) continue;
@@ -523,8 +523,6 @@ void CFrmAdminInfo::onCopyModelDirectoryLoaded(QString path)
 
 void CFrmAdminInfo::on_btnCopyToggleSource_clicked(bool checked)
 {
-    //static_cast<QTreeView*>(ui->treeViewCopy)->selectionModel()->clearSelection();
-    //ui->treeViewCopy->collapseAll();
     if(checked)
     {
         qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, checked, " << usbDevice1 << ", " << usbDevice0;
@@ -1277,7 +1275,6 @@ void CFrmAdminInfo::OnCloseAdmin() {
 
 void CFrmAdminInfo::on_btnOpenDoor_clicked()
 {
-    // Open selected door
 }
 
 void CFrmAdminInfo::on_cbBox1_clicked()
@@ -1737,7 +1734,6 @@ void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
     qDebug() << "CFrmAdminInfo::OnLockStatusUpdate()";
     _pLocksStatus = locksStatus;
 
-    // Update the view
     // Populate the Available doors combobox
     populateAvailableDoors();
 }
@@ -1774,7 +1770,7 @@ void CFrmAdminInfo::codeTableCellSelected(int nRow, int nCol)
         CLockSet::Iterator itor;
         CLockState  *pState;
         itor = _pworkingSet->begin();
-        for(int i=0; i<nRow; i++, itor++) {
+        for(int i = 0; i < nRow; i++, itor++) {
         }
 
         pState = itor.value();  // This should be the correct state

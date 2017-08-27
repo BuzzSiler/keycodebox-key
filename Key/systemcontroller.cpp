@@ -43,7 +43,6 @@ void CSystemController::initialize(QThread *pthread)
 
     if( _LCDGraphicsController.isLCDAttached() ) {
         qDebug() << "CSystemController::initialize moveToThread.";
-        //        _LCDGraphicsController.moveToThread(_pInitThread);
         _LCDGraphicsController.setBrightness(75);
     }
 
@@ -408,7 +407,6 @@ void CSystemController::OnAdminSecurityCheckOk(QString type)
 
 void CSystemController::OnAdminSecurityCheckFailed()
 {
-    //    _systemState = EAdminPasswordFailed;
     emit __OnCodeMessage("Incorrect Password");
     emit __OnClearEntry();
     emit __AdminSecurityCheckFailed();
@@ -445,7 +443,6 @@ void CSystemController::OnOpenLockRequest(int nLockNum)
         // Open the lock
         qDebug() << "Lock Open";
         emit __OnCodeMessage("Lock Open");
-        //        _LockController.openLockWithPulse(nLockNum, );
         _LockController.openLock(nLockNum);
         qDebug() << "SystemController: reportActivity";
     } else {
@@ -689,6 +686,7 @@ void CSystemController::looprun()
             stopTimeoutTimer();
 
             qDebug() << "CSystemController::EnrollFingerprintCancel()";
+
             if(_fingerprintReader)
                 _fingerprintReader->cancelEnrollment();
             if(_fingerprintReader)
@@ -701,7 +699,9 @@ void CSystemController::looprun()
 
             startTimeoutTimer(30000);
         }
-    } else if(_systemState == EUserCodeTwo) {
+    }
+    else if(_systemState == EUserCodeTwo)
+    {
         if(_systemStateDisplay != EUserCodeTwo) {
             _systemStateDisplay = EUserCodeTwo;
 

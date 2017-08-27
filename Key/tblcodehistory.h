@@ -10,7 +10,6 @@
 #include "lockhistoryrec.h"
 #include "lockhistoryset.h"
 
-
 /**
  * @brief The CTblCodes class
  * @table "codes" fields
@@ -127,6 +126,4 @@ public:
     void selectLastLockCodeHistorySet(int &nLockNum, QDateTime &start, QDateTime &end, CLockHistorySet **pLockHistorySet);
 };
 
-
 #endif // CTBLCODEHISTORY_H
-

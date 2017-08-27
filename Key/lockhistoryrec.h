@@ -56,6 +56,4 @@ public slots:
 
 };
 
-
-
 #endif // CLOCKHISTORYREC_H

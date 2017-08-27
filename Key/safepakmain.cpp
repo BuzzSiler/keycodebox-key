@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initialize();
 
     setAttribute(Qt::WA_AcceptTouchEvents, true);
-    
+
     _pscene = new QGraphicsScene(this);
     ui->graphicsView->setScene(_pscene);
     _pPixmap = new QPixmap("/home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg");
@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
             qDebug() << "Failed to load image!";
         }
     }
-    
+
     // Scale the image...
     _pPixmapItem = new CClickableGraphicsItem(_pPixmap->scaled(760, 390));
     _pscene->addItem(_pPixmapItem);
@@ -128,7 +128,7 @@ void MainWindow::initialize() {
     _pdFingerprint = 0;
     _pdFingerprintVerify = 0;
     _pQuestions = 0;
-    
+
     QApplication::setOverrideCursor(Qt::BlankCursor);
 
     if( isInternetTime() )
@@ -256,7 +256,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
-        connect(psysController, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool))); //BING
+        connect(psysController, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool)));
 
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
@@ -268,7 +268,6 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
     disconnect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, 0);
     connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEnteredTwo(QString)));
 
-    
     disconnect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, 0);
     connect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, SLOT(OnFingerprintCodeEnteredTwo(QString)));
 
@@ -278,7 +277,6 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 
 void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
 {
-
 }
 
 void MainWindow::hideFormsExcept(QDialog * pfrm) {

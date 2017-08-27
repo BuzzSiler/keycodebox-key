@@ -297,6 +297,3 @@ void CSecurityController::OnRequestedCurrentAdmin(CAdminRec *admin)
     qDebug() << "CSecurityController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(admin);
 }
-
-
-

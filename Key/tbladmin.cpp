@@ -211,7 +211,7 @@ QString CTblAdmin::isAccessCode(QString code)
 bool CTblAdmin::isPassword(QString password, QString type)
 {
     // unencrypt
-    std::string adminPassword   =  _currentAdmin.getPassword();         // Already unencrypted in currentAdmin
+    std::string adminPassword   = _currentAdmin.getPassword();          // Already unencrypted in currentAdmin
     std::string assistPassword  = _currentAdmin.getAssistPassword();    // Already unencrypted in currentAdmin
     std::string enteredPassword = CEncryption::decryptString(password).toStdString();
 
@@ -238,7 +238,7 @@ bool CTblAdmin::createTable()
                 " default_report_freq DATETIME,"
                 " default_report_start DATETIME, password text, "
                 " access_code text,"
-                " assist_password, assist_code, show_fingerprint, "
+                " assist_password text, assist_code text, show_fingerprint bool,"
                 " use_predictive_access_code bool, "
                 " predictive_key text, predictive_resolution integer,"
                 " max_locks,"

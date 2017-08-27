@@ -5,14 +5,13 @@
 #include "encryption.h"
 #include "lockhistoryrec.h"
 
-
 /**
  * @brief CTblCodeHistory::selectCodeSet
  * @param code - encrypted
  */
 void CTblCodeHistory::selectLockCodeHistorySet(int &nLockNum, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet)
 {
-    qDebug() << "CTblCodes::selectCodeSet()";
+    qDebug() << "CTblCodes::selectLockCodeHistorySet()";
     // hold on to the code
     CLockHistoryRec  *pLockHistory;
     *pLockHistorySet = 0;
@@ -21,11 +20,11 @@ void CTblCodeHistory::selectLockCodeHistorySet(int &nLockNum, QDateTime start, Q
         QSqlQuery qry(*_pDB);
         QString sql = "SELECT ids, sequence, sequence_order, locknum, description, "
                       "code1, code2, "
-                    " starttime, endtime, status, access_count, retry_count, max_access, max_retry,"
-                    " access_time, admin_notification_sent,"
-                    " user_notification_email, user_notification_sent, answer1, answer2, answer3"
-                    " from " + QString(TABLENAME.c_str()) +
-                    " WHERE ";
+                      " starttime, endtime, status, access_count, retry_count, max_access, max_retry,"
+                      " access_time, admin_notification_sent,"
+                      " user_notification_email, user_notification_sent, answer1, answer2, answer3"
+                      " from " + QString(TABLENAME.c_str()) +
+                      " WHERE ";
         if(nLockNum != -1 ) {
             sql += " locknum = :lockNum and ";
         }
@@ -77,10 +76,9 @@ void CTblCodeHistory::selectLockCodeHistorySet(int &nLockNum, QDateTime start, Q
             int fldAdminNotificationSent = qry.record().indexOf("admin_notification_sent");
             int fldUserNotificationEmail = qry.record().indexOf("user_notification_email");
             int fldUserNotificationSent = qry.record().indexOf("user_notification_sent");
-	    int fldQuestion1 = qry.record().indexOf("answer1");
-	    int fldQuestion2 = qry.record().indexOf("answer2");
-	    int fldQuestion3 = qry.record().indexOf("answer3");
-
+            int fldQuestion1 = qry.record().indexOf("answer1");
+            int fldQuestion2 = qry.record().indexOf("answer2");
+            int fldQuestion3 = qry.record().indexOf("answer3");
 
             qDebug() << "fldLockNo:" << fldLockNo << "  fldCode1No:" << fldCode1No << "  fldCode2No:" << fldCode2No;
             qDebug() << "Count: " << qry.size();
@@ -120,9 +118,9 @@ void CTblCodeHistory::selectLockCodeHistorySet(int &nLockNum, QDateTime start, Q
                 pLockHistory->setUserNotificationEmail(qry.value(fldUserNotificationEmail).toString().toStdString());
                 pLockHistory->setUserNotificationSent(qry.value(fldUserNotificationSent).toBool());
 
-		pLockHistory->setQuestion1(qry.value(fldQuestion1).toString().toStdString());
-		pLockHistory->setQuestion2(qry.value(fldQuestion2).toString().toStdString());
-		pLockHistory->setQuestion3(qry.value(fldQuestion3).toString().toStdString());
+                pLockHistory->setQuestion1(qry.value(fldQuestion1).toString().toStdString());
+                pLockHistory->setQuestion2(qry.value(fldQuestion2).toString().toStdString());
+                pLockHistory->setQuestion3(qry.value(fldQuestion3).toString().toStdString());
 
                 (*pLockHistorySet)->addToSet(*pLockHistory);
             }
@@ -148,11 +146,11 @@ void CTblCodeHistory::selectLastLockCodeHistorySet(int &nLockNum, QDateTime &sta
         QSqlQuery qry(*_pDB);
         QString sql = "SELECT ids, sequence, sequence_order, locknum, description, "
                       "code1, code2, "
-                    " starttime, endtime, status, access_count, retry_count, max_access, max_retry,"
-                    " access_time, admin_notification_sent,"
-                    " user_notification_email, user_notification_sent, answer1, answer2, answer3"
-                    " from " + QString(TABLENAME.c_str()) +
-                    " WHERE ";
+                      " starttime, endtime, status, access_count, retry_count, max_access, max_retry,"
+                      " access_time, admin_notification_sent,"
+                      " user_notification_email, user_notification_sent, answer1, answer2, answer3"
+                      " from " + QString(TABLENAME.c_str()) +
+                      " WHERE ";
         if(nLockNum != -1 ) {
             sql += " locknum = :lockNum and ";
         }
@@ -205,9 +203,9 @@ void CTblCodeHistory::selectLastLockCodeHistorySet(int &nLockNum, QDateTime &sta
             int fldAdminNotificationSent = qry.record().indexOf("admin_notification_sent");
             int fldUserNotificationEmail = qry.record().indexOf("user_notification_email");
             int fldUserNotificationSent = qry.record().indexOf("user_notification_sent");
-	    int fldQuestion1 = qry.record().indexOf("answer1");
-	    int fldQuestion2 = qry.record().indexOf("answer2");
-	    int fldQuestion3 = qry.record().indexOf("answer3");
+            int fldQuestion1 = qry.record().indexOf("answer1");
+            int fldQuestion2 = qry.record().indexOf("answer2");
+            int fldQuestion3 = qry.record().indexOf("answer3");
 
             qDebug() << "fldLockNo:" << fldLockNo << "  fldCode1No:" << fldCode1No << "  fldCode2No:" << fldCode2No;
             qDebug() << "Count: " << qry.size();
@@ -249,9 +247,9 @@ void CTblCodeHistory::selectLastLockCodeHistorySet(int &nLockNum, QDateTime &sta
                 pLockHistory->setUserNotificationEmail(qry.value(fldUserNotificationEmail).toString().toStdString());
                 pLockHistory->setUserNotificationSent(qry.value(fldUserNotificationSent).toBool());
 
-		pLockHistory->setQuestion1(qry.value(fldQuestion1).toString().toStdString());
-		pLockHistory->setQuestion2(qry.value(fldQuestion2).toString().toStdString());
-		pLockHistory->setQuestion3(qry.value(fldQuestion3).toString().toStdString());
+                pLockHistory->setQuestion1(qry.value(fldQuestion1).toString().toStdString());
+                pLockHistory->setQuestion2(qry.value(fldQuestion2).toString().toStdString());
+                pLockHistory->setQuestion3(qry.value(fldQuestion3).toString().toStdString());
             }
             if( pLockHistory ) {
                 (*pLockHistorySet)->addToSet(*pLockHistory);
@@ -281,54 +279,52 @@ bool CTblCodeHistory::tableExists()
 
 bool CTblCodeHistory::columnExists(QString column)
 {
-  qDebug() << "CTblCodeHistory::columnExists()";
-  QStringList::iterator  itor;
-  QSqlQuery qry(*_pDB);
-  bool foundColumn = false;
-  
-  if( _pDB && _pDB->isOpen() )
+    qDebug() << "CTblCodeHistory::columnExists()";
+    QStringList::iterator  itor;
+    QSqlQuery qry(*_pDB);
+    bool foundColumn = false;
+
+    if( _pDB && _pDB->isOpen() )
     {
-      QString sql("PRAGMA TABLE_INFO(codes);");
+        QString sql("PRAGMA TABLE_INFO(codes);");
 
-      qry.prepare( sql );
+        qry.prepare( sql );
 
-      if( qry.exec() )
-	{
-	  while( qry.next() )
-	    {
-	      if( qry.value(1).toString().compare(column) == 0 )
-		{
-		  qDebug() << "CTblCodeHistory::columnExists(), found column: " << column;
+        if( qry.exec() )
+        {
+            while( qry.next() )
+            {
+                if( qry.value(1).toString().compare(column) == 0 )
+                {
+                    qDebug() << "CTblCodeHistory::columnExists(), found column: " << column;
 
+                    foundColumn = true;
+                    break;
+                }
+            }
+        }
+        else
+            qDebug() << qry.lastError();
 
-
-		  foundColumn = true;
-		  break;
-		}
-	    }
-	}
-      else
-	  qDebug() << qry.lastError();
-            
     } else {
         std::cout << "Either _pDB is NULL or _pDB is not open\n";
     }
-  return foundColumn;
+    return foundColumn;
 }
 
 void CTblCodeHistory::createColumn(QString column, QString fieldType)
 {
-  qDebug() << "CTblCodeHistory::createColumn\n";
+    qDebug() << "CTblCodeHistory::createColumn\n";
     if( _pDB && _pDB->isOpen() ) {
         std::cout << "Creating table \n";
         QSqlQuery qry(*_pDB);
 
         QString sql("ALTER TABLE  ");
         sql += QString(TABLENAME.c_str());
-	sql += " ADD ";
-	sql += column;
-	sql += " ";
-	sql += fieldType;
+        sql += " ADD ";
+        sql += column;
+        sql += " ";
+        sql += fieldType;
 
         qry.prepare( sql );
 
@@ -339,7 +335,6 @@ void CTblCodeHistory::createColumn(QString column, QString fieldType)
     } else {
         std::cout << "Either _pDB is NULL or _pDB is not open\n";
     }
-
 }
 
 void CTblCodeHistory::initialize()
@@ -358,15 +353,13 @@ void CTblCodeHistory::initialize()
     QString column2 = "answer2";
     QString column3 = "answer3";
 
-    
     if(!columnExists(column1))
-      createColumn(column1, "text");
+        createColumn(column1, "text");
     if(!columnExists(column2))
-      createColumn(column2, "text");
+        createColumn(column2, "text");
     if(!columnExists(column3))
-      createColumn(column3, "text");
+        createColumn(column3, "text");
 }
-
 
 void CTblCodeHistory::createTable()
 {
@@ -378,10 +371,10 @@ void CTblCodeHistory::createTable()
         QString sql("CREATE TABLE IF NOT EXISTS ");
         sql += QString(TABLENAME.c_str());
         sql += "(ids integer primary key unique, sequence text,"
-                "sequence_order integer, locknum integer, description text, "
-                "code1 text, code2 text,"
-                " starttime DATETIME, endtime DATETIME, status text, access_count integer,"
-                " retry_count integer, max_access integer, max_retry integer,"
+               "sequence_order integer, locknum integer, description text, "
+               "code1 text, code2 text,"
+               " starttime DATETIME, endtime DATETIME, status text, access_count integer,"
+               " retry_count integer, max_access integer, max_retry integer,"
                " access_time DATETIME, admin_notification_sent BOOL,"
                 " user_notification_email text, user_notification_sent BOOL)";
 
@@ -397,18 +390,16 @@ void CTblCodeHistory::createTable()
 
 }
 
-
 bool CTblCodeHistory::addLockCodeHistory(CLockHistoryRec &lockHistoryRec)
 {
     return addLockCodeHistory(lockHistoryRec.getLockNum(), lockHistoryRec.getCode1(), lockHistoryRec.getCode2(),
-                lockHistoryRec.getStartTime(), lockHistoryRec.getEndTime(), lockHistoryRec.getMaxAccess(),
-                    lockHistoryRec.getStatus(), lockHistoryRec.getDescription(),
-                    lockHistoryRec.getSequence(), lockHistoryRec.getSequenceOrder(),
-                    lockHistoryRec.getMaxRetry(), lockHistoryRec.getAccessTime(),
-                    lockHistoryRec.getAdminNotificationSent(), lockHistoryRec.getUserNotificationEmail(),
-                    lockHistoryRec.getUserNotificationSent());
+                              lockHistoryRec.getStartTime(), lockHistoryRec.getEndTime(), lockHistoryRec.getMaxAccess(),
+                              lockHistoryRec.getStatus(), lockHistoryRec.getDescription(),
+                              lockHistoryRec.getSequence(), lockHistoryRec.getSequenceOrder(),
+                              lockHistoryRec.getMaxRetry(), lockHistoryRec.getAccessTime(),
+                              lockHistoryRec.getAdminNotificationSent(), lockHistoryRec.getUserNotificationEmail(),
+                              lockHistoryRec.getUserNotificationSent());
 }
-
 
 /**
  * @brief CTblCodeHistory::addLockCodeHistory
@@ -436,17 +427,17 @@ bool CTblCodeHistory::addLockCodeHistory(int locknum, std::string code1, std::st
 
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + QString(TABLENAME.c_str()) +
-                    QString(" (sequence, sequence_order, "
-                  "locknum, description, code1, "
-                  "code2, starttime, endtime, status, access_count,"
-                            "retry_count, max_access, max_retry,"
-                            "access_time, admin_notification_sent,"
-                            "user_notification_email, user_notification_sent)"
-                  " VALUES (:seqDesc, :seqOrder, :lockNum, :desc, :codeOne, "
-                            " :codeTwo, "
-                            " :start, :end, :stat, 0, 0, :maxAccess, :maxRetry, "
-                            " :accessTime, :adminNotificationSent, "
-                            " :userEmail, :userNotificationSent)" ));
+                QString(" (sequence, sequence_order, "
+                        "locknum, description, code1, "
+                        "code2, starttime, endtime, status, access_count,"
+                        "retry_count, max_access, max_retry,"
+                        "access_time, admin_notification_sent,"
+                        "user_notification_email, user_notification_sent)"
+                        " VALUES (:seqDesc, :seqOrder, :lockNum, :desc, :codeOne, "
+                        " :codeTwo, "
+                        " :start, :end, :stat, 0, 0, :maxAccess, :maxRetry, "
+                        " :accessTime, :adminNotificationSent, "
+                        " :userEmail, :userNotificationSent)" ));
 
     qDebug() << "Query:" << qry.lastQuery();
 
@@ -465,22 +456,6 @@ bool CTblCodeHistory::addLockCodeHistory(int locknum, std::string code1, std::st
     qry.bindValue(":adminNotificationSent", QVariant(adminNotificationSent));
     qry.bindValue(":userEmail", userNotificationEmail.c_str());
     qry.bindValue(":userNotificationSent", QVariant(userNotificationSent));
-//    qry.bindValue(0, sequence.c_str());
-//    qry.bindValue(1, sequenceNum);
-//    qry.bindValue(2, locknum);
-//    qry.bindValue(3, desc.c_str());
-//    qry.bindValue(4, code1.c_str());
-//    qry.bindValue(5, code2.c_str());
-//    qry.bindValue(6, starttime.toString(datetimeFormat));
-//    qry.bindValue(7, endtime.toString(datetimeFormat));
-//    qry.bindValue(8, status.c_str());
-//    qry.bindValue(9, maxAccess);
-//    qry.bindValue(10, maxRetry);
-//    qry.bindValue(11, accesstime.toString(datetimeFormat));
-//    qry.bindValue(12, QVariant(adminNotificationSent));
-//    qry.bindValue(13, userNotificationEmail.c_str());
-//    qry.bindValue(14, QVariant(userNotificationSent));
-
 
     QMap<QString, QVariant> mapVals = qry.boundValues();
     qDebug() << "Mapped count:" << mapVals.count();
@@ -496,18 +471,16 @@ bool CTblCodeHistory::addLockCodeHistory(int locknum, std::string code1, std::st
     }
 }
 
-
 bool CTblCodeHistory::addLockCodeHistoryWithAnswers(CLockHistoryRec &lockHistoryRec, QString answer1, QString answer2, QString answer3)
 {
     return addLockCodeHistoryWithAnswers(lockHistoryRec.getLockNum(), lockHistoryRec.getCode1(), lockHistoryRec.getCode2(),
-                lockHistoryRec.getStartTime(), lockHistoryRec.getEndTime(), lockHistoryRec.getMaxAccess(),
-                    lockHistoryRec.getStatus(), lockHistoryRec.getDescription(),
-                    lockHistoryRec.getSequence(), lockHistoryRec.getSequenceOrder(),
-                    lockHistoryRec.getMaxRetry(), lockHistoryRec.getAccessTime(),
-                    lockHistoryRec.getAdminNotificationSent(), lockHistoryRec.getUserNotificationEmail(),
-			      lockHistoryRec.getUserNotificationSent(), answer1, answer2, answer3);
+                                         lockHistoryRec.getStartTime(), lockHistoryRec.getEndTime(), lockHistoryRec.getMaxAccess(),
+                                         lockHistoryRec.getStatus(), lockHistoryRec.getDescription(),
+                                         lockHistoryRec.getSequence(), lockHistoryRec.getSequenceOrder(),
+                                         lockHistoryRec.getMaxRetry(), lockHistoryRec.getAccessTime(),
+                                         lockHistoryRec.getAdminNotificationSent(), lockHistoryRec.getUserNotificationEmail(),
+                                         lockHistoryRec.getUserNotificationSent(), answer1, answer2, answer3);
 }
-
 
 /**
  * @brief CTblCodeHistory::addLockCodeHistory
@@ -525,29 +498,29 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(CLockHistoryRec &lockHistory
  * @return
  */
 bool CTblCodeHistory::addLockCodeHistoryWithAnswers(int locknum, std::string code1, std::string code2,
-                                         QDateTime starttime, QDateTime endtime, int maxAccess,
-                                         std::string status, std::string desc, std::string sequence, int sequenceNum,
-                                         int maxRetry, QDateTime accesstime,
-                                         bool adminNotificationSent, std::string userNotificationEmail,
-                                         bool userNotificationSent, QString answer1, QString answer2, QString answer3)
+                                                    QDateTime starttime, QDateTime endtime, int maxAccess,
+                                                    std::string status, std::string desc, std::string sequence, int sequenceNum,
+                                                    int maxRetry, QDateTime accesstime,
+                                                    bool adminNotificationSent, std::string userNotificationEmail,
+                                                    bool userNotificationSent, QString answer1, QString answer2, QString answer3)
 {
     qDebug() << "CTblCodeHistory::addLockCodeHistory()";
 
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + QString(TABLENAME.c_str()) +
-                    QString(" (sequence, sequence_order, "
-                  "locknum, description, code1, "
-                  "code2, starttime, endtime, status, access_count,"
-                            "retry_count, max_access, max_retry,"
-                            "access_time, admin_notification_sent,"
-                            "user_notification_email, user_notification_sent,"
-			    "answer1, answer2, answer3)"
-                  " VALUES (:seqDesc, :seqOrder, :lockNum, :desc, :codeOne, "
-                            " :codeTwo, "
-                            " :start, :end, :stat, 0, 0, :maxAccess, :maxRetry, "
-                            " :accessTime, :adminNotificationSent, "
-                            " :userEmail, :userNotificationSent, "
-			    " :answer1, :answer2, :answer3)" ));
+                QString(" (sequence, sequence_order, "
+                        "locknum, description, code1, "
+                        "code2, starttime, endtime, status, access_count,"
+                        "retry_count, max_access, max_retry,"
+                        "access_time, admin_notification_sent,"
+                        "user_notification_email, user_notification_sent,"
+                        "answer1, answer2, answer3)"
+                        " VALUES (:seqDesc, :seqOrder, :lockNum, :desc, :codeOne, "
+                        " :codeTwo, "
+                        " :start, :end, :stat, 0, 0, :maxAccess, :maxRetry, "
+                        " :accessTime, :adminNotificationSent, "
+                        " :userEmail, :userNotificationSent, "
+                        " :answer1, :answer2, :answer3)" ));
 
     qDebug() << "Query:" << qry.lastQuery();
 
@@ -569,22 +542,6 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(int locknum, std::string cod
     qry.bindValue(":answer1", answer1.toStdString().c_str());
     qry.bindValue(":answer2", answer2.toStdString().c_str());
     qry.bindValue(":answer3", answer3.toStdString().c_str());
-//    qry.bindValue(0, sequence.c_str());
-//    qry.bindValue(1, sequenceNum);
-//    qry.bindValue(2, locknum);
-//    qry.bindValue(3, desc.c_str());
-//    qry.bindValue(4, code1.c_str());
-//    qry.bindValue(5, code2.c_str());
-//    qry.bindValue(6, starttime.toString(datetimeFormat));
-//    qry.bindValue(7, endtime.toString(datetimeFormat));
-//    qry.bindValue(8, status.c_str());
-//    qry.bindValue(9, maxAccess);
-//    qry.bindValue(10, maxRetry);
-//    qry.bindValue(11, accesstime.toString(datetimeFormat));
-//    qry.bindValue(12, QVariant(adminNotificationSent));
-//    qry.bindValue(13, userNotificationEmail.c_str());
-//    qry.bindValue(14, QVariant(userNotificationSent));
-
 
     QMap<QString, QVariant> mapVals = qry.boundValues();
     qDebug() << "Mapped count:" << mapVals.count();
@@ -619,7 +576,6 @@ void CTblCodeHistory::currentTimeFormat(std::string format, std::string strBuffe
     strBuffer = buffer;
 }
 
-
 bool CTblCodeHistory::readTestDefault()
 {
     qDebug( )<< "CTblCodeHistory::readTestDefault()";
@@ -628,10 +584,10 @@ bool CTblCodeHistory::readTestDefault()
     QString sql = "SELECT sequence, sequence_order, "\
                   "locknum, description, code1,"\
                   "code2, starttime, endtime, status, access_count,"\
-                            "retry_count, max_access, max_retry,"
-                          "access_time, admin_notification_sent,"
-                          "user_notification_email, user_notification_sent"
-                      " FROM ";
+                  "retry_count, max_access, max_retry,"
+                  "access_time, admin_notification_sent,"
+                  "user_notification_email, user_notification_sent"
+                  " FROM ";
     sql += QString(TABLENAME.c_str());
     sql += QString(" WHERE description = 'test history lock'");
 
@@ -684,12 +640,10 @@ bool CTblCodeHistory::deleteLockCodeHistory(int locknum, QDateTime starttime, QD
 }
 
 bool CTblCodeHistory::deleteLockCodeHistory(int locknum, QString code1, QString code2,
-                           QDateTime starttime, QDateTime endtime, QDateTime accesstime)
+                                            QDateTime starttime, QDateTime endtime, QDateTime accesstime)
 {
-    //
     return false;
 }
-
 
 bool CTblCodeHistory::deleteLockCodeHistory(QDateTime accesstime)
 {
@@ -698,7 +652,6 @@ bool CTblCodeHistory::deleteLockCodeHistory(QDateTime accesstime)
 
 bool CTblCodeHistory::deleteLockCodeHistory(QDateTime starttime, QDateTime endtime)
 {
-    //
     return false;
 }
 
@@ -720,14 +673,14 @@ bool CTblCodeHistory::deleteLockCodeHistory(CLockHistoryRec &rec)
     QString sql;
     if(rec.getID() == -1 ) {
         sql = "DELETE FROM " + QString(TABLENAME.c_str()) +
-                    QString(" WHERE access_time = :faccessTime and "
-                            " locknum=:lockNum");
+                QString(" WHERE access_time = :faccessTime and "
+                        " locknum=:lockNum");
         query.prepare(sql);
         query.bindValue("faccessTime", rec.getAccessTime().toString(datetimeFormat));
         query.bindValue(":locknum", rec.getLockNum());
     } else {
         sql = "DELETE FROM " + QString(TABLENAME.c_str()) +
-                    QString(" WHERE ids = :fids");
+                QString(" WHERE ids = :fids");
         query.prepare(sql);
         query.bindValue("fids", rec.getID());
     }
@@ -745,13 +698,13 @@ bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
-                   " SET " + QString("sequence=:seqDesc, sequence_order=:seqOrder, "
-                      "locknum=:lockNum, description=:desc, code1=:codeOne, "
-                      "code2=:codeTwo, starttime=:start, endtime=:end, status=:stat, access_count=:accessCount,"
-                      "retry_count=:retryCount, max_access=:maxAccess, max_retry=:maxRetry,"
-                      "access_time=:accessTime, admin_notification_sent=:adminNotificationSent,"
-                      "user_notification_email=:userNotificationEmail, user_notification_sent=:userNotificationSent"
-                    " WHERE ids=:fids");
+            " SET " + QString("sequence=:seqDesc, sequence_order=:seqOrder, "
+                              "locknum=:lockNum, description=:desc, code1=:codeOne, "
+                              "code2=:codeTwo, starttime=:start, endtime=:end, status=:stat, access_count=:accessCount,"
+                              "retry_count=:retryCount, max_access=:maxAccess, max_retry=:maxRetry,"
+                              "access_time=:accessTime, admin_notification_sent=:adminNotificationSent,"
+                              "user_notification_email=:userNotificationEmail, user_notification_sent=:userNotificationSent"
+                              " WHERE ids=:fids");
 
     qry.prepare(sql);
 
@@ -783,34 +736,8 @@ bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
 
 bool CTblCodeHistory::updateLockCodeHistory(CLockHistoryRec &rec)
 {
-    // update
-//    if(rec.isMarkedForDeletion()) {
-//        deleteLockCodeHistory(rec);
-//    } else {
-//        if(rec.getID() == -1 ) {
-//            addLockCodeHistory(rec.getDoorNum(),rec.getCode1(),rec.getCode2(),
-//                        rec.getStartTime(), rec.getEndTime(),
-//                        rec.getStatus(), rec.getDescription(),
-//                        rec.getSequence(), rec.getSequenceOrder(), rec.getMaxAccess(), rec.getMaxRetry());
-
-//            int locknum, std::string code1, std::string code2,
-//                                   QDateTime starttime, QDateTime endtime, int maxAccess,
-//                                   std::string status, std::string desc, std::string sequence, int sequenceNum,
-//                                   int maxRetry, QDateTime accesstime,
-//                                   bool adminNotificationSent, std::string userNotificationEmail,
-//                                   bool userNotificationSent
-//        }
-
-
-//        if(rec.getID() > 0) {
-//            if(rec.isModified()) {
-//                updateRecord(rec);
-//            }
-//        }
-//    }
     return false;
 }
-
 
 /**
  * @brief CTblCodeHistory::updateCodeSet
@@ -853,4 +780,3 @@ bool CTblCodeHistory::updateLockCodeHistorySet(QJsonObject &jsonObj)
     // Valid set
     return updateLockCodeHistorySet(lockHistorySet);
 }
-

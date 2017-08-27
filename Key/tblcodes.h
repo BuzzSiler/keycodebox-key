@@ -1,16 +1,12 @@
 #ifndef CTBLCODES_H
 #define CTBLCODES_H
 
-
 #include <iostream>
 #include <cstdlib>
 #include <QtSql>
 #include <QtDebug>
 #include "lockstate.h"
 #include "lockset.h"
-
-
-
 
 /**
  * @brief The CTblCodes class
@@ -52,7 +48,7 @@ class CTblCodes
 
     const char *ffingerprint1 = "fingerprint1";
     const char *ffingerprint2 = "fingerprint2";
-    
+
     const char *fstatus = "status";  // text,
     const char *faccess_count = "access_count";   // integer,
     const char *fretry_count = "retry_count"; // integer,
@@ -75,17 +71,16 @@ private:
     bool tableExists();
     bool columnExists(QString column);
     void createColumn(QString column, QString fieldType);
-    
+
     void initialize();
 
     bool readTestDefault();
     bool createTestDefault();
 
     bool isWhiteSpace(const QString &str);
-    
-public:    
-    void setLastCodeOne(QString code);
 
+public:
+    void setLastCodeOne(QString code);
     int _lastIDS = -1;
 
     CTblCodes(QSqlDatabase *db) {
@@ -104,19 +99,19 @@ public:
     int checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &bQuestionsRequired, std::string &codeOne, int &nDoorNum, bool &bAskQuestions, QString &question1, QString &question2, QString &question3);
 
     int addLockCodeClear(int locknum, std::string code1, std::string code2="",
-                          QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
-                          QDateTime endtime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
-			 bool fingerprint1=false, bool fingerprint2=false,
-			   bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
-                          std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
-			 int maxAccess=0, int maxRetry=0);
+                         QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
+                         QDateTime endtime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
+                         bool fingerprint1=false, bool fingerprint2=false,
+                         bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
+                         std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
+                         int maxAccess=0, int maxRetry=0);
     int addLockCode(int locknum, std::string code1, std::string code2="",
-                       QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
-                       QDateTime endtime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
-		    bool fingerprint1=false, bool fingerprint2=false,
-		    bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
-                       std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
-                       int maxAccess=0, int maxRetry=0);
+                    QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
+                    QDateTime endtime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
+                    bool fingerprint1=false, bool fingerprint2=false,
+                    bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
+                    std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
+                    int maxAccess=0, int maxRetry=0);
     void addJSONCodes(const CLockState *prec);
     void addJSONCodes(const CLockSet *pcodeSet);
     void addJSONCodes(std::iostream iofile);
@@ -129,15 +124,15 @@ public:
 
     bool updateRecord(CLockState &rec);
     bool updateLockboxState(int fids, bool lockstate);
-    
+
     bool updateAskQuestions(int fids, bool askQuestions);
     bool updateQuestion1(int fids, QString question);
     bool updateQuestion2(int fids, QString question);
     bool updateQuestion3(int fids, QString question);
-    
+
     bool deleteCode(CLockState &rec);
     bool deleteCode(QString locknum, QString code1, QString code2,
-		    QDateTime starttime, QDateTime endtime);
+                    QDateTime starttime, QDateTime endtime);
 
     void selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLockSet **pLockSet);
     void selectCodeSet(int ids, CLockSet **pLockSet);

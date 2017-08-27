@@ -39,10 +39,10 @@ signals:
     void __CodeEntered(QString sCode);
     void __FingerprintCodeEntered(QString sCode);
     void __OnUserCodeCancel();
-    
+
     void __onVerifyFingerprint();
     void __onVerifyFingerprintDialog();
-    
+
 public slots:
     void OnEnableKeyboard(bool bEnable);
     void OnNewMessage(QString sMsg);

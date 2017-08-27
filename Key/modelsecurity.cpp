@@ -270,24 +270,24 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 
                 // need to do check again for code 2
 
-//                if( bSecondCodeRequired ) {
-//                    emit __OnRequireCodeTwo();
-//                } else {
-                if( bFingerprintRequired == true)
-                {
-                    //we need to check if a fingerprint directory already exists,
-                    // if they do, do not attempt enrollment
-                    if( !QDir("/home/pi/run/prints/" + code).exists() )
+                if( bSecondCodeRequired ) {
+                    emit __OnRequireCodeTwo();
+                } else {
+                    if( bFingerprintRequired == true)
                     {
-                        emit __EnrollFingerprintDialog(code);
-                        emit __EnrollFingerprint(code);
+                        //we need to check if a fingerprint directory already exists,
+                        // if they do, do not attempt enrollment
+                        if( !QDir("/home/pi/run/prints/" + code).exists() )
+                        {
+                            emit __EnrollFingerprintDialog(code);
+                            emit __EnrollFingerprint(code);
+                        }
+                        else
+                            emit __OnSecurityCheckedFailed();
+                        return;
                     }
-                    else
-                        emit __OnSecurityCheckedFailed();
-                    return;
+                    emit __OnSecurityCheckSuccess(nDoorNum);
                 }
-                emit __OnSecurityCheckSuccess(nDoorNum);
-//                }
             } else {
                 emit __OnSecurityCheckedFailed();
             }
@@ -417,7 +417,6 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
             }
             else
                 emit __OnSecurityCheckSuccess(nDoorNum);
-
         }
         else
         {
@@ -631,4 +630,3 @@ void CModelSecurity::OnRequestCurrentAdmin()
 
     emit __OnRequestedCurrentAdmin(&_ptblAdmin->getCurrentAdmin());
 }
-

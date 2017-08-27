@@ -1754,7 +1754,7 @@
     </property>
     <property name="visible">
       <bool>
-	true
+        true
       </bool>
     </property>
    </widget>

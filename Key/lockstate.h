@@ -48,7 +48,7 @@ protected:
     const char *fquestion1 = "question1";
     const char *fquestion2 = "question2";
     const char *fquestion3 = "question3";
-    
+
 public:
     explicit CLockState(QObject *parent = 0);
 
@@ -78,7 +78,7 @@ protected:
     std::string     _question1;
     std::string     _question2;
     std::string     _question3;
-    
+
 public:
     virtual int getID() { return _ids; }// integer primary key unique,
     virtual void setID(int id) { _ids = id; }
@@ -151,8 +151,5 @@ signals:
 
 public slots:
 };
-
-
-
 
 #endif // CLOCKSTATE_H

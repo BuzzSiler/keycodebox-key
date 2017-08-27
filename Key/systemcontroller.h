@@ -87,8 +87,8 @@ signals:
 
     // For Entry dialogs
     void __OnDisplayTimeoutScreen();
-    void __OnNewMessage(QString sMsg);      //
-    void __OnCodeMessage(QString sMsg); // <>
+    void __OnNewMessage(QString sMsg);
+    void __OnCodeMessage(QString sMsg);
     void __OnClearEntry();
     void __OnEnableKeypad(bool bEnable);
     void __AdminSecurityCheckFailed();
