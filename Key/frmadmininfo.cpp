@@ -2063,7 +2063,7 @@ void CFrmAdminInfo::LocalReadLockHistorySet(int nLock, QDateTime dtStart, QDateT
     emit __OnReadLockSet(nLock, QDateTime::fromString(_DATENONE), QDateTime::fromString(_DATENONE));
 }
 
-void CFrmAdminInfo::on_btnReadCodes_2_clicked()
+void CFrmAdminInfo::on_btnRead_clicked()
 {
     //
     QDateTime dtStart = ui->dtStartCodeHistoryList->dateTime();

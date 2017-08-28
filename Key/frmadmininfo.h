@@ -311,7 +311,6 @@ private slots:
     void codeHistoryTableCellSelected(int nRow, int nCol);
 
     void codeCellSelected(int row, int col);
-    void on_btnReadCodes_2_clicked();
     void on_tblCodesList_clicked(const QModelIndex &index);
     void on_btnSetupSMTP_clicked();
     void onSMTPDialogComplete(CDlgSMTP *dlg);
@@ -353,6 +352,7 @@ private slots:
     void on_btnCopyToggleSource_clicked(bool checked);
     void on_btnRebootSystem_clicked();
     void on_btnPurgeCodes_clicked();
+    void on_btnRead_clicked();
 };
 
 #endif // FRMADMININFO_H
