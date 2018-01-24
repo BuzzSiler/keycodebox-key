@@ -18,7 +18,7 @@ CUSBController::CUSBController()
 CUSBController::~CUSBController()
 {
     // Finalize the hidapi library
-    int res = hid_exit();
+    (void)hid_exit();
 }
 
 
@@ -26,7 +26,7 @@ CUSBController::~CUSBController()
 void CUSBController::initController()
 {
     // Initialize the hidapi library
-    int res = hid_init();
+    (void)hid_init();
 
 }
 
@@ -81,7 +81,9 @@ std::string CUSBController::getDevicePortString(QString deviceType, QString filt
 {
     std::string     aCmd;
     FILE *pF;
-    
+
+    Q_UNUSED(nFindPos);   
+ 
     aCmd = "ls -al /dev/";
     aCmd += deviceType.toStdString();
     aCmd += "/by-id/ | grep -iE '(";

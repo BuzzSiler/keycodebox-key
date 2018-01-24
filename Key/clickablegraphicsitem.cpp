@@ -2,7 +2,7 @@
 
 void CClickableGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-
+    event = event;
 }
 
 

@@ -144,6 +144,9 @@ void CReportController::processLockCodeHistoryReport(CLockHistorySet *_pHistoryS
 {
     qDebug() << "CReportController::processLockCodeHistoryReport()";
 
+    Q_UNUSED(_pHistorySet);
+    Q_UNUSED(nLockNum);
+
     _pFile = pFile;
     _dtReportStart = dtReportStart;
     _dtReportEnd = dtReportEnd;
@@ -154,11 +157,16 @@ void CReportController::processLockCodeHistoryReport(CLockHistorySet *_pHistoryS
 
 void CReportController::assembleAndSendCodeRecordsForReportDate(QDateTime dtStart, QDateTime dtEnd)
 {
+    Q_UNUSED(dtStart);
+    Q_UNUSED(dtEnd);
     emit __RequestCodeHistoryForDateRange(dtStart, dtEnd);
 }
 
 void CReportController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet)
 {
+    Q_UNUSED(dtStart);
+    Q_UNUSED(dtEnd);
+
     // Build the file
     qDebug() << "CReportController::OnCodeHistoryForDateRange() >> buildReportFile(...)";
     requestCurrentAdminRecord();
@@ -208,7 +216,7 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
     }
 
     QDateTime   tmpDate;
-    QFile       *pFile;
+    QFile       *pFile = NULL;
     CLockHistorySet *pHistorySet = NULL;
     if(dtFreq == QDateTime(QDate(1,1,1), QTime(1,0)))
     { // Hourly
@@ -268,7 +276,9 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
         }
     }
     if(pHistorySet)
+    {
         delete pHistorySet;
+    }
     if(pFile) {
         delete pFile;
         return true;

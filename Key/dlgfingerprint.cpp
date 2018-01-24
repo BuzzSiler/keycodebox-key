@@ -43,10 +43,14 @@ void CDlgFingerprint::on_buttonBoxOk_clicked()
 
 void CDlgFingerprint::setValues(int nFingerprintPort, QString sPassword)
 {
+    Q_UNUSED(nFingerprintPort);
+    Q_UNUSED(sPassword);
 }
 
 void CDlgFingerprint::getValues(int &nFingerprintPort, QString &sPassword)
 {
+    Q_UNUSED(nFingerprintPort);
+    Q_UNUSED(sPassword);
 }
 
 void CDlgFingerprint::setDefaultStage(int stage)

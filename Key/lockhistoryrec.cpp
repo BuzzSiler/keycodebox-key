@@ -31,7 +31,7 @@ QString CLockHistoryRec::jsonRecordAsString()
     return str;
 }
 
-bool CLockHistoryRec::setFromLockState(CLockState &newLockState)
+void CLockHistoryRec::setFromLockState(CLockState &newLockState)
 {
     _ids = newLockState.getID();            // Record id // integer primary key unique, (if -1 then this is a new record)
     _sequence = newLockState.getSequence();    // Sequence // text,

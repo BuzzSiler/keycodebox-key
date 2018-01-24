@@ -15,9 +15,11 @@
 #include "lockcontroller.h"
 #include "lockhistoryrec.h"
 #include "lockstate.h"
+#include "version.h"
 
 CSystemController::CSystemController(QObject *parent)
 {
+    Q_UNUSED(parent);
 }
 
 CSystemController::~CSystemController()
@@ -47,7 +49,7 @@ void CSystemController::initialize(QThread *pthread)
     }
 
 
-    qDebug() << "Starting up KeyCodeBox Alpha v1.10k";
+    qDebug() << "Starting up KeyCodeBox Alpha " VERSION;
 
     initializeSecurityConnections();
     initializeLockController();
@@ -99,6 +101,10 @@ void CSystemController::OnVerifyFingerprintDialogCancel()
 
 void CSystemController::TrigQuestionUser(int doorNum, QString question1, QString question2, QString question3)
 {
+    Q_UNUSED(doorNum);
+    Q_UNUSED(question1);
+    Q_UNUSED(question2);
+    Q_UNUSED(question3);
     qDebug() << "CSystemController::TrigQuestionUser()";
     stopTimeoutTimer();
 }
@@ -539,6 +545,7 @@ CFrmUserCode* CSystemController::getUserCodeOne()
     if(!_pfUsercode)
     {
     }
+    return (CFrmUserCode *)NULL;
 }
 
 void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
@@ -578,13 +585,17 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
     while(std::getline(ss,ssOutput,'\n'))
     {
         if( ssOutput.length() > 1 )
+        {
             if( foundDeviceCount > 4 )
+            {
                 break;
+            }
             else
             {
                 strcpy(foundDevices[foundDeviceCount], ssOutput.c_str());
                 foundDeviceCount++;
             }
+        }
     }
 
     bool refreshAdminDeviceList = false;

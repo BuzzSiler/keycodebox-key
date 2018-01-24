@@ -112,7 +112,7 @@ void CDlgSMTP::onStartEditLabel(QLabel* pLabel, QString sLabelText)
 
 void CDlgSMTP::OnTextEntered(CDlgFullKeyboard *pkeyboard, CCurrentEdit *pCurrEdit)
 {
-    //
+    Q_UNUSED(pkeyboard);
     qDebug() << "SMTP OnTextEntered";
     pCurrEdit->getLabelBeingEdited()->setText(pCurrEdit->getNewText());
     _pKeyboard->hide();
@@ -122,11 +122,14 @@ void CDlgSMTP::OnTextEntered(CDlgFullKeyboard *pkeyboard, CCurrentEdit *pCurrEdi
 void CDlgSMTP::OnCancelKeyboard(CDlgFullKeyboard *pkeyboard, CCurrentEdit *pCurrEdit)
 {
     // Do nothing
+    Q_UNUSED(pkeyboard);
+    Q_UNUSED(pCurrEdit);
 }
 
 void CDlgSMTP::OnCloseKeyboard(CDlgFullKeyboard *pkeyboard)
 {
     // Do nothing
+    Q_UNUSED(pkeyboard);
 }
 
 void CDlgSMTP::on_buttonBox_accepted()

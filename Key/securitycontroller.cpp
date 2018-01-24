@@ -117,10 +117,10 @@ std::string CSecurityController::GetPredictiveAccessCode(QString code, int nLock
 {
     QDateTime datetime = QDateTime::currentDateTime();
     std::string skey;
-    uint8_t nVal = 0;
-    uint32_t un32Sum = 0;
     std::string outEncrypt = "";
     QString  sTmp;
+
+    Q_UNUSED(code);
 
     if(_pAdminRec) {
         // Round the current date up to the resolution specified
@@ -129,10 +129,12 @@ std::string CSecurityController::GetPredictiveAccessCode(QString code, int nLock
 
         CEncryption::calculatePredictiveCodeOld(nLockNum, skey, datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
 
-sTmp += QString(" trunc outEncrypt:") + outEncrypt.c_str();
-qDebug() << sTmp;
+        sTmp += QString(" trunc outEncrypt:") + outEncrypt.c_str();
+        qDebug() << sTmp;
         return outEncrypt;
     }
+
+    return outEncrypt;
 }
 
 
@@ -141,8 +143,6 @@ void CSecurityController::CheckPredictiveAccessCode(QString code)
     uint32_t nLockNum;
     QDateTime datetime = QDateTime::currentDateTime();
     std::string skey;
-    uint8_t nVal = 0;
-    uint32_t un32Sum = 0;
     std::string outEncrypt = "";
     QString sTmp;
 
@@ -154,7 +154,6 @@ sTmp = " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
 
         for(nLockNum=1; nLockNum<256; nLockNum++) {
             // Round the current date up to the resolution specified
-            un32Sum = 0;
 
             CEncryption::calculatePredictiveCodeOld(nLockNum, skey, datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
 

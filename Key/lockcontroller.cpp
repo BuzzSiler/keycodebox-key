@@ -457,6 +457,7 @@ void CLockController::OnLocksStatusRequest()
  */
 int CLockController::isLock(uint16_t nLockNum)
 {
+    nLockNum = nLockNum;
     return 1;
 //    if( _bLockStateRead )
 //    {

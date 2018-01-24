@@ -12,5 +12,6 @@ CClickableLineEdit::~CClickableLineEdit()
 
 void CClickableLineEdit::mousePressEvent(QMouseEvent* event)
 {
+    event = event;
     emit clicked();
 }

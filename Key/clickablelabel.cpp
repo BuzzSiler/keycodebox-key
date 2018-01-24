@@ -12,5 +12,6 @@ CClickableLabel::~CClickableLabel()
 
 void CClickableLabel::mousePressEvent(QMouseEvent* event)
 {
+    Q_UNUSED(event);
     emit clicked();
 }

@@ -47,7 +47,7 @@ public:
     virtual bool setFromJsonObject(QJsonObject jsonObj);
     virtual bool setFromJsonString(std::string strJson);
 
-    bool setFromLockState(CLockState &lockState);
+    void setFromLockState(CLockState &lockState);
 
 
 signals:

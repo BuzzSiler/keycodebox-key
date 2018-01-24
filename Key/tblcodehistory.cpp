@@ -592,38 +592,21 @@ bool CTblCodeHistory::readTestDefault()
     sql += QString(" WHERE description = 'test history lock'");
 
     if( query.exec(sql)) {
-        int fldLock= query.record().indexOf("locknum");
-        int fldDescription = query.record().indexOf("description");
         int fldCode1 = query.record().indexOf("code1");
         int fldCode2 = query.record().indexOf("code2");
-        int fldSequence = query.record().indexOf("sequence");
-        int fldSequenceOrder = query.record().indexOf("sequence_order");
         int fldStart = query.record().indexOf("starttime");
         int fldEnd = query.record().indexOf("endtime");
-        int fldStatus = query.record().indexOf("status");
-        int fldAccessCount = query.record().indexOf("access_count");
-        int fldRetryCount = query.record().indexOf("retry_count");
-        int fldMaxAccess = query.record().indexOf("max_access");
-        int fldMaxRetry = query.record().indexOf("max_retry");
-        int fldAccessTime = query.record().indexOf("access_time");
-        int fldAdminNotificationSent = query.record().indexOf("admin_notification_sent");
-        int fldUserNotificationEmail = query.record().indexOf("user_notification_email");
-        int fldUserNotificationSent = query.record().indexOf("user_notification_sent");
 
         if (query.next())
         {
             // it exists
             struct tm tm;
 
-            int nLock = query.value(fldLock).toInt();
             QString code1 = query.value(fldCode1).toString();
             QString code2 = query.value(fldCode2).toString();
 
             strptime(query.value(fldStart).toDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString().c_str(), "yyyy-MM-dd %H:%M:%S", &tm);
-            time_t start_time = mktime(&tm);
-
             strptime(query.value(fldEnd).toDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString().c_str(), "yyyy-MM-dd %H:%M:%S", &tm);
-            time_t end_time = mktime(&tm);
 
             qDebug() << "CTblCodeHistory::readTestDefault(): Code1:" << code1 << " len:" << code1.size();
             qDebug() << "CTblCodeHistory::readTestDefault(): Code2:" << code2 << " len:" << code2.size();
@@ -636,22 +619,34 @@ bool CTblCodeHistory::readTestDefault()
 
 bool CTblCodeHistory::deleteLockCodeHistory(int locknum, QDateTime starttime, QDateTime endtime)
 {
+    Q_UNUSED(locknum);
+    Q_UNUSED(starttime);
+    Q_UNUSED(endtime);
     return false;
 }
 
 bool CTblCodeHistory::deleteLockCodeHistory(int locknum, QString code1, QString code2,
                                             QDateTime starttime, QDateTime endtime, QDateTime accesstime)
 {
+    Q_UNUSED(locknum);
+    Q_UNUSED(code1);
+    Q_UNUSED(code2);
+    Q_UNUSED(starttime);
+    Q_UNUSED(endtime);
+    Q_UNUSED(accesstime);
     return false;
 }
 
 bool CTblCodeHistory::deleteLockCodeHistory(QDateTime accesstime)
-{
+{   
+    Q_UNUSED(accesstime);
     return false;
 }
 
 bool CTblCodeHistory::deleteLockCodeHistory(QDateTime starttime, QDateTime endtime)
 {
+    Q_UNUSED(starttime);
+    Q_UNUSED(endtime);
     return false;
 }
 
@@ -736,6 +731,7 @@ bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
 
 bool CTblCodeHistory::updateLockCodeHistory(CLockHistoryRec &rec)
 {
+    Q_UNUSED(rec);
     return false;
 }
 

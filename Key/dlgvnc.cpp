@@ -89,7 +89,7 @@ void CDlgVNC::onStartEditLabel(QLabel* pLabel, QString sLabelText)
 
 void CDlgVNC::OnTextEntered(CDlgFullKeyboard *pkeyboard, CCurrentEdit *pCurrEdit)
 {
-    //
+    Q_UNUSED(pkeyboard);
     qDebug() << "VNC OnTextEntered";
     pCurrEdit->getLabelBeingEdited()->setText(pCurrEdit->getNewText());
     _pKeyboard->hide();
@@ -99,11 +99,14 @@ void CDlgVNC::OnTextEntered(CDlgFullKeyboard *pkeyboard, CCurrentEdit *pCurrEdit
 void CDlgVNC::OnCancelKeyboard(CDlgFullKeyboard *pkeyboard, CCurrentEdit *pCurrEdit)
 {
     // Do nothing
+    Q_UNUSED(pkeyboard);
+    Q_UNUSED(pCurrEdit);
 }
 
 void CDlgVNC::OnCloseKeyboard(CDlgFullKeyboard *pkeyboard)
 {
     // Do nothing
+    Q_UNUSED(pkeyboard);
 }
 
 void CDlgVNC::on_buttonBox_accepted()

@@ -43,10 +43,14 @@ void CDlgFingerprintVerify::on_buttonBoxOk_clicked()
 
 void CDlgFingerprintVerify::setValues(int nFingerprintPort, QString sPassword)
 {
+    Q_UNUSED(nFingerprintPort);
+    Q_UNUSED(sPassword);
 }
 
 void CDlgFingerprintVerify::getValues(int &nFingerprintPort, QString &sPassword)
 {
+    Q_UNUSED(nFingerprintPort);
+    Q_UNUSED(sPassword);
 }
 
 void CDlgFingerprintVerify::setMessage(QString message)

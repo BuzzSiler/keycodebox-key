@@ -81,6 +81,7 @@ void CDlgFullKeyboard::OnClearCodeDisplay()
 
 void CDlgFullKeyboard::highlightNumbers(bool bSet)
 {
+    Q_UNUSED(bSet);
     ui->btn_0->setStyleSheet("{ background-color: rgb(60,179,113) }: white");
     ui->btn_1->setStyleSheet("{ background-color: rgb(60,179,113) }: white");
     ui->btn_2->setStyleSheet("{ background-color: rgb(60,179,113) }: white");
@@ -115,20 +116,6 @@ void CDlgFullKeyboard::buttonClicked(QWidget *btn)
         onButtonClick(pb->text().at(0).toLatin1());
     }
 
-//    if ((key == Qt::Key_Enter) || (key == Qt::Key_Backspace))
-//        emit specialKeyClicked(key);
-//    else
-//        emit keyClicked(keyToCharacter(key));
-}
-
-static QString keyToCharacter(int key)
-{
-//    for (int i = 0; i < layoutSize; ++i) {
-//        if (keyboardLayout[i].key == key)
-//            return QString::fromLatin1(keyboardLayout[i].label);
-//    }
-
-//    return QString();
 }
 
 void CDlgFullKeyboard::onButtonClick(char key) {
@@ -187,8 +174,6 @@ void CDlgFullKeyboard::onButtonClick(char key) {
 
 void CDlgFullKeyboard::keyPressEvent( QKeyEvent* event )
 {
-    unsigned int n = 0;
-
     switch ( event->key() )
     {
     case Qt::Key_Enter:

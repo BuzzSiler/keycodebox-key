@@ -6,6 +6,7 @@
 #include "hidreader.h"
 #include <libfprint/fprint.h>
 #include "dlgfingerprint.h"
+#include "version.h"
 
 CFrmUserCode::CFrmUserCode(QWidget *parent) :
     QDialog(parent),
@@ -27,6 +28,7 @@ void CFrmUserCode::initialize()
     _dtTimer.setInterval(1000);
     _dtTimer.connect(&_dtTimer, SIGNAL(timeout()), this, SLOT(OnDateTimeTimerTimeout()));
     _dtTimer.start();
+    ui->lVersion->setText(VERSION);
 }
 
 void CFrmUserCode::OnDateTimeTimerTimeout()
@@ -99,6 +101,7 @@ void CFrmUserCode::onBackSpace()
 
 void CFrmUserCode::enableKeypad(bool bEnable)
 {
+    Q_UNUSED(bEnable);
     ui->edCode->setFocus();
 }
 
@@ -114,6 +117,7 @@ void CFrmUserCode::OnEnableKeyboard(bool bEnable)
 
 void CFrmUserCode::OnNewMessage(QString sMsg)
 {
+    Q_UNUSED(sMsg);
     // TODO: Disabled for now. The lblMessage has been removed but this SLOT is still called.
 }
 
@@ -236,7 +240,6 @@ void CFrmUserCode::on_btn_Cancel_clicked()
 
 void CFrmUserCode::on_btnIdentifyFingerPrint_clicked()
 {
-    int i;
     qDebug() << "CFrmUserCode::on_IdentifyFingerPrint_clicked()";
 
     emit __onVerifyFingerprintDialog();

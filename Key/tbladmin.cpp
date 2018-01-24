@@ -145,6 +145,8 @@ bool CAdminRec::setFromJsonObject(QJsonObject jsonObj)
     {
         qDebug() << "CAdminRec::setFromJsonObject()" << e.what();
     }
+
+    return true;
 }
 
 /**

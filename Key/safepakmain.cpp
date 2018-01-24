@@ -277,6 +277,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 
 void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
 {
+    psysController = psysController;
 }
 
 void MainWindow::hideFormsExcept(QDialog * pfrm) {
@@ -367,10 +368,13 @@ void MainWindow::OnUserFingerprintCodeTwo(QString sCode2)
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
+    e = e;
 }
 
 void MainWindow::OnEnrollFingerprintDialog(QString sCode)
 {
+    sCode = sCode;
+
     qDebug() << "MainWindow::OnEnrollFingerprintDialog()";
 
     _pdFingerprint->show();

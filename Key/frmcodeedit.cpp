@@ -9,8 +9,9 @@
 #include <QMessageBox>
 
 CFrmCodeEdit::CFrmCodeEdit(QWidget *parent) :
-    QDialog(parent), _pcurrentLineEdit(0),
-    ui(new Ui::CFrmCodeEdit)
+    QDialog(parent),
+    ui(new Ui::CFrmCodeEdit),
+    _pcurrentLineEdit(0)
 {
     ui->setupUi(this);
     CFrmCodeEdit::showFullScreen();
@@ -191,7 +192,7 @@ void CFrmCodeEdit::OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdi
 
 void CFrmCodeEdit::on_buttonBox_clicked(QAbstractButton *button)
 {
-    //
+    Q_UNUSED(button);
 }
 
 void CFrmCodeEdit::on_chkAllAccess_clicked(bool checked)
@@ -213,6 +214,7 @@ void CFrmCodeEdit::on_chkAllAccess_clicked(bool checked)
 
 void CFrmCodeEdit::on_chkFingerPrint1_clicked(bool checked)
 {
+    Q_UNUSED(checked);
     if( ui->chkFingerPrint2->isChecked() )
         ui->chkFingerPrint2->setChecked(false);
 
@@ -222,7 +224,7 @@ void CFrmCodeEdit::on_chkFingerPrint1_clicked(bool checked)
     {
         if( ui->edtAccessCode->text() == QString("") )
         {
-            int nRC_codeOne = QMessageBox::warning(this, tr("No Code #1 Entered"),
+            (void) QMessageBox::warning(this, tr("No Code #1 Entered"),
                                                    tr("You are enabling fingerprint authentication for this code,"
                                                       " but you must have already entered a Code #1."
                                                       " Enter a unique Code #1 and try again."),
@@ -274,6 +276,7 @@ void CFrmCodeEdit::on_chkFingerPrint1_clicked(bool checked)
 
 void CFrmCodeEdit::on_chkQuestions_clicked(bool checked)
 {
+    Q_UNUSED(checked);
     qDebug() << "CFrmCodeEdit::on_chkQuestions_clicked()";
     if(!_pDlgEditQuestions)
     {
@@ -289,6 +292,7 @@ void CFrmCodeEdit::on_chkQuestions_clicked(bool checked)
 
 void CFrmCodeEdit::on_chkFingerPrint2_clicked(bool checked)
 {
+    Q_UNUSED(checked);
     if( ui->chkFingerPrint1->isChecked() )
         ui->chkFingerPrint1->setChecked(false);
     ui->edtAccessCode->setDisabled(false);
@@ -320,6 +324,8 @@ void CFrmCodeEdit::on_chkFingerPrint2_clicked(bool checked)
 
 void CFrmCodeEdit::OnAdminInfoCodes(QString code1, QString code2)
 {
+    Q_UNUSED(code1);
+    Q_UNUSED(code2);
     emit __OnCodes(code1);
 }
 

@@ -22,7 +22,7 @@ class CUSBHWKeypad : public QObject
     hid_device *_handle;
 
 private:
-    bool openDeviceHandle();
+    void openDeviceHandle();
     int parseKeyboardCodes(std::string sKeyboardData, std::string *pkey);
 
 public:

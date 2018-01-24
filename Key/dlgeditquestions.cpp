@@ -9,14 +9,16 @@
 #include <QMessageBox>
 
 CDlgEditQuestions::CDlgEditQuestions(QWidget *parent) :
-    QDialog(parent), _pcurrentLineEdit(0),
-    ui(new Ui::CDlgEditQuestions)
+    QDialog(parent),
+    ui(new Ui::CDlgEditQuestions),
+    _pcurrentLineEdit(0)
 {
     ui->setupUi(this);
 }
 
 void CDlgEditQuestions::setMaxLocks(int nLocks)
 {
+  Q_UNUSED(nLocks);
   //ui->spinLockNum->setMaximum(nLocks);
 }
 
@@ -111,11 +113,12 @@ void CDlgEditQuestions::OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurre
 
 void CDlgEditQuestions::on_buttonBoxQuestions_clicked(QAbstractButton *button)
 {
-    //
+    Q_UNUSED(button);
 }
 
 void CDlgEditQuestions::OnAdminInfoCodes(QString code1, QString code2)
 {
+    Q_UNUSED(code2);
     emit __OnCodes(code1);
 }
 

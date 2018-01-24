@@ -35,6 +35,9 @@ static void dev_open_cb(struct fp_dev *dev, int status, void *user_data)
 {
     struct fp_driver *drv;
 
+    Q_UNUSED(status);
+    Q_UNUSED(user_data);
+
     fpdev = dev;
     drv = fp_dev_get_driver(fpdev);
     qDebug() << "CFingerprintReader::openDeviceHandle(), Device ready to use!";
@@ -69,10 +72,11 @@ bool CFingerprintReader::openDeviceHandle()
     }
 
     int count = 0;
-    struct fp_driver *drv;
+    //struct fp_driver *drv;
     for(i=0; (ddev=discovered_devs[i]); i++)
     {
-        drv = fp_dscv_dev_get_driver(ddev);
+        //drv = fp_dscv_dev_get_driver(ddev);
+        (void)fp_dscv_dev_get_driver(ddev);
         // for now, we'll just stop on one
         count++;
         break;
@@ -129,6 +133,8 @@ void CFingerprintReader::enrollStageCb(struct fp_dev *dev, int result,
     QString tmp = "";
     QString prependPath = "";
     QString fullPath = "";
+
+    Q_UNUSED(dev);
 
     if (result < 0) {
         //edlg_cancel_enroll(result);
@@ -226,6 +232,8 @@ bool CFingerprintReader::initEnrollment(QString sCode)
 
 void CFingerprintReader::enrollCancelCb(struct fp_dev *dev, void *user_data)
 {
+    Q_UNUSED(dev);
+    Q_UNUSED(user_data);
     qDebug() << "CFingerprintReader::enrollCancelCb()";
 }
 
@@ -250,6 +258,8 @@ void CFingerprintReader::resetEnrollmentStage()
 
 void CFingerprintReader::verifyCancelCb(struct fp_dev *dev, void *user_data)
 {
+    Q_UNUSED(dev);
+    Q_UNUSED(user_data);
     qDebug() << "CFingerprintReader::verifyCancelCb()";
 }
 
@@ -268,6 +278,9 @@ bool CFingerprintReader::cancelVerify()
 void CFingerprintReader::identifyCb(struct fp_dev *dev, int result, size_t match_offset, struct fp_img *img, void *user_data)
 {
     qDebug() << "CFingerprintReader::verifyCb()";
+
+    Q_UNUSED(dev);
+    Q_UNUSED(img);
 
     QString tmp = "";
     bool retResult = false;
@@ -381,8 +394,6 @@ bool CFingerprintReader::loadEnrollData(QString sCode)
 bool CFingerprintReader::initVerify()
 {
     qDebug() << "CFingerprintReader::InitVerify()";
-    int result = 0;
-    size_t match_offset;
 
     //build list of all enrolldata we have
 
@@ -412,7 +423,7 @@ bool CFingerprintReader::initVerify()
         count++;
     }
 
-    result = fp_async_identify_start(fpdev, print_gallery, identifyCb, this);
+    (void)fp_async_identify_start(fpdev, print_gallery, identifyCb, this);
 
     return true;
 }

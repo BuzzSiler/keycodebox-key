@@ -29,6 +29,7 @@ class MainWindow : public QMainWindow
 
 private:
     //    QThread myObjThread;
+    Ui::MainWindow *ui;
     CSystemControllerThread     _sysControlThread;
     QGraphicsWidget     *_pGWidget;
     CSystemController   *_psystemController;
@@ -95,7 +96,7 @@ private slots:
     void OnQuestionUserDialogClose();
     
 private:
-    Ui::MainWindow *ui;
+//    Ui::MainWindow *ui;
     void initialize();
     void hideFormsExcept(QDialog *pfrm);
 };

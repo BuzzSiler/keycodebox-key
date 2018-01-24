@@ -73,7 +73,7 @@ void CUSBHWKeypad::readHWKeyboardLoop()
 
 
 
-bool CUSBHWKeypad::openDeviceHandle()
+void CUSBHWKeypad::openDeviceHandle()
 {
     // Open the device using the VID, PID,
     // and optionally the Serial number.
@@ -84,10 +84,11 @@ bool CUSBHWKeypad::openDeviceHandle()
     } else {
         std::cout << "failed to open hid\n";
     }
-
 }
 
 int CUSBHWKeypad::parseKeyboardCodes(std::string sKeyboardData, std::string *pkey)
 {
- //
+    Q_UNUSED(sKeyboardData);
+    Q_UNUSED(pkey);
+    return 0;
 }

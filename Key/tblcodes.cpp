@@ -184,7 +184,6 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
             int fldCode2No = qry.record().indexOf("code2");
             int fldFingerprint2 = qry.record().indexOf("fingerprint2");
             int fldLockboxStatus = qry.record().indexOf("lockbox_state");
-            int fldAskQuestions = qry.record().indexOf("ask_questions");
             int fldQuestion1 = qry.record().indexOf("question1");
             int fldQuestion2 = qry.record().indexOf("question2");
             int fldQuestion3 = qry.record().indexOf("question3");
@@ -678,20 +677,23 @@ void CTblCodes::createColumn(QString column, QString fieldType)
 
 void CTblCodes::addJSONCodes(const CLockState *prec)
 {
+    Q_UNUSED(prec);
 }
 
 void CTblCodes::addJSONCodes(const CLockSet *pcodeSet)
 {
+    Q_UNUSED(pcodeSet);
 }
 
 // JSON format file
 void CTblCodes::addJSONCodes(std::iostream iofile)
 {
-
+    Q_UNUSED(iofile);
 }
 
 void CTblCodes::addJSONCodes(QString jsonCodes)
 {
+    Q_UNUSED(jsonCodes);
 }
 
 /**
@@ -890,37 +892,22 @@ bool CTblCodes::readTestDefault()
     sql += QString(" WHERE description = 'test lock'");
 
     if( query.exec(sql)) {
-        int fldLock= query.record().indexOf("locknum");
-        int fldDescription = query.record().indexOf("description");
         int fldCode1 = query.record().indexOf("code1");
         int fldCode2 = query.record().indexOf("code2");
-        int fldSequence = query.record().indexOf("sequence");
-        int fldSequenceOrder = query.record().indexOf("sequence_order");
         int fldStart = query.record().indexOf("starttime");
         int fldEnd = query.record().indexOf("endtime");
-        int fldFingerprint1 = query.record().indexOf("fingerprint1");
-        int fldFingerprint2 = query.record().indexOf("fingerprint2");
-        int fldStatus = query.record().indexOf("status");
-        int fldAccessCount = query.record().indexOf("access_count");
-        int fldRetryCount = query.record().indexOf("retry_count");
-        int fldMaxAccess = query.record().indexOf("max_access");
-        int fldMaxRetry = query.record().indexOf("max_retry");
-        int fldLockBoxState = query.record().indexOf("lockbox_state");
 
         if (query.next())
         {
             // it exists
             struct tm tm;
 
-            int nLock = query.value(fldLock).toInt();
             QString code1 = query.value(fldCode1).toString();
             QString code2 = query.value(fldCode2).toString();
 
             strptime(query.value(fldStart).toDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString().c_str(), "yyyy-MM-dd %H:%M:%S", &tm);
-            time_t start_time = mktime(&tm);
 
             strptime(query.value(fldEnd).toDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString().c_str(), "yyyy-MM-dd %H:%M:%S", &tm);
-            time_t end_time = mktime(&tm);
 
             qDebug() << "CTblCodes::readTestDefault(): Code1:" << code1 << " len:" << code1.size();
             qDebug() << "CTblCodes::readTestDefault(): Code2:" << code2 << " len:" << code2.size();
@@ -935,7 +922,13 @@ bool CTblCodes::readTestDefault()
 bool CTblCodes::deleteCode(QString locknum, QString code1, QString code2,
                            QDateTime starttime, QDateTime endtime)
 {
+    Q_UNUSED(locknum);
+    Q_UNUSED(code1);
+    Q_UNUSED(code2);
+    Q_UNUSED(starttime);
+    Q_UNUSED(endtime);
 
+    return false;
 }
 
 /**
@@ -1172,6 +1165,8 @@ bool CTblCodes::updateCode(CLockState *prec)
             }
         }
     }
+
+    return true;
 }
 
 /**

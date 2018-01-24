@@ -108,11 +108,13 @@ public:
         smtp_password = newRec.smtp_password;
 
         vnc_port = newRec.vnc_port;
-	    vnc_password = newRec.vnc_password;
+        vnc_password = newRec.vnc_password;
 	
         report_via_email = newRec.report_via_email;
         report_save_to_file = newRec.report_save_to_file;
         report_directory = newRec.report_directory;
+
+        return *this;
     }
 
     int getID() { return ids; }    //  integer primary key unique,
