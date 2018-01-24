@@ -31,7 +31,7 @@
         </font>
       </property>
       <property name="text">
-        <string>v1.10.k</string>
+        <string>noversion</string>
       </property>
     </widget>
     <widget class="QGroupBox" name="grpKeypad">
