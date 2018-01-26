@@ -35,8 +35,8 @@ void MainWindow::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    _psystemController(new CSystemController(this))
+    _psystemController(new CSystemController(this)),
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     QMainWindow::showFullScreen();
@@ -339,7 +339,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 
 void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
 {
-
+    Q_UNUSED(psysController);
 }
 
 void MainWindow::hideFormsExcept(QDialog * pfrm) {
@@ -431,11 +431,12 @@ void MainWindow::OnUserFingerprintCodeTwo(QString sCode2)
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
-    //
+    Q_UNUSED(e);
 }
 
 void MainWindow::OnEnrollFingerprintDialog(QString sCode)
 {
+  Q_UNUSED(sCode);
   qDebug() << "MainWindow::OnEnrollFingerprintDialog()";
   
   _pdFingerprint->show();

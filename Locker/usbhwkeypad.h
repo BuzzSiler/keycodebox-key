@@ -11,7 +11,9 @@
 #include "usbcontroller.h"
 
 #define MAX_STR 255
+#undef VID
 #define VID     0x04d8
+#undef PID
 #define PID     0xffd5
 
 class CUSBHWKeypad : public QObject

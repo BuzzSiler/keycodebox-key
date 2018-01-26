@@ -26,7 +26,9 @@
 #include "usbcontroller.h"
 
 #define MAX_STR 255
+#undef VID
 #define VID     0x0801
+#undef PID
 #define PID     0x0002
 
 

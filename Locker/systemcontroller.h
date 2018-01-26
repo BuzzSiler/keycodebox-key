@@ -208,7 +208,7 @@ public slots:
 
     void AccessCodeVerification(QString verification)
     {
-
+        Q_UNUSED(verification);
     }      // Just one check at a time right now.
 
     // Security Controller connections

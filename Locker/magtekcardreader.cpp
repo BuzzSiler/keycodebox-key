@@ -51,7 +51,7 @@ bool CMagTekCardReader::floatXInputDevice()
   
   qDebug() << "CMagTekCardReader::floatXInputDevice(), sOuput = " << QString::fromStdString(sOutput);
 
-  int idPos = sOutput.find(parseToken);
+  size_t idPos = sOutput.find(parseToken);
   
   if( idPos != std::string::npos )
     {
@@ -151,15 +151,13 @@ void CMagTekCardReader::loop()
 {
 
   int i, idx;
-  int count = 0;
-  int iterationCount = 0;
   bool capturingIntegers = false;
   int currentCode[40];
   char codeElement;
   char finalCode[5];
   int consecutiveZeros = 0;
   int currentCodeLength = 0;
-  bool foundStartCharacter;
+  bool foundStartCharacter = false;
   QString finalStrCode;
 
   while( 1 )
@@ -175,7 +173,7 @@ void CMagTekCardReader::loop()
 	}
       else
 	{
-	  for (i = 0; i < readDescriptor / sizeof(struct input_event); i++)
+	  for (i = 0; i < (int) (readDescriptor / sizeof(struct input_event)); i++)
 	    if (ev[i].type == EV_SYN || ev[i].value == 0 )
 	      {
 		// ignore these

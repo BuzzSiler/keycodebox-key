@@ -281,7 +281,7 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
                 }
 		
 		QString period = ".";
-		int findN = nthSubstr(3, ip.toStdString(), period.toStdString());
+		size_t findN = nthSubstr(3, ip.toStdString(), period.toStdString());
 		
 		qDebug() << "CFrmAdminInfo::getSystemIPAddressAndState(), findN: " << QString::number(findN);
 		if( findN != std::string::npos )
@@ -422,6 +422,7 @@ void CFrmAdminInfo::populateCodeLockHistorySelection()
 
 void CFrmAdminInfo::populateFileWidget(QString sDirectory, QString sFilter)
 {
+    Q_UNUSED(sFilter);
     QString rp = "/media/pi";
 
     if(_pmodel) {
@@ -486,6 +487,7 @@ void CFrmAdminInfo::on_treeView_clicked(const QModelIndex &index)
 
 void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
 {
+    Q_UNUSED(sFilter);
     QString rp = "/media/pi";
 
     if(_pcopymodel) {
@@ -605,7 +607,6 @@ void CFrmAdminInfo::on_btnCopyFile_clicked()
 void CFrmAdminInfo::printElementNames(xmlNode *aNode)
 {
   xmlNode *curNode = NULL;
-  const char *tempChar = NULL;
 
   /*
     <?xml version="1.0"?>
@@ -737,7 +738,7 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
 
   if( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
     {
-      int nRC = QMessageBox::warning(this, tr("XML Parsing Failed"),
+      (void) QMessageBox::warning(this, tr("XML Parsing Failed"),
 				     tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
 				     QMessageBox::Ok);
      qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked(), can't parse XML file: " << _copyDirectory;
@@ -749,7 +750,7 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
     xmlFreeDoc(doc);
     xmlCleanupParser();
     
-    int nRC = QMessageBox::warning(this, tr("Bulk Code Upload Complete"),
+    (void) QMessageBox::warning(this, tr("Bulk Code Upload Complete"),
                                    tr("Please check the 'Codes' tab to see that your codes were added successfully."),
                                    QMessageBox::Ok);
 }
@@ -1892,24 +1893,27 @@ const int fEnd = 5;
 */
 void CFrmAdminInfo::codeTableCellSelected(int nRow, int nCol)
 {
+    Q_UNUSED(nCol);
 //    QMessageBox::information(this, "", "Cell at row " + QString::number(nRow) + " column " + QString::number(nCol) + " was double clicked.");
 
     if(_pworkingSet)
     {
         CLockSet::Iterator itor;
-        CLockState  *pState;
+        CLockState *pState;
         itor = _pworkingSet->begin();
         for(int i=0;i<nRow;i++,itor++) {
         }
 
         pState = itor.value();  // This should be the correct state
 
+        Q_UNUSED(pState);
         // Pull up code entry for edit
     }
 }
 
 void CFrmAdminInfo::codeHistoryTableCellSelected(int nRow, int nCol)
 {
+    Q_UNUSED(nCol);
 //    QMessageBox::information(this, "", "Cell at row " + QString::number(nRow) + " column " + QString::number(nCol) + " was double clicked.");
 
     if(_pworkingSet)
@@ -1922,6 +1926,7 @@ void CFrmAdminInfo::codeHistoryTableCellSelected(int nRow, int nCol)
 
         pState = itor.value();  // This should be the correct state
 
+        Q_UNUSED(pState);
         // Pull up code entry for edit
     }
 }
@@ -1971,7 +1976,6 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
     int nRow = 0;
     int nCol = 0;
-    bool alwaysActive = false;
 
     QDateTime alwaysActiveStart = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
     QDateTime alwaysActiveEnd = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
@@ -2125,9 +2129,10 @@ void CFrmAdminInfo::codeCellSelected( int row, int col) {
     CLockSet::Iterator itor;
     CLockState  *pState;
     int nRow = 0;
-    int nCol = 0;
-    QTableWidget    *table = ui->tblCodesList;
+    //int nCol = 0;
+    //QTableWidget    *table = ui->tblCodesList;
 
+    Q_UNUSED(col);
     _nRowSelected = row;
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
@@ -2135,6 +2140,7 @@ void CFrmAdminInfo::codeCellSelected( int row, int col) {
         if(nRow == row) {
             // itor is our man!
             pState = itor.value();
+            Q_UNUSED(pState);
         }
 //        qDebug() << "Adding row of Lock State - Codes. Lock Num:" << QVariant(pState->getLockNum()).toString();
 //        nCol = 0;
@@ -2175,7 +2181,7 @@ void CFrmAdminInfo::openAllDoors()
     qDebug() << "CFrmAdminInfo::openAllDoors()";
     // Loop to open all doors
 
-    for(int i=1; i<=_tmpAdminRec.getMaxLocks() && !_bStopOpen;i++)
+    for(uint32_t i=1; i<=_tmpAdminRec.getMaxLocks() && !_bStopOpen;i++)
     {
         while(!_bContinueOpenLoop && !_bStopOpen) {
             QCoreApplication::processEvents();
@@ -2408,6 +2414,7 @@ void CFrmAdminInfo::setTime()
 
 void CFrmAdminInfo::on_tblCodesList_doubleClicked(const QModelIndex &index)
 {
+    Q_UNUSED(index);
 //    _pState = createNewLockState();
 //    if(!_pworkingSet) {
 //        _pworkingSet = new CLockSet();
@@ -2431,6 +2438,8 @@ void CFrmAdminInfo::on_tblCodesList_doubleClicked(const QModelIndex &index)
 
 void CFrmAdminInfo::on_tblCodesList_cellDoubleClicked(int row, int column)
 {
+    Q_UNUSED(row);
+    Q_UNUSED(column);
 //    qDebug() << "CFrmAdminInfo::on_tblCodesList_cellDoubleClicked";
 //    //
 //    _nRowSelected = row;
@@ -2490,6 +2499,7 @@ void CFrmAdminInfo::on_tblCodesList_cellDoubleClicked(int row, int column)
 // Add a new code
 void CFrmAdminInfo::on_tblCodesList_clicked(const QModelIndex &index)
 {
+    Q_UNUSED(index);
 //    qDebug() << "CFrmAdminInfo::on_tblCodesList_clicked";
 //    //
 //    if(!_pFrmCodeEdit) {
@@ -2517,7 +2527,7 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum, QString 
 				       QString sSecondCode, QString sDescription, QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2,
 				       bool askQuestions, QString question1, QString question2, QString question3)
 {
-
+    Q_UNUSED(fingerprint2);
   qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave(), nRow: " << QString::number(nRow) << " nId: " << QString::number(nId); 
     _pState->setLockNum(nLockNum);
     _pState->setCode1(sAccessCode.toStdString());
@@ -2606,7 +2616,9 @@ void CFrmAdminInfo::setTableMenuLocation(QMenu *pmenu)
     pmenu->setGeometry(_lastTouchPos.x(),_lastTouchPos.y(),pmenu->width(), pmenu->height());
 }
 
-void CFrmAdminInfo::OnRowSelected(int row, int column) {
+void CFrmAdminInfo::OnRowSelected(int row, int column) 
+{
+    Q_UNUSED(column);
     _nRowSelected = row;
     qDebug() << "Row Selected:" << QVariant(_nRowSelected).toString();
     _pTableMenu->show();
@@ -2683,10 +2695,14 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
         break;
     case QEvent::TouchUpdate:
         break;
+    default:
+        break;
     }
 }
 
-void CFrmAdminInfo::OnHeaderSelected(int nHeader) {
+void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
+{
+    Q_UNUSED(nHeader);    
     _pTableMenuAdd->show();
     
     //MANUAL GEOMETRY
@@ -2710,12 +2726,13 @@ void CFrmAdminInfo::checkAndCreateCodeEditForm()
 
 void CFrmAdminInfo::addCodeByRow(int row)
 {
+    Q_UNUSED(row);
     checkAndCreateCodeEditForm();
 
     // Get line values
     CLockSet::Iterator itor;
     _pState = 0;
-    int nRow = 0;
+    //int nRow = 0;
 
     _pState = createNewLockState();
     if(!_pworkingSet) {

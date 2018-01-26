@@ -54,7 +54,7 @@ bool CHWKeyboardReader::floatXInputDevice()
   
   qDebug() << "CHWKeyboardReader::floatXInputDevice(), sOuput = " << QString::fromStdString(sOutput);
 
-  int idPos = sOutput.find(parseToken);
+  size_t idPos = sOutput.find(parseToken);
   
   if( idPos != std::string::npos )
     {
@@ -95,6 +95,7 @@ bool CHWKeyboardReader::closeDeviceHandle()
         hid_close(_handle);
         _handle = 0;
     }
+    return true;
 }
 
 unsigned char CHWKeyboardReader::convertHIDKeyboardChar(unsigned char byIn)
@@ -228,28 +229,27 @@ QString CHWKeyboardReader::convertHexStringToNumString(QString inHex)
 void CHWKeyboardReader::readHIDReaderLoop()
 {
     QString sCardData;
-    int         nRC;
 
     while(1)    // Or on flag
     {
-        try {
+        try 
+        {
             sCardData = readHIDReader();
 
             // sCardData is in hex
             qDebug() << "HID Read:" << sCardData;
 
-            if(nRC > 0) {
-                // Succeeded in getting at least one code
-                qDebug() << "Read some codes";
-                if(sCardData.size() > 0 )
-                {
-                    qDebug() << "Code before conversion:" << sCardData;
-                    sCardData = convertHexStringToNumString(sCardData);
-                    qDebug() << "Code after conversion:" << sCardData;
-                    emit __onHIDSwipeCodes(sCardData, "");
-                }
+            // Succeeded in getting at least one code
+            qDebug() << "Read some codes";
+            if(sCardData.size() > 0 )
+            {
+                qDebug() << "Code before conversion:" << sCardData;
+                sCardData = convertHexStringToNumString(sCardData);
+                qDebug() << "Code after conversion:" << sCardData;
+                emit __onHIDSwipeCodes(sCardData, "");
             }
-        } catch (const std::runtime_error &e)
+        } 
+        catch (const std::runtime_error &e)
         {
             qDebug() << "readHIDReaderLoop() runtime error:\t" << e.what();
         }

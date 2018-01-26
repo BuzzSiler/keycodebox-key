@@ -14,6 +14,7 @@
 
 CSystemController::CSystemController(QObject *parent)
 {
+    Q_UNUSED(parent);
 }
 
 CSystemController::~CSystemController()
@@ -93,6 +94,10 @@ void CSystemController::OnVerifyFingerprintDialogCancel()
 
 void CSystemController::TrigQuestionUser(int doorNum, QString question1, QString question2, QString question3)
 {
+  Q_UNUSED(doorNum);
+  Q_UNUSED(question1);
+  Q_UNUSED(question2);
+  Q_UNUSED(question3);
   qDebug() << "CSystemController::TrigQuestionUser()";
   stopTimeoutTimer();
 }
@@ -576,7 +581,7 @@ CFrmUserCode* CSystemController::getUserCodeOne() {
 
 //    _pfUsercode->__EnableKeyboard(true);
 //    _pfUsercode->show();
-
+    return (CFrmUserCode *) NULL;
 }
 
 void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
@@ -614,16 +619,20 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
   int foundDeviceCount = 0;
   
   while(std::getline(ss,ssOutput,'\n'))
-    {
+  {
       if( ssOutput.length() > 1 )
-	if( foundDeviceCount > 4 )
-	  break;
-	else
-	  {
-	    strcpy(foundDevices[foundDeviceCount], ssOutput.c_str());
-	    foundDeviceCount++;
-	  }
-    }
+      {
+	   if( foundDeviceCount > 4 )
+           {
+	       break;
+           }
+	   else
+	   {
+	       strcpy(foundDevices[foundDeviceCount], ssOutput.c_str());
+	       foundDeviceCount++;
+           }
+      }
+  }
 
   bool refreshAdminDeviceList = false;
   bool oldDeviceFound[2] = {false};

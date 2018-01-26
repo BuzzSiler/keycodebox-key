@@ -359,7 +359,6 @@ void CFrmUserCode::on_btn_Cancel_clicked()
 
 void CFrmUserCode::on_btnIdentifyFingerPrint_clicked()
 {
-  int i;
   qDebug() << "CFrmUserCode::on_IdentifyFingerPrint_clicked()";
 
   emit __onVerifyFingerprintDialog();

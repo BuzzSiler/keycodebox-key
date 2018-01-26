@@ -109,7 +109,7 @@ private:
     CLockController     *_pLockController = 0;
 
 public:
-    explicit CLocksStatus(QObject* parent=0) {};
+    explicit CLocksStatus(QObject* parent=0) { Q_UNUSED(parent) };
 
     void setLockController(CLockController *pLockController) { _pLockController = pLockController; }
 

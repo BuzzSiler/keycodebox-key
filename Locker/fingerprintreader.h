@@ -12,7 +12,6 @@
 
 #include "usbcontroller.h"
 
-static void dev_open_cb(struct fp_dev *dev, int status, void *user_data);
 
 class CFingerprintReader : public QObject
 {

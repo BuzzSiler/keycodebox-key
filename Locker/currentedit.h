@@ -17,7 +17,9 @@ private:
 
 public:
     explicit CCurrentEdit(QObject *parent = 0)
-    {
+    {  
+        Q_UNUSED(parent);
+
         pregExpNums = new QRegExpValidator(QRegExp("[0-9]*$"));
 
         QRegExp mailREX(QRegExp("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b"));
@@ -45,7 +47,6 @@ public:
     QLineEdit           *_pLineCurrentlyBeingEdited;
 
     bool isNumbersOnly() { return _bNumbersOnly; }
-    bool setNumbersOnly(bool bNumsOnly) { _bNumbersOnly = bNumsOnly; }
 
     void setKeyboardEditLine(QLineEdit *pEd) {
         pEditLine = pEd;
@@ -89,7 +90,7 @@ public:
         pEditLine->setText(originalText);
     }
 
-    QString setNewText(QString text) { newText = text; }
+    void setNewText(QString text) { newText = text; }
     QString getNewText() { return newText; }
     QString retrieveEditedText() { newText = pEditLine->text(); return newText; }
 
