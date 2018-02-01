@@ -29,6 +29,7 @@ private:
     uint32_t    max_locks;
 
     bool        show_fingerprint; // bool: true = display button
+    bool        show_password; // bool: true = display button
     std::string smtp_server;
     int smtp_port;
     int smtp_type;
@@ -64,7 +65,8 @@ public:
         pred_resolution = 10;
         max_locks = 16;
 
-        show_fingerprint = 0;
+        show_fingerprint = false;
+        show_password = false;
         smtp_server = "";
         smtp_port = 0;
         smtp_type = 0; // 0=TCP, 1=SSL, 2=TSL
@@ -101,6 +103,7 @@ public:
         max_locks = newRec.max_locks;
 
         show_fingerprint = newRec.show_fingerprint;
+        show_password = newRec.show_password;
         smtp_server = newRec.smtp_server;
         smtp_port = newRec.smtp_port;
         smtp_type = newRec.smtp_type;
@@ -168,8 +171,11 @@ public:
     std::string getSMTPServer() { return smtp_server; }
     void setSMTPServer(std::string smtpserver) { smtp_server = smtpserver; }
 
-    bool getShowFingerprint() { return show_fingerprint; }
-    void setShowFingerprint(bool showFingerprint) { show_fingerprint = showFingerprint; }
+    bool getDisplayFingerprintButton() { return show_fingerprint; }
+    void setDisplayFingerprintButton(bool showFingerprint) { show_fingerprint = showFingerprint; }
+
+    bool getDisplayShowHideButton() { return show_password; }
+    void setDisplayShowHideButton(bool showPassword) { show_password = showPassword; }
 
     int getSMTPPort() { return smtp_port; }
     void setSMTPPort(int port) { smtp_port = port; }
@@ -262,7 +268,7 @@ public:
                      bool activeReport, QDateTime repFreq, QDateTime startReport,
                      std::string passwordEnc, std::string accessCdEnc,
                      std::string assistPasswordEnc, std::string assistCodeEnc,
-                     bool showFingerprint,
+                     bool showFingerprint, bool showPassword,
                      bool usePredictive, std::string predKey, int predRes,
                      uint32_t nMaxLocks,
                      std::string smtpserver, int smptport, int smtptype,
@@ -274,7 +280,7 @@ public:
                      bool activeReport, QDateTime repFreq, QDateTime startReport,
                      std::string passwordClear, std::string accessCdClear,
                      std::string assistPasswordClear, std::string assistCodeClear,
-                     bool showFingerprint,
+                     bool showFingerprint, bool showPassword,
                      bool usePredictive, std::string predKey, int predRes,
                      uint32_t nMaxLocks,
                      std::string smtpserver, int smptport, int smtptype,

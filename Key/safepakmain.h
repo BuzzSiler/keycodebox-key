@@ -96,7 +96,6 @@ private slots:
     void OnQuestionUserDialogClose();
     
 private:
-//    Ui::MainWindow *ui;
     void initialize();
     void hideFormsExcept(QDialog *pfrm);
 };

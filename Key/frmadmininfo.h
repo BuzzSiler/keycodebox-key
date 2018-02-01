@@ -172,6 +172,9 @@ signals:
     void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, int nLockNum);
     void __OnAdminInfoCodes(QString code1, QString code2);
 
+    void __OnDisplayFingerprintButton(bool state);
+    void __OnDisplayShowHideButton(bool state);
+
 signals:
     void __LocalOnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
     void __LocalOnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);

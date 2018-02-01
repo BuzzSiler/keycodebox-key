@@ -68,7 +68,8 @@ public:
     void initialize(QThread *pthread);
     SystemState getSystemState() { return _systemState; }
     SystemState getSystemStateDisplay() { return _systemStateDisplay; }
-    bool getShowFingerprint();
+    bool getDisplayFingerprintButton();
+    bool getDisplayShowHideButton();
     QString getAdminType() { return _adminType; }
 
     void setMainWindow(QMainWindow *mw) { _pmainWindow = mw; }
@@ -111,7 +112,8 @@ signals:
     void __OnFoundNewStorageDevice(QString device0, QString device1);
 
     void __OnLockStatusUpdated(CLocksStatus *locksStatus);
-    // void __OnEnableShowFingerprint(bool);
+    void __OnDisplayFingerprintButton(bool);
+    void __OnHideShowPassword(bool);
 
     void __onUserCodeOne(QString sCode1);
     void __onUserCodeTwo(QString sCode2);

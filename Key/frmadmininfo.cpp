@@ -110,6 +110,9 @@ void CFrmAdminInfo::initializeConnections()
     connect(ui->cbTimeZone, SIGNAL(currentIndexChanged(QString)), this, SLOT(setTimeZone()));
 
     connect(_psysController, SIGNAL(__OnFoundNewStorageDevice(QString, QString)), this, SLOT(OnFoundNewStorageDevice(QString, QString)));
+
+    connect(ui->chkDisplayFingerprintButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayFingerprintButton(bool)));
+    connect(ui->chkDisplayShowHideButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayShowHideButton(bool)));
 }
 
 void CFrmAdminInfo::setSystemController(CSystemController *psysController)
@@ -1031,7 +1034,8 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
     _tmpAdminRec.setAccessCode(ui->lblAccessCode->text().toStdString());
     _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text().toStdString());
     _tmpAdminRec.setAssistCode(ui->lblAssistCode->text().toStdString());
-    _tmpAdminRec.setShowFingerprint(ui->chkShowFingerprint->isChecked());
+    _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
+    _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
     _tmpAdminRec.setUsePredictiveAccessCode(ui->chkUsePredictive->isChecked());
     _tmpAdminRec.setPredictiveKey(ui->lblKey->text().toStdString());
     _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
@@ -1079,7 +1083,8 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setAccessCode(ui->lblAccessCode->text().toStdString());
     _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text().toStdString());
     _tmpAdminRec.setAssistCode(ui->lblAssistCode->text().toStdString());
-    _tmpAdminRec.setShowFingerprint(ui->chkShowFingerprint->isChecked());
+    _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
+    _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
     _tmpAdminRec.setUsePredictiveAccessCode(ui->chkUsePredictive->isChecked());
     _tmpAdminRec.setPredictiveKey(ui->lblKey->text().toStdString());
     _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
@@ -1123,7 +1128,8 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->lblPassword->setText(adminInfo->getPassword().c_str());
         ui->lblAssistCode->setText(adminInfo->getAssistCode().c_str());
         ui->lblAssistPassword->setText(adminInfo->getAssistPassword().c_str());
-        ui->chkShowFingerprint->setChecked(adminInfo->getShowFingerprint());
+        ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayShowHideButton());
+        ui->chkDisplayShowHideButton->setChecked(adminInfo->getDisplayShowHideButton());
 
         QString sFreq;
         QDateTime dtFreq = adminInfo->getDefaultReportFreq();

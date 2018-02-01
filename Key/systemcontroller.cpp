@@ -56,7 +56,6 @@ void CSystemController::initialize(QThread *pthread)
     initializeReportController();
     initializeReaders();
 
-    // emit __OnEnableShowFingerprint(_padminInfo->getShowFingerprint());
 }
 
 void CSystemController::TrigEnrollFingerprint(QString sCode)
@@ -535,9 +534,14 @@ void CSystemController::OnRequestCurrentAdmin()
     _securityController.OnRequestCurrentAdmin();
 }
 
-bool CSystemController::getShowFingerprint()
+bool CSystemController::getDisplayFingerprintButton()
 {
-    return _padminInfo->getShowFingerprint();
+    return _padminInfo->getDisplayFingerprintButton();
+}
+
+bool CSystemController::getDisplayShowHideButton()
+{
+    return _padminInfo->getDisplayShowHideButton();
 }
 
 CFrmUserCode* CSystemController::getUserCodeOne()
@@ -679,7 +683,7 @@ void CSystemController::start()
 }
 
 void CSystemController::OnTouchScreenTouched() {
-    _systemState = EUserCodeOne;
+    _systemState = EUserCodeOne;    
 }
 
 void CSystemController::looprun()

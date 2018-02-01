@@ -22,6 +22,9 @@ public:
     explicit CFrmUserCode(QWidget *parent = 0);
     ~CFrmUserCode();
 
+    void SetDisplayFingerprintButton(bool state);
+    void SetDisplayShowHideButton(bool state);
+
 private:
     Ui::CFrmUserCode *ui;
 
@@ -42,6 +45,8 @@ signals:
 
     void __onVerifyFingerprint();
     void __onVerifyFingerprintDialog();
+    void __OnDisplayFingerprintButton(bool showFingerprint);
+    void __OnEnableShowPassword(bool showPassword);
 
 public slots:
     void OnEnableKeyboard(bool bEnable);
@@ -50,8 +55,9 @@ public slots:
     void OnClearCodeDisplay();
 
     void OnSwipeCode(QString sCode);
+    void OnDisplayShowHideButton(bool state);
+    void OnDisplayFingerprintButton(bool state);
 
-    void OnEnableShowFingerprint(bool showFingerprint);
 
 private slots:
     void ResetPlaceholderText();
@@ -69,7 +75,7 @@ private slots:
     void on_btn_Return_clicked();
     void on_btn_Del_clicked();
     void on_btn_Clear_clicked();
-    void on_btnShowPassword_clicked(bool checked);
+    void on_btnShowHideCode_clicked(bool checked);
     void on_btn_Cancel_clicked();
     void on_btnIdentifyFingerPrint_clicked();
     void OnDateTimeTimerTimeout();

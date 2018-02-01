@@ -15,7 +15,6 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     ui->setupUi(this);
     CFrmUserCode::showFullScreen();
     initialize();
-    // OnEnableShowFingerprint(false);
 }
 
 CFrmUserCode::~CFrmUserCode()
@@ -29,6 +28,9 @@ void CFrmUserCode::initialize()
     _dtTimer.connect(&_dtTimer, SIGNAL(timeout()), this, SLOT(OnDateTimeTimerTimeout()));
     _dtTimer.start();
     ui->lVersion->setText(VERSION);
+
+    connect(this, SIGNAL(__OnDisplayFingerprintButton(bool)), this, SLOT(OnDisplayFingerprintButton(bool)));
+    connect(this, SIGNAL(__OnDisplayShowHideButton(bool)), this, SLOT(OnDisplayShowHideButton(bool)));
 }
 
 void CFrmUserCode::OnDateTimeTimerTimeout()
@@ -103,11 +105,6 @@ void CFrmUserCode::enableKeypad(bool bEnable)
 {
     Q_UNUSED(bEnable);
     ui->edCode->setFocus();
-}
-
-void CFrmUserCode::OnEnableShowFingerprint(bool showFingerprint)
-{
-    ui->btnIdentifyFingerPrint->setVisible(showFingerprint);
 }
 
 void CFrmUserCode::OnEnableKeyboard(bool bEnable)
@@ -222,14 +219,14 @@ void CFrmUserCode::on_btn_Clear_clicked()
     onButtonClick(0x00);
 }
 
-void CFrmUserCode::on_btnShowPassword_clicked(bool checked)
+void CFrmUserCode::on_btnShowHideCode_clicked(bool checked)
 {
     if(checked) {
         ui->edCode->setEchoMode(QLineEdit::Normal);
-        ui->btnShowPassword->setText("Hide");
+        ui->btnShowHideCode->setText("Hide");
     } else {
         ui->edCode->setEchoMode(QLineEdit::Password);
-        ui->btnShowPassword->setText("Show");
+        ui->btnShowHideCode->setText("Show");
     }
 }
 
@@ -240,8 +237,45 @@ void CFrmUserCode::on_btn_Cancel_clicked()
 
 void CFrmUserCode::on_btnIdentifyFingerPrint_clicked()
 {
-    qDebug() << "CFrmUserCode::on_IdentifyFingerPrint_clicked()";
-
     emit __onVerifyFingerprintDialog();
     emit __onVerifyFingerprint();
 }
+
+void CFrmUserCode::SetDisplayFingerprintButton(bool state)
+{
+    ui->btnIdentifyFingerPrint->setVisible(state);
+}
+
+void CFrmUserCode::SetDisplayShowHideButton(bool state)
+{
+    /* Set the Show Password button to unchecked state whenever it is checked
+       so that we don't inadvertently enable showing the password.  This applies 
+       to the transition of showing/hiding the Show Password button.
+
+       If the Show Password button is checked when we make the button invisible then we want
+       to not showing the password.  So, if checked uncheck and emit signal to set text and
+       password display appropriately.
+
+       If we are making the Show Password button visiable, then the button should not be checked,
+       but, just in case, go ahead and check anyway.  It can't hurt.
+    */
+    if (ui->btnShowHideCode->isChecked())
+    {
+        emit ui->btnShowHideCode->click();
+    }
+
+    ui->btnShowHideCode->setVisible(state);
+}
+
+void CFrmUserCode::OnDisplayFingerprintButton(bool state)
+{
+    SetDisplayFingerprintButton(state);
+}
+
+void CFrmUserCode::OnDisplayShowHideButton(bool state)
+{
+    SetDisplayShowHideButton(state);
+}
+
+
+

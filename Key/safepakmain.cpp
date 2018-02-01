@@ -188,7 +188,6 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
-        connect(this, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool)));
 
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
@@ -202,7 +201,6 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
         connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
 
-        _pfUsercode->OnEnableShowFingerprint(_psystemController->getShowFingerprint());
 
         if( !_pdFingerprint )
         {
@@ -229,6 +227,9 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
             connect(_pQuestions, SIGNAL(__OnQuestionsSave(int,QString,QString,QString)), psysController, SLOT(AnswerUserSave(int,QString,QString,QString)));
             connect(_pQuestions, SIGNAL(__OnQuestionsClose()), this, SLOT(OnQuestionUserDialogClose()));
         }
+
+        _pfUsercode->SetDisplayFingerprintButton(_psystemController->getDisplayFingerprintButton());
+        _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());
     }
     else
     {
@@ -243,6 +244,8 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         qDebug() << "MainWindow::OnDisplayCodeDialog()";
 
         _pfUsercode->OnEnableKeyboard(true);
+        _pfUsercode->SetDisplayFingerprintButton(_psystemController->getDisplayFingerprintButton());
+        _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());
         _pfUsercode->show();
     }
 }
@@ -256,7 +259,8 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
-        connect(psysController, SIGNAL(__OnEnableShowFingerprint(bool)), _pfUsercode, SLOT(OnEnableShowFingerprint(bool)));
+        connect(psysController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SLOT(OnDisplayFingerprintButton(bool)));
+        connect(psysController, SIGNAL(__OnEnableShowPassword(bool)), _pfUsercode, SLOT(OnEnableShowPassword(bool)));
 
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
@@ -272,6 +276,8 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
     connect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, SLOT(OnFingerprintCodeEnteredTwo(QString)));
 
     _pfUsercode->OnEnableKeyboard(true);
+    _pfUsercode->SetDisplayFingerprintButton(_psystemController->getDisplayFingerprintButton());
+    _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());    
     _pfUsercode->show();
 }
 
@@ -328,6 +334,9 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
     }
     connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(int)), _psystemController, SLOT(OnOpenLockRequest(int)));
     connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
+    connect(_pfAdminInfo, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SIGNAL(__OnDisplayFingerprintButton(bool)));
+    connect(_pfAdminInfo, SIGNAL(__OnEnableShowPassword(bool)), _pfUsercode, SIGNAL(__OnEnableShowPassword(bool)));
+
     hideFormsExcept(_pfAdminInfo);
 
     _pfAdminInfo->show();
