@@ -17,16 +17,32 @@
 class CSystemController : public QObject
 {
     Q_OBJECT
-public:
-    explicit CSystemController(QObject *parent = 0);
-    ~CSystemController();
 
+public:
     enum SystemState
     {
         ENone, ETimeoutScreen, EUserCodeOne, EUserCodeTwo,
         EAdminPassword, EPasswordFailed, EPasswordTimeout,
         EAdminPasswordFailed, EThankYou, EAdminMain, EAssistMain
     };
+
+    explicit CSystemController(QObject *parent = 0);
+    ~CSystemController();
+
+    void initialize(QThread *pthread);
+    SystemState getSystemState() { return _systemState; }
+    SystemState getSystemStateDisplay() { return _systemStateDisplay; }
+    bool getDisplayFingerprintButton();
+    bool getDisplayShowHideButton();
+    QString getAdminType() { return _adminType; }
+
+    void setMainWindow(QMainWindow *mw) { _pmainWindow = mw; }
+
+    void looprun();
+
+    const CLockController &getLockController() { return _LockController; }
+
+    void reportActivity();
 
 private:
     QThread                 *_pInitThread;
@@ -64,21 +80,6 @@ private:
     void stopTimeoutTimer();
     void initializeReaders();
     QString getCodeToUse(QString code1, QString code2);
-public:
-    void initialize(QThread *pthread);
-    SystemState getSystemState() { return _systemState; }
-    SystemState getSystemStateDisplay() { return _systemStateDisplay; }
-    bool getDisplayFingerprintButton();
-    bool getDisplayShowHideButton();
-    QString getAdminType() { return _adminType; }
-
-    void setMainWindow(QMainWindow *mw) { _pmainWindow = mw; }
-
-    void looprun();
-
-    const CLockController &getLockController() { return _LockController; }
-
-    void reportActivity();
 signals:
     void __verifyUserAccess(QString sCode1);
     void __verifyUserAccessTwo(QString sCode1, QString sCode2);

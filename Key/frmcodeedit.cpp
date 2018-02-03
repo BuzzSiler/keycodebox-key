@@ -42,7 +42,8 @@ void CFrmCodeEdit::setEditingRow(int nRow)
 }
 
 void CFrmCodeEdit::getValues(int *pId, int *pLockNum, QString *psAccessCode, QString *psSecondCode, QString *psDesc,
-                             QDateTime *pdtStart, QDateTime *pdtEnd, bool *pFingerprint1, bool *pFingerprint2)
+                             QDateTime *pdtStart, QDateTime *pdtEnd, bool *pFingerprint1, bool *pFingerprint2,
+                             int *pAccessType)
 {
     *pId = _id;
     *pLockNum = ui->spinLockNum->value();
@@ -53,11 +54,13 @@ void CFrmCodeEdit::getValues(int *pId, int *pLockNum, QString *psAccessCode, QSt
     *pdtEnd = ui->dtEndAccess->dateTime();
     *pFingerprint1 = ui->chkFingerPrint1->isChecked();
     *pFingerprint2 = ui->chkFingerPrint2->isChecked();
+    *pAccessType = _access_type;
 }
 
 void CFrmCodeEdit::setValues(int id, int nLockNum, QString sAccessCode, QString sSecondCode, QString sDesc,
                              QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2,
-                             bool askQuestions, std::string question1, std::string question2, std::string question3)
+                             bool askQuestions, std::string question1, std::string question2, std::string question3,
+                             int access_type)
 {
     qDebug() << "Editing Code ID:" << QVariant(id).toString() << " Lock:" << QVariant(nLockNum).toString() << " AccessCd:" << sAccessCode << " fingerprint: " << QString::number(fingerprint1) << " fingerprint1: " << QString::number(fingerprint2) << " askQuestions: " << QString::number(askQuestions) << " question1: " << QString::fromStdString(question1) << " question2: " << QString::fromStdString(question2) << " question3: " << QString::fromStdString(question3);
 
@@ -85,21 +88,23 @@ void CFrmCodeEdit::setValues(int id, int nLockNum, QString sAccessCode, QString 
     _question2 = QString::fromStdString(question2);
     _question3 = QString::fromStdString(question3);
 
-    if( dtStart == (QDateTime(QDate(1990,1,1), QTime(0,0,0))) && dtEnd == (QDateTime(QDate(1990,1,1), QTime(0,0,0))))
-    {
-        ui->dtStartAccess->hide();
-        ui->dtEndAccess->hide();
-        ui->strStartAccess->show();
-        ui->strEndAccess->show();
-        ui->chkAllAccess->setChecked(true);
-    } else {
-        ui->dtStartAccess->show();
-        ui->dtEndAccess->show();
-        ui->strStartAccess->hide();
-        ui->strEndAccess->hide();
-        ui->chkAllAccess->setChecked(false);
-    }
+    _access_type = access_type;
 
+    if (_access_type == 0 /* ACCESS_ALWAYS */)
+    {
+        qDebug() << "ACCESS TYPE is ACCESS ALWAYS";
+        emit ui->radioCodeAccessAlways->clicked();
+    }
+    else if (_access_type == 1 /* ACCESS_TIMED */)
+    {
+        qDebug() << "ACCESS TYPE is ACCESS TIMED";
+        emit ui->radioCodeAccessTimed->clicked();
+    }
+    else if (_access_type == 2 /* ACCESS_LIMITED_USE */)
+    {
+        qDebug() << "ACCESS TYPE is ACCESS LIMITED USE";
+        emit ui->radioCodeAccessLimitedUse->clicked();
+    }
 }
 
 void CFrmCodeEdit::on_buttonBox_accepted()
@@ -119,10 +124,15 @@ void CFrmCodeEdit::on_buttonBox_accepted()
 
     qDebug() << "------------------------QUESTION 3: " << _question3;
     for(i=0; i<ui->spinLocksToCreate->value(); i++)
+    {
+        qDebug() << _nRow << ui->spinLockNum->value() << _access_type;
+
         emit(OnDoneSave(_nRow, _id, ui->spinLockNum->value(), ui->edtAccessCode->text(), ui->edtSecondCode->text(),
                         ui->edtDescription->text(), ui->dtStartAccess->dateTime(), ui->dtEndAccess->dateTime(),
                         ui->chkFingerPrint1->isChecked(), ui->chkFingerPrint2->isChecked(),0,
-                        _question1, _question2, _question3));
+                        _question1, _question2, _question3, _access_type));
+    }
+    
     this->hide();
 }
 
@@ -193,23 +203,6 @@ void CFrmCodeEdit::OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdi
 void CFrmCodeEdit::on_buttonBox_clicked(QAbstractButton *button)
 {
     Q_UNUSED(button);
-}
-
-void CFrmCodeEdit::on_chkAllAccess_clicked(bool checked)
-{
-    if(checked) {
-        ui->dtStartAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
-        ui->dtEndAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
-        ui->dtStartAccess->hide();
-        ui->dtEndAccess->hide();
-        ui->strStartAccess->show();
-        ui->strEndAccess->show();
-    } else {
-        ui->strStartAccess->hide();
-        ui->strEndAccess->hide();
-        ui->dtStartAccess->show();
-        ui->dtEndAccess->show();
-    }
 }
 
 void CFrmCodeEdit::on_chkFingerPrint1_clicked(bool checked)
@@ -365,4 +358,49 @@ void CFrmCodeEdit::OnQuestionEditClose()
         delete _pDlgEditQuestions;
         _pDlgEditQuestions = 0;
     }
+}
+
+void CFrmCodeEdit::on_radioCodeAccessAlways_clicked()
+{
+    qDebug() << "on_radioCodeAccessAlways_clicked";
+    
+    ui->radioCodeAccessAlways->setChecked(true);
+    ui->dtStartAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
+    ui->dtEndAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
+    ui->dtStartAccess->hide();
+    ui->dtEndAccess->hide();
+    ui->strStartAccess->setText("ALWAYS");
+    ui->strStartAccess->show();
+    ui->strEndAccess->show();
+
+    _access_type = 0;
+}
+
+void CFrmCodeEdit::on_radioCodeAccessTimed_clicked()
+{
+    qDebug() << "on_radioCodeAccessTimed_clicked";
+
+    ui->radioCodeAccessTimed->setChecked(true);
+    ui->dtStartAccess->show();
+    ui->dtEndAccess->show();
+    ui->strStartAccess->hide();
+    ui->strEndAccess->hide();
+
+    _access_type = 1;
+}
+
+void CFrmCodeEdit::on_radioCodeAccessLimitedUse_clicked()
+{
+    qDebug() << "on_radioCodeAccessLimitedUse_clicked";
+
+    ui->radioCodeAccessLimitedUse->setChecked(true);
+    ui->dtStartAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
+    ui->dtEndAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
+    ui->dtStartAccess->hide();
+    ui->dtEndAccess->hide();
+    ui->strStartAccess->setText("LIMITED USE (Take and Return only)");
+    ui->strStartAccess->show();
+    ui->strEndAccess->show();
+
+    _access_type = 2;
 }

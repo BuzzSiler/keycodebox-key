@@ -1442,9 +1442,7 @@
      </font>
     </property>
     <property name="visible">
-      <bool>
-	false
-      </bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QDialogButtonBox" name="buttonBox">
@@ -1654,7 +1652,7 @@
      </font>
     </property>
     <property name="text">
-      <string>Clear</string>
+     <string>Clear</string>
     </property>
    </widget>
    <widget class="CClickableLineEdit" name="edtSecondCode">
@@ -1672,7 +1670,7 @@
      </font>
     </property>
     <property name="text">
-      <string>Clear</string>
+     <string>Clear</string>
     </property>
    </widget>
    <widget class="QPushButton" name="clrSecondCode">
@@ -1690,7 +1688,7 @@
      </font>
     </property>
     <property name="text">
-      <string>Clear</string>
+     <string>Clear</string>
     </property>
    </widget>
    <widget class="CClickableLineEdit" name="edtDescription">
@@ -1732,7 +1730,7 @@
      </font>
     </property>
     <property name="text">
-      <string>Clear</string>
+     <string>Clear</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="chkFingerPrint1">
@@ -1749,13 +1747,11 @@
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="visible">
+     <bool>false</bool>
+    </property>
     <property name="text">
      <string>Fingerprint</string>
-    </property>
-    <property name="visible">
-      <bool>
-        true
-      </bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="chkFingerPrint2">
@@ -1772,13 +1768,14 @@
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="visible">
+     <bool>false</bool>
+    </property>
     <property name="text">
      <string>Fingerprint</string>
     </property>
-    <property name="visible">
-      <bool>false</bool>
-    </property>
-   </widget><widget class="QPushButton" name="chkQuestions">
+   </widget>
+   <widget class="QPushButton" name="chkQuestions">
     <property name="geometry">
      <rect>
       <x>142</x>
@@ -1834,11 +1831,11 @@
       <pointsize>12</pointsize>
      </font>
     </property>
-    <property name="text">
-      <string>ALWAYS</string>
-    </property>
     <property name="visible">
-      <bool>false</bool>
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
    <widget class="QDateTimeEdit" name="dtEndAccess">
@@ -1864,7 +1861,8 @@
     <property name="displayFormat">
      <string>MMM dd yyyy hh:mm AP</string>
     </property>
-   </widget><widget class="QLabel" name="strEndAccess">
+   </widget>
+   <widget class="QLabel" name="strEndAccess">
     <property name="geometry">
      <rect>
       <x>230</x>
@@ -1878,11 +1876,11 @@
       <pointsize>12</pointsize>
      </font>
     </property>
-    <property name="text">
-      <string>ACTIVE</string>
-    </property>
     <property name="visible">
-      <bool>false</bool>
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>ACTIVE</string>
     </property>
    </widget>
    <widget class="Line" name="line">
@@ -1898,13 +1896,13 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QCheckBox" name="chkAllAccess">
+   <widget class="QRadioButton" name="radioCodeAccessAlways">
     <property name="geometry">
      <rect>
       <x>630</x>
-      <y>325</y>
-      <width>95</width>
-      <height>51</height>
+      <y>310</y>
+      <width>82</width>
+      <height>17</height>
      </rect>
     </property>
     <property name="font">
@@ -1914,6 +1912,45 @@
     </property>
     <property name="text">
      <string>Always</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioCodeAccessTimed">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>350</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Timed</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioCodeAccessLimitedUse">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>390</y>
+      <width>131</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Limited Use</string>
     </property>
    </widget>
   </widget>

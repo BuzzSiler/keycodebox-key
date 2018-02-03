@@ -30,6 +30,9 @@
  */
 class CTblCodes
 {
+public:
+
+    // Constants
     const std::string TABLENAME = "codes";
 
     const char *datetimeFormat = "yyyy-MM-dd HH:mm:ss";
@@ -60,28 +63,12 @@ class CTblCodes
 
     const char *flockboxstate = "lockbox_state";
 
-private:
-    QSqlDatabase *_pDB;
-    QString _sCodeOne;
-    QString _sCodeTwo;
+    const char *faccess_type = "access_type";
 
-    QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
-
-    void createTable();
-    bool tableExists();
-    bool columnExists(QString column);
-    void createColumn(QString column, QString fieldType);
-
-    void initialize();
-
-    bool readTestDefault();
-    bool createTestDefault();
-
-    bool isWhiteSpace(const QString &str);
-
-public:
-    void setLastCodeOne(QString code);
+    // Attributes
     int _lastIDS = -1;
+
+    // Methods
 
     CTblCodes(QSqlDatabase *db) {
         std::cout << "CTblCodes constructor\n";
@@ -94,6 +81,8 @@ public:
         _pDB = db;
     }
 
+    void setLastCodeOne(QString code);
+
     int getLastSuccessfulIDS() { return _lastIDS; }
     int checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &bFingerprintRequired, int &nDoorNum );
     int checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &bQuestionsRequired, std::string &codeOne, int &nDoorNum, bool &bAskQuestions, QString &question1, QString &question2, QString &question3);
@@ -104,14 +93,14 @@ public:
                          bool fingerprint1=false, bool fingerprint2=false,
                          bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
                          std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
-                         int maxAccess=0, int maxRetry=0);
+                         int maxAccess=0, int maxRetry=0, int accessType=0);
     int addLockCode(int locknum, std::string code1, std::string code2="",
                     QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
                     QDateTime endtime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
                     bool fingerprint1=false, bool fingerprint2=false,
                     bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
                     std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
-                    int maxAccess=0, int maxRetry=0);
+                    int maxAccess=0, int maxRetry=0, int accessType=0);
     void addJSONCodes(const CLockState *prec);
     void addJSONCodes(const CLockSet *pcodeSet);
     void addJSONCodes(std::iostream iofile);
@@ -136,6 +125,27 @@ public:
 
     void selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLockSet **pLockSet);
     void selectCodeSet(int ids, CLockSet **pLockSet);
+
+private:
+    QSqlDatabase *_pDB;
+    QString _sCodeOne;
+    QString _sCodeTwo;
+
+    QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
+
+    void createTable();
+    bool tableExists();
+    bool columnExists(QString column);
+    void createColumn(QString column, QString fieldType);
+
+    void initialize();
+
+    bool readTestDefault();
+    bool createTestDefault();
+
+    bool isWhiteSpace(const QString &str);
+    bool isExpired(int access_type, int access_count, int max_access);
+    bool incrementAccessCount(int ids);
 };
 
 #endif // CTBLCODES_H

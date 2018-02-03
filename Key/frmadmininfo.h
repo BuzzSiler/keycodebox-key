@@ -53,148 +53,44 @@ public:
     void resizeTreeViewColumns();
     void show();
 
-private:
-    Ui::CFrmAdminInfo   *ui;
-    CSystemController   *_psysController;
-    bool                _bClose;
-    QMenu               *_pTableMenu, *_pTableMenuAdd;
-    int                 _nRowSelected = 0;
-    bool                _bAddingCode = false;
-
-    const char *fNever = "Never";
-    const char *fEach = "Each Activity";
-    const char *fHourly = "Hourly";
-    const char *fEvery12Hours = "Every 12 Hours";
-    const char *fDaily = "Daily";
-    const char *fWeekly = "Weekly";
-    const char *fMonthly = "Monthly";
-
-    const int fLockNum = 0;
-    const int fDesc = 1;
-    const int fCode1 = 2;
-    const int fCode2 = 3;
-    const int fStart = 4;
-    const int fEnd = 5;
-
-    const bool fFingerprint1 = 6;
-    const bool fFingerprint2 = 7;
-
-    const bool fAskQuestions = 8;
-    const bool fQuestion1 = 9;
-    const bool fQuestion2 = 10;
-    const bool fQuestion3 = 11;
-
-    QString usbDevice0;
-    QString usbDevice1;
-
-    QDateTime _currentTime;
-
-    QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
-
-    CAdminRec           _tmpAdminRec;
-    uint64_t            _un64LockLocks;
-    CLocksStatus        *_pLocksStatus;
-
-    CLockState          *_pState = 0;
-    CLockSet            *_pworkingSet = 0;
-    CLockHistorySet     *_phistoryWorkingSet = 0;
-
-    QFileSystemModel    *_pmodel;
-    QFileSystemModel    *_pcopymodel;
-    QPoint              _lastTouchPos;
-
-    QTimer              _timerMedia;
-
-    CDlgFullKeyboard    *_pKeyboard = 0;
-    CCurrentEdit        *_pcurrentLabelEdit = 0;
-
-    CFrmCodeEdit        *_pFrmCodeEdit = 0;
-
-    QString             _reportDirectory;
-    QString             _copyDirectory;
-
-    int                 _tmpDoorOpen;
-    bool                _bContinueOpenLoop, _bStopOpen;
-
-    void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
-    std::string rtrim(std::string &s);
-
-    void initialize();
-    bool isInternetTime();
-    void onButtonClick(char key);
-    void onBackSpace();
-    void hideKeyboard(bool bHide);
-    void onDelete();
-    void populateAvailableDoors();
-    void open_single_door(int nLockNum);
-    void createLockMenus();
-
-    void initializeConnections();
-    int parseLockNumFromObjectName(QString objectName);
-    int isLock(uint16_t nLockNum);
-    void openAllDoors();
-    void displayInTable(CLockSet *pSet);
-    void setupCodeTableContextMenu();
-    void displayInHistoryTable(CLockHistorySet *pSet);
-    void populateBoxListSelection(QComboBox *cbox);
-    void populateCodeLockSelection();
-    void populateCodeLockHistorySelection();
-    void populateFileWidget(QString sDirectory, QString sFilter);
-    void startMediaTimer();
-    void setTableMenuLocation(QMenu*);
-    int nthSubstr(int n, const std::string& s, const std::string& p);
-    void getSystemIPAddressAndStatus();
-    void populateFileCopyWidget(QString sDirectory, QString sFilter);
-    void purgeCodes();
-
-public slots:
-    void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
-    void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
 
 signals:
-    void __OnDoneSave(int nRow, int nId, int nLockNum, QString sAccessCode, QString sSecondCode, QString sDescription, QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2, bool askQuestions, QString question1, QString question2, QString question3);
+    void __OnDoneSave(int nRow, int nId, int nLockNum, 
+                      QString sAccessCode, QString sSecondCode, QString sDescription, 
+                      QDateTime dtStart, QDateTime dtEnd, 
+                      bool fingerprint1, bool fingerprint2, 
+                      bool askQuestions, QString question1, QString question2, QString question3,
+                      int access_type);
     void __OnCloseFrmAdmin();
     void __TextEntered(QString sText);
     void __KeyPressed(char key);
     void __OnCloseWidgetEdit();
-
     void __OnRequestCurrentAdmin();
-
     void __UpdateCurrentAdmin(CAdminRec *adminInfo);
     void __OnUpdatedCurrentAdmin(bool bSuccess);
-
     void __OnOpenLockRequest(int nLockNum);
-
     void __OnReadDoorLocksState();
-
     void __OnBrightnessChanged(int nValue);
-
     void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, int nLockNum);
     void __OnAdminInfoCodes(QString code1, QString code2);
-
     void __OnDisplayFingerprintButton(bool state);
     void __OnDisplayShowHideButton(bool state);
 
-signals:
     void __LocalOnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
     void __LocalOnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
     void __OnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
     void __OnLockSet(CLockSet *pLockSet);
-public slots:
-    void OnReadLockSet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockSet(nLockNum, start, end); }
-    void OnLockSet(CLockSet *pSet);
-
-signals:
     void __OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
     void __OnLockHistorySet(CLockHistorySet *pLockSet);
-
     void __OnUpdateCodeState(CLockState *rec);
 
 public slots:
+    void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
+    void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
+    void OnReadLockSet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockSet(nLockNum, start, end); }
+    void OnLockSet(CLockSet *pSet);
     void OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(nLockNum, start, end); }
     void OnLockHistorySet(CLockHistorySet *pSet);
-
-public slots:
     void OnUpdateCurrentAdmin(CAdminRec *adminInfo) {emit __UpdateCurrentAdmin(adminInfo);}
     void OnUpdatedCurrentAdmin(bool bSuccess);
 
@@ -206,11 +102,14 @@ public slots:
     void onStartEditLabel(QLabel* pLabel, QString sLabelText);
 
     void onStopEdit();
-    void OnCodeEditDoneSave(int nRow, int nId, int nLockNum, QString sAccessCode, QString sSecondCode, QString sDescription, QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2, bool askQuestions, QString question1, QString question2, QString question3);
+    void OnCodeEditDoneSave(int nRow, int nId, int nLockNum, 
+                            QString sAccessCode, QString sSecondCode, QString sDescription, 
+                            QDateTime dtStart, QDateTime dtEnd, 
+                            bool fingerprint1, bool fingerprint2, 
+                            bool askQuestions, QString question1, QString question2, QString question3,
+                            int access_type);
     void OnCodeEditClose();
-protected:
-    void touchEvent(QTouchEvent *ev);
-    bool eventFilter(QObject *target, QEvent *event);
+    
 private slots:
     void OnCodes(QString code1, QString code2);
     void LocalReadLockSet(int nLock, QDateTime dtStart, QDateTime dtEnd);
@@ -356,6 +255,104 @@ private slots:
     void on_btnRebootSystem_clicked();
     void on_btnPurgeCodes_clicked();
     void on_btnRead_clicked();
+
+private:
+    Ui::CFrmAdminInfo   *ui;
+    CSystemController   *_psysController;
+    bool                _bClose;
+    QMenu               *_pTableMenu, *_pTableMenuAdd;
+    int                 _nRowSelected = 0;
+    bool                _bAddingCode = false;
+
+    const char *fNever = "Never";
+    const char *fEach = "Each Activity";
+    const char *fHourly = "Hourly";
+    const char *fEvery12Hours = "Every 12 Hours";
+    const char *fDaily = "Daily";
+    const char *fWeekly = "Weekly";
+    const char *fMonthly = "Monthly";
+
+    const int fLockNum = 0;
+    const int fDesc = 1;
+    const int fCode1 = 2;
+    const int fCode2 = 3;
+    const int fStart = 4;
+    const int fEnd = 5;
+
+    const bool fFingerprint1 = 6;
+    const bool fFingerprint2 = 7;
+
+    const bool fAskQuestions = 8;
+    const bool fQuestion1 = 9;
+    const bool fQuestion2 = 10;
+    const bool fQuestion3 = 11;
+
+    QString usbDevice0;
+    QString usbDevice1;
+
+    QDateTime _currentTime;
+
+    QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
+
+    CAdminRec           _tmpAdminRec;
+    uint64_t            _un64LockLocks;
+    CLocksStatus        *_pLocksStatus;
+
+    CLockState          *_pState = 0;
+    CLockSet            *_pworkingSet = 0;
+    CLockHistorySet     *_phistoryWorkingSet = 0;
+
+    QFileSystemModel    *_pmodel;
+    QFileSystemModel    *_pcopymodel;
+    QPoint              _lastTouchPos;
+
+    QTimer              _timerMedia;
+
+    CDlgFullKeyboard    *_pKeyboard = 0;
+    CCurrentEdit        *_pcurrentLabelEdit = 0;
+
+    CFrmCodeEdit        *_pFrmCodeEdit = 0;
+
+    QString             _reportDirectory;
+    QString             _copyDirectory;
+
+    int                 _tmpDoorOpen;
+    bool                _bContinueOpenLoop, _bStopOpen;
+
+    void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
+    std::string rtrim(std::string &s);
+
+    void initialize();
+    bool isInternetTime();
+    void onButtonClick(char key);
+    void onBackSpace();
+    void hideKeyboard(bool bHide);
+    void onDelete();
+    void populateAvailableDoors();
+    void open_single_door(int nLockNum);
+    void createLockMenus();
+
+    void initializeConnections();
+    int parseLockNumFromObjectName(QString objectName);
+    int isLock(uint16_t nLockNum);
+    void openAllDoors();
+    void displayInTable(CLockSet *pSet);
+    void setupCodeTableContextMenu();
+    void displayInHistoryTable(CLockHistorySet *pSet);
+    void populateBoxListSelection(QComboBox *cbox);
+    void populateCodeLockSelection();
+    void populateCodeLockHistorySelection();
+    void populateFileWidget(QString sDirectory, QString sFilter);
+    void startMediaTimer();
+    void setTableMenuLocation(QMenu*);
+    int nthSubstr(int n, const std::string& s, const std::string& p);
+    void getSystemIPAddressAndStatus();
+    void populateFileCopyWidget(QString sDirectory, QString sFilter);
+    void purgeCodes();
+
+protected:
+    void touchEvent(QTouchEvent *ev);
+    bool eventFilter(QObject *target, QEvent *event);
 };
 
 #endif // FRMADMININFO_H

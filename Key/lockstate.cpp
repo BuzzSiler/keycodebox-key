@@ -10,6 +10,7 @@ CLockState::CLockState(QObject *parent) : QObject(parent)
 {
     _bModified = false;
     _bMarkForDeletion = false;
+    _access_type = 0;
 }
 
 QJsonObject &CLockState::jsonRecord(QJsonObject &json)
@@ -39,6 +40,7 @@ QJsonObject &CLockState::jsonRecord(QJsonObject &json)
     json.insert(fquestion1, QJsonValue(_question1.c_str()));
     json.insert(fquestion2, QJsonValue(_question2.c_str()));
     json.insert(fquestion3, QJsonValue(_question3.c_str()));
+    json.insert(faccess_type, QJsonValue(_access_type));
     
     return json;
 }
@@ -99,6 +101,8 @@ bool CLockState::setFromJsonObject(QJsonObject jsonObj)
             _question2 = jsonObj.value(fquestion2).toString().toStdString();
         if(!jsonObj.value(fquestion3).isUndefined())
             _question3 = jsonObj.value(fquestion3).toString().toStdString();
+        if(!jsonObj.value(faccess_type).isUndefined())
+            _access_type = jsonObj.value(faccess_type).toInt();
     } catch(std::exception &e) {
         qDebug() << "CLockState::setFromJsonObject():" << e.what();
         return false;

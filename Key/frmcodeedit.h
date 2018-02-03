@@ -23,22 +23,25 @@ public:
     ~CFrmCodeEdit();
 
     void getValues(int *pId, int *pLockNum, QString *psAccessCode, QString *psSecondCode, QString *psDesc,
-		   QDateTime *pdtStart, QDateTime *pdtEnd, bool *pFingerprint1, bool *pFingerprint2);
+		   QDateTime *pdtStart, QDateTime *pdtEnd, bool *pFingerprint1, bool *pFingerprint2,
+           int *pAccessType);
     
     void setValues(int id, int nLockNum, QString sAccessCode, QString sSecondCode, QString sDesc,
 		   QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2,
-		   bool askQuestions, std::string question1, std::string question2, std::string question3);
+		   bool askQuestions, std::string question1, std::string question2, std::string question3,
+           int access_type);
 
     void setMaxLocks(int nLocks);
     void setEditingRow(int nRow);
     int getEditingRow() { return _nRow; }
+    
 
 private:
     Ui::CFrmCodeEdit *ui;
 
     CDlgEditQuestions *_pDlgEditQuestions = 0;
-    CCurrentEdit    *_pcurrentLineEdit = 0;
-    CDlgFullKeyboard *_pKeyboard = 0;
+    CCurrentEdit      *_pcurrentLineEdit = 0;
+    CDlgFullKeyboard  *_pKeyboard = 0;
 
     int _id;
     int _nRow;
@@ -46,10 +49,16 @@ private:
     QString _question1;
     QString _question2;
     QString _question3;
+    int _access_type;
 
     void checkAndCreateCurrentLineEdit();
 signals:
-    void OnDoneSave(int nRow, int nId, int nLockNum, QString sAccessCode, QString sSecondCode, QString sDescription, QDateTime dtStart, QDateTime dtEnd, bool fingerprint1, bool fingerprint2, bool askQuestions, QString question1, QString question2, QString question3);
+    void OnDoneSave(int nRow, int nId, int nLockNum, 
+                    QString sAccessCode, QString sSecondCode, QString sDescription, 
+                    QDateTime dtStart, QDateTime dtEnd, 
+                    bool fingerprint1, bool fingerprint2, 
+                    bool askQuestions, QString question1, QString question2, QString question3,
+                    int access_type);
     void OnClose();
     void __OnCodes(QString code1);
     void __OnQuestionEditSave();
@@ -67,7 +76,6 @@ private slots:
 
     void on_buttonBox_clicked(QAbstractButton *button);
 
-    void on_chkAllAccess_clicked(bool checked);
     void on_chkFingerPrint1_clicked(bool checked);
     void on_chkQuestions_clicked(bool checked);
     void on_chkFingerPrint2_clicked(bool checked);
@@ -77,6 +85,10 @@ private slots:
     void on_clrAccessCode_clicked();
     void on_clrSecondCode_clicked();
     void on_clrDescription_clicked();
+
+    void on_radioCodeAccessAlways_clicked();
+    void on_radioCodeAccessTimed_clicked();
+    void on_radioCodeAccessLimitedUse_clicked();
     
 public slots:
     void onStartEditLine(QLineEdit *pLine, QString sLabelText);

@@ -612,7 +612,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
         {
             if( strcmp(mountedDevices[i],foundDevices[j]) == 0 )
             {
-                qDebug() << "CSystemController::watchUSBStorageDevices(), found old device";
+                //qDebug() << "CSystemController::watchUSBStorageDevices(), found old device";
                 oldDeviceFound[i] = true;
                 existingDeviceCount++;
             }
@@ -628,7 +628,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
 
     for(i=0; i<foundDeviceCount; i++)
     {
-        qDebug() << "CSystemController::watchUSBStorageDevices(), found device " << QString::number(i) << " ";
+        //qDebug() << "CSystemController::watchUSBStorageDevices(), found device " << QString::number(i) << " ";
 
         if( (strcmp(mountedDevices[0],foundDevices[i]) != 0) &&
                 (strcmp(mountedDevices[1],foundDevices[i]) != 0) )

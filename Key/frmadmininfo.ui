@@ -27,7 +27,7 @@
     <rect>
      <x>1</x>
      <y>9</y>
-     <width>800</width>
+     <width>821</width>
      <height>481</height>
     </rect>
    </property>
@@ -665,7 +665,7 @@
       <rect>
        <x>20</x>
        <y>100</y>
-       <width>81</width>
+       <width>101</width>
        <height>28</height>
       </rect>
      </property>
@@ -682,9 +682,9 @@
     <widget class="QLabel" name="lblIPAddress">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>130</x>
        <y>100</y>
-       <width>181</width>
+       <width>161</width>
        <height>28</height>
       </rect>
      </property>
@@ -869,8 +869,8 @@
      <property name="geometry">
       <rect>
        <x>520</x>
-       <y>350</y>
-       <width>300</width>
+       <y>330</y>
+       <width>251</width>
        <height>45</height>
       </rect>
      </property>
@@ -887,8 +887,8 @@
      <property name="geometry">
       <rect>
        <x>520</x>
-       <y>395</y>
-       <width>300</width>
+       <y>390</y>
+       <width>251</width>
        <height>45</height>
       </rect>
      </property>

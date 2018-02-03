@@ -110,6 +110,8 @@ void CSecurityController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime
 
 void CSecurityController::OnUpdateCodeState(CLockState *rec)
 {
+    qDebug() << "CSecurityController::OnUpdateCodeState emitting __OnUpdateCodeState";
+
     emit __OnUpdateCodeState(rec);
 }
 

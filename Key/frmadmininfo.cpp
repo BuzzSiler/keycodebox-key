@@ -197,8 +197,8 @@ void CFrmAdminInfo::initialize()
 
     ui->btnCopyToggleSource->setText("Source #1");
 
-    connect(this, SIGNAL(__OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString)),
-            this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString)));
+    connect(this, SIGNAL(__OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)),
+            this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)));
 
     ui->btnCopyFileBrandingImageReset->setEnabled(true);
 }
@@ -254,9 +254,17 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
                 QString ip = addresses[a].toString();
                 if ( ip.isEmpty() ) continue;
                 bool foundMatch = false;
-                for (int j=0; j < possibleMatches.size(); j++) if ( ip == possibleMatches[j] ) { foundMatch = true; break; }
-                if ( !foundMatch ) { possibleMatches.push_back( ip );
-                    qDebug() << "possible address: " << ifaces[i].humanReadableName() << "->" << ip; }
+                for (int j=0; j < possibleMatches.size(); j++) 
+                    if ( ip == possibleMatches[j] ) 
+                    { 
+                        foundMatch = true; break; 
+                    }
+
+                if ( !foundMatch ) 
+                { 
+                    possibleMatches.push_back( ip );
+                    //qDebug() << "possible address: " << ifaces[i].humanReadableName() << "->" << ip; 
+                }
                 ui->lblIPAddress->setText(ip);
                 if((bool)(flags & QNetworkInterface::IsUp))
                 {
@@ -269,7 +277,7 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
 
                     QString period = ".";
                     uint findN = nthSubstr(3, ip.toStdString(), period.toStdString());
-                    qDebug() << "CFrmAdminInfo::getSystemIPAddressAndState(), findN: " << QString::number(findN);
+                    //qDebug() << "CFrmAdminInfo::getSystemIPAddressAndState(), findN: " << QString::number(findN);
                     if(findN != std::string::npos)
                     {
                         pingAddress = ip.mid(0, findN);
@@ -615,6 +623,7 @@ void CFrmAdminInfo::printElementNames(xmlNode *aNode)
     QString question3 = "";
     QDateTime dtStart;
     QDateTime dtEnd;
+    int access_type = 0;
 
     for (curNode = aNode; curNode; curNode=curNode->next)
     {
@@ -686,7 +695,8 @@ void CFrmAdminInfo::printElementNames(xmlNode *aNode)
 
                 emit(__OnDoneSave(-1, -1, nLockNum, sAccessCode, sSecondCode,
                                   description, dtStart, dtEnd,
-                                  false, false, false, question1, question2, question3));
+                                  false, false, false, question1, question2, question3,
+                                  access_type));
             }
         }
         printElementNames(curNode->children);
@@ -764,19 +774,18 @@ void CFrmAdminInfo::populateAvailableDoors() {
     {
         pb = (QPushButton*)(*itor);
 
-        qDebug() << "Widget Classname:" << pb->metaObject()->className();
-        qDebug() << "objectName:" << pb->objectName();
+        //qDebug() << "Widget Classname:" << pb->metaObject()->className();
+        //qDebug() << "objectName:" << pb->objectName();
 
-        if((QString(pb->metaObject()->className()) == QString("QPushButton")) &&
-                (pb->objectName().mid(0, 5) == "cbBox"))
-            qDebug() << "cbBox";
+        if((QString(pb->metaObject()->className()) == QString("QPushButton")) && (pb->objectName().mid(0, 5) == "cbBox"))
         {
+            //qDebug() << "cbBox";
             nLockNum = parseLockNumFromObjectName(pb->objectName());
             if(_pLocksStatus->isLock(nLockNum)) {
-                qDebug() << "Lock on " << nLockNum;
+                //qDebug() << "Lock on " << nLockNum;
                 pb->setIcon(icon);
             } else {
-                qDebug() << "No lock on " << nLockNum;
+                //qDebug() << "No lock on " << nLockNum;
                 pb->setIcon(QIcon());
             }
         }
@@ -1857,16 +1866,27 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode1().c_str()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2().c_str()));
 
-        if( (pState->getStartTime().secsTo(alwaysActiveStart) == 0) && (pState->getEndTime().secsTo(alwaysActiveEnd) == 0) )
+
+        qDebug() << "ACCESS TYPE is " << pState->getAccessType();
+        qDebug() << "ACCESS COUNT is " << pState->getAccessCount();
+        qDebug() << "MAX ACCESS is " << pState->getMaxAccess();
+
+        if (pState->getAccessType() == 0 /* ACCESS_ALWAYS */)
         {
             table->setItem(nRow, nCol++, new QTableWidgetItem("ALWAYS"));
             table->setItem(nRow, nCol++, new QTableWidgetItem("ACTIVE"));
         }
-        else
+        else if (pState->getAccessType() == 1 /* ACCESS_TIMED */)
         {
             table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getStartTime().toString("MMM dd yyyy hh:mm:ss AP")));
             table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getEndTime().toString("MMM dd yyyy hh:mm:ss AP")));
         }
+        else if (pState->getAccessType() == 2 /* ACCESS_LIMITED_USE */)
+        {
+            table->setItem(nRow, nCol++, new QTableWidgetItem("LIMITED USE (" + QString::number(pState->getRemainingUses()) + " uses remaining)"));
+            table->setItem(nRow, nCol++, new QTableWidgetItem(pState->isActive() ? "ACTIVE" : "EXPIRED"));
+        }
+
         nRow++;
     }
 }
@@ -2253,11 +2273,30 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum,
                                        bool askQuestions, 
                                        QString question1, 
                                        QString question2, 
-                                       QString question3)
+                                       QString question3,
+                                       int access_type)
 {
     Q_UNUSED(fingerprint2);
 
-    qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave(), nRow: " << QString::number(nRow) << " nId: " << QString::number(nId);
+    qDebug() << "-------------------CFrmAdminInfo::OnCodeEditDoneSave()-----------------------";
+    qDebug() << "Parameters:";
+    qDebug() << "    nRow: " << QString::number(nRow);
+    qDebug() << "    nId: " << QString::number(nId);
+    qDebug() << "    nLockNum: " << QString::number(nLockNum);
+    qDebug() << "    sAccessCode: " << sAccessCode;
+    qDebug() << "    sSecondCode: " << sSecondCode;
+    qDebug() << "    sDescription: " << sDescription;
+    qDebug() << "    dtStart: " << dtStart.toString();
+    qDebug() << "    dtEnd: " << dtEnd.toString();
+    qDebug() << "    fingerprint1: " << fingerprint1;
+    qDebug() << "    fingerprint2: " << fingerprint2;
+    qDebug() << "    askQuestions: " << askQuestions;
+    qDebug() << "    question1: " << question1;
+    qDebug() << "    question2: " << question2;
+    qDebug() << "    question3: " << question3;
+    qDebug() << "    access_type: " << access_type;
+    qDebug() << "-------------------CFrmAdminInfo::OnCodeEditDoneSave()-----------------------";
+
     _pState->setLockNum(nLockNum);
     _pState->setCode1(sAccessCode.toStdString());
     _pState->setCode2(sSecondCode.toStdString());
@@ -2266,25 +2305,43 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum,
     _pState->setEndTime(dtEnd);
 
     if(fingerprint1)
+    {
         _pState->setFingerprint1();
+    }
     else
+    {
         _pState->clearFingerprint1();
+    }
 
-    qDebug() << "------------------------QUESTION 1: " << question1;
-    qDebug() << "------------------------QUESTION 2: " << question2;
-    qDebug() << "------------------------QUESTION 3: " << question3;
+    //qDebug() << "------------------------QUESTION 1: " << question1;
+    //qDebug() << "------------------------QUESTION 2: " << question2;
+    //qDebug() << "------------------------QUESTION 3: " << question3;
 
     _pState->setAskQuestions(askQuestions);
     _pState->setQuestion1(question1.toStdString());
     _pState->setQuestion2(question2.toStdString());
     _pState->setQuestion3(question3.toStdString());
 
+    /* Set max access based on access type
+    */
+    _pState->setAccessType(access_type);
+    
+    if (access_type == 2)
+    {
+        _pState->setMaxAccess(2);
+    }
+
+    qDebug() << "Max Access " << _pState->getMaxAccess();
+
     if(_pState->isNew())
     {
+        qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave() new _pState";
         if(_pworkingSet)
         {
+            qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave() adding _pState to _pworkingSet";
             _pworkingSet->addToSet(_pState);
         }
+        qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave() emitting __OnUpdateCodeState";
         emit __OnUpdateCodeState(_pState);
     } else {
         nRow = 0;
@@ -2292,6 +2349,10 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum,
         QTableWidget    *table = ui->tblCodesList;
         QTableWidgetItem    *item;
         item = table->item(nRow, nCol++);
+
+        /* Note: The following code seems to assume dtStart/dtEnd will be datetime, but what about ALWAYS? */
+        qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave() not new _pState";
+
         if(item) {
             item->setText(QVariant(nLockNum).toString());
             item = table->item(nRow, nCol++);
@@ -2326,6 +2387,10 @@ CLockState* CFrmAdminInfo::createNewLockState()
     pState->setDescription("");
     pState->setStartTime(QDateTime().currentDateTime());
     pState->setEndTime(QDateTime().currentDateTime());
+
+    /* Set the access type: default is ACCESS_ALWAYS */
+    pState->setAccessType(0 /*ACCESS_ALWAYS*/);
+    pState->setMaxAccess(-1);
 
     pState->clearFingerprint1();
     pState->clearFingerprint2();
@@ -2435,8 +2500,8 @@ void CFrmAdminInfo::checkAndCreateCodeEditForm()
         _pFrmCodeEdit = new CFrmCodeEdit(this);
         _pFrmCodeEdit->setMaxLocks(_tmpAdminRec.getMaxLocks());
         connect(_pFrmCodeEdit, SIGNAL(OnClose()), this, SLOT(OnCodeEditClose()));
-        connect(_pFrmCodeEdit, SIGNAL(OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString)),
-                this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString)));
+        connect(_pFrmCodeEdit, SIGNAL(OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)),
+                this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)));
         connect(this, SIGNAL(__OnAdminInfoCodes(QString,QString)), _pFrmCodeEdit, SLOT(OnAdminInfoCodes(QString,QString)));
     }
 }
@@ -2455,7 +2520,14 @@ void CFrmAdminInfo::addCodeByRow(int row)
         _pworkingSet = new CLockSet();
     }
 
-    _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(), _pState->getStartTime(), _pState->getEndTime(), false, false, _pState->getAskQuestions(), _pState->getQuestion1(), _pState->getQuestion2(), _pState->getQuestion3());
+    _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), 
+                             _pState->getCode1().c_str(), _pState->getCode2().c_str(), 
+                             _pState->getDescription().c_str(), 
+                             _pState->getStartTime(), _pState->getEndTime(), 
+                             false, false, 
+                             _pState->getAskQuestions(), _pState->getQuestion1(), 
+                             _pState->getQuestion2(), _pState->getQuestion3(),
+                             _pState->getAccessType());
     _pFrmCodeEdit->setEditingRow(-1);
     _pFrmCodeEdit->show();
 }
@@ -2484,7 +2556,10 @@ void CFrmAdminInfo::editCodeByRow(int row)
     if(_pState) {
         qDebug() << "   pState Found One";
         _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(),
-                                 _pState->getStartTime(), _pState->getEndTime(), _pState->getFingerprint1(), _pState->getFingerprint2(), _pState->getAskQuestions(), _pState->getQuestion1(), _pState->getQuestion2(), _pState->getQuestion3());
+                                 _pState->getStartTime(), _pState->getEndTime(), 
+                                 _pState->getFingerprint1(), _pState->getFingerprint2(), 
+                                 _pState->getAskQuestions(), _pState->getQuestion1(), _pState->getQuestion2(), _pState->getQuestion3(),
+                                 _pState->getAccessType());
         _pFrmCodeEdit->setEditingRow(row);
         _pFrmCodeEdit->show();
     }
@@ -2495,7 +2570,10 @@ void CFrmAdminInfo::editCodeByRow(int row)
         _pworkingSet->addToSet(_pState);
 
         _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(),
-                                 _pState->getStartTime(), _pState->getEndTime(), false, false, _pState->getAskQuestions(), _pState->getQuestion1(), _pState->getQuestion2(), _pState->getQuestion3());
+                                 _pState->getStartTime(), _pState->getEndTime(), 
+                                 false, false, 
+                                 _pState->getAskQuestions(), _pState->getQuestion1(), _pState->getQuestion2(), _pState->getQuestion3(),
+                                 _pState->getAccessType());
         _pFrmCodeEdit->setEditingRow(-1);
         _pFrmCodeEdit->show();
     }
