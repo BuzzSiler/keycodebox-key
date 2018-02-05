@@ -1884,7 +1884,7 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         else if (pState->getAccessType() == 2 /* ACCESS_LIMITED_USE */)
         {
             table->setItem(nRow, nCol++, new QTableWidgetItem("LIMITED USE (" + QString::number(pState->getRemainingUses()) + " uses remaining)"));
-            table->setItem(nRow, nCol++, new QTableWidgetItem(pState->isActive() ? "ACTIVE" : "EXPIRED"));
+            table->setItem(nRow, nCol++, new QTableWidgetItem(pState->isActive() ? "ACTIVE" : "DISABLED"));
         }
 
         nRow++;
@@ -2063,7 +2063,7 @@ void CFrmAdminInfo::on_dialBright_valueChanged(int value)
 {
     if( value < 20 ) value = 20;
     if( value > 255) value = 255;
-    emit __OnBrightnessChanged(value);  //
+    emit __OnBrightnessChanged(value);
 }
 
 void CFrmAdminInfo::on_btnReadCodes_clicked()
@@ -2330,6 +2330,8 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum,
     {
         _pState->setMaxAccess(2);
     }
+    /* Clear the access count in all cases; whether this is a new code or edited code. */
+    _pState->setAccessCount(0);
 
     qDebug() << "Max Access " << _pState->getMaxAccess();
 
@@ -2362,6 +2364,7 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum,
             item = table->item(nRow, nCol++);
             item->setText(sSecondCode);
             item = table->item(nRow, nCol++);
+            qDebug() << "We're assuming start and end are date/time";
             item->setText(dtStart.toString("MMM dd yyyy hh:mm AP"));
             item = table->item(nRow, nCol++);
             item->setText(dtEnd.toString("MMM dd yyyy hh:mm AP"));
