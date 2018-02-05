@@ -30,7 +30,7 @@ CDlgFullKeyboard::CDlgFullKeyboard(QWidget *parent) :
     for(itor = lstWidgets.begin(); itor != lstWidgets.end(); itor++)
     {
         pb = (QPushButton*)(*itor);
-        qDebug() << "Mapping key:" << pb->text();
+        //qDebug() << "Mapping key:" << pb->text();
         if(pb->text().length()==1) {
             _pmapper->setMapping(pb, pb);
         }
