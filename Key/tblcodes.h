@@ -93,14 +93,14 @@ public:
                          bool fingerprint1=false, bool fingerprint2=false,
                          bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
                          std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
-                         int maxAccess=0, int maxRetry=0, int accessType=0);
+                         int maxAccess=0, int maxRetry=0, int accessType=0, int accessCount=0);
     int addLockCode(int locknum, std::string code1, std::string code2="",
                     QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
                     QDateTime endtime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
                     bool fingerprint1=false, bool fingerprint2=false,
                     bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
                     std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
-                    int maxAccess=0, int maxRetry=0, int accessType=0);
+                    int maxAccess=0, int maxRetry=0, int accessType=0, int accessCount=0);
     void addJSONCodes(const CLockState *prec);
     void addJSONCodes(const CLockSet *pcodeSet);
     void addJSONCodes(std::iostream iofile);

@@ -55,9 +55,6 @@ public:
     void ExtractCommandOutput(FILE *pF, std::string &rtnStr);
     bool isInternetTime();
     
-protected:
-    void keyPressEvent(QKeyEvent *e);
-
 signals:
     void __TouchScreenTouched();
     void __onCode(QString sCode);
@@ -98,6 +95,10 @@ private slots:
 private:
     void initialize();
     void hideFormsExcept(QDialog *pfrm);
+
+protected:
+    void keyPressEvent(QKeyEvent *e);
+
 };
 
 #endif // SAFEPAKMAIN_H

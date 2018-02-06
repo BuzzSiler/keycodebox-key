@@ -40,6 +40,7 @@ void CModelSecurity::OnReadLockSet(int nLockNum, QDateTime start, QDateTime end)
 {
     CLockSet    *pLockSet;
     // Build the lock set for this lock num
+    qDebug() << "CModelSecurity::OnReadLockSet";
     _ptblCodes->selectCodeSet(nLockNum, start, end, &pLockSet);
 
     emit __OnLockSet(pLockSet);

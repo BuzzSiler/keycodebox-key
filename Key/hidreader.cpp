@@ -169,11 +169,10 @@ QString CHWKeyboardReader::readHIDReader()
     }
 
     for(i=strHID.length() - 1; i >= 0; i--)
-      {
-	strResult += strHID[i];
-	digitCount++;
-	
-      }
+    {
+	    strResult += strHID[i];
+	    digitCount++;
+    }
 
     qDebug() << "HID RESULT:" << strResult.c_str();
     qDebug() << "HID RESULT LENGTH: " << strResult.length();

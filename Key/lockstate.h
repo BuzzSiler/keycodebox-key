@@ -94,6 +94,8 @@ public:
     virtual bool isActive() { return _access_count < _max_access; }
     virtual int getRemainingUses() { return _max_access - _access_count; }
 
+    void Show();
+
 protected:
     const char *datetimeFormat = "yyyy-MM-dd HH:mm:ss";
     const char *timeFormatShort = "HH:mm";

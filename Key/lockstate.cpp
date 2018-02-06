@@ -135,3 +135,33 @@ bool CLockState::setFromJsonString(std::string strJson)
     }
     return true;
 }
+
+void CLockState::Show()
+{
+#ifdef ENABLE_LOCKSTATE_DUMP    
+    qDebug() << "       Id: " << _ids;
+    qDebug() << "      Seq: " << _sequence.c_str();
+    qDebug() << "Seq Order: " << _sequence_order;
+    qDebug() << "  LockNum: " << _lock_num;
+    qDebug() << "   Desc: " << _description.c_str();
+    qDebug() << "  Code1: " << _code1.c_str();
+    qDebug() << "  Code2: " << _code2.c_str();
+    qDebug() << "  Start: " << _starttime;
+    qDebug() << "    End: " << _endtime;
+    qDebug() << "   Stat: " << _status.c_str();
+    qDebug() << "    FP1: " << _bFingerprint1;
+    qDebug() << "    FP2: " << _bFingerprint2;
+    qDebug() << "    Ask: " << _bAskQuestions;
+    qDebug() << "     Q1: " << _question1.c_str();
+    qDebug() << "     Q2: " << _question2.c_str();
+    qDebug() << "     Q3: " << _question3.c_str();
+    qDebug() << "     AT: " << _access_type;
+    qDebug() << "     AC: " << _access_count;
+    qDebug() << "     MA: " << _max_access;
+    qDebug() << "     MR: " << _max_retry;
+    qDebug() << "     RC: " << _retry_count;
+    qDebug() << "  IsNew: " << _bIsNew;
+    qDebug() << "    MOD: " << _bModified;
+    qDebug() << "    MFD: " << _bMarkForDeletion;
+#endif    
+}

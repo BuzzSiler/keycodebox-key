@@ -19,6 +19,8 @@ class CFrmCodeEdit : public QDialog
 
 
 public:
+    const QDateTime _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0));
+
     explicit CFrmCodeEdit(QWidget *parent = 0);
     ~CFrmCodeEdit();
 
@@ -36,22 +38,6 @@ public:
     int getEditingRow() { return _nRow; }
     
 
-private:
-    Ui::CFrmCodeEdit *ui;
-
-    CDlgEditQuestions *_pDlgEditQuestions = 0;
-    CCurrentEdit      *_pcurrentLineEdit = 0;
-    CDlgFullKeyboard  *_pKeyboard = 0;
-
-    int _id;
-    int _nRow;
-    bool _askQuestions;
-    QString _question1;
-    QString _question2;
-    QString _question3;
-    int _access_type;
-
-    void checkAndCreateCurrentLineEdit();
 signals:
     void OnDoneSave(int nRow, int nId, int nLockNum, 
                     QString sAccessCode, QString sSecondCode, QString sDescription, 
@@ -74,8 +60,6 @@ private slots:
 
     void on_buttonBox_rejected();
 
-    void on_buttonBox_clicked(QAbstractButton *button);
-
     void on_chkFingerPrint1_clicked(bool checked);
     void on_chkQuestions_clicked(bool checked);
     void on_chkFingerPrint2_clicked(bool checked);
@@ -90,11 +74,41 @@ private slots:
     void on_radioCodeAccessTimed_clicked();
     void on_radioCodeAccessLimitedUse_clicked();
     
+    void on_spinLockNum_valueChanged(int arg1);
+    void on_spinLocksToCreate_valueChanged(int arg1);
+    void on_edtAccessCode_textEdited(const QString &arg1);
+    void on_edtSecondCode_textEdited(const QString &arg1);
+    void on_chkQuestions_clicked();
+    void on_edtDescription_textEdited(const QString &arg1);
+    void on_dtStartAccess_dateTimeChanged(const QDateTime &dateTime);
+    void on_dtEndAccess_dateTimeChanged(const QDateTime &dateTime);
+
 public slots:
     void onStartEditLine(QLineEdit *pLine, QString sLabelText);
     void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
     void OnQuestionEditSave();
     void OnQuestionEditClose();
+
+private:
+    Ui::CFrmCodeEdit *ui;
+
+    CDlgEditQuestions *_pDlgEditQuestions = 0;
+    CCurrentEdit      *_pcurrentLineEdit = 0;
+    CDlgFullKeyboard  *_pKeyboard = 0;
+
+    int _id;
+    int _nRow;
+    bool _askQuestions;
+    QString _question1;
+    QString _question2;
+    QString _question3;
+    int _access_type;
+
+    void checkAndCreateCurrentLineEdit();
+    void EvaluateDisplayConditions();
+
+    void EnableSaveButton();
+
 };
 
 #endif // FRMCODEEDIT_H

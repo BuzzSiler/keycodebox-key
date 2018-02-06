@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>848</width>
     <height>480</height>
    </rect>
   </property>
@@ -520,9 +520,12 @@
     <string>Fingerprint</string>
    </property>
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="autoDefault">
     <bool>false</bool>
    </property>
   </widget>

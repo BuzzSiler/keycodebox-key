@@ -81,7 +81,9 @@ void CFrmUserCode::onButtonClick(char key) {
 
 void CFrmUserCode::onCodeEntered()
 {
+    
     QString sCode = ui->edCode->text();
+    qDebug() << "CFrmUserCode::onCodeEntered" << sCode;
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
     if(sCode.length() > 0 ) {
@@ -133,6 +135,7 @@ void CFrmUserCode::OnClearCodeDisplay()
  */
 void CFrmUserCode::OnSwipeCode(QString sCode)
 {
+    qDebug() << "CFrmUserCode::OnSwipeCode" << sCode;
     ui->edCode->setText(sCode);
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;

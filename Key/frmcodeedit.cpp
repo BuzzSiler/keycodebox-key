@@ -14,6 +14,7 @@ CFrmCodeEdit::CFrmCodeEdit(QWidget *parent) :
     _pcurrentLineEdit(0)
 {
     ui->setupUi(this);
+    ui->buttonBox->button(QDialogButtonBox::Save)->setEnabled(false);    
     CFrmCodeEdit::showFullScreen();
 }
 
@@ -50,11 +51,32 @@ void CFrmCodeEdit::getValues(int *pId, int *pLockNum, QString *psAccessCode, QSt
     *psAccessCode = ui->edtAccessCode->text();
     *psSecondCode = ui->edtSecondCode->text().trimmed();
     *psDesc = ui->edtDescription->text();
-    *pdtStart = ui->dtStartAccess->dateTime();
-    *pdtEnd = ui->dtEndAccess->dateTime();
+
+    /* Other parts of the software depend on _DATENONE as a way of controlling
+       display.  So, we must translate 'minimum' datetime, what we get when
+       we assign _DATENONE to a CDateTimeEdit control, to _DATENONE before
+       we exit.
+    */
+    if (ui->dtStartAccess->dateTime() == ui->dtStartAccess->minimumDateTime())
+    {
+        *pdtStart = _DATENONE;
+    }
+    else
+    {
+        *pdtStart = ui->dtStartAccess->dateTime();
+    }
+    if (ui->dtEndAccess->dateTime() == ui->dtEndAccess->minimumDateTime())
+    {
+        *pdtEnd = _DATENONE;        
+    }
+    else
+    {
+        *pdtStart = ui->dtStartAccess->dateTime();
+    }
     *pFingerprint1 = ui->chkFingerPrint1->isChecked();
     *pFingerprint2 = ui->chkFingerPrint2->isChecked();
     *pAccessType = _access_type;
+
 }
 
 void CFrmCodeEdit::setValues(int id, int nLockNum, QString sAccessCode, QString sSecondCode, QString sDesc,
@@ -70,8 +92,6 @@ void CFrmCodeEdit::setValues(int id, int nLockNum, QString sAccessCode, QString 
     ui->edtAccessCode->setText(sAccessCode);
     ui->edtSecondCode->setText(sSecondCode);
     ui->edtDescription->setText(sDesc);
-    ui->dtStartAccess->setDateTime(dtStart);
-    ui->dtEndAccess->setDateTime(dtEnd);
 
     if( fingerprint1 )
     {
@@ -98,6 +118,18 @@ void CFrmCodeEdit::setValues(int id, int nLockNum, QString sAccessCode, QString 
     else if (_access_type == 1 /* ACCESS_TIMED */)
     {
         qDebug() << "ACCESS TYPE is ACCESS TIMED";
+
+        /* Note: For a new code, dtStart and dtEnd will be set to _DATENONE
+           However, dtStartAccess and dtEndAccess are QDateTimeEdit controls
+           which have their minimum set much lated than _DATENONE which means
+           that upon assignment, they will default to their minimum.
+
+           In the case of an edit, where the datetime should be within the min
+           and max of the QDateTimeEdit control, the correct datetime will be
+           populated.
+        */
+        ui->dtStartAccess->setDateTime(dtStart);
+        ui->dtEndAccess->setDateTime(dtEnd);
         emit ui->radioCodeAccessTimed->clicked();
     }
     else if (_access_type == 2 /* ACCESS_LIMITED_USE */)
@@ -105,11 +137,33 @@ void CFrmCodeEdit::setValues(int id, int nLockNum, QString sAccessCode, QString 
         qDebug() << "ACCESS TYPE is ACCESS LIMITED USE";
         emit ui->radioCodeAccessLimitedUse->clicked();
     }
+
+    qDebug() << "CFrmCodeEdit::setValues start" << ui->dtStartAccess->dateTime();
+    qDebug() << "CFrmCodeEdit::setValues end" << ui->dtEndAccess->dateTime();
 }
 
 void CFrmCodeEdit::on_buttonBox_accepted()
 {
     qDebug() << "on_buttonBox_accepted()";
+
+    /* For the cases where start/end access is not valid, i.e., access always and access limited use,
+       the datetime will be the minimum datetime of the QDateTimeEdit control.  In thoses case,
+       return _DATENONE.  Other parts of the software rely on _DATENONE.
+
+       Note: It may not be the best decision to query based on a default datetime like _DATANONE.
+       Now that there are different types of access maybe the query should be modified to 
+       accommodate these types.
+    */
+    QDateTime dtStart = ui->dtStartAccess->dateTime();
+    QDateTime dtEnd = ui->dtEndAccess->dateTime();
+    if (ui->dtStartAccess->dateTime() == ui->dtStartAccess->minimumDateTime())
+    {
+        dtStart = _DATENONE;
+    }
+    if (ui->dtEndAccess->dateTime() == ui->dtEndAccess->minimumDateTime())
+    {
+        dtEnd = _DATENONE;        
+    }
 
     // if we have a 'set all locks' checkbox set,
     // spin and increment the spinLockNum from 1-END
@@ -123,12 +177,11 @@ void CFrmCodeEdit::on_buttonBox_accepted()
     qDebug() << "------------------------QUESTION 2: " << _question2;
 
     qDebug() << "------------------------QUESTION 3: " << _question3;
+
     for(i=0; i<ui->spinLocksToCreate->value(); i++)
     {
-        qDebug() << _nRow << ui->spinLockNum->value() << _access_type;
-
         emit(OnDoneSave(_nRow, _id, ui->spinLockNum->value(), ui->edtAccessCode->text(), ui->edtSecondCode->text(),
-                        ui->edtDescription->text(), ui->dtStartAccess->dateTime(), ui->dtEndAccess->dateTime(),
+                        ui->edtDescription->text(), dtStart, dtEnd,
                         ui->chkFingerPrint1->isChecked(), ui->chkFingerPrint2->isChecked(),0,
                         _question1, _question2, _question3, _access_type));
     }
@@ -198,11 +251,7 @@ void CFrmCodeEdit::OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdi
 {
     currEdit->getLineBeingEdited()->setText(currEdit->getNewText());
     keyboard->hide();
-}
-
-void CFrmCodeEdit::on_buttonBox_clicked(QAbstractButton *button)
-{
-    Q_UNUSED(button);
+    EnableSaveButton();    
 }
 
 void CFrmCodeEdit::on_chkFingerPrint1_clicked(bool checked)
@@ -230,12 +279,15 @@ void CFrmCodeEdit::on_chkFingerPrint1_clicked(bool checked)
 
         int nRC = QMessageBox::warning(this, tr("Warning! Adding Fingerprint Authentication"),
                                        tr("You are enabling fingerprint authentication for this code,"
+						                  " Code #2 is disallowed with fingerprint authentication."
                                           " Are you sure this is what you want to do?"),
                                        QMessageBox::Yes, QMessageBox::Cancel);
 
         if( nRC == QMessageBox::Yes )
         {
             ui->edtAccessCode->setDisabled(true);
+	        ui->edtSecondCode->setDisabled(true);
+	        ui->edtSecondCode->setText("");
             ui->chkFingerPrint1->setChecked(true);
         }
         else
@@ -278,8 +330,6 @@ void CFrmCodeEdit::on_chkQuestions_clicked(bool checked)
         connect(_pDlgEditQuestions, SIGNAL(__OnQuestionEditClose()), this, SLOT(OnQuestionEditClose()));
         _pDlgEditQuestions->setValues(_question1, _question2, _question3);
         _pDlgEditQuestions->show();
-
-
     }
 }
 
@@ -362,11 +412,7 @@ void CFrmCodeEdit::OnQuestionEditClose()
 
 void CFrmCodeEdit::on_radioCodeAccessAlways_clicked()
 {
-    qDebug() << "on_radioCodeAccessAlways_clicked";
-    
     ui->radioCodeAccessAlways->setChecked(true);
-    ui->dtStartAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
-    ui->dtEndAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
     ui->dtStartAccess->hide();
     ui->dtEndAccess->hide();
     ui->strStartAccess->setText("ALWAYS");
@@ -374,28 +420,39 @@ void CFrmCodeEdit::on_radioCodeAccessAlways_clicked()
     ui->strEndAccess->show();
 
     _access_type = 0;
+    EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_radioCodeAccessTimed_clicked()
 {
-    qDebug() << "on_radioCodeAccessTimed_clicked";
-
     ui->radioCodeAccessTimed->setChecked(true);
+
+    /* Note: If the 'default' datetime (_DATENONE) was passed, which happens for a new
+       code, then we want to set the Start/EndAccess datetime to be the current datetime
+
+       If we are editing an existing code, then the datetime value will be more resent
+       and greater than the minimum datetime of the QDateTimeEdit control.
+    */
+    if (ui->dtStartAccess->dateTime() == ui->dtStartAccess->minimumDateTime())
+    {
+        ui->dtStartAccess->setDateTime(QDateTime().currentDateTime());
+    }
+    if (ui->dtEndAccess->dateTime() == ui->dtStartAccess->minimumDateTime())
+    {
+        ui->dtEndAccess->setDateTime(QDateTime().currentDateTime());
+    }
     ui->dtStartAccess->show();
     ui->dtEndAccess->show();
     ui->strStartAccess->hide();
     ui->strEndAccess->hide();
 
     _access_type = 1;
+    EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_radioCodeAccessLimitedUse_clicked()
 {
-    qDebug() << "on_radioCodeAccessLimitedUse_clicked";
-
     ui->radioCodeAccessLimitedUse->setChecked(true);
-    ui->dtStartAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
-    ui->dtEndAccess->setDateTime(QDateTime(QDate(1990,1,1), QTime(0,0,0)));
     ui->dtStartAccess->hide();
     ui->dtEndAccess->hide();
     ui->strStartAccess->setText("LIMITED USE (Take and Return only)");
@@ -403,4 +460,56 @@ void CFrmCodeEdit::on_radioCodeAccessLimitedUse_clicked()
     ui->strEndAccess->show();
 
     _access_type = 2;
+    EnableSaveButton();
+}
+
+/* Note: An alternative for the following might be to use an event filter
+    http://doc.qt.io/archives/qt-4.8/qobject.html#installEventFilter
+*/
+
+void CFrmCodeEdit::on_spinLockNum_valueChanged(int arg1)
+{
+    EnableSaveButton();
+}
+
+void CFrmCodeEdit::on_spinLocksToCreate_valueChanged(int arg1)
+{
+    EnableSaveButton();
+}
+
+void CFrmCodeEdit::on_edtAccessCode_textEdited(const QString &arg1)
+{
+    EnableSaveButton();
+}
+
+void CFrmCodeEdit::on_edtSecondCode_textEdited(const QString &arg1)
+{
+    EnableSaveButton();
+}
+
+void CFrmCodeEdit::on_chkQuestions_clicked()
+{
+    EnableSaveButton();
+}
+
+void CFrmCodeEdit::on_edtDescription_textEdited(const QString &arg1)
+{
+    EnableSaveButton();
+}
+
+void CFrmCodeEdit::on_dtStartAccess_dateTimeChanged(const QDateTime &dateTime)
+{
+    EnableSaveButton();
+}
+
+void CFrmCodeEdit::on_dtEndAccess_dateTimeChanged(const QDateTime &dateTime)
+{
+    EnableSaveButton();
+}
+
+void CFrmCodeEdit::EnableSaveButton()
+{
+    bool valid_code = ui->edtAccessCode->text().length() > 0 ? true : false;
+
+    ui->buttonBox->button(QDialogButtonBox::Save)->setEnabled(valid_code);
 }

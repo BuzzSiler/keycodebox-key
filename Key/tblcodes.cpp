@@ -154,14 +154,7 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
                         bSecondCodeRequired = false;
                     }
 
-                    if( (qry.value(fldFingerprint1No).toInt() == 1) )
-                    {
-                        bFingerprintRequired = true;
-                    }
-                    else
-                    {
-                        bFingerprintRequired = false;
-                    }
+                    bFingerprintRequired = qry.value(fldFingerprint1No).toInt() == 1 ? true : false;
 
                     return nLockNum;
                 }
@@ -282,14 +275,10 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
 
                         nLockNum = qry.value(fldLockNo).toInt();
 
-                        if( qry.value(fldFingerprint2).toInt() == 1)
+                        bFingerprintRequired = qry.value(fldFingerprint2).toInt() == 1 ? true : false;
+                        if( bFingerprintRequired )
                         {
-                            bFingerprintRequired = true;
                             codeOne = sCode1;
-                        }
-                        else
-                        {
-                            bFingerprintRequired = false;
                         }
 
 
@@ -318,13 +307,19 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
                             QString emptyQString = "";
 
                             if( !question1.isEmpty() )
+                            {
                                 bQuestionsRequired = true;
+                            }
 
                             if( !question2.isEmpty() )
+                            {
                                 bQuestionsRequired = true;
+                            }
 
                             if( !question3.isEmpty() )
+                            {
                                 bQuestionsRequired = true;
+                            }
 
                             updateLockboxState(_lastIDS, false);
                         }
@@ -394,7 +389,7 @@ void CTblCodes::selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLo
 
         std::string sCode1;
         std::string sCode2;
-        int nCount = 0; //
+        int nCount = 0;
         // Selection
         if(qry.exec())
         {
@@ -460,20 +455,25 @@ void CTblCodes::selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLo
                     pLock->setMaxAccess(qry.value(fldMaxAccess).toInt());
                     pLock->setMaxRetry(qry.value(fldMaxRetry).toInt());
 
-                    qDebug() << QString::number(qry.value(fldFingerprint1).toInt());
-                    qDebug() << QString::number(qry.value(fldFingerprint2).toInt());
+                    /* Note: The conversio from qry.value to bool had odd behavior which caused
+                       the bool to become true even when it displayed as false.  I introduced
+                       intermediate variables to store the conversion plus also biased the
+                       conversion to be false unless explicitly true.
+                    */
+                    bool fp1 = qry.value(fldFingerprint1).toInt() == 1 ? true : false;
+                    bool fp2 = qry.value(fldFingerprint2).toInt() == 1 ? true : false;
 
-                    if( qry.value(fldFingerprint1).toInt() > 0)
-                        pLock->setFingerprint1();
-                    if( qry.value(fldFingerprint2).toInt() > 0)
-                        pLock->setFingerprint2();
+                    fp1 == true ? pLock->setFingerprint1() : pLock->clearFingerprint1();
+                    fp2 == true ? pLock->setFingerprint2() : pLock->clearFingerprint2();
+
+                    bool aq = qry.value(fldAskQuestions).toInt() == 1 ? true : false;
+                    pLock->setAskQuestions(aq);
 
                     pLock->setAskQuestions(qry.value(fldAskQuestions).toInt());
                     pLock->setQuestion1(qry.value(fldQuestion1).toString().toStdString());
                     pLock->setQuestion2(qry.value(fldQuestion2).toString().toStdString());
                     pLock->setQuestion3(qry.value(fldQuestion3).toString().toStdString());
 
-                    qDebug() << "Access Type" << qry.value(fldAccessType).toInt();
                     pLock->setAccessType(qry.value(fldAccessType).toInt());
 
                     (*pLockSet)->addToSet(pLock);
@@ -583,20 +583,20 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
                     pLock->setMaxAccess(qry.value(fldMaxAccess).toInt());
                     pLock->setMaxRetry(qry.value(fldMaxRetry).toInt());
 
-                    qDebug() << "Test fingerprint fields (1 then 2 ): ";
-                    qDebug() << QString::number(qry.value(fldFingerprint1).toInt());
-                    qDebug() << QString::number(qry.value(fldFingerprint2).toInt());
+                    /* Note: The conversio from qry.value to bool had odd behavior which caused
+                       the bool to become true even when it displayed as false.  I introduced
+                       intermediate variables to store the conversion plus also biased the
+                       conversion to be false unless explicitly true.
+                    */
+                    bool fp1 = qry.value(fldFingerprint1).toInt() == 1 ? true : false;
+                    bool fp2 = qry.value(fldFingerprint2).toInt() == 1 ? true : false;
 
-                    if( qry.value(fldFingerprint1).toInt() > 0)
-                    {
-                        pLock->setFingerprint1();
-                    }
-                    if( qry.value(fldFingerprint2).toInt() > 0)
-                    {
-                        pLock->setFingerprint2();
-                    }
+                    fp1 == true ? pLock->setFingerprint1() : pLock->clearFingerprint1();
+                    fp2 == true ? pLock->setFingerprint2() : pLock->clearFingerprint2();
 
-                    pLock->setAskQuestions(qry.value(fldAskQuestions).toInt());
+                    bool aq = qry.value(fldAskQuestions).toInt() == 1 ? true : false;
+                    pLock->setAskQuestions(aq);
+
                     pLock->setQuestion1(qry.value(fldQuestion1).toString().toStdString());
                     pLock->setQuestion2(qry.value(fldQuestion2).toString().toStdString());
                     pLock->setQuestion3(qry.value(fldQuestion3).toString().toStdString());
@@ -796,7 +796,7 @@ int CTblCodes::addLockCodeClear(int locknum, std::string code1, std::string code
                                 bool askQuestions, std::string question1, std::string question2, std::string question3,
                                 std::string status, std::string desc,
                                 std::string sequence, int sequenceNum,
-                                int maxAccess, int maxRetry, int accessType)
+                                int maxAccess, int maxRetry, int accessType, int accessCount)
 {
     qDebug() << "CTblCodes::addLockCodeClear()";
     std::string     encCode1, encCode2;
@@ -813,7 +813,7 @@ int CTblCodes::addLockCodeClear(int locknum, std::string code1, std::string code
                        askQuestions, question1, question2, question3,
                        status, desc,
                        sequence, sequenceNum,
-                       maxAccess, maxRetry, accessType);
+                       maxAccess, maxRetry, accessType, accessCount);
 }
 
 /**
@@ -839,15 +839,9 @@ int CTblCodes::addLockCode(int locknum, std::string code1, std::string code2,
                            bool askQuestions, std::string question1, std::string question2, std::string question3,
                            std::string status, std::string desc,
                            std::string sequence, int sequenceNum,
-                           int maxAccess, int maxRetry, int accessType)
+                           int maxAccess, int maxRetry, int accessType, int accessCount)
 {
     qDebug() << "CTblCodes::addLockCode()";
-
-    qDebug() << "---------------------------------------------------";
-    qDebug() << "     access_type: " << accessType;
-    qDebug() << "     max_access: " << maxAccess;
-    qDebug() << "---------------------------------------------------";
-    
 
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + QString(TABLENAME.c_str()) +
@@ -857,7 +851,7 @@ int CTblCodes::addLockCode(int locknum, std::string code1, std::string code2,
                         "retry_count, max_access, max_retry, lockbox_state, access_type)"
                         " VALUES (:seqDesc, :seqOrder, :lockNum, :desc, :codeOne, :codeTwo,"
                         " :start, :end, :fingerprint1, :fingerprint2, :ask_questions, :question1, :question2, :question3,"
-                        " :stat, 0, 0, :maxAccess, :maxRetry, 0, :accessType)"));
+                        " :stat, :access_count, 0, :maxAccess, :maxRetry, 0, :accessType)"));
 
     qDebug() << "Query:" << qry.lastQuery();
 
@@ -873,17 +867,16 @@ int CTblCodes::addLockCode(int locknum, std::string code1, std::string code2,
     qry.bindValue(":start", starttime.toString(datetimeFormat));
     qry.bindValue(":end", endtime.toString(datetimeFormat));
     qry.bindValue(":stat", status.c_str());
-    qry.bindValue(":fingerprint1", fingerprint1);
-    qry.bindValue(":fingerprint2", fingerprint2);
-    qry.bindValue(":ask_questions", askQuestions);
+    qry.bindValue(":fingerprint1", (int) fingerprint1);
+    qry.bindValue(":fingerprint2", (int) fingerprint2);
+    qry.bindValue(":ask_questions", (int) askQuestions);
     qry.bindValue(":question1", question1.c_str());
     qry.bindValue(":question2", question2.c_str());
     qry.bindValue(":question3", question3.c_str());
     qry.bindValue(":maxAccess", maxAccess);
     qry.bindValue(":maxRetry", maxRetry);
     qry.bindValue(":accessType", accessType);
-
-    qDebug() << "CTblCodes::addLockCode" << "Access Type " << accessType;
+    qry.bindValue(":access_count", accessCount);
 
     QMap<QString, QVariant> mapVals = qry.boundValues();
     qDebug() << "Mapped count:" << mapVals.count();
@@ -1181,12 +1174,6 @@ bool CTblCodes::updateRecord(CLockState &rec)
 {
     qDebug() << "CTblAdmin::updateRecord()";
 
-    qDebug() << "---------------------------------------------------";
-    qDebug() << "     access_type: " << rec.getAccessType();
-    qDebug() << "    access_count: " << rec.getAccessCount();
-    qDebug() << "      max_access: " << rec.getMaxAccess();
-    qDebug() << "---------------------------------------------------";
-
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
             " SET " + QString("sequence=:seqDesc, sequence_order=:seqOrder, "
@@ -1214,13 +1201,14 @@ bool CTblCodes::updateRecord(CLockState &rec)
     qry.bindValue(":codeTwo", code2.c_str());
     qry.bindValue(":start", rec.getStartTime().toString(datetimeFormat));
     qry.bindValue(":end", rec.getEndTime().toString(datetimeFormat));
-    qry.bindValue(":fingerprinone", rec.getFingerprint1());
-    qry.bindValue(":fingerprintwo", rec.getFingerprint2());
-    qry.bindValue(":askQuestions", rec.getAskQuestions());
+    qry.bindValue(":fingerprinone", (int) rec.getFingerprint1());
+    qry.bindValue(":fingerprintwo", (int) rec.getFingerprint2());
+    qry.bindValue(":askQuestions", (int) rec.getAskQuestions());
     qry.bindValue(":question1", rec.getQuestion1().c_str());
     qry.bindValue(":question2", rec.getQuestion2().c_str());
     qry.bindValue(":question3", rec.getQuestion3().c_str());
     qry.bindValue(":stat", rec.getStatus().c_str());
+    qry.bindValue(":accessCount", rec.getAccessCount());
     qry.bindValue(":maxAccess", rec.getMaxAccess());
     qry.bindValue(":maxRetry", rec.getMaxRetry());
     qry.bindValue(":fids", rec.getID());
@@ -1250,7 +1238,7 @@ bool CTblCodes::updateCode(CLockState *prec)
                                   prec->getAskQuestions(), prec->getQuestion1(), prec->getQuestion2(), prec->getQuestion3(),
                                   prec->getStatus(), prec->getDescription(),
                                   prec->getSequence(), prec->getSequenceOrder(), prec->getMaxAccess(), prec->getMaxRetry(),
-                                  prec->getAccessType());
+                                  prec->getAccessType(), prec->getAccessCount());
             if(nId != -1 )
             {
                 return false;

@@ -129,6 +129,7 @@ void MainWindow::initialize() {
     _pdFingerprintVerify = 0;
     _pQuestions = 0;
 
+    QCursor::setPos(848, 480);
     QApplication::setOverrideCursor(Qt::BlankCursor);
 
     if( isInternetTime() )
@@ -283,7 +284,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 
 void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
 {
-    psysController = psysController;
+    Q_UNUSED(psysController);
 }
 
 void MainWindow::hideFormsExcept(QDialog * pfrm) {
@@ -357,11 +358,13 @@ void MainWindow::OnUserCodeCancel()
 
 void MainWindow::OnUserCodeOne(QString sCode1)
 {
+    qDebug() << "MainWindow::OnUserCodeTwo" << sCode1;
     emit __onCode(sCode1);
 }
 
 void MainWindow::OnUserCodeTwo(QString sCode2)
 {
+    qDebug() << "MainWindow::OnUserCodeTwo" << sCode2;
     emit __onCode(sCode2);
 }
 
@@ -377,12 +380,12 @@ void MainWindow::OnUserFingerprintCodeTwo(QString sCode2)
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
-    e = e;
+    Q_UNUSED(e);
 }
 
 void MainWindow::OnEnrollFingerprintDialog(QString sCode)
 {
-    sCode = sCode;
+    Q_UNUSED(sCode);
 
     qDebug() << "MainWindow::OnEnrollFingerprintDialog()";
 

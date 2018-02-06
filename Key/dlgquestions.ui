@@ -57,7 +57,7 @@
       </rect>
      </property>
      <property name="font">
-       <font>
+      <font>
        <pointsize>15</pointsize>
       </font>
      </property>
@@ -1402,7 +1402,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>848</width>
      <height>480</height>
     </rect>
    </property>
@@ -1424,9 +1424,7 @@
      </font>
     </property>
     <property name="visible">
-      <bool>
-	false
-      </bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QDialogButtonBox" name="buttonBoxQuestions">
@@ -1450,8 +1448,7 @@
      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
     </property>
    </widget>
-
-<widget class="QLabel" name="label_question1">
+   <widget class="QLabel" name="label_question1">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -1466,12 +1463,10 @@
      </font>
     </property>
     <property name="text">
-     <string></string>
+     <string/>
     </property>
-</widget>
-
-
-<widget class="QLabel" name="label_question2">
+   </widget>
+   <widget class="QLabel" name="label_question2">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -1486,12 +1481,10 @@
      </font>
     </property>
     <property name="text">
-     <string></string>
+     <string/>
     </property>
    </widget>
-
-
-<widget class="QLabel" name="label_question3">
+   <widget class="QLabel" name="label_question3">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -1506,10 +1499,9 @@
      </font>
     </property>
     <property name="text">
-     <string></string>
+     <string/>
     </property>
    </widget>
-   
    <widget class="QLabel" name="labelLockNum">
     <property name="geometry">
      <rect>
@@ -1564,7 +1556,7 @@
      </font>
     </property>
     <property name="text">
-      <string>Clear</string>
+     <string>Clear</string>
     </property>
    </widget>
    <widget class="CClickableLineEdit" name="edtAnswer2">
@@ -1597,7 +1589,7 @@
      </font>
     </property>
     <property name="text">
-      <string>Clear</string>
+     <string>Clear</string>
     </property>
    </widget>
    <widget class="CClickableLineEdit" name="edtAnswer3">
@@ -1639,18 +1631,18 @@
      </font>
     </property>
     <property name="text">
-      <string>Clear</string>
+     <string>Clear</string>
     </property>
    </widget>
+  </widget>
  </widget>
-</widget>
-<customwidgets>
+ <customwidgets>
   <customwidget>
-    <class>CClickableLineEdit</class>
-    <extends>QLineEdit</extends>
-    <header location="global">clickablelineedit.h</header>
+   <class>CClickableLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">clickablelineedit.h</header>
   </customwidget>
-</customwidgets>
-<resources/>
-<connections/>
+ </customwidgets>
+ <resources/>
+ <connections/>
 </ui>

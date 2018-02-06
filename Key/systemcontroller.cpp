@@ -141,27 +141,29 @@ void CSystemController::initializeReaders()
     }
 
     // Original HID Reader
+    bool hid_reader_found = false;
     _phidReader = new CHWKeyboardReader();
     if( _phidReader->initHIDReader(0x04d8, 0x0055) )
+    {
+        hid_reader_found = true;
+        qDebug() << "RF 0x04d8:0x0055 HID Reader Found and started";
+    }
+    else if( _phidReader->initHIDReader(0x076b, 0x5428) )
+    {
+        hid_reader_found = true;
+        qDebug() << "RF 0x076b:0x5428 HID Reader Found and started";
+    }
+    else
+    {
+        qDebug() << "No RF HID Reader found";
+    }
+
+    if (hid_reader_found)
     {
         connect(_phidReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
         _phidReader->moveToThread(&_threadHID);
         connect(&_threadHID, SIGNAL(started()), _phidReader, SLOT(start()));
         _threadHID.start();
-        qDebug() << "RF 0x04d8:0x0055 HID Reader Found and started";
-    }
-    else
-    {
-        if( _phidReader->initHIDReader(0x076b, 0x5428) )
-        {
-            connect(_phidReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
-            _phidReader->moveToThread(&_threadHID);
-            connect(&_threadHID, SIGNAL(started()), _phidReader, SLOT(start()));
-            _threadHID.start();
-            qDebug() << "RF 0x076b:0x5428 HID Reader Found and started";
-        } else {
-            qDebug() << "No RF HID Reader found";
-        }
     }
 
     // Fingerprint Reader
@@ -231,13 +233,13 @@ void CSystemController::OnFingerSwipe(QString sCode1, QString sCode2)
 
 void CSystemController::OnHIDCard(QString sCode1, QString sCode2)
 {
-    qDebug() << "CSystemController::OnHIDCard(" << sCode1 << ")";
+    qDebug() << "CSystemController::OnHIDCard(" << sCode1 << ", " << sCode2 << ")";
 
     if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) {
         qDebug() << "...ETimeoutScreen || EUserCodeOne:" << sCode1;
         emit __onUserCodeOne(sCode1);
     } else if( _systemState == EUserCodeTwo) {
-        qDebug() << "... EUserCodeTwo: " << sCode1;
+        qDebug() << "... EUserCodeTwo: " << sCode2;
         emit __onUserCodeTwo(sCode2);
     }
     // Always emit the two -- s.b.going to the AdminInfo screen only

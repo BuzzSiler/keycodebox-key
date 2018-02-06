@@ -27,8 +27,8 @@
     <rect>
      <x>1</x>
      <y>9</y>
-     <width>821</width>
-     <height>481</height>
+     <width>848</width>
+     <height>480</height>
     </rect>
    </property>
    <property name="font">
@@ -43,7 +43,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tabAdministrator">
     <attribute name="title">
@@ -86,6 +86,9 @@
      </property>
     </widget>
     <widget class="QCheckBox" name="chkUsePredictive">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>16</x>
@@ -103,7 +106,7 @@
       <string>Use Predictive Code</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="CClickableLabel" name="lblKey">

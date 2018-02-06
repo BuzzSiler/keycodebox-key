@@ -1782,36 +1782,15 @@ const int fEnd = 5;
 */
 void CFrmAdminInfo::codeTableCellSelected(int nRow, int nCol)
 {
+    Q_UNUSED(nRow);
     Q_UNUSED(nCol);
-    if(_pworkingSet)
-    {
-        CLockSet::Iterator itor;
-        CLockState  *pState;
-        itor = _pworkingSet->begin();
-        for(int i = 0; i < nRow; i++, itor++) {
-        }
 
-        pState = itor.value();  // This should be the correct state
-
-        // Pull up code entry for edit
-    }
 }
 
 void CFrmAdminInfo::codeHistoryTableCellSelected(int nRow, int nCol)
 {
+    Q_UNUSED(nRow);
     Q_UNUSED(nCol);
-    if(_pworkingSet)
-    {
-        CLockSet::Iterator itor;
-        CLockState  *pState;
-        itor = _pworkingSet->begin();
-        for(int i=0;i<nRow;i++,itor++) {
-        }
-
-        pState = itor.value();  // This should be the correct state
-
-        // Pull up code entry for edit
-    }
 }
 
 void CFrmAdminInfo::displayInTable(CLockSet *pSet)
@@ -2006,6 +1985,7 @@ void CFrmAdminInfo::codeCellSelected( int row, int col)
         if(nRow == row) {
             // itor is our man!
             pState = itor.value();
+            Q_UNUSED(pState);
         }
 
         nRow++;
@@ -2322,16 +2302,14 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum,
     _pState->setQuestion2(question2.toStdString());
     _pState->setQuestion3(question3.toStdString());
 
-    /* Set max access based on access type
-    */
+    _pState->setMaxAccess(-1); 
+    _pState->setAccessCount(0);
     _pState->setAccessType(access_type);
-    
+
     if (access_type == 2)
     {
         _pState->setMaxAccess(2);
     }
-    /* Clear the access count in all cases; whether this is a new code or edited code. */
-    _pState->setAccessCount(0);
 
     qDebug() << "Max Access " << _pState->getMaxAccess();
 
@@ -2511,6 +2489,8 @@ void CFrmAdminInfo::checkAndCreateCodeEditForm()
 
 void CFrmAdminInfo::addCodeByRow(int row)
 {
+
+    qDebug() << "CFrmAdminInfo::addCodeByRow";
     Q_UNUSED(row);
     checkAndCreateCodeEditForm();
 
@@ -2537,6 +2517,8 @@ void CFrmAdminInfo::addCodeByRow(int row)
 
 void CFrmAdminInfo::editCodeByRow(int row)
 {
+    qDebug() << "CFrmAdminInfo::editCodeByRow" << row;
+    
     checkAndCreateCodeEditForm();
 
     // Get line values
@@ -2557,7 +2539,6 @@ void CFrmAdminInfo::editCodeByRow(int row)
     }
 
     if(_pState) {
-        qDebug() << "   pState Found One";
         _pFrmCodeEdit->setValues(_pState->getID(), _pState->getLockNum(), _pState->getCode1().c_str(), _pState->getCode2().c_str(), _pState->getDescription().c_str(),
                                  _pState->getStartTime(), _pState->getEndTime(), 
                                  _pState->getFingerprint1(), _pState->getFingerprint2(), 
@@ -2567,8 +2548,6 @@ void CFrmAdminInfo::editCodeByRow(int row)
         _pFrmCodeEdit->show();
     }
     else {
-        qDebug() << "   pState NOT Found";
-
         _pState = createNewLockState();
         _pworkingSet->addToSet(_pState);
 

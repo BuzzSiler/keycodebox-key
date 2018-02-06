@@ -1402,7 +1402,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>848</width>
      <height>480</height>
     </rect>
    </property>
@@ -1446,6 +1446,9 @@
     </property>
    </widget>
    <widget class="QDialogButtonBox" name="buttonBox">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>420</x>
@@ -1748,10 +1751,13 @@
      </font>
     </property>
     <property name="visible">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="text">
      <string>Fingerprint</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="chkFingerPrint2">
@@ -1813,6 +1819,26 @@
     <property name="accelerated">
      <bool>true</bool>
     </property>
+    <property name="maximumDateTime">
+     <datetime>
+      <hour>0</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2055</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="minimumDateTime">
+     <datetime>
+      <hour>0</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2016</year>
+      <month>1</month>
+      <day>1</day>
+     </datetime>
+    </property>
     <property name="displayFormat">
      <string>MMM dd yyyy hh:mm AP</string>
     </property>
@@ -1857,6 +1883,40 @@
     </property>
     <property name="accelerated">
      <bool>true</bool>
+    </property>
+    <property name="maximumDateTime">
+     <datetime>
+      <hour>11</hour>
+      <minute>59</minute>
+      <second>59</second>
+      <year>2055</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="minimumDateTime">
+     <datetime>
+      <hour>0</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2016</year>
+      <month>1</month>
+      <day>1</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2055</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2016</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
     </property>
     <property name="displayFormat">
      <string>MMM dd yyyy hh:mm AP</string>
