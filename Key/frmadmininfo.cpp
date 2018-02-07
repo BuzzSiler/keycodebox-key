@@ -200,6 +200,8 @@ void CFrmAdminInfo::initialize()
     connect(this, SIGNAL(__OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)),
             this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)));
 
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabSelected(int)));
+
     ui->btnCopyFileBrandingImageReset->setEnabled(true);
 }
 
@@ -2675,4 +2677,12 @@ void CFrmAdminInfo::on_btnPurgeCodes_clicked()
                                    tr("Code Removal is successful!!\nPlease give the codes list a moment to update."),
                                    QMessageBox::Ok);
     }
+}
+
+void CFrmAdminInfo::OnTabSelected(int index)
+{
+    qDebug() << "CFrmAdminInfo::OnTabSelected" << index;
+
+    ui->dtEndCodeHistoryList->setDateTime(QDateTime().currentDateTime());        
+    ui->dtEndCodeList->setDateTime(QDateTime().currentDateTime());
 }

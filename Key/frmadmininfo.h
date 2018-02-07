@@ -349,6 +349,7 @@ private:
     void getSystemIPAddressAndStatus();
     void populateFileCopyWidget(QString sDirectory, QString sFilter);
     void purgeCodes();
+    void OnTabSelected(int index);
 
 protected:
     void touchEvent(QTouchEvent *ev);
