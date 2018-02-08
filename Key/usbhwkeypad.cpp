@@ -35,7 +35,9 @@ std::string CUSBHWKeypad::readHWKeyboard()
     while (res == 0) {
         res = hid_read(_handle, buf, sizeof(buf));
         if (res < 0)
-            std::cout << "Unable to read()\n";
+        {
+            //std::cout << "Unable to read()\n";
+        }
         usleep(500*1000);  // 500 ms
     }
 

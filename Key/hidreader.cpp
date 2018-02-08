@@ -153,7 +153,9 @@ QString CHWKeyboardReader::readHIDReader()
         while (res == 0) {
             res = hid_read(_handle, buf, sizeof(buf));
             if (res < 0)
-                qDebug() << "Unable to read()\n";
+            {
+                //qDebug() << "Unable to read()\n";
+            }
             usleep(50*1000);  // 50 ms
         }
         //QByteArray array((char*)buf, res);
@@ -392,10 +394,10 @@ void CHWKeyboardReader::TestTwo()
     res = hid_get_feature_report(handle, buf, sizeof(buf));
 
     // Print out the returned buffer.
-    printf("Feature Report\n   ");
+    qDebug() << "Feature Report\n   ");
     for (i = 0; i < res; i++)
-        printf("%02hhx ", buf[i]);
-    printf("\n");
+        qDebug() << QString("%02hhx ").arg(buf[i]);
+    qDebug() << "\n";
 
     // Set the hid_read() function to be non-blocking.
     hid_set_nonblocking(handle, 1);
@@ -412,11 +414,15 @@ void CHWKeyboardReader::TestTwo()
     // Read requested state
     res = hid_read(handle, buf, 65);
     if (res < 0)
-        printf("Unable to read()\n");
+    {
+        //printf("Unable to read()\n");
+    }
 
     // Print out the returned buffer.
     for (i = 0; i < res; i++)
-        printf("buf[%d]: %d\n", i, buf[i]);
+    {
+        qDebug() << QString("buf[%d]: %d\n").arg(i, buf[i]);
+    }
 }
 
 
