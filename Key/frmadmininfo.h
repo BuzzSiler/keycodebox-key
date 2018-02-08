@@ -323,6 +323,8 @@ private:
     int                 _tmpDoorOpen;
     bool                _bContinueOpenLoop, _bStopOpen;
 
+    bool                _testEmail;
+
     void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
     std::string rtrim(std::string &s);
 

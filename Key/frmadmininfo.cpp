@@ -1200,6 +1200,18 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
 {
     if( bSuccess ) {
         qDebug() << "Succeeded in updating Current Admin Info";
+
+        /* Note: This is such an ugly hack.  I hate it. 
+           I think the better way is to separate "Save and Close" so that
+           the user can "Save" without closing and then you can enable
+           the "Test Email" button once it is saved.
+        */
+        if (_testEmail)
+        {
+            emit __OnSendTestEmail(2 /*ADMIN_RECV*/);
+            _testEmail = false;
+        }
+
     } else {
         qDebug() << "Failed to update Current Admin Info";
     }
@@ -2703,6 +2715,7 @@ void CFrmAdminInfo::on_btnTestEmail_clicked()
 
 void CFrmAdminInfo::on_btnTestUserEmail_clicked()
 {
-    qDebug() << "Testing admin recv email";    
-    emit __OnSendTestEmail(2 /*ADMIN_RECV*/);
+    qDebug() << "Testing admin recv email";
+    _testEmail = true;
+    on_btnSaveSettings_clicked();
 }

