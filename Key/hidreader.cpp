@@ -394,7 +394,7 @@ void CHWKeyboardReader::TestTwo()
     res = hid_get_feature_report(handle, buf, sizeof(buf));
 
     // Print out the returned buffer.
-    qDebug() << "Feature Report\n   ");
+    qDebug() << "Feature Report\n   ";
     for (i = 0; i < res; i++)
         qDebug() << QString("%02hhx ").arg(buf[i]);
     qDebug() << "\n";

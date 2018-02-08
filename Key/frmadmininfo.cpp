@@ -180,6 +180,13 @@ void CFrmAdminInfo::initialize()
     populateCodeLockHistorySelection();
     startMediaTimer();
 
+    ui->dtStartCodeList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+    ui->dtEndCodeList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+    ui->dtStartCodeHistoryList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+    ui->dtEndCodeHistoryList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+    ui->dtStartReport->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+    ui->dtEndReport->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+    
     ui->dtEndCodeList->setDateTime(QDateTime().currentDateTime());
     ui->dtEndCodeHistoryList->setDateTime(QDateTime().currentDateTime());
     ui->dtEndReport->setDateTime(QDateTime().currentDateTime());
@@ -2683,6 +2690,7 @@ void CFrmAdminInfo::OnTabSelected(int index)
 {
     qDebug() << "CFrmAdminInfo::OnTabSelected" << index;
 
-    ui->dtEndCodeHistoryList->setDateTime(QDateTime().currentDateTime());        
-    ui->dtEndCodeList->setDateTime(QDateTime().currentDateTime());
+    QDateTime dt = QDateTime().currentDateTime();
+    ui->dtEndCodeHistoryList->setDateTime(dt);
+    ui->dtEndCodeList->setDateTime(dt);
 }
