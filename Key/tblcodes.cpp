@@ -113,9 +113,9 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
                     qDebug() << "Code1:" << sCode1.c_str() << " == code:" << code.c_str();
 
                     /* Check for expiration */
-                    int access_type = qry.value(fldAccessType).toInt();
-                    int access_count = qry.value(fldAccessCount).toInt();
-                    int max_access = qry.value(fldMaxAccess).toInt();
+                    access_type = qry.value(fldAccessType).toInt();
+                    access_count = qry.value(fldAccessCount).toInt();
+                    max_access = qry.value(fldMaxAccess).toInt();
                     if (isExpired(access_type, access_count, max_access))
                     {
                         return nLockNum;
