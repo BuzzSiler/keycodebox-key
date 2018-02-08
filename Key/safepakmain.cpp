@@ -337,6 +337,7 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
     connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
     connect(_pfAdminInfo, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(_pfAdminInfo, SIGNAL(__OnEnableShowPassword(bool)), _pfUsercode, SIGNAL(__OnEnableShowPassword(bool)));
+    connect(_pfAdminInfo, SIGNAL(__OnSendTestEmail(int)), _psystemController, SLOT(OnSendTestEmail(int)));
 
     hideFormsExcept(_pfAdminInfo);
 

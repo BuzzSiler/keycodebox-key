@@ -176,6 +176,8 @@ public slots:
 
 signals:
     void __RequestLastSuccessfulLogin();
+    void __OnSendTestEmail(int test_type);
+    
 public slots:
     void RequestLastSuccessfulLogin();
     void OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory);
@@ -187,6 +189,7 @@ public slots:
 
     void OnUpdateCodeState(CLockState *rec) { emit __OnUpdateCodeState(rec); }
     void OnUpdatedCodeState(bool bSuccess) { emit __OnUpdatedCodeState(bSuccess); }
+    void OnSendTestEmail(int test_type);
 
 private slots:
     void OnCodeEntered(QString sCode);

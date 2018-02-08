@@ -294,6 +294,7 @@ void CSystemController::initializeSecurityConnections()
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), &_securityController, SLOT(OnUpdateCodeState(CLockState*)));
     connect(&_securityController, SIGNAL(__OnUpdatedCodeState(bool)), this, SLOT(OnUpdatedCodeState(bool)));
 
+
     emit __OnRequestCurrentAdmin();
 }
 
@@ -864,4 +865,68 @@ void CSystemController::OnBrightnessChanged(int nValue)
     if( _LCDGraphicsController.isLCDAttached() ) {
         _LCDGraphicsController.setBrightness(nValue);
     }
+}
+
+void CSystemController::OnSendTestEmail(int test_type)
+{
+    qDebug() << "Sending Test Email (" << test_type << ")";
+
+    QString SMTPSvr;
+    int SMTPPort;
+    int SMTPType;
+    QString SMTPUser;
+    QString SMTPPW;
+    QString from;
+    QString to;
+    QString subject;
+
+    QString body;
+    
+    if (test_type == 1 /* ADMIN_SEND */)
+    {
+        /* When this button is clicked we will send an email from the account configure in the
+        email settings to the email configured in the Administrator tab.
+        The email will also be BCC'd to kcb@keycodebox.com
+        */
+
+        SMTPSvr = _padminInfo->getSMTPServer().c_str();
+        SMTPPort = _padminInfo->getSMTPPort();
+        SMTPType = _padminInfo->getSMTPType();
+
+        SMTPUser = _padminInfo->getSMTPUsername().c_str();
+        SMTPPW = _padminInfo->getSMTPPassword().c_str();
+
+        from = _padminInfo->getSMTPUsername().c_str();
+        to = _padminInfo->getAdminEmail().c_str();
+        subject = "Testing Email Configuration";
+
+        body = "You have successfully configured the email settings!";
+    }
+    else if (test_type == 2 /* ADMIN_RECV */)
+    {
+        /* When this button is clicked we will send an email from test@keycodebox.com to the 
+        Administrators email.
+        */
+
+        SMTPSvr = "smtpout.secureserver.net";
+        SMTPPort = 465;
+        SMTPType = 1;
+
+        SMTPUser = "test@keycodebox.com";
+        SMTPPW = "keycodebox";
+
+        from = "test@keycodebox.com";
+        to = _padminInfo->getAdminEmail().c_str();
+        subject = "Testing Administrator Email";
+
+        body = "You have successfully configured the Administrator email!";
+    }
+    else
+    {
+        qDebug() << "Invalid test type" << test_type;
+        return;
+    }
+
+    emit __OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, NULL );
+    
 }

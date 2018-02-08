@@ -83,6 +83,7 @@ signals:
     void __OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
     void __OnLockHistorySet(CLockHistorySet *pLockSet);
     void __OnUpdateCodeState(CLockState *rec);
+    void __OnSendTestEmail(int test_type);
 
 public slots:
     void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
@@ -255,6 +256,9 @@ private slots:
     void on_btnRebootSystem_clicked();
     void on_btnPurgeCodes_clicked();
     void on_btnRead_clicked();
+
+    void on_btnTestEmail_clicked();
+    void on_btnTestUserEmail_clicked();
 
 private:
     Ui::CFrmAdminInfo   *ui;

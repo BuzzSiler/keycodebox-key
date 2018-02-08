@@ -2694,3 +2694,15 @@ void CFrmAdminInfo::OnTabSelected(int index)
     ui->dtEndCodeHistoryList->setDateTime(dt);
     ui->dtEndCodeList->setDateTime(dt);
 }
+
+void CFrmAdminInfo::on_btnTestEmail_clicked()
+{
+    qDebug() << "Testing admin send email";
+    emit __OnSendTestEmail(1 /*ADMIN_SEND*/);
+}
+
+void CFrmAdminInfo::on_btnTestUserEmail_clicked()
+{
+    qDebug() << "Testing admin recv email";    
+    emit __OnSendTestEmail(2 /*ADMIN_RECV*/);
+}
