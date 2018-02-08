@@ -469,21 +469,25 @@ void CFrmCodeEdit::on_radioCodeAccessLimitedUse_clicked()
 
 void CFrmCodeEdit::on_spinLockNum_valueChanged(int arg1)
 {
+    Q_UNUSED(arg1);
     EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_spinLocksToCreate_valueChanged(int arg1)
 {
+    Q_UNUSED(arg1);
     EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_edtAccessCode_textEdited(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_edtSecondCode_textEdited(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     EnableSaveButton();
 }
 
@@ -494,16 +498,19 @@ void CFrmCodeEdit::on_chkQuestions_clicked()
 
 void CFrmCodeEdit::on_edtDescription_textEdited(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_dtStartAccess_dateTimeChanged(const QDateTime &dateTime)
 {
+    Q_UNUSED(dateTime);
     EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_dtEndAccess_dateTimeChanged(const QDateTime &dateTime)
 {
+    Q_UNUSED(dateTime);
     EnableSaveButton();
 }
 
