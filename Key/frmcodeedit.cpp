@@ -14,7 +14,7 @@ CFrmCodeEdit::CFrmCodeEdit(QWidget *parent) :
     _pcurrentLineEdit(0)
 {
     ui->setupUi(this);
-    ui->buttonBox->button(QDialogButtonBox::Save)->setEnabled(false);    
+    ui->buttonBox->button(QDialogButtonBox::Save)->setEnabled(false);  
     CFrmCodeEdit::showFullScreen();
 }
 
@@ -376,18 +376,21 @@ void CFrmCodeEdit::on_clrAccessCode_clicked()
 {
     qDebug() << "on_clrAccessCode_clicked()";
     ui->edtAccessCode->setText("");
+    EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_clrSecondCode_clicked()
 {
     qDebug() << "on_clrSecondCode_clicked()";
     ui->edtSecondCode->setText("");
+    EnableSaveButton();
 }
 
 void CFrmCodeEdit::on_clrDescription_clicked()
 {
     qDebug() << "on_clrDescription_clicked()";
     ui->edtDescription->setText("");
+    EnableSaveButton();
 }
 
 void CFrmCodeEdit::OnQuestionEditSave()

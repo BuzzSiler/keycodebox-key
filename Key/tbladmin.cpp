@@ -322,6 +322,8 @@ bool CTblAdmin::createAdminDefault()
     std::string encCode = CEncryption::encryptString("112233").toStdString();
     std::string encAssistPw = CEncryption::encryptString("").toStdString();
     std::string encAssistCode = CEncryption::encryptString("332211").toStdString();
+    std::string encSMTPPW = CEncryption::encryptString("keycodebox").toStdString();
+    std::string encVNCPW = CEncryption::encryptString("keycodebox").toStdString();
 
     qDebug() << "pw:" << encPW.c_str() << " code:" << encCode.c_str();
 
@@ -330,6 +332,13 @@ bool CTblAdmin::createAdminDefault()
     qry.bindValue(":assistpw", encAssistPw.c_str());
     qry.bindValue(":assistCode", encAssistCode.c_str());
     qry.bindValue(":showFingerprint", QVariant(false));
+    qry.bindValue(":showPassword", QVariant(false));
+    qry.bindValue(":smtp_server", "smtpout.secureserver.net");
+    qry.bindValue(":smtp_port", 465);
+    qry.bindValue(":smtp_type", 1);
+    qry.bindValue(":smtp_username", "kcb@keycodebox.com");
+    qry.bindValue(":smtp_password", encSMTPPW.c_str());
+    qry.bindValue(":vnc_password", encVNCPW.c_str());
 
     qry.bindValue(":use_pred", QVariant(true));
     qry.bindValue(":pred_key", QVariant("\*phzNZ2'od:9g\"J]Yc%1_m6Y51NpHImY8dz3,VVXU|jp7B]HG8@SxuC\od9;_>"));
@@ -434,7 +443,6 @@ bool CTblAdmin::readAdmin()
             _currentAdmin.setPredictiveKey(query.value(fldPredKey).toString().toStdString());
             _currentAdmin.setPredictiveResolution(query.value(fldPredRes).toInt());
             _currentAdmin.setMaxLocks(query.value(fldMaxLocks).toInt());
-
             _currentAdmin.setSMTPServer(query.value(fldSMTPServer).toString().toStdString());
             _currentAdmin.setSMTPPort(query.value(fldSMTPPort).toInt());
             _currentAdmin.setSMTPType(query.value(fldSMTPType).toInt());

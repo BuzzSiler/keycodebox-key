@@ -261,7 +261,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
         connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
         connect(psysController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SLOT(OnDisplayFingerprintButton(bool)));
-        connect(psysController, SIGNAL(__OnEnableShowPassword(bool)), _pfUsercode, SLOT(OnEnableShowPassword(bool)));
+        connect(psysController, SIGNAL(__OnDisplayShowHideButton(bool)), _pfUsercode, SLOT(OnDisplayShowHideButton(bool)));
 
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
@@ -336,8 +336,10 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
     connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(int)), _psystemController, SLOT(OnOpenLockRequest(int)));
     connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
     connect(_pfAdminInfo, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SIGNAL(__OnDisplayFingerprintButton(bool)));
-    connect(_pfAdminInfo, SIGNAL(__OnEnableShowPassword(bool)), _pfUsercode, SIGNAL(__OnEnableShowPassword(bool)));
+    connect(_pfAdminInfo, SIGNAL(__OnDisplayShowHideButton(bool)), _pfUsercode, SIGNAL(__OnDisplayShowHideButton(bool)));
     connect(_pfAdminInfo, SIGNAL(__OnSendTestEmail(int)), _psystemController, SLOT(OnSendTestEmail(int)));
+    connect(_psystemController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfAdminInfo, SLOT(OnDisplayFingerprintButton(bool)));
+    connect(_psystemController, SIGNAL(__OnDisplayShowHideButton(bool)), _pfAdminInfo, SLOT(OnDisplayShowHideButton(bool)));
 
     hideFormsExcept(_pfAdminInfo);
 

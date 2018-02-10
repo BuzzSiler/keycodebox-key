@@ -73,8 +73,6 @@ signals:
     void __OnBrightnessChanged(int nValue);
     void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, int nLockNum);
     void __OnAdminInfoCodes(QString code1, QString code2);
-    void __OnDisplayFingerprintButton(bool state);
-    void __OnDisplayShowHideButton(bool state);
 
     void __LocalOnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
     void __LocalOnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
@@ -84,7 +82,9 @@ signals:
     void __OnLockHistorySet(CLockHistorySet *pLockSet);
     void __OnUpdateCodeState(CLockState *rec);
     void __OnSendTestEmail(int test_type);
-
+    void __OnDisplayFingerprintButton(bool state);
+    void __OnDisplayShowHideButton(bool state);
+    
 public slots:
     void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
     void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
@@ -110,6 +110,9 @@ public slots:
                             bool askQuestions, QString question1, QString question2, QString question3,
                             int access_type);
     void OnCodeEditClose();
+    void OnTabSelected(int index);
+    void OnDisplayFingerprintButton(bool);
+    void OnDisplayShowHideButton(bool);
     
 private slots:
     void OnCodes(QString code1, QString code2);
@@ -355,7 +358,7 @@ private:
     void getSystemIPAddressAndStatus();
     void populateFileCopyWidget(QString sDirectory, QString sFilter);
     void purgeCodes();
-    void OnTabSelected(int index);
+
 
 protected:
     void touchEvent(QTouchEvent *ev);

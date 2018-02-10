@@ -28,9 +28,6 @@ void CFrmUserCode::initialize()
     _dtTimer.connect(&_dtTimer, SIGNAL(timeout()), this, SLOT(OnDateTimeTimerTimeout()));
     _dtTimer.start();
     ui->lVersion->setText(VERSION);
-
-    connect(this, SIGNAL(__OnDisplayFingerprintButton(bool)), this, SLOT(OnDisplayFingerprintButton(bool)));
-    connect(this, SIGNAL(__OnDisplayShowHideButton(bool)), this, SLOT(OnDisplayShowHideButton(bool)));
 }
 
 void CFrmUserCode::OnDateTimeTimerTimeout()

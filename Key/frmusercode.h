@@ -46,7 +46,7 @@ signals:
     void __onVerifyFingerprint();
     void __onVerifyFingerprintDialog();
     void __OnDisplayFingerprintButton(bool showFingerprint);
-    void __OnEnableShowPassword(bool showPassword);
+    void __OnDisplayShowHideButton(bool showShowHide);
 
 public slots:
     void OnEnableKeyboard(bool bEnable);
@@ -55,8 +55,8 @@ public slots:
     void OnClearCodeDisplay();
 
     void OnSwipeCode(QString sCode);
-    void OnDisplayShowHideButton(bool state);
     void OnDisplayFingerprintButton(bool state);
+    void OnDisplayShowHideButton(bool state);
 
 
 private slots:

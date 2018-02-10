@@ -826,14 +826,26 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
             {
                 qDebug() << "Sending email";
 
-                QString SMTPSvr = _padminInfo->getSMTPServer().c_str();
-                int SMTPPort = _padminInfo->getSMTPPort();
-                int SMTPType = _padminInfo->getSMTPType();
+                /* Make kcb@keycodebox.com the default */
+                QString SMTPSvr = "smtpout.secureserver.net";
+                int SMTPPort = 465;
+                int SMTPType = 1;
+                QString SMTPUser = "kcb@keycodebox.com";
+                QString SMTPPW = "keycodebox";
+                QString from = "kcb@keycodebox.com";
 
-                QString SMTPUser = _padminInfo->getSMTPUsername().c_str();
-                QString SMTPPW = _padminInfo->getSMTPPassword().c_str();
-
-                QString from = _padminInfo->getAdminEmail().c_str();
+                if (_padminInfo->getSMTPServer().length() > 0 &&
+                    _padminInfo->getSMTPPort() != 0 &&
+                    (_padminInfo->getSMTPType() >= 0 && _padminInfo->getSMTPType() <= 2) &&
+                    _padminInfo->getSMTPUsername().length() > 0)
+                {
+                    SMTPSvr = _padminInfo->getSMTPServer().c_str();
+                    SMTPPort = _padminInfo->getSMTPPort();
+                    SMTPType = _padminInfo->getSMTPType();
+                    SMTPUser = _padminInfo->getSMTPUsername().c_str();
+                    SMTPPW = _padminInfo->getSMTPPassword().c_str();
+                    from = _padminInfo->getSMTPUsername().c_str();
+                }
                 QString to = _padminInfo->getAdminEmail().c_str();
                 QString subject = "Lock Box Event";
 

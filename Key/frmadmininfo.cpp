@@ -1146,7 +1146,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->lblPassword->setText(adminInfo->getPassword().c_str());
         ui->lblAssistCode->setText(adminInfo->getAssistCode().c_str());
         ui->lblAssistPassword->setText(adminInfo->getAssistPassword().c_str());
-        ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayShowHideButton());
+        ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayFingerprintButton());
         ui->chkDisplayShowHideButton->setChecked(adminInfo->getDisplayShowHideButton());
 
         QString sFreq;
@@ -2704,7 +2704,7 @@ void CFrmAdminInfo::OnTabSelected(int index)
 
     QDateTime dt = QDateTime().currentDateTime();
     ui->dtEndCodeHistoryList->setDateTime(dt);
-    ui->dtEndCodeList->setDateTime(dt);
+    ui->dtEndCodeList->setDateTime(dt);    
 }
 
 void CFrmAdminInfo::on_btnTestEmail_clicked()
@@ -2718,4 +2718,14 @@ void CFrmAdminInfo::on_btnTestUserEmail_clicked()
     qDebug() << "Testing admin recv email";
     _testEmail = true;
     on_btnSaveSettings_clicked();
+}
+
+void CFrmAdminInfo::OnDisplayFingerprintButton(bool state)
+{
+    ui->chkDisplayFingerprintButton->setChecked(state);
+}
+
+void CFrmAdminInfo::OnDisplayShowHideButton(bool state)
+{
+    ui->chkDisplayShowHideButton->setChecked(state);
 }

@@ -114,6 +114,7 @@ signals:
 
     void __OnLockStatusUpdated(CLocksStatus *locksStatus);
     void __OnDisplayFingerprintButton(bool);
+    void __OnDisplayShowHideButton(bool);
     void __OnHideShowPassword(bool);
 
     void __onUserCodeOne(QString sCode1);
