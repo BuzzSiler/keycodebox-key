@@ -43,7 +43,7 @@ void CReportController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 QString CReportController::createNewFileName()
 {
     QDateTime   now = QDateTime::currentDateTime();
-    QString strFileName = "SafePak_" + now.toString("yyyy-MM-dd-HH_mm_ss");
+    QString strFileName = "SafePak_" + now.toString("yyyy-MM-dd-HH_mm_ss") + ".txt";
     return strFileName;
 }
 
