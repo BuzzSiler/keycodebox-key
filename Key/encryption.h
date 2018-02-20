@@ -20,7 +20,8 @@ private:
 public:
     CEncryption();
 
-    static QByteArray hashed(QString strToHash) {
+    static QByteArray hashed(QString strToHash) 
+    {
         return QCryptographicHash::hash(strToHash.toUtf8(), QCryptographicHash::Sha1);
     }
 
@@ -97,14 +98,14 @@ public:
         uint32_t unStartOff = 0;
         uint32_t unCharPos = 0;
 
-*psTmp += " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
+        *psTmp += " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
 
         // Encrypt and sum the date for an ok multiplier
         std::string sdt = datetime.toString("yyyy-MM-dd HH:mm").toStdString();
         // Encrypt the rounded date as "yyyy-MM-dd HH:mm"
         std::string encDate = encryptDecryptOld(nLockNum * 3, sdt, skey);
 
-*psTmp += QString(" EncDate:") + encDate.c_str();
+        *psTmp += QString(" EncDate:") + encDate.c_str();
 
         // Add sum encDate
         for(i=0;i<encDate.size();i++)
@@ -133,7 +134,7 @@ public:
         {
             un32Sum += skey[i] * unLockTmp;
         }
-    *psTmp += " un32Sum (key[...]*unLockTmp):" + QVariant(un32Sum).toString();
+        *psTmp += " un32Sum (key[...]*unLockTmp):" + QVariant(un32Sum).toString();
 
         // Encode the sumkey
         std::string encSumKey = encryptDecryptOld(un32Sum, QVariant(un32Sum).toString().toStdString(), skey);
@@ -142,7 +143,7 @@ public:
         {
             un32Sum += (uint32_t)encSumKey[i] * unLockTmp;
         }
-    *psTmp += QString(" encSum:") + encSumKey.c_str();
+        *psTmp += QString(" encSum:") + encSumKey.c_str();
 
 
         // Add sum encDate
@@ -154,11 +155,11 @@ public:
         un32Sum += (uint32_t)nLockNum;
 
         *poutEncrypt = QVariant(un32Sum).toString().toStdString();
-    *psTmp += QString("  outEncrypt:") + poutEncrypt->c_str();
+        *psTmp += QString("  outEncrypt:") + poutEncrypt->c_str();
         if(poutEncrypt->size() > maxLength) {
             *poutEncrypt = poutEncrypt->substr(poutEncrypt->size()-maxLength, maxLength);
         }
-    *psTmp += QString(" trunc outEncrypt:") + poutEncrypt->c_str();
+        *psTmp += QString(" trunc outEncrypt:") + poutEncrypt->c_str();
     }
 
     static void calculatePredictiveCode(uint32_t nLockNum, std::string skey, QDateTime datetime, std::string *poutEncrypt, uint32_t maxLength, QString *psTmp)
@@ -170,14 +171,14 @@ public:
         uint32_t unStartOff = 0;
         uint32_t unCharPos = 0;
 
-*psTmp += " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
+        *psTmp += " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
 
         // Encrypt and sum the date for an ok multiplier
         std::string sdt = datetime.toString("yyyy-MM-dd HH:mm").toStdString();
         // Encrypt the rounded date as "yyyy-MM-dd HH:mm"
         std::string encDate = encryptString(sdt.c_str()).toStdString();
 
-*psTmp += QString(" EncDate:") + encDate.c_str();
+        *psTmp += QString(" EncDate:") + encDate.c_str();
 
         // Add sum encDate
         for(i=0;i<encDate.size();i++)
@@ -206,17 +207,17 @@ public:
         {
             un32Sum += skey[i] * unLockTmp;
         }
-    *psTmp += " un32Sum (key[...]*unLockTmp):" + QVariant(un32Sum).toString();
+            *psTmp += " un32Sum (key[...]*unLockTmp):" + QVariant(un32Sum).toString();
 
         // Encode the sumkey
-//        std::string encSumKey = encryptDecrypt(un32Sum, QVariant(un32Sum).toString().toStdString(), skey);
+        //        std::string encSumKey = encryptDecrypt(un32Sum, QVariant(un32Sum).toString().toStdString(), skey);
         std::string encSumKey = encryptString(QVariant(un32Sum).toString()).toStdString();
         // Add sum encSumKey
         for(uint32_t i=0;i<encSumKey.size();i++)
         {
             un32Sum += (uint32_t)encSumKey[i] * unLockTmp;
         }
-    *psTmp += QString(" encSum:") + encSumKey.c_str();
+        *psTmp += QString(" encSum:") + encSumKey.c_str();
 
 
         // Add sum encDate
@@ -228,11 +229,11 @@ public:
         un32Sum += (uint32_t)nLockNum;
 
         *poutEncrypt = QVariant(un32Sum).toString().toStdString();
-    *psTmp += QString("  outEncrypt:") + poutEncrypt->c_str();
+        *psTmp += QString("  outEncrypt:") + poutEncrypt->c_str();
         if(poutEncrypt->size() > maxLength) {
             *poutEncrypt = poutEncrypt->substr(poutEncrypt->size()-maxLength, maxLength);
         }
-    *psTmp += QString(" trunc outEncrypt:") + poutEncrypt->c_str();
+        *psTmp += QString(" trunc outEncrypt:") + poutEncrypt->c_str();
     }
 
 
