@@ -14,3 +14,6 @@
 ui_*.h
 moc_*.h
 moc_*.cpp
+
+*pro.user
+*ui.autosave
