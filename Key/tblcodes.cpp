@@ -1067,7 +1067,8 @@ bool CTblCodes::resetCodeLimitedUse(CLockState &rec)
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
             " SET " + QString("access_count=0, max_access=2 "
-                              " WHERE ids=:fids");
+                              " WHERE access_type=2 and access_count > 0 and ids=:fids");
+    // Limit reset to 'limited use' codes (access type 2)                              
 
     qDebug() << "CTblCodes::resetCodeLimitedUse(), query: " << sql;
 

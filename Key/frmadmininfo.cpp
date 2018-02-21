@@ -671,8 +671,7 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
 {
     qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()";
 
-    xmlDoc *doc = NULL;
-    xmlNode *rootElement = NULL;
+    xmlDocPtr doc = NULL;
 
     if( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
     {
@@ -2045,8 +2044,12 @@ void CFrmAdminInfo::codeEnableAll()
 
         if(_pState)
         {
-            _pState->setMarkForReset();
-            emit __OnUpdateCodeState(_pState);
+            // Only reset codes that are access type 'limited use' (value 2)
+            if (_pState->getAccessType() == 2 && _pState->getAccessCount() > 0)
+            {
+                _pState->setMarkForReset();
+                emit __OnUpdateCodeState(_pState);
+            }
         }
         nRow++;
     }
