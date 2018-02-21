@@ -122,6 +122,7 @@ public:
     bool deleteCode(CLockState &rec);
     bool deleteCode(QString locknum, QString code1, QString code2,
                     QDateTime starttime, QDateTime endtime);
+    bool resetCodeLimitedUse(CLockState &rec);                    
 
     void selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLockSet **pLockSet);
     void selectCodeSet(int ids, CLockSet **pLockSet);
@@ -130,8 +131,6 @@ private:
     QSqlDatabase *_pDB;
     QString _sCodeOne;
     QString _sCodeTwo;
-
-    QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
 
     void createTable();
     bool tableExists();

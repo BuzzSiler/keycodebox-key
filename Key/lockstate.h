@@ -54,6 +54,7 @@ public:
     virtual bool isNew() { return _bIsNew; }
     virtual bool isModified() { return _bModified; }
     virtual bool isMarkedForDeletion() { return _bMarkForDeletion; }
+    virtual bool isMarkedForReset() { return _bMarkForReset; }
 
     virtual void setFingerprint1() { _bFingerprint1 = true; };
     virtual void clearFingerprint1() { _bFingerprint1 = false; };
@@ -84,6 +85,9 @@ public:
     virtual void clearModified() { _bModified = false; }
     virtual void setMarkForDeletion() { _bMarkForDeletion = true; }
     virtual void clearMarkForDeletion() { _bMarkForDeletion = false; }
+
+    virtual void setMarkForReset() { _bMarkForReset = true; }
+    virtual void clearMarkForReset() { _bMarkForReset = false; }
     
     virtual QJsonObject &jsonRecord(QJsonObject &json);
     virtual QString jsonRecordAsString();
@@ -146,6 +150,7 @@ protected:
     bool            _bIsNew = false;
     bool            _bModified = false;
     bool            _bMarkForDeletion = false;
+    bool            _bMarkForReset = false;
     bool            _bFingerprint1;
     bool            _bFingerprint2;
 

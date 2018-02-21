@@ -239,8 +239,6 @@ class CTblAdmin
 private:
     QSqlDatabase *_pDB;
 
-    QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
-
     bool createTable();
     bool tableExists();
 

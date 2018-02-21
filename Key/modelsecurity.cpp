@@ -78,6 +78,7 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 
 void CModelSecurity::OnUpdateCodeState(CLockState *rec)
 {
+    qDebug() << "CModelSecurity::OnUpdateCodeState";
     bool bSuccess = _ptblCodes->updateCode(rec);
 
     emit __OnUpdatedCodeState(bSuccess);
@@ -249,13 +250,17 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
         } else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
         {
             // Store AnyAccessCode = code
-            // Enter Secondary code - Verify against DB (second access code?)
+            // Enter Secondary code - Verify against DB (second access code?)            
         }
         else
         {
+            
             QString sCodeEnc = CEncryption::encryptString(code);
 
+            qDebug() << "CModelSecurity::OnVerifyCodeOne Encrypted Code" << sCodeEnc;
+
             nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
+            qDebug() << "CModelSecurity::OnVerifyCodeOne nDoorNum" << nDoorNum;
             if( nDoorNum > 0 )
             {
                 // need to check if fingerprint security is enabled

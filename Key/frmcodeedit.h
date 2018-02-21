@@ -19,7 +19,6 @@ class CFrmCodeEdit : public QDialog
 
 
 public:
-    const QDateTime _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0));
 
     explicit CFrmCodeEdit(QWidget *parent = 0);
     ~CFrmCodeEdit();

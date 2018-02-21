@@ -144,23 +144,44 @@ void CDlgVNC::on_lblPassword_clicked()
     onStartEditLabel(ui->lblPassword, "Password");
 }
 
+/*
+string GetEnv( const string & var ) {
+     const char * val = ::getenv( var.c_str() );
+     if ( val == 0 ) {
+         return "";
+     }
+     else {
+         return val;
+     }
+}
+*/
+
 void CDlgVNC::on_btnResetVNC_clicked()
 {
-  qDebug() << "btnRestVNC_clicked()";
+    qDebug() << "btnRestVNC_clicked()";
 
-  int nVNCPort = ui->lblVNCPort->text().toInt();
-  QString sPassword = ui->lblPassword->text();
-  std::string VNCPort = std::to_string(nVNCPort);
-  std::string fullCmd = "/home/pi/scripts/start_remote_desktop.sh ";
-  std::stringstream ss;
-  ss << fullCmd << VNCPort << " /home/pi/etc/x11vnc.cfg " << sPassword.toStdString();
-  std::string newCmd = ss.str();
-  
-  FILE *cmdResult;
-  cmdResult = popen(newCmd.c_str(), "r");
-  if(!cmdResult)
+    /* NOTE: the following would be better accessed via the KCB environment
+       variables.  Above, is pasted a function for returning environment
+       variables.  Consider creating a common or system module where all of
+       the system ivocations and accesses can be placed.  Ideally, below
+       should look more like:
+
+       kcbsystem::update_password(vnc_port, password)
+    */
+
+    int nVNCPort = ui->lblVNCPort->text().toInt();
+    QString sPassword = ui->lblPassword->text();
+    std::string VNCPort = std::to_string(nVNCPort);
+    std::string fullCmd = "/home/pi/kcb-config/scripts/kcb-remotedesktop.sh ";
+    std::stringstream ss;
+    ss << fullCmd << VNCPort << " /home/pi/kcb-config/config/x11vnc.cfg " << sPassword.toStdString();
+    std::string newCmd = ss.str();
+
+    FILE *cmdResult;
+    cmdResult = popen(newCmd.c_str(), "r");
+    if(!cmdResult)
     {
-      std::cout << "\tfailed to popen(fullCmd, 'r');\n";
+        std::cout << "\tfailed to popen(fullCmd, 'r');\n";
     }
   
 }

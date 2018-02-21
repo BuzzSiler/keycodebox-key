@@ -7,6 +7,7 @@
 #include <QtSql>
 #include <string>
 #include <QMessageBox>
+#include "kcbcommon.h"
 
 CFrmCodeEdit::CFrmCodeEdit(QWidget *parent) :
     QDialog(parent),
@@ -162,7 +163,7 @@ void CFrmCodeEdit::on_buttonBox_accepted()
     }
     if (ui->dtEndAccess->dateTime() == ui->dtEndAccess->minimumDateTime())
     {
-        dtEnd = _DATENONE;        
+        dtEnd = _DATENONE;
     }
 
     // if we have a 'set all locks' checkbox set,
@@ -178,12 +179,16 @@ void CFrmCodeEdit::on_buttonBox_accepted()
 
     qDebug() << "------------------------QUESTION 3: " << _question3;
 
+    qDebug() << dtStart.toString();
+    qDebug() << dtEnd.toString();
+
     for(i=0; i<ui->spinLocksToCreate->value(); i++)
     {
-        emit(OnDoneSave(_nRow, _id, ui->spinLockNum->value(), ui->edtAccessCode->text(), ui->edtSecondCode->text(),
+        qDebug() << "_nRow" << _nRow << "_id" << _id;
+        emit OnDoneSave(_nRow, _id, ui->spinLockNum->value(), ui->edtAccessCode->text(), ui->edtSecondCode->text(),
                         ui->edtDescription->text(), dtStart, dtEnd,
                         ui->chkFingerPrint1->isChecked(), ui->chkFingerPrint2->isChecked(),0,
-                        _question1, _question2, _question3, _access_type));
+                        _question1, _question2, _question3, _access_type);
     }
     
     this->hide();

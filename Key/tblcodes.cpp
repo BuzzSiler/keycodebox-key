@@ -3,7 +3,7 @@
 #include <string>
 #include "tblcodes.h"
 #include "encryption.h"
-
+#include "kcbcommon.h"
 
 bool CTblCodes::isExpired(int access_type, int access_count, int max_access)
 {
@@ -37,15 +37,15 @@ void CTblCodes::setLastCodeOne(QString code)
 int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &bFingerprintRequired, int &nLockNum )
 {
     qDebug() << "CTblCodes::checkCodeOne()";
-    qDebug() << " code:" << code.c_str();
     // get the time.
     QDateTime time = QDateTime::currentDateTime();
-    // hold on to the code
+    // hold on to the code    
     code = CEncryption::decryptString(code.c_str()).toStdString();
     _sCodeOne = code.c_str();   // Unencrypted
     nLockNum = -1;
 
-    if( _pDB && _pDB->isOpen() ) {
+    if( _pDB && _pDB->isOpen() ) 
+    {
         QSqlQuery qry(*_pDB);
         QString sql = "SELECT ids, sequence, sequence_order, locknum, description, "
                       "       code1, code2, fingerprint1, fingerprint2, "
@@ -56,14 +56,20 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
 
         qDebug() << "SQL:" << sql;
 
-        if( !qry.prepare(sql) ) {
+        if( !qry.prepare(sql) ) 
+        {
             qDebug() << "qry.prepare fails!" << qry.lastError();
         }
 
-        qry.bindValue(":startNone", _DATENONE); // .toStdString().c_str());
-        qry.bindValue(":endNone", _DATENONE); // .toStdString().c_str());
+        //qDebug() << "startNone/endNone" << _DATENONE_STR;
+        //qDebug() << "time" << time.toString("yyyy-MM-dd HH:mm:ss") << "timeend" << time.toString("yyyy-MM-dd HH:mm:ss");
+
+        qry.bindValue(":startNone", _DATENONE_STR); // .toStdString().c_str());
+        qry.bindValue(":endNone", _DATENONE_STR); // .toStdString().c_str());
         qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));   // .toStdString().c_str());
         qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));    //.toStdString().c_str());
+
+        //qDebug() << "SQL:" << sql;
 
         nLockNum = -1;  // Just because we don't have a specific door number
         bSecondCodeRequired = true;
@@ -107,10 +113,12 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
                 sCode1 = CEncryption::decryptString(sCode1.c_str()).toStdString();
 
 
+                //qDebug() << "sCode1" << sCode1.c_str() << "Code" << code.c_str();
+
                 /// first one in the set to match unencrypted
                 if( sCode1 == code ) 
                 {
-                    qDebug() << "Code1:" << sCode1.c_str() << " == code:" << code.c_str();
+                    //qDebug() << "Code1:" << sCode1.c_str() << " == code:" << code.c_str();
 
                     /* Check for expiration */
                     access_type = qry.value(fldAccessType).toInt();
@@ -131,7 +139,7 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
                         sCode2 = qry.value(fldCode2No).toString();
                         sCode2 = CEncryption::decryptString(sCode2);
                     }
-                    qDebug() << "Code2:>" << sCode2 << "< and nLockNum=" << QVariant(nLockNum).toString();
+                    //qDebug() << "Code2:>" << sCode2 << "< and nLockNum=" << QVariant(nLockNum).toString();
                     if(!sCode2.trimmed().isEmpty())
                     {
                         nSecondCode++;
@@ -164,6 +172,8 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
             } else {
                 bSecondCodeRequired = false;
             }
+
+            //qDebug() << "CTblCodes::checkCodeOne nLockNum" << nLockNum;
             return nLockNum;
         }
         else {
@@ -208,10 +218,10 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
             qDebug() << "qry.prepare fails!" << qry.lastError();
         }
 
-        qry.bindValue(":startNone", _DATENONE); // .toStdString().c_str());
-        qry.bindValue(":endNone", _DATENONE);   //.toStdString().c_str());
-        qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));   //.toStdString().c_str());
-        qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));    //.toStdString().c_str());
+        qry.bindValue(":startNone", _DATENONE_STR);
+        qry.bindValue(":endNone", _DATENONE_STR);
+        qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));
+        qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));
 
         nLockNum = -1;  // Just because we don't have a specific door number
         std::string sCode1;
@@ -253,15 +263,15 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
                     sCode2 = qry.value(fldCode2No).toString().toStdString();
                     sCode2 = CEncryption::decryptString(sCode2.c_str()).toStdString();
 
-                    qDebug() << "Code1:" << sCode1.c_str() << " == _sCodeOne:" << _sCodeOne;
-                    qDebug() << "Code2:" << sCode2.c_str() << " == _sCodeTwo:" << _sCodeTwo;
+                    //qDebug() << "Code1:" << sCode1.c_str() << " == _sCodeOne:" << _sCodeOne;
+                    //qDebug() << "Code2:" << sCode2.c_str() << " == _sCodeTwo:" << _sCodeTwo;
 
                     // first one in the set to match unencrypted
                     // Both codes must match
                     if( sCode1 == _sCodeOne.toStdString() && sCode2 == code)
                     {
                         _lastIDS = qry.value(fldIDS).toInt();
-                        qDebug() << "_lastIDS: " << QString::number(_lastIDS) << " Code2:" << sCode2.c_str() << " == code:" << code.c_str();
+                        //qDebug() << "_lastIDS: " << QString::number(_lastIDS) << " Code2:" << sCode2.c_str() << " == code:" << code.c_str();
 
 
                         int access_type = qry.value(fldAccessType).toInt();
@@ -285,7 +295,7 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
                         // if lockbox status == 0, then item is IN
                         //            status == 1, then ttem is OUT
 
-                        qDebug() << "LOCKBOX STATE: " << QString::number(qry.value(fldLockboxStatus).toInt());
+                        //qDebug() << "LOCKBOX STATE: " << QString::number(qry.value(fldLockboxStatus).toInt());
 
                         if( qry.value(fldLockboxStatus).toInt() == 0)
                         {
@@ -374,10 +384,10 @@ void CTblCodes::selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLo
         if(nLockNum != -1 ) {
             qry.bindValue(":lockNum", nLockNum);
         }
-        qry.bindValue(":startNone", _DATENONE); // .toStdString().c_str());
-        qry.bindValue(":endNone", _DATENONE); // .toStdString().c_str());
-        qry.bindValue(":stime", start); // start.toString("yyyy-MM-dd HH:mm:ss"));   // .toStdString().c_str());
-        qry.bindValue(":etime", end);   // end.toString("yyyy-MM-dd HH:mm:ss"));    //.toStdString().c_str());
+        qry.bindValue(":startNone", _DATENONE_STR);
+        qry.bindValue(":endNone", _DATENONE_STR);
+        qry.bindValue(":stime", start);
+        qry.bindValue(":etime", end);
 
         QMap<QString, QVariant> mapVals = qry.boundValues();
         qDebug() << "Mapped count:" << mapVals.count();
@@ -922,8 +932,8 @@ bool CTblCodes::createTestDefault()
 
     qry.bindValue(":codeOne", encCode1);
     qry.bindValue(":codeTwo", encCode2);
-    qry.bindValue(":start", _DATENONE);
-    qry.bindValue(":end", _DATENONE);
+    qry.bindValue(":start", _DATENONE_STR);
+    qry.bindValue(":end", _DATENONE_STR);
     qry.bindValue(":fingerprint1", false);
     qry.bindValue(":fingerprint2", false);
 
@@ -1043,6 +1053,39 @@ bool CTblCodes::deleteCode(CLockState &rec)
         qDebug() << "CTblCodes::deleteCode(" << QVariant(rec.getID()).toString() << ") failed";
         return false;
     }
+}
+
+bool CTblCodes::resetCodeLimitedUse(CLockState &rec)
+{
+    qDebug() << "CTblCodes::resetCodeLimitedUse(CLockState)";
+
+    if (rec.getID() == -1)
+    {
+        return false;
+    }
+
+    QSqlQuery qry(*_pDB);
+    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+            " SET " + QString("access_count=0, max_access=2 "
+                              " WHERE ids=:fids");
+
+    qDebug() << "CTblCodes::resetCodeLimitedUse(), query: " << sql;
+
+    qry.prepare(sql);
+
+    qry.bindValue(":fids", rec.getID());
+
+    if(qry.exec()) 
+    {
+        qDebug() << "CTblCodes::resetCodeLimitedUse() succeeded";
+        return true;
+    } 
+    else 
+    {
+        qDebug() << "CTblCodes::resetCodeLimitedUse() failed";
+        return false;
+    }
+                              
 }
 
 bool CTblCodes::updateLockboxState(int fids, bool lockstate)
@@ -1226,12 +1269,20 @@ bool CTblCodes::updateRecord(CLockState &rec)
 
 bool CTblCodes::updateCode(CLockState *prec)
 {
+    qDebug() << "CTblCodes::updateCode";
     // update
-    if(prec->isMarkedForDeletion()) {
+    if(prec->isMarkedForDeletion()) 
+    {
         return deleteCode(*prec);
-    } else {
-        if(prec->getID() == -1 ) {
-
+    } 
+    else if (prec->isMarkedForReset())
+    {        
+        return resetCodeLimitedUse(*prec);        
+    }
+    else 
+    {
+        if(prec->getID() == -1 ) 
+        {
             int nId = addLockCode(prec->getLockNum(),prec->getCode1(),prec->getCode2(),
                                   prec->getStartTime(), prec->getEndTime(),
                                   prec->getFingerprint1(), prec->getFingerprint2(),
@@ -1247,8 +1298,10 @@ bool CTblCodes::updateCode(CLockState *prec)
                 return true;
             }
         }
-        if(prec->getID() > 0) {
-            if(prec->isModified()) {
+        if (prec->getID() > 0) 
+        {
+            if (prec->isModified())
+            {
                 updateRecord(*prec);
             }
         }

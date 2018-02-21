@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "kcbcommon.h"
 #include <QVariant>
 #include <QMenu>
 #include <QList>
@@ -42,7 +43,10 @@ void CFrmAdminInfo::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 
 CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::CFrmAdminInfo), _pworkingSet(0)
+    ui(new Ui::CFrmAdminInfo), 
+    _pworkingSet(0),
+    // Explicit initialization needed to prevent spurious test emails
+    _testEmail(false)
 {
     ui->setupUi(this);
     CFrmAdminInfo::showFullScreen();
@@ -140,7 +144,10 @@ void CFrmAdminInfo::show()
         ui->tabUtilities->setEnabled(true);
         ui->tabWidget->setTabEnabled(1, true);
         ui->gpAdminInfo->setVisible(true);
+        // Force tabwidget to show administrator tab
+        emit ui->tabWidget->currentChanged(0);
     }
+
 }
 
 bool CFrmAdminInfo::isInternetTime()
@@ -597,118 +604,66 @@ void CFrmAdminInfo::on_btnCopyFile_clicked()
     QMessageBox::information(this, "File Copied", tr("New SafePak application copied.\nSystem requires reboot to run."));
 }
 
-void CFrmAdminInfo::printElementNames(xmlNode *aNode)
+
+void parseCode (xmlNodePtr cur,
+                int *lock, QString &code1, QString &code2, QString &username, 
+                QString &question1, QString &question2, QString &question3, 
+                QDateTime &dtStart, QDateTime &dtEnd, int *access_type) 
 {
-    xmlNode *curNode = NULL;
-
-    /*
-    <?xml version="1.0"?>
-    <codeListing title="20161213 Codes">
-      <code>
-        <lock>4</lock>
-        <code1>88888888</code1>
-        <code2>999999999</code2>
-        <user>This is an exciting code!</user>
-        <startDT>2008-10-31T15:07:38.6875000-05:00</startDT>
-        <endDT>2008-10-31T15:07:38.6875000-05:00</endDT>
-      </code>
-      <code>
-        <lock>5</lock>
-        <code1>88888888</code1>
-        <code2>999999999</code2>
-        <user>This is another exciting code!</user>
-        <startDT>2008-10-31T15:07:38.6875000-05:00</startDT>
-        <endDT>2008-10-31T15:07:38.6875000-05:00</endDT>
-      </code>
-    </codeListing>
-   */
-
-    int nLockNum = 0;
-    QString sAccessCode = "";
-    QString sSecondCode = "";
-    QString description = "";
-    QString question1 = "";
-    QString question2 = "";
-    QString question3 = "";
-    QDateTime dtStart;
-    QDateTime dtEnd;
-    int access_type = 0;
-
-    for (curNode = aNode; curNode; curNode=curNode->next)
+    cur = cur->xmlChildrenNode;
+    while (cur != NULL)
     {
-        if (curNode->type == XML_ELEMENT_NODE)
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"lock")))
         {
-            if( !strcmp((char *)curNode->name, "lock") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording lock'";
-                nLockNum = atoi((char *)xmlNodeGetContent(curNode));
-                qDebug() << nLockNum;
-            }
-            if( !strcmp((char *)curNode->name, "code1") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording code1'";
-                sAccessCode = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-                qDebug() << sAccessCode;
-            }
-            if( !strcmp((char *)curNode->name, "code2") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording code2'";
-                sSecondCode = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-                qDebug() << sSecondCode;
-            }
-            if( !strcmp((char *)curNode->name, "username") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording user'";
-                description = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-                qDebug() << description;
-            }
-            if( !strcmp((char *)curNode->name, "question1") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording question1'";
-                question1 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-                qDebug() << question1;
-            }
-            if( !strcmp((char *)curNode->name, "question2") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording question2'";
-                question2 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-                qDebug() << question2;
-            }
-            if( !strcmp((char *)curNode->name, "question3") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording question3'";
-                question3 = QString::fromLatin1((char *)xmlNodeGetContent(curNode));
-                qDebug() << question3;
-            }
-
-            if( !strcmp((char *)curNode->name, "startDT") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording start daytime'";
-                dtStart = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(curNode)),Qt::ISODate);
-                qDebug() << dtStart.toString();
-            }
-            if( !strcmp((char *)curNode->name, "endDT") )
-            {
-                qDebug() << "CFrmAdminInfo::printElementNames(), recording end daytime'";
-                dtEnd = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(curNode)),Qt::ISODate);
-                qDebug() << dtEnd.toString();
-
-
-                _pState = createNewLockState();
-                if(!_pworkingSet) {
-                    _pworkingSet = new CLockSet();
-                }
-                qDebug() << "CFrmAdminInfo::printElementNames(), ADD CODE";
-
-                // NEED TO ADD XML PARSING FOR QUESTIONS
-
-                emit(__OnDoneSave(-1, -1, nLockNum, sAccessCode, sSecondCode,
-                                  description, dtStart, dtEnd,
-                                  false, false, false, question1, question2, question3,
-                                  access_type));
-            }
+            *lock = atoi((char *)xmlNodeGetContent(cur));
+            qDebug() << "Lock" << lock;
         }
-        printElementNames(curNode->children);
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"code1")))
+        {
+            code1 = QString::fromLatin1((char *)xmlNodeGetContent(cur));
+            qDebug() << "code1" << code1;
+        }
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"code2")))
+        {
+            code2 = QString::fromLatin1((char *)xmlNodeGetContent(cur));  
+            qDebug() << "code2" << code2;            
+        }
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"username")))
+        {
+            username = QString::fromLatin1((char *)xmlNodeGetContent(cur));  
+            qDebug() << "username" << username;            
+        }
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"question1")))
+        {
+            question1 = QString::fromLatin1((char *)xmlNodeGetContent(cur));
+            qDebug() << "question1" << question1;
+        }
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"question2")))
+        {
+            question2 = QString::fromLatin1((char *)xmlNodeGetContent(cur));  
+            qDebug() << "question2" << question2;
+        }
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"question3")))
+        {
+            question3 = QString::fromLatin1((char *)xmlNodeGetContent(cur));  
+            qDebug() << "question3" << question3;
+        }
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"startDT")))
+        {
+            dtStart = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(cur)),Qt::ISODate);  
+            qDebug() << "startDT" << dtStart.toString();
+        }
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"endDT")))
+        {
+            dtEnd = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(cur)),Qt::ISODate);
+            qDebug() << "endDT" << dtEnd.toString();
+        }
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"accesstype")))
+        {
+            *access_type = atoi((char *)xmlNodeGetContent(cur));
+            qDebug() << "accesstype" << access_type;  
+        }
+        cur = cur->next;
     }
 }
 
@@ -728,8 +683,75 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
         return;
     }
 
-    rootElement = xmlDocGetRootElement(doc);
-    printElementNames(rootElement);
+    if(!_pworkingSet) {
+        _pworkingSet = new CLockSet();
+    }
+
+    xmlNodePtr cur = xmlDocGetRootElement(doc);
+
+    if (cur == NULL) 
+    {
+        qDebug() << "empty document";
+        xmlFreeDoc(doc);
+        return;
+    }
+
+    if (xmlStrcmp(cur->name, (const xmlChar *) "codeListing")) 
+    {
+        qDebug() << "document of the wrong type, root node != codeListing";
+        xmlFreeDoc(doc);
+        return;
+    }    
+
+    int lock = 0;
+    QString code1 = "";
+    QString code2 = "";    
+    QString description = "";
+    QString question1 = "";
+    QString question2 = "";
+    QString question3 = "";
+    QDateTime dtStart = _DATENONE;
+    QDateTime dtEnd = _DATENONE;
+    int access_type = 0;    
+
+    cur = cur->xmlChildrenNode;
+    while (cur != NULL) 
+    {
+        if ((!xmlStrcmp(cur->name, (const xmlChar *)"code")))
+        {
+            qDebug() << "Parsing code node";
+            parseCode (cur, &lock, code1, code2, description, question1, question2, question3,
+                        dtStart, dtEnd, &access_type);
+            qDebug() << "Parse complete";
+
+            /* Initial start/end dates (if present) based on access type
+               There are three access types:
+                   - Always
+                   - Timed
+                   - Limited Use
+               Start/end dates are only valid for 'Timed' codes.  All other codes should be _DATENONE
+               While they are initialized above, it is possible that a customer will put a start/end
+               datetime in the XML file.               
+            */
+            if (access_type == 0 || access_type == 2)
+            {
+                dtStart = _DATENONE;
+                dtEnd = _DATENONE;
+            }
+
+            qDebug() << dtStart.toString();
+            qDebug() << dtEnd.toString();
+
+            _pState = createNewLockState();
+
+            OnCodeEditDoneSave(-1, -1, lock, code1, code2, description, 
+                              dtStart, dtEnd, false, false, false, 
+                              question1, question2, question3,
+                              access_type);            
+        }
+        cur = cur->next;
+    }
+    
     xmlFreeDoc(doc);
     xmlCleanupParser();
 
@@ -881,7 +903,7 @@ int CFrmAdminInfo::parseLockNumFromObjectName(QString objectName) {
     {
         try {
             int nVal = QString(objectName.right(objectName.length()-5)).toInt();
-            qDebug() << "Parse lock number from objectName:" + QVariant(nVal).toString();
+            //qDebug() << "Parse lock number from objectName:" + QVariant(nVal).toString();
             return nVal;
         } catch(exception &e) {
             qDebug() << "Parsing lock number from object name failed!";
@@ -898,16 +920,16 @@ void CFrmAdminInfo::menuSelection(QAction *action)
     {
         qDebug() << "Open Lock Num:" << QVariant(nLockNum).toString();
         emit __OnOpenLockRequest(nLockNum);
-    } else if(action->text() == QString("Codes")) {
-        emit __LocalOnReadLockSet(nLockNum,
-                                  QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"),
-                                  QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"));
+    } 
+    else if(action->text() == QString("Codes")) 
+    {
+        emit __LocalOnReadLockSet(nLockNum, _DATENONE, _DATENONE);
         // Switch tabs
         ui->tabWidget->setCurrentIndex(3);
-    } else if(action->text() == QString("History")) {
-        emit __LocalOnReadLockHistorySet(nLockNum,
-                                         QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"),
-                                         QDateTime::fromString(_DATENONE, "yyyy-MM-dd HH:mm:ss"));
+    } 
+    else if(action->text() == QString("History")) 
+    {
+        emit __LocalOnReadLockHistorySet(nLockNum, _DATENONE, _DATENONE);
         ui->tabWidget->setCurrentIndex(4);
     }
 }
@@ -1188,9 +1210,16 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         qDebug() << adminInfo->getReportToFile();
 
         if(adminInfo->getReportViaEmail())
+        {
             ui->cbReportViaEmail->setChecked(true);
+        }
         if(adminInfo->getReportToFile())
+        {
             ui->cbReportToFile->setChecked(true);
+        }
+
+        ui->tabWidget->setCurrentIndex(0);
+        
     } else {
         qDebug() << "Admin Info received is blank.";
     }
@@ -1858,7 +1887,7 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
-        qDebug() << "Adding row of Lock State - Codes. Lock Num:" << QVariant(pState->getLockNum()).toString();
+        //qDebug() << "Adding row of Lock State - Codes. Lock Num:" << QVariant(pState->getLockNum()).toString();
         nCol = 0;
         table->setItem(nRow, nCol++, new QTableWidgetItem(QVariant(nRow + 1).toString()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(QVariant(pState->getLockNum()).toString()));
@@ -1867,9 +1896,9 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2().c_str()));
 
 
-        qDebug() << "ACCESS TYPE is " << pState->getAccessType();
-        qDebug() << "ACCESS COUNT is " << pState->getAccessCount();
-        qDebug() << "MAX ACCESS is " << pState->getMaxAccess();
+        //qDebug() << "ACCESS TYPE is " << pState->getAccessType();
+        //qDebug() << "ACCESS COUNT is " << pState->getAccessCount();
+        //qDebug() << "MAX ACCESS is " << pState->getMaxAccess();
 
         if (pState->getAccessType() == 0 /* ACCESS_ALWAYS */)
         {
@@ -1891,17 +1920,19 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     }
 }
 
-void CFrmAdminInfo::setupCodeTableContextMenu() {
+void CFrmAdminInfo::setupCodeTableContextMenu() 
+{
     QTableWidget    *table = ui->tblCodesList;
 
+    /* Create a menu for adding, editing, and deleting codes */
     _pTableMenu = new QMenu(table);
     _pTableMenu->addAction("Edit Code", this, SLOT(codeEditSelection()));
     _pTableMenu->addAction("Add Code", this, SLOT(codeInitNew()));
     _pTableMenu->addAction("Delete", this, SLOT(codeDeleteSelection()));
     connect(table,SIGNAL(cellClicked(int,int)),this,SLOT(OnRowSelected(int, int)));
 
+    /* Create a menu for adding codes and enabling 'limited use' access type codes */
     _pTableMenuAdd = new QMenu(table);
-    _pTableMenuAdd->addAction("Add Code", this, SLOT(codeInitNew()));
     connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnHeaderSelected(int)));
 }
 
@@ -1984,6 +2015,42 @@ void CFrmAdminInfo::codeInitNew()
     if( nLock == -1 )
         nLock = 1;
     addCodeByRow(nLock);
+}
+
+void CFrmAdminInfo::codeEnableAll()
+{
+    qDebug() << "Enabling all Limited Use codes";
+
+    /* Looping over all the codes in the working set
+           if code access type is 'limited use' then
+               reset using __OnUpdateCodeState
+    */
+    CLockSet::Iterator itor;
+    int nRow = 0;
+    _pState = 0;
+
+    if(!_pworkingSet) {
+        _pworkingSet = new CLockSet();
+    }
+
+    on_btnReadCodes_clicked();
+    displayInTable(_pworkingSet);
+
+    qDebug() << "before loop iterator cellClicked";
+
+    for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
+    {
+        // itor is our man!
+        _pState = itor.value();
+
+        if(_pState)
+        {
+            _pState->setMarkForReset();
+            emit __OnUpdateCodeState(_pState);
+        }
+        nRow++;
+    }
+    
 }
 
 void CFrmAdminInfo::codeEditSelection()
@@ -2083,7 +2150,7 @@ void CFrmAdminInfo::LocalReadLockSet(int nLock, QDateTime dtStart, QDateTime dtE
     ui->cbLockNum->setCurrentIndex( nLock );
     ui->dtStartCodeList->setDateTime(dtStart);
     ui->dtEndCodeList->setDateTime(dtEnd);
-    emit __OnReadLockSet(nLock, QDateTime::fromString(_DATENONE), QDateTime::fromString(_DATENONE));
+    emit __OnReadLockSet(nLock, _DATENONE, _DATENONE);
 }
 
 void CFrmAdminInfo::LocalReadLockHistorySet(int nLock, QDateTime dtStart, QDateTime dtEnd)
@@ -2091,7 +2158,7 @@ void CFrmAdminInfo::LocalReadLockHistorySet(int nLock, QDateTime dtStart, QDateT
     ui->cbLockNumHistory->setCurrentIndex( nLock );
     ui->dtStartCodeHistoryList->setDateTime(dtStart);
     ui->dtEndCodeHistoryList->setDateTime(dtEnd);
-    emit __OnReadLockSet(nLock, QDateTime::fromString(_DATENONE), QDateTime::fromString(_DATENONE));
+    emit __OnReadLockSet(nLock, _DATENONE, _DATENONE);
 }
 
 void CFrmAdminInfo::on_btnRead_clicked()
@@ -2332,7 +2399,7 @@ void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, int nLockNum,
         _pState->setMaxAccess(2);
     }
 
-    qDebug() << "Max Access " << _pState->getMaxAccess();
+    //qDebug() << "isNew" << _pState->isNew();
 
     if(_pState->isNew())
     {
@@ -2399,6 +2466,7 @@ CLockState* CFrmAdminInfo::createNewLockState()
 
     pState->setNew();
     pState->clearMarkForDeletion();
+    pState->clearMarkForReset();
     pState->clearModified();
 
     return pState;
@@ -2416,7 +2484,6 @@ void CFrmAdminInfo::OnRowSelected(int row, int column)
     qDebug() << "Row Selected:" << QVariant(_nRowSelected).toString();
     _pTableMenu->show();
 
-    //MANUAL GEOMETRY
     QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
     _pTableMenu->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenu->width(), _pTableMenu->height());
 }
@@ -2461,14 +2528,12 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 
         if(ui->tblCodesList->rowCount() == 0 )
         {
-            qDebug() << "Show Menu";
             _pTableMenuAdd->show();
             setTableMenuLocation(_pTableMenuAdd);
         }
 
         if(ui->tblCodesList->rowCount() > 0 )
         {
-            qDebug() << "Show Menu";
             _pTableMenu->show();
             setTableMenuLocation(_pTableMenu);
         }
@@ -2487,13 +2552,22 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 }
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
-{
-    Q_UNUSED(nHeader);
+{    
+    /* Originally, the actions were added in setupCodeTableContextMenu but when they were displayed
+       here, the menu was the size of the _pTableMenu.  I couldn't track down why, so I decided to
+       just clear the menu and add what was needed here.  I like the just-in-time approach better
+    */
+
+    _pTableMenuAdd->clear();
+    _pTableMenuAdd->addAction("Add Code", this, SLOT(codeInitNew()));
+    if (nHeader == 5)
+    {
+        _pTableMenuAdd->addAction("Enable All", this, SLOT(codeEnableAll()));
+    }
     _pTableMenuAdd->show();
 
-    //MANUAL GEOMETRY
     QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
-    _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenu->width(), _pTableMenu->height());
+    _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenuAdd->width(), _pTableMenuAdd->height());
 }
 
 void CFrmAdminInfo::checkAndCreateCodeEditForm()
@@ -2704,7 +2778,10 @@ void CFrmAdminInfo::OnTabSelected(int index)
 
     QDateTime dt = QDateTime().currentDateTime();
     ui->dtEndCodeHistoryList->setDateTime(dt);
-    ui->dtEndCodeList->setDateTime(dt);    
+    ui->dtEndCodeList->setDateTime(dt);
+
+    // Force the codes to be read into the codes tab
+    emit ui->btnReadCodes->clicked();
 }
 
 void CFrmAdminInfo::on_btnTestEmail_clicked()

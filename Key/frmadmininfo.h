@@ -125,6 +125,7 @@ private slots:
     void codeDeleteSelection();
     void codeAddNew();
     void codeInitNew();
+    void codeEnableAll();
     void codeEditSelection();
 
     void on_btnDone_clicked();
@@ -250,7 +251,6 @@ private slots:
     void onCopyModelDirectoryLoaded(QString path);
     void on_btnCopyFile_clicked();
 
-    void printElementNames(xmlNode *aNode);
     void on_btnCopyFileLoadCodes_clicked();
     void on_btnCopyFileBrandingImage_clicked();
     void on_btnCopyFileBrandingImageReset_clicked();
@@ -298,8 +298,6 @@ private:
     QString usbDevice1;
 
     QDateTime _currentTime;
-
-    QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
 
     CAdminRec           _tmpAdminRec;
     uint64_t            _un64LockLocks;

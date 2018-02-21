@@ -150,7 +150,7 @@ void CSecurityController::CheckPredictiveAccessCode(QString code)
 
     if(_pAdminRec) {
         datetime = CEncryption::roundDateTime(_pAdminRec->getPredictiveResolution(), datetime);
-sTmp = " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
+        sTmp = " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
 
         skey = _pAdminRec->getPredictiveKey();
 
@@ -159,8 +159,8 @@ sTmp = " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
 
             CEncryption::calculatePredictiveCodeOld(nLockNum, skey, datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
 
-sTmp += QString(" trunc outEncrypt:") + outEncrypt.c_str();
-qDebug() << sTmp;
+            sTmp += QString(" trunc outEncrypt:") + outEncrypt.c_str();
+            qDebug() << sTmp;
 
             if( outEncrypt == code.toStdString()) {
                 OnSecurityCheckSuccess(nLockNum);

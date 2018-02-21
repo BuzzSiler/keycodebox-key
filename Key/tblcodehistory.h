@@ -67,8 +67,6 @@ private:
     QString _sCodeOne;
     QString _sCodeTwo;
 
-    QString _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0)).toString("yyyy-MM-dd HH:mm:ss");
-
     void createTable();
     bool tableExists();
     void createColumn(QString column, QString fieldType);
