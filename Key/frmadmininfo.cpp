@@ -616,7 +616,7 @@ void parseCode (xmlNodePtr cur,
         if ((!xmlStrcmp(cur->name, (const xmlChar *)"lock")))
         {
             *lock = atoi((char *)xmlNodeGetContent(cur));
-            qDebug() << "Lock" << lock;
+            qDebug() << "Lock" << *lock;
         }
         if ((!xmlStrcmp(cur->name, (const xmlChar *)"code1")))
         {
@@ -661,7 +661,7 @@ void parseCode (xmlNodePtr cur,
         if ((!xmlStrcmp(cur->name, (const xmlChar *)"accesstype")))
         {
             *access_type = atoi((char *)xmlNodeGetContent(cur));
-            qDebug() << "accesstype" << access_type;  
+            qDebug() << "accesstype" << *access_type;  
         }
         cur = cur->next;
     }
@@ -709,13 +709,15 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
     QString question1 = "";
     QString question2 = "";
     QString question3 = "";
-    QDateTime dtStart = _DATENONE;
-    QDateTime dtEnd = _DATENONE;
     int access_type = 0;    
 
     cur = cur->xmlChildrenNode;
     while (cur != NULL) 
     {
+        // Default start/end date/time to today's date
+        QDateTime dtStart = QDateTime::currentDateTime();
+        QDateTime dtEnd = QDateTime::currentDateTime();
+
         if ((!xmlStrcmp(cur->name, (const xmlChar *)"code")))
         {
             qDebug() << "Parsing code node";
