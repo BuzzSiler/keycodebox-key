@@ -596,10 +596,10 @@ void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
 void CFrmAdminInfo::on_btnCopyFile_clicked()
 {
     qDebug() << "Copy:" << _copyDirectory;
-    QString cmd = "sudo cp '" + _copyDirectory + "' " + "/home/pi/bin/Alpha_NEW";
+    QString cmd = "sudo cp '" + _copyDirectory + "' " + "/home/pi/kcb-config/bin/alpha_NEW";
     qDebug() << "CMD: " << cmd;
     std::system(cmd.toStdString().c_str());
-    std::system("sudo chmod +x /home/pi/bin/Alpha_NEW");
+    std::system("sudo chmod +x /home/pi/kcb-config/bin/alpha_NEW");
 
     QMessageBox::information(this, "File Copied", tr("New SafePak application copied.\nSystem requires reboot to run."));
 }
@@ -770,7 +770,7 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
     if(nRC == QMessageBox::Yes) {
         sync();
         createCmd += _copyDirectory;
-        createCmd += "' /home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg";
+        createCmd += "' /home/pi/kcb-config/images/alpha_logo.jpg";
         std::system(createCmd.toStdString().c_str());
     }
 }
@@ -783,7 +783,7 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
                                    QMessageBox::Yes, QMessageBox::Cancel);
     if(nRC == QMessageBox::Yes) {
         sync();
-        std::system("cp /home/pi/dev/keycodebox/alpha/images/alpha_logo_touch.jpg /home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg");
+        std::system("cp /home/pi/kcb-config/images/alpha_logo_touch.jpg /home/pi/kcb-config/images/alpha_logo.jpg");
     }
 }
 

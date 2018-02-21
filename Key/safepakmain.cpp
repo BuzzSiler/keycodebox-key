@@ -47,13 +47,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _pscene = new QGraphicsScene(this);
     ui->graphicsView->setScene(_pscene);
-    _pPixmap = new QPixmap("/home/pi/dev/keycodebox/alpha/images/alpha_logo.jpg");
+    _pPixmap = new QPixmap("/home/pi/kcb-config/images/alpha_logo.jpg");
 
     if( _pPixmap->isNull() )
     {
         qDebug() << "Failed to load image, loading backup!";
 
-        _pPixmap = new QPixmap("/home/pi/dev/keycodebox/alpha/images/alpha_logo_touch.jpg");
+        _pPixmap = new QPixmap("/home/pi/kcb-config/images/alpha_logo_touch.jpg");
         if(_pPixmap->isNull()) {
             qDebug() << "Failed to load image!";
         }

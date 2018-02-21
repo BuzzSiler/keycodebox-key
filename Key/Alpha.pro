@@ -9,7 +9,7 @@ QT       += core gui serialport sql network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Alpha
-target.path = /home/pi/dev/keycodebox/alpha/Alpha
+target.path = /home/pi/kcb-config/bin/Alpha
 INSTALLS += target
 TEMPLATE = app
 
