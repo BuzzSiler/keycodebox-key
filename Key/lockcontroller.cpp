@@ -1,25 +1,20 @@
 #include <bitset>
 #include <unistd.h>
 #include <string>
-#include <boost/format.hpp>
 #include "lockcontroller.h"
+#include "serialport.h"
 #include "usbcontroller.h"
-#include "blockingreader.h"
+#include "usbprovider.h"
+#include <QDebug>
+#include <QString>
 
 
 CLockController::CLockController(QObject *parent) : QObject(parent)
 {
-
 }
 
 void CLockController::initController()
 {
-    _sFilterString0 = "USB-Serial.*ttyUSB";
-    _sFilterString1 = "USB2.0-Ser.*ttyUSB";
-    _sFilterString2 = "usb-FTDI.*ttyUSB";
-    _sDeviceType = "serial";
-    _sFindDevicePrefix = "ttyUSB";
-
     if( !_plockStatus )
     {
         _plockStatus = new CLocksStatus();
@@ -27,133 +22,18 @@ void CLockController::initController()
 
     _plockStatus->setLockController(this);
 
-    //TODO: Look up the saved setting for USB cables
 
-    qDebug() << "searching for USB->serial adapter version 1...";
-    // Check for more than one Serial Cable -- we can't tell them apart at the USB-Serial level.
-    int nCountDevs = _pusbController->CountDevicePorts(_sDeviceType, _sFilterString0);
-    if( nCountDevs > 1 ) {
-        // Can't continue
-        std::cout << "More than one USB->serial adapter found. Will need to reconcile.\n";
-        return;
-    }
+    // Get the lock controller serial device
+    _pport = UsbProvider::GetLockControllerDevice();
 
-    std::string sDevNum = _pusbController->getDevicePortString(_sDeviceType, _sFilterString0, _sFindDevicePrefix);
-
-    std::cout << "initController() sDevNum:" << sDevNum.c_str() << "\t";
-
-    // check for the alternative usb-serial converter type
-    if(sDevNum.empty())
-      {
-	qDebug() << "USB->serial adapter version 1 not found, searching for version 2...";
-	nCountDevs = _pusbController->CountDevicePorts(_sDeviceType, _sFilterString1);
-	if( nCountDevs > 1 ) {
-	  // Can't continue
-	  std::cout << "More than one USB->serial adapter found. Will need to reconcile.\n";
-	  return;
-	}
-	sDevNum = _pusbController->getDevicePortString(_sDeviceType, _sFilterString1, _sFindDevicePrefix);
-	std::cout << "initController() sDevNum:" << sDevNum.c_str() << "\t";
-      }
-
-    // check for the alternative FTDI usb-serial converter type
-    if(sDevNum.empty())
-      {
-	qDebug() << "USB->serial adapter version 2 not found, searching for version 3...";
-	nCountDevs = _pusbController->CountDevicePorts(_sDeviceType, _sFilterString2);
-	if( nCountDevs > 1 ) {
-	  // Can't continue
-	  std::cout << "More than one USB->serial adapter found. Will need to reconcile.\n";
-	  return;
-	}
-	sDevNum = _pusbController->getDevicePortString(_sDeviceType, _sFilterString2, _sFindDevicePrefix);
-	std::cout << "initController() sDevNum:" << sDevNum.c_str() << "\t";
-      }
- 
-    if(!sDevNum.empty())
+    if(_pport) 
     {
-        std::string sDevice = "/dev/ttyUSB";
-        sDevice += sDevNum;
-
-        std::cout << "\tsDevice:" << sDevice.c_str();
-
-        _pport = _pusbController->getPortForDevice("LockControl", sDevice);
-        if(_pport) {
-            this->setStateConnected();
-/*            this->openLock(1);
-            try {
-                this->readCommandResponse();    // 500ms wait...
-            } catch (const std::runtime_error &e)
-            {
-                std::cout << "runtime error:" << e.what();
-            }
-            this->openLock(3);
-            try {
-                this->readCommandResponse();    // 500ms wait...
-            } catch (const std::runtime_error &e)
-            {
-                std::cout << "runtime error:" << e.what();
-            }
-            this->openLock(5);
-            try {
-                this->readCommandResponse();    // 500ms wait...
-            } catch (const std::runtime_error &e)
-            {
-                std::cout << "runtime error:" << e.what();
-            }
-            this->openLock(7);
-            try {
-                this->readCommandResponse();    // 500ms wait...
-            } catch (const std::runtime_error &e)
-            {
-                std::cout << "runtime error:" << e.what();
-            }
-
-            std::cout << "Lock State(1):\n";
-            readLockStateCmd(17);
-
-            try {
-                this->readCommandResponse();
-            } catch (const std::runtime_error &e)
-            {
-                std::cout << "runtime error:\n";
-                std::cout << "\t\t" << e.what();
-            }
-
-            try {
-                _un64LockLocks = inquireLockStatus(4);
-                _bLockStateRead = true;
-            }
-            catch (const std::runtime_error &e)
-            {
-                std::cout << "runtime error inquireLockStatus(): " << e.what() << "\n";
-            }
-
-            // Test
-            uint64_t    nMask = 0x0000000000000001;
-            std::cout << "\nLocks:";
-            for(uint64_t n=0;n<64;n++) {
-                std::cout << ((_un64LockLocks & (nMask << n)) != 0 ? '1' : '0');
-            }
-            std::cout << "\n";
-
-            int nLock = 1;
-            bool bLock = isLockLock(nLock);
-            std::cout << "Lock #" << nLock << ":" << bLock << "\n";
-            nLock = 3;
-            bLock = isLockLock(nLock);
-            std::cout << "Lock #" << nLock << ":" << bLock << "\n";
-            nLock = 5;
-            bLock = isLockLock(nLock);
-            std::cout << "Lock #" << nLock << ":" << bLock << "\n";
-*/
-        }
-  }
-    else {
-      std::cout << "USB->serial adapter version 2 not found, aborting...";
-        std::cout << "\tError: device number not found for:" << _sDeviceType.toStdString() << "\n";
+        this->setStateConnected();
     }
-
+    else
+    {
+        qDebug() << "USB->serial adapter not found";
+    }    
 }
 
 std::string CLockController::int_to_bin(uint16_t number)
@@ -162,12 +42,11 @@ std::string CLockController::int_to_bin(uint16_t number)
     return result.substr(result.find("1", 0));
 }
 
-std::string CLockController::to_hex(uint16_t to_convert){
+std::string CLockController::to_hex(uint16_t to_convert)
+{
     std::string result;
-    std::stringstream ss;
-    ss << std::hex << to_convert;
-    ss >> result;
-    return result;
+    result = QString(QByteArray::number(to_convert, 16)).toStdString();
+    return result;        
 }
 
 union inttohex_t {
@@ -197,7 +76,7 @@ void CLockController::openLock(uint16_t nLockNum)
 {
     static unsigned char    seqNum = 0;
     qDebug() << "CLockController::openLock #" << QVariant(nLockNum).toString();
-    if(this->isConnected() && _pport->is_open())
+    if(this->isConnected())
     {
         unsigned char commands[9] = { 0x5D, 0x8E, 0x01, 0x00, 0xC8, 0x01, 0x20, 0x00, 0x8A };
 
@@ -215,9 +94,9 @@ void CLockController::openLock(uint16_t nLockNum)
         {
             nchksum += commands[i];
         }
-//        std::cout << "  checksum:" << std::to_string(nchksum) << "\n";
+        qDebug() << "  checksum:" << QString::number(nchksum);
         commands[8] = (unsigned char)nchksum;
-        _pport->write_some(asio::buffer(commands, 9));
+        _pport->WriteData(QByteArray((char *) commands, 9));
 
         seqNum += 0x01;
         if(seqNum > 0x07)
@@ -238,7 +117,7 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
 {
     static unsigned char    seqNum = 0;
 
-    if(this->isConnected() && _pport->is_open())
+    if(this->isConnected())
     {
         unsigned char commands[9] = { 0x5D, 0x8E, 0x01, 0x00, 0xC8, 0x01, 0x32, 0x00, 0x8A };
 
@@ -260,7 +139,7 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
         std::string sPulseCount = to_hex(nPulseCount);
         std::string sPulseOn = to_hex(nPulseOnTimeMS);
         std::string sPulseOff = to_hex(nPulseOffTimeMS);
-        std::cout << "openLockWithPulse:" << sLockNum << " Pulse ON (/10):" << sPulseOn << " Pulse OFF(/10):" << sPulseOff << "\n";
+        qDebug() << "openLockWithPulse:" << QString::fromStdString(sLockNum) << " Pulse ON (/10):" << QString::fromStdString(sPulseOn) << " Pulse OFF(/10):" << QString::fromStdString(sPulseOff);
 
         if(sLockNum.length()>1) {
             commands[3] = sLockNum[1];
@@ -283,18 +162,17 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
             nchksum += commands[i];
         }
 
-//        std::cout << "  checksum:" << std::to_string(nchksum) << "\n";
+        qDebug() << "  checksum:" << QString::number(nchksum) << "\n";
         commands[8] = (unsigned char)nchksum;
 
-        std::cout << "openLockWithPulse():";
+        qDebug() << "openLockWithPulse():";
         for(uint i=0;i<sizeof(commands);i++)
         {
-            std::cout << (boost::format("0x%02x ") % static_cast<int>(commands[i]));
+            qDebug() << QString("%1").arg(commands[i], 2, 16, QChar('0'));
         }
-        std::cout << "\n";
+        qDebug() << "\n";
 
-
-        _pport->write_some(asio::buffer(commands, 9));
+        _pport->WriteData(QByteArray((char *) commands, 9));
 
         seqNum += 0x01;
         if(seqNum > 0x07)
@@ -323,53 +201,48 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
  */
 void CLockController::readLockStateCmd(uint8_t nLockNum)
 {
-   if(this->isConnected() && _pport->is_open())
-   {
-       unsigned char commands[9] = { 0x5D, 0x8A, 0x01, 0x00, 0xC8, 0x00, 0x00, 0x00, 0x53 };
-       commands[2] = (unsigned char)nLockNum;
+    if(this->isConnected())
+    {
+        unsigned char commands[9] = { 0x5D, 0x8A, 0x01, 0x00, 0xC8, 0x00, 0x00, 0x00, 0x53 };
+        commands[2] = (unsigned char)nLockNum;
 
-       uint8_t nchksum = 0;
-       for(int i=1; i<8; i++)
-       {
-           nchksum += commands[i];
-       }
+        uint8_t nchksum = 0;
+        for(int i=1; i<8; i++)
+        {
+            nchksum += commands[i];
+        }
 
-//       std::cout << "  checksum:" << std::to_string(nchksum) << "\n";
+        qDebug() << "  checksum:" << QString::number(nchksum) << "\n";
 
-       commands[8] = (unsigned char)nchksum;
+        commands[8] = (unsigned char)nchksum;
 
-       std::cout << "Command: ";
-       for(uint i=0;i<sizeof(commands);i++)
-       {
-           std::cout << (boost::format("0x%02x ") % static_cast<int>(commands[i]));
-       }
-       std::cout << "\n";
+        qDebug() << "Command: ";
+        for(uint i=0;i<sizeof(commands);i++)
+        {
+            qDebug() << QString("%1").arg(commands[i], 2, 16, QChar('0'));
+           
+        }
+        qDebug() << "\n";
 
-       _pport->write_some(asio::buffer(commands, 9));
-   }
+        _pport->WriteData(QByteArray((char *) commands, 9));
+    }
 }
 
 
 std::string CLockController::readCommandResponse()
 {
     std::string rsp = "";
+    int  nCount = 0;
+    if( this->isConnected() && _pport ) 
+    {
+        QByteArray data;
+        nCount = _pport->ReadData(data);
+        rsp = QString(data).toStdString();        
+    }
 
-    if( this->isConnected() && _pport ) {
-        CBlockingReader reader(*_pport, 2000);    // Read serial with timeout.
-
-        int  nCount = 0;
-        char c;
-
-        // read from the serial port until we get a
-        // \n or until a read times-out (500ms)
-        while (reader.readChar(c) && nCount++ < 9) {
-            rsp += c;
-        }
-
-        if (nCount < 9) {
-            // it must have timed out.
-            throw std::runtime_error("Read timed out!");
-        }
+    if (nCount < 9) {
+        // it must have timed out.
+        throw std::runtime_error("Read timed out!");
     }
     return rsp;
 }
@@ -388,10 +261,8 @@ uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
     uint64_t        un64ShiftValue = 0;
     unsigned char   ucLocks[2];
     std::string sResponse;
-//    std::string sLocks="";
-//    sLocks = std::to_string(un64Locks);
 
-    std::cout << "Lock State(1):\n";
+    qDebug() << "Lock State(1):\n";
 
     if( unBanks > 4 ) {
         unBanks = 4;
@@ -399,37 +270,41 @@ uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
     for(int i=0;i<unBanks;i++)
     {
         readLockStateCmd(i*16+1);   // Read locks 1-16, 17-32, 33-48,  or 49-64
-        try {
-            sResponse = this->readCommandResponse();
-        } catch (const std::runtime_error &e)
+        try 
         {
-            std::cout << "inquireLockStatus() runtime error:\t" << e.what();
+            sResponse = this->readCommandResponse();
+        } 
+        catch (const std::runtime_error &e)
+        {
+            qDebug() << "inquireLockStatus() runtime error:\t" << e.what();
             _un64LockLocks = 0xFFFFFFFFFFFFFFFF;
             return _un64LockLocks;
         }
-        std::cout << "Command Response Count:" << sResponse.length() << "\n";
-        std::cout << "Hex Response:";
-        for(uint i=0;i<sResponse.length();i++)
+        qDebug() << "Command Response Count:" << sResponse.length() << "\n";
+        qDebug() << "Hex Response:";
+        for(uint j=0;j<sResponse.length();j++)
         {
-            std::cout << (boost::format("0x%02x ") % static_cast<int>(sResponse[i]));
+            qDebug() << QString("%1").arg(sResponse[j], 2, 16, QChar('0'));
         }
 
-        std::cout << "\n";
+        qDebug() << "\n";
 
         // Populate to 64 bit unsigned return value
         ucLocks[0] = (unsigned char)sResponse[6];
         ucLocks[1] = (unsigned char)sResponse[7];
 
         // Print out for test/check now
-        std::cout << "Locks[" << i*16+1 << "+]:";
-        for(uint8_t n=0;n<8;n++) {
-            std::cout << ((ucLocks[0] & (0x01 << n)) != 0x00 ? '1' : '0');
+        qDebug() << "Locks[" << i*16+1 << "+]:";
+        for(uint8_t n=0;n<8;n++) 
+        {
+            qDebug() << ((ucLocks[0] & (0x01 << n)) != 0x00 ? '1' : '0');
         }
-        std::cout << ":";
-        for(uint8_t n=0;n<8;n++) {
-            std::cout << ((ucLocks[1] & (0x01 << n)) != 0x00 ? '1' : '0');
+        qDebug() << ":";
+        for(uint8_t n=0;n<8;n++) 
+        {
+            qDebug() << ((ucLocks[1] & (0x01 << n)) != 0x00 ? '1' : '0');
         }
-        std::cout << "\n";
+        qDebug() << "\n";
 
         un64ShiftValue = ucLocks[0];
         un64Locks = un64Locks | (un64ShiftValue << (i*2)*8);
@@ -439,7 +314,7 @@ uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
     _un64LockLocks = un64Locks;
     _bLockStateRead = true;
     _plockStatus->setLockState(_un64LockLocks);
-//    std::cout << "saved banks..." << std::to_string(un64Locks) << "\n";
+    //qDebug << "saved banks..." << QString::number(un64Locks) << "\n";
 
     return un64Locks;
 }
@@ -457,7 +332,7 @@ void CLockController::OnLocksStatusRequest()
  */
 int CLockController::isLock(uint16_t nLockNum)
 {
-    nLockNum = nLockNum;
+    Q_UNUSED(nLockNum);
     return 1;
 //    if( _bLockStateRead )
 //    {
@@ -475,5 +350,3 @@ int CLockController::isLock(uint16_t nLockNum)
 //    }
 
 }
-
-

@@ -17,7 +17,6 @@
 class CFingerprintReader : public QObject
 {
     Q_OBJECT
-    CUSBController  *_usbController;
 
 private:
     bool openDeviceHandle();

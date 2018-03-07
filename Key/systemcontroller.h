@@ -50,7 +50,6 @@ private:
     QThread                 _threadHID, _threadCardReader;
     CSecurityController     _securityController;
     CLCDGraphicsController  _LCDGraphicsController;
-    CUSBController          _serialCtrl;
     CLockController         _LockController;
     CReportController       _ReportController;
     QMainWindow             *_pmainWindow;

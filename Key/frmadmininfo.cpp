@@ -796,7 +796,7 @@ void CFrmAdminInfo::open_single_door(int nLockNum)
 
 void CFrmAdminInfo::populateAvailableDoors() {
     QPushButton *pb;
-    QIcon       icon("/home/pi/SafePak/images/vault.png");
+    QIcon       icon("/home/pi/kcb-config/images/vault.png");
     QList<QPushButton*> lstWidgets;
     QList<QPushButton*>::Iterator   itor;
     lstWidgets = ui->tabWidget->findChildren<QPushButton *>();
@@ -902,11 +902,14 @@ void CFrmAdminInfo::createLockMenus()
 int CFrmAdminInfo::parseLockNumFromObjectName(QString objectName) {
     if(objectName.mid(0,5) == "cbBox")
     {
-        try {
+        try 
+        {
             int nVal = QString(objectName.right(objectName.length()-5)).toInt();
             //qDebug() << "Parse lock number from objectName:" + QVariant(nVal).toString();
             return nVal;
-        } catch(exception &e) {
+        } 
+        catch(std::exception &e) 
+        {
             qDebug() << "Parsing lock number from object name failed!";
         }
     }

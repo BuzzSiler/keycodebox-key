@@ -6,7 +6,6 @@
 #include <cstdlib>
 
 #include "usbcontroller.h"
-#include "crystalfontzcontroller.h"
 #include "lockcontroller.h"
 #include "usbhwkeypad.h"
 #include "frmadmininfo.h"

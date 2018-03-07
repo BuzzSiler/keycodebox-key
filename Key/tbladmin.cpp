@@ -1,13 +1,10 @@
-#include <ctime>
-#include <string>
+#include "tbladmin.h"
 #include <QtSql>
 #include <QtDebug>
 #include <sqlite3.h>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonDocument>
-#include <boost/algorithm/string.hpp>
-#include "tbladmin.h"
 #include "encryption.h"
 #include <exception>
 
@@ -42,6 +39,84 @@ const char *fvncpassword = "vnc_password";
 const char *freportviaemail = "report_via_email";
 const char *freporttofile = "report_to_file";
 const char *freportdirectory = "report_directory";
+
+CAdminRec::CAdminRec() : 
+    QObject(nullptr),
+    default_report_freq(*new QDateTime(QDate(), QTime(24, 0, 0))),
+    default_report_start(*new QDateTime(QDate(2016, 6, 1), QTime(00, 00)))
+{
+    ids = -1;
+    admin_name = "";
+    admin_email = "";
+    admin_phone = "";
+
+    //default_report_freq = QDateTime(QDate(), QTime(24, 0, 0)); // TIME, Daily
+    //default_report_start = QDateTime(QDate(2016, 6, 1), QTime(00, 00));    // DATETIME,
+    password = "";
+    access_code_old = "";
+    access_code = "";
+    assist_code = "";
+    assist_password = "";
+    use_predictive_access_code = false;
+    pred_key = "KEYCODEBOXTEST";
+    pred_resolution = 10;
+    max_locks = 16;
+
+    show_fingerprint = false;
+    show_password = false;
+    smtp_server = "";
+    smtp_port = 0;
+    smtp_type = 0; // 0=TCP, 1=SSL, 2=TSL
+    smtp_username = "";
+    smtp_password = "";
+    vnc_server = "";
+    vnc_port = 0;
+    vnc_type = 0; // 0=TCP, 1=SSL, 2=TSL
+    vnc_username = "";
+    vnc_password = "";
+
+    report_via_email = false;
+    report_save_to_file = false;
+    report_directory = "";
+}
+
+CAdminRec &CAdminRec::operator=(CAdminRec &newRec) 
+{
+    ids = newRec.ids;
+    admin_name = newRec.admin_name;
+    admin_email = newRec.admin_email;
+    admin_phone = newRec.admin_phone;
+    email_report_active = newRec.email_report_active;
+    default_report_freq = newRec.default_report_freq;
+    default_report_start = newRec.default_report_start;
+    password = newRec.password;
+    access_code_old = newRec.access_code_old;
+    access_code = newRec.access_code;
+    assist_code = newRec.assist_code;
+    assist_password = newRec.assist_password;
+    use_predictive_access_code = newRec.use_predictive_access_code;
+    pred_key = newRec.pred_key;
+    pred_resolution = newRec.pred_resolution;
+    max_locks = newRec.max_locks;
+
+    show_fingerprint = newRec.show_fingerprint;
+    show_password = newRec.show_password;
+    smtp_server = newRec.smtp_server;
+    smtp_port = newRec.smtp_port;
+    smtp_type = newRec.smtp_type;
+    smtp_username = newRec.smtp_username;
+    smtp_password = newRec.smtp_password;
+
+    vnc_port = newRec.vnc_port;
+    vnc_password = newRec.vnc_password;
+
+    report_via_email = newRec.report_via_email;
+    report_save_to_file = newRec.report_save_to_file;
+    report_directory = newRec.report_directory;
+
+    return *this;
+}
+
 
 QJsonObject& CAdminRec::jsonRecord(QJsonObject &json)
 {
@@ -80,14 +155,14 @@ QJsonObject& CAdminRec::jsonRecord(QJsonObject &json)
     return json;
 }
 
-QString CAdminRec::jsonRecordAsString()
-{
-    QJsonObject jsonObj;
-    jsonObj = this->jsonRecord(jsonObj);
-    QJsonDocument doc(jsonObj);
-    QString str(doc.toJson(QJsonDocument::Compact));
-    return str;
-}
+// QString CAdminRec::jsonRecordAsString()
+// {
+//     QJsonObject jsonObj;
+//     jsonObj = this->jsonRecord(jsonObj);
+//     QJsonDocument doc(jsonObj);
+//     QString str(doc.toJson(QJsonDocument::Compact));
+//     return str;
+// }
 
 bool CAdminRec::setFromJsonObject(QJsonObject jsonObj)
 {
@@ -185,26 +260,26 @@ bool CAdminRec::setFromJsonString(std::string strJson)
 
 QString CTblAdmin::isAccessCode(QString code)
 {
-    qDebug() << "CTblAdmin::isAccessCode():" << code.toStdString().c_str() << " =? " << _currentAdmin.getAccessCode().c_str();
+    qDebug() << "CTblAdmin::isAccessCode():" << code << " =? " << _currentAdmin.getAccessCode().c_str();
 
-    std::string access_code = _currentAdmin.getAccessCode();  // already unencrypted
-    std::string assist_code = _currentAdmin.getAssistCode();  // already unencrypted
-    std::string access_code_old = _currentAdmin.getAccessCodeOld();
-    std::string in_access_code = code.toStdString();  // CEncryption::encryptDecrypt(code.size(), code.toStdString());
+    QString access_code = QString::fromStdString(_currentAdmin.getAccessCode());  // already unencrypted
+    QString assist_code = QString::fromStdString(_currentAdmin.getAssistCode());  // already unencrypted
+    QString access_code_old = QString::fromStdString(_currentAdmin.getAccessCodeOld());
 
     //quit code
-    std::string quit_code = "123456789987654321";
-    if(boost::iequals(in_access_code, quit_code))
+    QString quit_code = QStringLiteral("123456789987654321");
+    if (code == quit_code)
     {
         qDebug() << "CTblAdmin::isAccessCode(): shutting down!";
         QCoreApplication::quit();
     }
 
-    if(boost::iequals(in_access_code, access_code) || boost::iequals(in_access_code, access_code_old))
+    if (code == access_code || code == access_code_old)
     {
         return "Admin";
     }
-    else if(boost::iequals(in_access_code, assist_code)){
+    if (code == assist_code)
+    {
         return "Assist";
     }
     else
@@ -216,16 +291,16 @@ QString CTblAdmin::isAccessCode(QString code)
 bool CTblAdmin::isPassword(QString password, QString type)
 {
     // unencrypt
-    std::string adminPassword   = _currentAdmin.getPassword();          // Already unencrypted in currentAdmin
-    std::string assistPassword  = _currentAdmin.getAssistPassword();    // Already unencrypted in currentAdmin
-    std::string enteredPassword = CEncryption::decryptString(password).toStdString();
+    QString adminPassword   = QString::fromStdString(_currentAdmin.getPassword());          // Already unencrypted in currentAdmin
+    QString assistPassword  = QString::fromStdString(_currentAdmin.getAssistPassword());    // Already unencrypted in currentAdmin
+    QString enteredPassword = CEncryption::decryptString(password);
 
-    if(type == "Assist" && boost::iequals(assistPassword, enteredPassword))
+    if(type == QStringLiteral("Assist") && (assistPassword == enteredPassword))
     {
         return true;
     }
 
-    if(type == "Admin" && boost::iequals(adminPassword, enteredPassword))
+    if(type == QStringLiteral("Admin") && (adminPassword == enteredPassword))
     {
         return true;
     }

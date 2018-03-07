@@ -21,8 +21,8 @@ char *access_fingerprint_index[5000];
 bool enroll_complete = false;
 QString access_code = "";
 QString access_code2 = "";
-CFingerprintReader::CFingerprintReader(QObject *parent) : QObject(parent),
-    _usbController(0)
+CFingerprintReader::CFingerprintReader(QObject *parent) : 
+    QObject(parent)
 {
 }
 

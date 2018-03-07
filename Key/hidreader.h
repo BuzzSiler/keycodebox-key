@@ -20,7 +20,6 @@
 class CHWKeyboardReader : public QObject
 {
     Q_OBJECT
-    CUSBController  *_usbController;
     hid_device *_handle;
 
     uint16_t    _unVID, _unPID;

@@ -18,7 +18,6 @@ class CUSBHWKeypad : public QObject
 {
     Q_OBJECT
 
-    CUSBController  *_usbController;
     hid_device *_handle;
 
 private:

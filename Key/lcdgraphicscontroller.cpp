@@ -1,12 +1,11 @@
 #include "lcdgraphicscontroller.h"
 
 #include <QDebug>
-#include <iostream>
 #include <cstdlib>
-#include <boost/lexical_cast.hpp>
 #include <unistd.h>
 
-CLCDGraphicsController::CLCDGraphicsController(QObject *parent) : QObject(parent),
+CLCDGraphicsController::CLCDGraphicsController(QObject *parent) : 
+    QObject(parent),
     _timerDim(this)
 {
 
@@ -26,7 +25,7 @@ void CLCDGraphicsController::setBrightness(unsigned int unValue)
     // echo 0 > /sys/class/backlight/rpi_backlight/brightness
     if( unValue > 255 ) { unValue = 255; }
 
-    sCmd = std::string("sudo bash -c 'echo ") + boost::lexical_cast<std::string>(unValue) + " > /sys/class/backlight/rpi_backlight/brightness'";
+    sCmd = std::string("sudo bash -c 'echo ") + std::to_string(unValue) + " > /sys/class/backlight/rpi_backlight/brightness'";
     qDebug() << sCmd.c_str();
     system(sCmd.c_str());
 }
@@ -45,10 +44,12 @@ void CLCDGraphicsController::turnBacklightOff()
 
 bool CLCDGraphicsController::isLCDAttached()
 {
-    if( access( "/sys/class/backlight/rpi_backlight/brightness", F_OK ) != -1 ) {
+    if( access( "/sys/class/backlight/rpi_backlight/brightness", F_OK ) != -1 ) 
+    {
         // file exists
         return true;
-    } else {
+    } else 
+    {
         // file doesn't exist
         return false;
     }

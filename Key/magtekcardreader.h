@@ -37,7 +37,6 @@
 class CMagTekCardReader : public QObject
 {
     Q_OBJECT
-    CUSBController  *_usbController;
     hid_device *_handle;
 
     int fileDescriptor, readDescriptor;
