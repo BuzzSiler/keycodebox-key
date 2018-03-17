@@ -1,124 +1,24 @@
 #ifndef CTBLADMIN_H
 #define CTBLADMIN_H
 
-#include <stdint-gcc.h>
 #include <ctime>
 #include <string>
-#include <QtSql>
+#include <QObject>
 #include <QDateTime>
 
+class QSqlDatabase;
+class QJsonObject;
+class QString;
 
-class CAdminRec : public QObject {
+
+class CAdminRec : public QObject 
+{
     Q_OBJECT
-private:
-    int ids;    //  integer primary key unique,
-    std::string admin_name; // text,
-    std::string admin_email; // text,
-    std::string admin_phone; // text,
-    bool        email_report_active;  // bool - true = email report, false = no email report
-    QDateTime   default_report_freq; // DATETIME
-    QDateTime   default_report_start;    // DATETIME,
-    std::string password;    // text,
-    std::string access_code_old; // text
-    std::string access_code; // text
-    std::string assist_code; //text
-    std::string assist_password; //text
-    bool        use_predictive_access_code;
-    std::string pred_key;
-    int         pred_resolution;
-    uint32_t    max_locks;
-
-    bool        show_fingerprint; // bool: true = display button
-    bool        show_password; // bool: true = display button
-    std::string smtp_server;
-    int smtp_port;
-    int smtp_type;
-    std::string smtp_username;
-    std::string smtp_password;
-
-    std::string vnc_server;
-    int vnc_port;
-    int vnc_type;
-    std::string vnc_username;
-    std::string vnc_password;
-    
-    bool        report_via_email;
-    bool        report_save_to_file;
-    std::string report_directory;
 
 public:
-    CAdminRec() {
-        ids = -1;
-        admin_name = "";
-        admin_email = "";
-        admin_phone = "";
+    CAdminRec();
 
-        default_report_freq = QDateTime(QDate(), QTime(24, 0, 0)); // TIME, Daily
-        default_report_start = QDateTime(QDate(2016, 6, 1), QTime(00, 00));    // DATETIME,
-        password = "";
-        access_code_old = "";
-        access_code = "";
-        assist_code = "";
-        assist_password = "";
-        use_predictive_access_code = false;
-        pred_key = "KEYCODEBOXTEST";
-        pred_resolution = 10;
-        max_locks = 16;
-
-        show_fingerprint = false;
-        show_password = false;
-        smtp_server = "";
-        smtp_port = 0;
-        smtp_type = 0; // 0=TCP, 1=SSL, 2=TSL
-        smtp_username = "";
-        smtp_password = "";
-        vnc_server = "";
-        vnc_port = 0;
-        vnc_type = 0; // 0=TCP, 1=SSL, 2=TSL
-        vnc_username = "";
-        vnc_password = "";
-
-        report_via_email = false;
-        report_save_to_file = false;
-        report_directory = "";
-    }
-
-public:
-    CAdminRec &operator=(CAdminRec &newRec) {
-        ids = newRec.ids;
-        admin_name = newRec.admin_name;
-        admin_email = newRec.admin_email;
-        admin_phone = newRec.admin_phone;
-        email_report_active = newRec.email_report_active;
-        default_report_freq = newRec.default_report_freq;
-        default_report_start = newRec.default_report_start;
-        password = newRec.password;
-        access_code_old = newRec.access_code_old;
-        access_code = newRec.access_code;
-        assist_code = newRec.assist_code;
-        assist_password = newRec.assist_password;
-        use_predictive_access_code = newRec.use_predictive_access_code;
-        pred_key = newRec.pred_key;
-        pred_resolution = newRec.pred_resolution;
-        max_locks = newRec.max_locks;
-
-        show_fingerprint = newRec.show_fingerprint;
-        show_password = newRec.show_password;
-        smtp_server = newRec.smtp_server;
-        smtp_port = newRec.smtp_port;
-        smtp_type = newRec.smtp_type;
-        smtp_username = newRec.smtp_username;
-        smtp_password = newRec.smtp_password;
-
-        vnc_port = newRec.vnc_port;
-        vnc_password = newRec.vnc_password;
-	
-        report_via_email = newRec.report_via_email;
-        report_save_to_file = newRec.report_save_to_file;
-        report_directory = newRec.report_directory;
-
-        return *this;
-    }
+    CAdminRec &operator=(CAdminRec &newRec);
 
     int getID() { return ids; }    //  integer primary key unique,
     void setID(int id) { ids = id; }
@@ -208,11 +108,47 @@ public:
     std::string getReportDirectory() { return report_directory; }
     void setReportDirectory(std::string directory) { report_directory = directory; }
 
-    QJsonObject &jsonRecord(QJsonObject &json);
-    QString jsonRecordAsString();
+    QJsonObject& jsonRecord(QJsonObject &json);
+    //QString jsonRecordAsString();
 
     bool setFromJsonObject(QJsonObject jsonObj);
     bool setFromJsonString(std::string strJson);
+
+private:
+    int ids;    //  integer primary key unique,
+    std::string admin_name; // text,
+    std::string admin_email; // text,
+    std::string admin_phone; // text,
+    bool        email_report_active;  // bool - true = email report, false = no email report
+    QDateTime&   default_report_freq; // DATETIME
+    QDateTime&   default_report_start;    // DATETIME,
+    std::string password;    // text,
+    std::string access_code_old; // text
+    std::string access_code; // text
+    std::string assist_code; //text
+    std::string assist_password; //text
+    bool        use_predictive_access_code;
+    std::string pred_key;
+    int         pred_resolution;
+    uint32_t    max_locks;
+
+    bool        show_fingerprint; // bool: true = display button
+    bool        show_password; // bool: true = display button
+    std::string smtp_server;
+    int smtp_port;
+    int smtp_type;
+    std::string smtp_username;
+    std::string smtp_password;
+
+    std::string vnc_server;
+    int vnc_port;
+    int vnc_type;
+    std::string vnc_username;
+    std::string vnc_password;
+    
+    bool        report_via_email;
+    bool        report_save_to_file;
+    std::string report_directory;
 };
 
 /**

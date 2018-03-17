@@ -1,5 +1,5 @@
 #include "hidreader.h"
-
+#include <unistd.h>
 #include <QDebug>
 #include <QRegExp>
 #include <QStringList>
@@ -7,8 +7,9 @@
 #include <iostream>
 
 
-CHWKeyboardReader::CHWKeyboardReader(QObject *parent) : QObject(parent),
-    _usbController(0), _handle(0)
+CHWKeyboardReader::CHWKeyboardReader(QObject *parent) : 
+    QObject(parent),
+    _handle(0)
 {    
 }
 

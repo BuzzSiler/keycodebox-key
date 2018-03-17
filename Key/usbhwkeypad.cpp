@@ -1,7 +1,8 @@
 #include "usbhwkeypad.h"
 
-CUSBHWKeypad::CUSBHWKeypad(QObject *parent) : QObject(parent),
-    _usbController(0), _handle(0)
+CUSBHWKeypad::CUSBHWKeypad(QObject *parent) : 
+    QObject(parent),
+    _handle(0)
 {
 
 }

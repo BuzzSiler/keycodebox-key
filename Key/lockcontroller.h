@@ -3,19 +3,16 @@
 
 #include <QObject>
 #include <stdio.h>
-#include <boost/asio.hpp>
-#include <boost/asio/serial_port.hpp>
-#include <boost/asio/basic_serial_port.hpp>
+#include "serialport.h"
+class SerialPort;
 
-#include "usbcontroller.h"
 
 #define MAX_PULSE_COUNT                     250
 #define MAX_PULSE_ON_TIME                   500     // milliseconds
 #define VOLTAGE_DOUBLER_ACTIVATION_DELAY    1000        // milliseconds
 #define TO_HEX(i) (i <= 9 ? '0' + i : 'A' - 10 + i)
 
-using namespace boost;
-
+class CUSBController;
 class CLocksStatus;
 
 /**
@@ -28,75 +25,71 @@ class CLockController : public QObject
 {
     Q_OBJECT
 
-    asio::serial_port *_pport;
 
-    QString     _sFilterString0 = "USB-Serial.*ttyUSB";
-    QString     _sFilterString1 = "USB2.0-Ser.*ttyUSB";
-    QString     _sFilterString2 = "usb-FTDI.*ttyUSB";
-    QString     _sDeviceType = "serial";
-    QString     _sFindDevicePrefix = "ttyUSB";
+    public:
+        explicit CLockController(QObject *parent = 0);
 
-    bool        _bLockStateRead = false;    // False until read at least once
-    uint64_t    _un64LockLocks = 0; // 1 bit for each up to 64
+        void initController();
+        bool isConnected() 
+        {
+            return __connectedState == ECONNECTED;
+        }
 
-private: // Object Connections
-    CUSBController  *_pusbController;
-    CLocksStatus    *_plockStatus = 0;
+        void openLock(uint16_t nLockNum);
+        void openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, uint16_t nPulseOnTimeMS, uint16_t nPulseOffTimeMS);
+        uint64_t inquireLockStatus(uint8_t unBanks);  // Single bit per Lock up to 64.
 
-    uint8_t     ENOT_CONNECTED = 0;
-    uint8_t     ECONNECTED = 1;
-    uint8_t __connectedState = ENOT_CONNECTED;
+        int isLock(uint16_t nLockNum);
 
-private: // methods
-    void initController();
+        CLocksStatus* getLockStatus() 
+        {
+            if( _plockStatus )
+                return _plockStatus;
+            else
+                return 0;
+        }
 
-    void setStateConnected() {
-        __connectedState = ECONNECTED;
-    }
+    signals:
+        void __OnLocksStatus(QObject &locksStatus);
 
-    void setStateDisconnected() {
-        __connectedState = ENOT_CONNECTED;
-    }
+    public slots:
+        void OnLocksStatusRequest();
 
-    std::string int_to_bin(uint16_t number);
-    std::string to_hex(uint16_t to_convert);
-protected:
-    void readLockStateCmd(uint8_t nLockNum);
-    std::string readCommandResponse();
+    private:
+        SerialPort* _pport;
 
-public:
-    explicit CLockController(QObject *parent = 0);
-    CUSBController& getUSBController() {
-        return *_pusbController;
-    }
+        QString     _sFilterString0 = "USB-Serial.*ttyUSB";
+        QString     _sFilterString1 = "USB2.0-Ser.*ttyUSB";
+        QString     _sFilterString2 = "usb-FTDI.*ttyUSB";
+        QString     _sDeviceType = "serial";
+        QString     _sFindDevicePrefix = "ttyUSB";
 
-    void setUSBController(CUSBController &usbController) {
-        _pusbController = &usbController;
-        initController();
-    }
+        bool        _bLockStateRead = false;    // False until read at least once
+        uint64_t    _un64LockLocks = 0; // 1 bit for each up to 64
 
-    bool isConnected() {
-        return __connectedState == ECONNECTED;
-    }
+    private: // Object Connections
+        CLocksStatus    *_plockStatus = 0;
 
-    void openLock(uint16_t nLockNum);
-    void openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, uint16_t nPulseOnTimeMS, uint16_t nPulseOffTimeMS);
-    uint64_t inquireLockStatus(uint8_t unBanks);  // Single bit per Lock up to 64.
+        uint8_t     ENOT_CONNECTED = 0;
+        uint8_t     ECONNECTED = 1;
+        uint8_t __connectedState = ENOT_CONNECTED;
 
-    int isLock(uint16_t nLockNum);
+    private: // methods
 
-    CLocksStatus* getLockStatus() {
-        if( _plockStatus )
-            return _plockStatus;
-        else
-            return 0;
-    }
+        void setStateConnected() {
+            __connectedState = ECONNECTED;
+        }
 
-signals:
-    void __OnLocksStatus(QObject &locksStatus);
+        void setStateDisconnected() {
+            __connectedState = ENOT_CONNECTED;
+        }
 
-public slots:
-    void OnLocksStatusRequest();
+        std::string int_to_bin(uint16_t number);
+        std::string to_hex(uint16_t to_convert);
+
+    protected:
+        void readLockStateCmd(uint8_t nLockNum);
+        std::string readCommandResponse();
 };
 
 

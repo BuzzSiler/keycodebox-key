@@ -151,7 +151,7 @@ void CFrmCodeEdit::on_buttonBox_accepted()
        the datetime will be the minimum datetime of the QDateTimeEdit control.  In thoses case,
        return _DATENONE.  Other parts of the software rely on _DATENONE.
 
-       Note: It may not be the best decision to query based on a default datetime like _DATANONE.
+       Note: It may not be the best decision to query based on a default datetime like _DATENONE.
        Now that there are different types of access maybe the query should be modified to 
        accommodate these types.
     */

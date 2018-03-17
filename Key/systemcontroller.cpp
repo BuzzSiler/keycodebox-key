@@ -7,7 +7,7 @@
 #include <QAbstractSocket>
 #include <QMetaEnum>
 #include <iostream>
-
+#include <sstream>
 #include "systemcontroller.h"
 #include "frmusercode.h"
 #include "encryption.h"
@@ -16,6 +16,7 @@
 #include "lockhistoryrec.h"
 #include "lockstate.h"
 #include "version.h"
+#include "usbprovider.h"
 
 CSystemController::CSystemController(QObject *parent)
 {
@@ -51,6 +52,7 @@ void CSystemController::initialize(QThread *pthread)
 
     qDebug() << "Starting up KeyCodeBox Alpha " VERSION;
 
+    UsbProvider::Initialize();
     initializeSecurityConnections();
     initializeLockController();
     initializeReportController();
@@ -302,11 +304,8 @@ void CSystemController::initializeLockController()
 {
     qDebug() << "CSystemController::initializeLockController moveToThread.";
 
-    //    _serialCtrl.moveToThread(_pInitThread);
-    //    _LockController.moveToThread(_pInitThread);
-
-    _LockController.setUSBController(_serialCtrl);
-    //    _un64Locks = _LockController.inquireLockStatus(4);
+    _LockController.initController();
+    
     emit __OnLockStatusUpdated(_LockController.getLockStatus());
 }
 

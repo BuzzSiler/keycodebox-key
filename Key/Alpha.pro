@@ -17,11 +17,10 @@ INCLUDEPATH += /usr/include
 INCLUDEPATH += /usr/local/include
 INCLUDEPATH += /usr/include/libusb-1.0
 
-LIBS += -L/usr/lib/arm-linux-gnueabihf -lboost_system -lhidapi-hidraw
+LIBS += -L/usr/lib/arm-linux-gnueabihf -lhidapi-hidraw
 
 SOURCES += main.cpp\
         safepakmain.cpp \
-    crystalfontzcontroller.cpp \
     lockcontroller.cpp \
     usbdrivecontroller.cpp \
     usbcontroller.cpp \
@@ -75,11 +74,11 @@ SOURCES += main.cpp\
     clickablegraphicsitem.cpp \
     clickablelineedit.cpp \
     hidreader.cpp \
-    simplecrypt.cpp
+    simplecrypt.cpp \
+    usbprovider.cpp \
+    serialport.cpp
 
 HEADERS  += safepakmain.h \
-    blockingreader.h \
-    crystalfontzcontroller.h \
     usbdrivecontroller.h \
     usbcontroller.h \
     fingerprintreader.h \
@@ -136,7 +135,9 @@ HEADERS  += safepakmain.h \
     reportcontroller.h \
     clickablelineedit.h \
     hidreader.h \
-    simplecrypt.h
+    simplecrypt.h \
+    usbprovider.h \
+    serialport.h
 
 FORMS    += mainwindow.ui \
     frmcodeentry.ui \
