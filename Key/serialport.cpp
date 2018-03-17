@@ -26,12 +26,12 @@ SerialPort::~SerialPort()
 int SerialPort::WriteData(const QByteArray &request)
 {
     // write request
-    qDebug() << "WriteData:" << qPrintable(request);
+    qDebug() << "WriteData:" << qPrintable(request.toHex());
 
     qint16 num_bytes = m_port.write(request);
     if (m_port.waitForBytesWritten(m_writeTimeout)) 
     {
-        qDebug() << num_bytes << "written to serial port";
+        qDebug() << "WriteData:" << num_bytes << "written to serial port";
     }
     else
     {
@@ -47,15 +47,20 @@ int SerialPort::ReadData(QByteArray& response)
     if (m_port.waitForReadyRead(m_readTimeout)) 
     {
         response = m_port.readAll();
+        qDebug() << "ReadData size: " << response.size();
         while (m_port.waitForReadyRead(m_readTimeout))
         {
             response += m_port.readAll();
+            qDebug() << "ReadData size: " << response.size();
         }
+
+        qDebug() << "ReadData:" << response.toHex();
     }
     else
     {
         qCritical() << "Timeout occurred while reading from serial port";
     }
     
+    qDebug() << "ReadData size: " << response.size();
     return response.size();
 }

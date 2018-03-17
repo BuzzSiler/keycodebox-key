@@ -103,6 +103,9 @@ void CLockController::openLock(uint16_t nLockNum)
         {
             seqNum = 0x00;
         }
+
+        QByteArray response;
+        int num_bytes = _pport->ReadData(response);
     }
 }
 
@@ -201,6 +204,7 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
  */
 void CLockController::readLockStateCmd(uint8_t nLockNum)
 {
+    qDebug() << "CLockController::readLockStateCmd";
     if(this->isConnected())
     {
         unsigned char commands[9] = { 0x5D, 0x8A, 0x01, 0x00, 0xC8, 0x00, 0x00, 0x00, 0x53 };
@@ -233,6 +237,9 @@ std::string CLockController::readCommandResponse()
 {
     std::string rsp = "";
     int  nCount = 0;
+
+    qDebug() << "CLockController::readCommandResponse";
+
     if( this->isConnected() && _pport ) 
     {
         QByteArray data;
@@ -262,11 +269,14 @@ uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
     unsigned char   ucLocks[2];
     std::string sResponse;
 
-    qDebug() << "Lock State(1):\n";
+    qDebug() << "CLockController::inquireLockStatus";
+    qDebug() << "Lock State(1):";
 
-    if( unBanks > 4 ) {
+    if( unBanks > 4 ) 
+    {
         unBanks = 4;
     }
+
     for(int i=0;i<unBanks;i++)
     {
         readLockStateCmd(i*16+1);   // Read locks 1-16, 17-32, 33-48,  or 49-64
@@ -280,7 +290,7 @@ uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
             _un64LockLocks = 0xFFFFFFFFFFFFFFFF;
             return _un64LockLocks;
         }
-        qDebug() << "Command Response Count:" << sResponse.length() << "\n";
+        qDebug() << "Command Response Count:" << sResponse.length();
         qDebug() << "Hex Response:";
         for(uint j=0;j<sResponse.length();j++)
         {
