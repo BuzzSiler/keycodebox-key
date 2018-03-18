@@ -1,5 +1,5 @@
-#ifndef SAFEPAKMAIN_H
-#define SAFEPAKMAIN_H
+#ifndef KEYCODEBOXMAIN_H
+#define KEYCODEBOXMAIN_H
 
 #include <QMainWindow>
 #include <QGraphicsScene>
@@ -101,4 +101,4 @@ protected:
 
 };
 
-#endif // SAFEPAKMAIN_H
+#endif // KEYCODEBOXMAIN_H

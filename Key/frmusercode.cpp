@@ -223,10 +223,10 @@ void CFrmUserCode::on_btnShowHideCode_clicked(bool checked)
 {
     if(checked) {
         ui->edCode->setEchoMode(QLineEdit::Normal);
-        ui->btnShowHideCode->setText("Hide");
+        ui->btnShowHideCode->setText(tr("Hide"));
     } else {
         ui->edCode->setEchoMode(QLineEdit::Password);
-        ui->btnShowHideCode->setText("Show");
+        ui->btnShowHideCode->setText(tr("Show"));
     }
 }
 

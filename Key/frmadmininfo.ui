@@ -20,7 +20,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Admin Information</string>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">

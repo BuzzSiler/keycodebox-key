@@ -20,7 +20,7 @@ INCLUDEPATH += /usr/include/libusb-1.0
 LIBS += -L/usr/lib/arm-linux-gnueabihf -lhidapi-hidraw
 
 SOURCES += main.cpp\
-        safepakmain.cpp \
+        keycodeboxmain.cpp \
     lockcontroller.cpp \
     usbdrivecontroller.cpp \
     usbcontroller.cpp \
@@ -78,7 +78,7 @@ SOURCES += main.cpp\
     usbprovider.cpp \
     serialport.cpp
 
-HEADERS  += safepakmain.h \
+HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
     usbcontroller.h \
     fingerprintreader.h \
@@ -171,3 +171,4 @@ DEPENDPATH += /usr/lib/arm-linux-gnueabihf
 DEFINES += SQLITE_CORE
 
 CONFIG += c++11
+TRANSLATIONS = trans_fr.ts trans_sp.ts

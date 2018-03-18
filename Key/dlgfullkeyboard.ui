@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Full Keyboard</string>
   </property>
   <widget class="QWidget" name="widgetEdit" native="true">
    <property name="enabled">
@@ -1607,7 +1607,7 @@
      </font>
     </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string/>
     </property>
    </widget>
    <widget class="QLineEdit" name="edText">

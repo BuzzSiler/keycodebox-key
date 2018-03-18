@@ -9,7 +9,7 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSceneMouseEvent>
 
-#include "safepakmain.h"
+#include "keycodeboxmain.h"
 
 namespace Ui {
 class MainWindow;

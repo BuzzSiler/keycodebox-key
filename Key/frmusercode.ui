@@ -14,7 +14,7 @@
    <enum>Qt::NoFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>User Code Entry</string>
   </property>
   <widget class="QLabel" name="lVersion">
    <property name="geometry">

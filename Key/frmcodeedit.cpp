@@ -205,7 +205,7 @@ void CFrmCodeEdit::on_edtAccessCode_clicked()
     checkAndCreateCurrentLineEdit();
 
     _pcurrentLineEdit->setNumbersOnly();
-    onStartEditLine(ui->edtAccessCode, "Code #1");
+    onStartEditLine(ui->edtAccessCode, tr("Code #1"));
 }
 
 void CFrmCodeEdit::on_edtSecondCode_clicked()
@@ -213,7 +213,7 @@ void CFrmCodeEdit::on_edtSecondCode_clicked()
     checkAndCreateCurrentLineEdit();
 
     _pcurrentLineEdit->setNumbersOnly();
-    onStartEditLine(ui->edtSecondCode, "Code #2");
+    onStartEditLine(ui->edtSecondCode, tr("Code #2"));
 }
 
 void CFrmCodeEdit::on_edtDescription_clicked()
@@ -221,7 +221,7 @@ void CFrmCodeEdit::on_edtDescription_clicked()
     checkAndCreateCurrentLineEdit();
 
     _pcurrentLineEdit->clearInputMasks();
-    onStartEditLine(ui->edtDescription, "Username");
+    onStartEditLine(ui->edtDescription, tr("Username"));
 }
 
 void CFrmCodeEdit::checkAndCreateCurrentLineEdit()
@@ -423,7 +423,7 @@ void CFrmCodeEdit::on_radioCodeAccessAlways_clicked()
     ui->radioCodeAccessAlways->setChecked(true);
     ui->dtStartAccess->hide();
     ui->dtEndAccess->hide();
-    ui->strStartAccess->setText("ALWAYS");
+    ui->strStartAccess->setText(tr("ALWAYS"));
     ui->strStartAccess->show();
     ui->strEndAccess->show();
 
@@ -463,7 +463,7 @@ void CFrmCodeEdit::on_radioCodeAccessLimitedUse_clicked()
     ui->radioCodeAccessLimitedUse->setChecked(true);
     ui->dtStartAccess->hide();
     ui->dtEndAccess->hide();
-    ui->strStartAccess->setText("LIMITED USE (Take and Return only)");
+    ui->strStartAccess->setText(tr("LIMITED USE (Take and Return only)"));
     ui->strStartAccess->show();
     ui->strEndAccess->show();
 

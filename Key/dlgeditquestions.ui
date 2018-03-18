@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Edit Questions</string>
   </property>
   <widget class="QWidget" name="widgetEdit" native="true">
    <property name="enabled">
@@ -44,7 +44,7 @@
       <pointsize>15</pointsize>
      </font>
     </property>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="gbKeyboard">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -1383,7 +1383,7 @@
      </font>
     </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string/>
     </property>
    </widget>
    <widget class="QLineEdit" name="edText">
@@ -1448,7 +1448,7 @@
      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="lblQuestion1">
     <property name="geometry">
      <rect>
       <x>11</x>
@@ -1466,7 +1466,7 @@
      <string>Question #1</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="lblQuestion2">
     <property name="geometry">
      <rect>
       <x>11</x>
@@ -1484,7 +1484,7 @@
      <string>Question #2</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QLabel" name="lblQuestion3">
     <property name="geometry">
      <rect>
       <x>11</x>
@@ -1502,7 +1502,7 @@
      <string>Question #3</string>
     </property>
    </widget>
-   <widget class="QLabel" name="labelLockNum">
+   <widget class="QLabel" name="lblQuestionsTitle">
     <property name="geometry">
      <rect>
       <x>351</x>
@@ -1634,7 +1634,7 @@
      <string>Clear</string>
     </property>
    </widget>
-   <widget class="Line" name="line">
+   <widget class="Line" name="lnSeparator">
     <property name="geometry">
      <rect>
       <x>20</x>

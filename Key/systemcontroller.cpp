@@ -449,7 +449,7 @@ void CSystemController::OnOpenLockRequest(int nLockNum)
     {
         // Open the lock
         qDebug() << "Lock Open";
-        emit __OnCodeMessage("Lock Open");
+        emit __OnCodeMessage(tr("Lock Open"));
         _LockController.openLock(nLockNum);
         qDebug() << "SystemController: reportActivity";
     } else {
@@ -486,7 +486,7 @@ void CSystemController::OnSecurityCheckSuccess(int lockNum)
     {
         // Open the lock
         qDebug() << "Lock Open";
-        emit __OnCodeMessage("Lock Open");
+        emit __OnCodeMessage(tr("Lock Open"));
         _LockController.openLock(lockNum);
         reportActivity();
     }
@@ -495,7 +495,7 @@ void CSystemController::OnSecurityCheckSuccess(int lockNum)
 void CSystemController::OnSecurityCheckedFailed()
 {
     //    _systemState = EPasswordFailed;
-    emit __OnCodeMessage("Incorrect Code");
+    emit __OnCodeMessage(tr("Incorrect Code"));
     emit __OnClearEntry();
 
     QTimer::singleShot(4000, this, SLOT(resetCodeMessage()));
@@ -504,17 +504,20 @@ void CSystemController::OnSecurityCheckedFailed()
 
 void CSystemController::resetCodeMessage()
 {
-    if(_systemState == EUserCodeOne) {
-        emit __OnCodeMessage("<Please Enter Code #1>");
-    } else if(_systemState == EUserCodeTwo) {
-        emit __OnCodeMessage("<Please Enter Second Code>");
+    if(_systemState == EUserCodeOne) 
+    {
+        emit __OnCodeMessage(QString("<%1 #1>").arg(tr("Please Enter Code")));
+    } 
+    else if(_systemState == EUserCodeTwo) 
+    {
+        emit __OnCodeMessage(QString("<%1>").arg(tr("Please Enter Second Code")));
     }
 }
 
 void CSystemController::OnSecurityCheckTimedOut()
 {
     _systemState = EPasswordTimeout;
-    emit __OnCodeMessage("Password Timeout");
+    emit __OnCodeMessage(tr("Password Timeout"));
     emit __OnClearEntry();
 }
 
@@ -525,9 +528,13 @@ void CSystemController::resetToTimeoutScreen()
     _systemState = ETimeoutScreen;
 
     if(_fingerprintReader)
+    {
         _fingerprintReader->cancelEnrollment();
+    }
     if(_fingerprintReader)
+    {
         _fingerprintReader->cancelVerify();
+    }
 }
 
 void CSystemController::OnRequestCurrentAdmin()
@@ -610,6 +617,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
     int i,j;
     int existingDeviceCount = 0;
     for(i=0; i<2; i++)
+    {
         for(j=0; j<foundDeviceCount; j++)
         {
             if( strcmp(mountedDevices[i],foundDevices[j]) == 0 )
@@ -619,14 +627,21 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
                 existingDeviceCount++;
             }
         }
+    }
 
     if( !oldDeviceFound[0] )
+    {
         strcpy(mountedDevices[0], "");
+    }
     if( !oldDeviceFound[1] )
+    {
         strcpy(mountedDevices[1], "");
+    }
 
     if( (existingDeviceCount > 1) )
+    {
         return existingDeviceCount;
+    }
 
     for(i=0; i<foundDeviceCount; i++)
     {
@@ -684,20 +699,26 @@ void CSystemController::start()
     }
 }
 
-void CSystemController::OnTouchScreenTouched() {
+void CSystemController::OnTouchScreenTouched() 
+{
     _systemState = EUserCodeOne;    
 }
 
 void CSystemController::looprun()
 {
-    if(_systemState == ETimeoutScreen) {
-        if(_systemStateDisplay != ETimeoutScreen) {
+    if(_systemState == ETimeoutScreen) 
+    {
+        if(_systemStateDisplay != ETimeoutScreen) 
+        {
             _systemStateDisplay = ETimeoutScreen;
             emit __OnDisplayTimeoutScreen();
         }
     }
-    if(_systemState == EUserCodeOne) {
-        if(_systemStateDisplay != EUserCodeOne) {
+
+    if(_systemState == EUserCodeOne) 
+    {
+        if(_systemStateDisplay != EUserCodeOne) 
+        {
             _systemStateDisplay = EUserCodeOne;
 
             stopTimeoutTimer();
@@ -709,17 +730,18 @@ void CSystemController::looprun()
             if(_fingerprintReader)
                 _fingerprintReader->cancelVerify();
 
-            emit __OnCodeMessage("<Please Enter Code #1>");
+            emit __OnCodeMessage(QString("<%1 #1>").arg(tr("Please Enter Code")));
             emit __OnDisplayCodeDialog(this);
-            emit __OnNewMessage("Enter Code #1");
+            emit __OnNewMessage(QString("%1 #1").arg(tr("Enter Code")));
             emit __OnEnableKeypad(true);
 
             startTimeoutTimer(30000);
         }
     }
-    else if(_systemState == EUserCodeTwo)
+    else if (_systemState == EUserCodeTwo)
     {
-        if(_systemStateDisplay != EUserCodeTwo) {
+        if(_systemStateDisplay != EUserCodeTwo) 
+        {
             _systemStateDisplay = EUserCodeTwo;
 
             stopTimeoutTimer();
@@ -727,30 +749,35 @@ void CSystemController::looprun()
             emit __OnClearEntry();
             emit __OnDisplayUserCodeTwoDialog(this);
             QThread::msleep(200);
-            emit __OnCodeMessage("<Please Enter Second Code>");
-            emit __OnNewMessage("Enter Second Code");
+            emit __OnCodeMessage(QString("<%1>").arg(tr("Please Enter Second Code")));
+            emit __OnNewMessage(tr("Enter Second Code"));
 
             startTimeoutTimer(20000);
         }
     }
-    else if(_systemState == EAdminPassword) {
-        if(_systemStateDisplay != EAdminPassword) {
+    else if (_systemState == EAdminPassword) 
+    {
+        if (_systemStateDisplay != EAdminPassword) 
+        {
             _systemStateDisplay = EAdminPassword;
             stopTimeoutTimer();
-            emit __OnCodeMessage("<Enter Admin Password>");
-            emit __OnNewMessage("Enter Admin Password");
+            emit __OnCodeMessage(QString("<%1>").arg(tr("Enter Admin Password")));
+            emit __OnNewMessage(tr("Enter Admin Password"));
             emit __OnClearEntry();
             emit __OnDisplayAdminPasswordDialog(this);
 
             startTimeoutTimer(30000);
         }
     }
-    else if(_systemState == EThankYou) {
-        if(_systemStateDisplay != EThankYou) {
+    else if(_systemState == EThankYou) 
+    {
+        if(_systemStateDisplay != EThankYou) 
+        {
             _systemStateDisplay = EThankYou;
             stopTimeoutTimer();
 
-            QString str = "Thank you! Lock #" + QVariant(_lockNum).toString() + " open.";
+            QString str = QString("%1 %2 #%3 %4.").arg(
+                tr("Thank you!"), tr("Lock"), QVariant(_lockNum).toString(), tr("open"));
             emit __OnClearEntry();
             emit __OnCodeMessage(str);
             emit __OnNewMessage("");
@@ -758,16 +785,20 @@ void CSystemController::looprun()
             startTimeoutTimer(5000);
         }
     }
-    else if(_systemState == EAdminMain) {
-        if(_systemStateDisplay != EAdminMain) {
+    else if(_systemState == EAdminMain) 
+    {
+        if(_systemStateDisplay != EAdminMain) 
+        {
             _systemStateDisplay = EAdminMain;
             _adminType = "Admin";
             stopTimeoutTimer();
             emit __OnDisplayAdminMainDialog(this);
         }
     }
-    else if(_systemState == EAssistMain) {
-        if(_systemStateDisplay != EAssistMain) {
+    else if(_systemState == EAssistMain) 
+    {
+        if(_systemStateDisplay != EAssistMain) 
+        {
             _systemStateDisplay = EAssistMain;
             _adminType = "Assist";
             stopTimeoutTimer();
@@ -778,9 +809,12 @@ void CSystemController::looprun()
 
 void CSystemController::stopTimeoutTimer()
 {
-    if(_ptimer) {
+    if(_ptimer) 
+    {
         if(_ptimer->isActive())
+        {
             _ptimer->stop();
+        }
         delete _ptimer;
         _ptimer = 0;
     }
@@ -791,7 +825,8 @@ void CSystemController::startTimeoutTimer(int duration)
     // TODO:Set timer to return to Code #1 entry screen
     //
     qDebug() << "SingleShot timer " << QVariant(duration).toString();
-    if(!_ptimer) {
+    if(!_ptimer) 
+    {
         _ptimer = new QTimer();
         connect(_ptimer, SIGNAL(timeout()), this, SLOT(resetToTimeoutScreen()));
     }
@@ -806,7 +841,8 @@ void CSystemController::RequestLastSuccessfulLogin()
 void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
     int nCount = 0;
-    while(!_bCurrentAdminRetrieved && nCount < 25) {
+    while(!_bCurrentAdminRetrieved && nCount < 25) 
+    {
         usleep(100000);
         QCoreApplication::processEvents();
         nCount++;
@@ -817,7 +853,8 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
 
         QDateTime dtFreq = _padminInfo->getDefaultReportFreq();
 
-        if( _padminInfo->getReportViaEmail()) {
+        if( _padminInfo->getReportViaEmail()) 
+        {
             qDebug() << " Reporting via email";
             qDebug() << " Freq: " << dtFreq.toString("yyyy-MM-dd HH:mm:ss");
 
@@ -846,27 +883,29 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
                     from = _padminInfo->getSMTPUsername().c_str();
                 }
                 QString to = _padminInfo->getAdminEmail().c_str();
-                QString subject = "Lock Box Event";
+                QString subject = tr("Lock Box Event");
 
                 QDateTime dtAccess = pLockHistory->getAccessTime();
 
                 QString sDesc = pLockHistory->getDescription().c_str();
                 int nLockNum = pLockHistory->getLockNum();
 
-                QString body = QString("Lock #") + QVariant(nLockNum).toString();
+                QString body = QString("%1 #%2").arg(tr("Lock"), QVariant(nLockNum).toString());
 
                 if( sDesc.size() > 0 )
                 {
-                    body += " [" + sDesc + "]";
+                    body += QString(" [%1]").arg(sDesc);
                 }
-                body += " was accessed at " + dtAccess.toString("MM/dd/yyyy HH:mm:ss");
+                //body += " " + tr("was accessed at") + " " + dtAccess.toString("MM/dd/yyyy HH:mm:ss");
+                body += QString(" %1 %2").arg(tr("was accessed at"), dtAccess.toString("MM/dd/yyyy HH:mm:ss"));
 
                 qDebug() << "Calling __OnSendEmail() from:" << from << endl << " to:" << to << endl << " subject:" << subject << endl << " body:" << body;
                 emit __OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, NULL );
             }
         }
         delete pLockHistory;
-    } else {
+    } else 
+    {
         qDebug() << "OnLastSuccessfulLoginRequest() No admin record yet!";
     }
 }
@@ -909,9 +948,9 @@ void CSystemController::OnSendTestEmail(int test_type)
 
         from = _padminInfo->getSMTPUsername().c_str();
         to = _padminInfo->getAdminEmail().c_str();
-        subject = "Testing Email Configuration";
+        subject = tr("Testing Email Configuration");
 
-        body = "You have successfully configured the email settings!";
+        body = tr("You have successfully configured the email settings!");
     }
     else if (test_type == 2 /* ADMIN_RECV */)
     {
@@ -928,9 +967,9 @@ void CSystemController::OnSendTestEmail(int test_type)
 
         from = "test@keycodebox.com";
         to = _padminInfo->getAdminEmail().c_str();
-        subject = "Testing Administrator Email";
+        subject = tr("Testing Administrator Email");
 
-        body = "You have successfully configured the Administrator email!";
+        body = tr("You have successfully configured the Administrator email!");
     }
     else
     {

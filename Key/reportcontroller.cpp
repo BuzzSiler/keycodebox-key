@@ -43,7 +43,7 @@ void CReportController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 QString CReportController::createNewFileName()
 {
     QDateTime   now = QDateTime::currentDateTime();
-    QString strFileName = "SafePak_" + now.toString("yyyy-MM-dd-HH_mm_ss") + ".txt";
+    QString strFileName = "KeyCodeBox_" + now.toString("yyyy-MM-dd-HH_mm_ss") + ".txt";
     return strFileName;
 }
 
@@ -62,7 +62,7 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
 
         return;
     }
-    // Check for directory "SafePakReports"
+    // Check for directory "KeyCodeBoxReports"
     // Create if it doesn't exist
     if(!dir.exists())
     {
@@ -74,43 +74,49 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
         qDebug() << "CReportController::buildReportFile() ... file open!:" << dir.absoluteFilePath(strFileName);
 
         QDateTime dtAccess;
-        QString sDesc, body;
+        QString sDesc;
+        QString body;
         int nLockNum;
-	QString question1, question2, question3;
+	    QString question1, question2, question3;
         QTextStream stream( *ppFile );
-        stream << "SafePak Access History." << endl;
+        stream << "KeyCodeBox Access History." << endl;
 
-        for(CLockHistorySet::Iterator itor = pLockHistorySet->begin(); itor != pLockHistorySet->end(); itor++) {
+        for (CLockHistorySet::Iterator itor = pLockHistorySet->begin(); itor != pLockHistorySet->end(); itor++) 
+        {
             plockHistoryRec = itor.value();
-            //
+            
             body = "";
 
             dtAccess = plockHistoryRec->getAccessTime();
-            sDesc = plockHistoryRec->getDescription().c_str();
+            sDesc = QString::fromStdString(plockHistoryRec->getDescription());
             nLockNum = plockHistoryRec->getLockNum();
 	    
-            body = QString("Lock #") + QVariant(nLockNum).toString();
+            body = QString("%1 #%2").arg(tr("Lock"), QVariant(nLockNum).toString());
 
             if( sDesc.size() > 0 )
             {
-                body += " user: [" + sDesc + "]";
+                body += QString(" %1: [%2]").arg(tr("user"), sDesc);
             }
-            body += " accessed:" + dtAccess.toString("MM/dd/yyyy HH:mm:ss");
+            body += QString(" %1: %2").arg(tr("accessed"), dtAccess.toString("MM/dd/yyyy HH:mm:ss"));
+
             std::string code_one = plockHistoryRec->getCode1();
             std::string code_two = plockHistoryRec->getCode2();
-	    std::string question1 = plockHistoryRec->getQuestion1();
-	    std::string question2 = plockHistoryRec->getQuestion2();
-	    std::string question3 = plockHistoryRec->getQuestion3();
-            body += " code #1:" + QString(code_one.c_str());
-            body += " code #2:" + QString(code_two.c_str());
-	    body += " question #1:" + QString(question1.c_str());
-	    body += " question #2:" + QString(question2.c_str());
-	    body += " question #3:" + QString(question3.c_str());
+            std::string question1 = plockHistoryRec->getQuestion1();
+            std::string question2 = plockHistoryRec->getQuestion2();
+            std::string question3 = plockHistoryRec->getQuestion3();
+
+            body += QString(" %1 #1:%2").arg(tr("code")).arg(QString::fromStdString(code_one));
+            body += QString(" %1 #2:%2").arg(tr("code")).arg(QString::fromStdString(code_two));
+            body += QString(" %1 #1:%2").arg(tr("question")).arg(QString::fromStdString(question1));
+            body += QString(" %1 #2:%2").arg(tr("question")).arg(QString::fromStdString(question2));
+            body += QString(" %1 #3:%2").arg(tr("question")).arg(QString::fromStdString(question3));
             stream << body << endl;
         }
         stream.flush();
         (*ppFile)->close();
-    } else {
+    } 
+    else 
+    {
         qDebug() << "can't open file: " << (*ppFile)->errorString();
         qDebug() << "CReportController::buildReportFile() ... can't open file!:" << dir.absoluteFilePath(strFileName);
         delete *ppFile;
@@ -326,9 +332,9 @@ void CReportController::PrepareToSendEmail(CAdminRec *admin, QFile *pFile)
 
     QString from = admin->getAdminEmail().c_str();
     QString to = admin->getAdminEmail().c_str();
-    QString subject = "Lock Box History Report";
+    QString subject = tr("Lock Box History Report");
 
-    QString body = "SafePak report :" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString body = QString("KeyCodeBox %1 :%2").arg(tr("report")).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
 
     OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, pFile );
 }
