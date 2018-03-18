@@ -67,19 +67,19 @@ void CDlgQuestions::on_buttonBoxQuestions_rejected()
 void CDlgQuestions::on_edtAnswer1_clicked()
 {
     checkAndCreateCurrentLineEdit();
-    onStartEditLine(ui->edtAnswer1, "Answer #1");
+    onStartEditLine(ui->edtAnswer1, tr("Answer #1"));
 }
 
 void CDlgQuestions::on_edtAnswer2_clicked()
 {
     checkAndCreateCurrentLineEdit();
-    onStartEditLine(ui->edtAnswer2, "Answer #2");
+    onStartEditLine(ui->edtAnswer2, tr("Answer #2"));
 }
 
 void CDlgQuestions::on_edtAnswer3_clicked()
 {
     checkAndCreateCurrentLineEdit();
-    onStartEditLine(ui->edtAnswer3, "Answer #3");
+    onStartEditLine(ui->edtAnswer3, tr("Answer #3"));
 }
 
 void CDlgQuestions::checkAndCreateCurrentLineEdit()

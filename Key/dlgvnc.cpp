@@ -133,7 +133,7 @@ void CDlgVNC::on_lblVNCPort_clicked()
   qDebug() << "liblVNCPort_clicked()";
     checkAndCreateCurrentLabelEdit();
     _pcurrentLabelEdit->setNumbersOnly();
-    onStartEditLabel(ui->lblVNCPort, "VNC Server Port");
+    onStartEditLabel(ui->lblVNCPort, tr("VNC Server Port"));
 }
 
 void CDlgVNC::on_lblPassword_clicked()
@@ -141,7 +141,7 @@ void CDlgVNC::on_lblPassword_clicked()
   qDebug() << "liblPassword_clicked()";
     checkAndCreateCurrentLabelEdit();
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblPassword, "Password");
+    onStartEditLabel(ui->lblPassword, tr("Password"));
 }
 
 /*

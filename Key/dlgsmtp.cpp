@@ -157,7 +157,7 @@ void CDlgSMTP::on_lblSMTPServer_clicked()
     qDebug() << "lblSMTPServer clicked";
     checkAndCreateCurrentLabelEdit();
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblSMTPServer, "SMTP Server Address");
+    onStartEditLabel(ui->lblSMTPServer, tr("SMTP Server Address"));
 }
 
 void CDlgSMTP::on_lblSMTPPort_clicked()
@@ -165,7 +165,7 @@ void CDlgSMTP::on_lblSMTPPort_clicked()
     //
     checkAndCreateCurrentLabelEdit();
     _pcurrentLabelEdit->setNumbersOnly();
-    onStartEditLabel(ui->lblSMTPPort, "SMTP Server Port");
+    onStartEditLabel(ui->lblSMTPPort, tr("SMTP Server Port"));
 }
 
 void CDlgSMTP::on_lblUsername_clicked()
@@ -173,7 +173,7 @@ void CDlgSMTP::on_lblUsername_clicked()
     //
     checkAndCreateCurrentLabelEdit();
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblUsername, "User Name");
+    onStartEditLabel(ui->lblUsername, tr("User Name"));
 }
 
 void CDlgSMTP::on_lblPassword_clicked()
@@ -181,5 +181,5 @@ void CDlgSMTP::on_lblPassword_clicked()
     //
     checkAndCreateCurrentLabelEdit();
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblPassword, "Password");
+    onStartEditLabel(ui->lblPassword, tr("Password"));
 }

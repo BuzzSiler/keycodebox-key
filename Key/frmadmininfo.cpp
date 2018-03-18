@@ -209,7 +209,7 @@ void CFrmAdminInfo::initialize()
         ui->cbInternetTime->setChecked(true);
     }
 
-    ui->btnCopyToggleSource->setText("Source #1");
+    ui->btnCopyToggleSource->setText(tr("Source #1"));
 
     connect(this, SIGNAL(__OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)),
             this, SLOT(OnCodeEditDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)));
@@ -414,10 +414,10 @@ void CFrmAdminInfo::setTimeZone()
 void CFrmAdminInfo::populateBoxListSelection(QComboBox *cbox)
 {
     cbox->clear();
-    cbox->addItem(QString("All Locks"));
+    cbox->addItem(QString(tr("All Locks")));
     for(int i=1;i<65;i++)
     {
-        cbox->addItem(QString("Lock #" + QVariant(i).toString()));
+        cbox->addItem(QString(tr("Lock") + " #" + QVariant(i).toString()));
     }
 }
 
@@ -491,7 +491,7 @@ void CFrmAdminInfo::on_treeView_clicked(const QModelIndex &index)
     _reportDirectory = _pmodel->rootPath() + "/" + index.data(Qt::DisplayRole).toString() + "/KeycodeboxReports";
     _tmpAdminRec.setReportDirectory(_reportDirectory.toStdString());
     qDebug() << "Save to Directory" << _tmpAdminRec.getReportDirectory().c_str();
-    QMessageBox::information(this, "Save Directory Set", _tmpAdminRec.getReportDirectory().c_str());
+    QMessageBox::information(this, tr("Save Directory Set"), _tmpAdminRec.getReportDirectory().c_str());
 }
 
 void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
@@ -556,13 +556,13 @@ void CFrmAdminInfo::on_btnCopyToggleSource_clicked(bool checked)
     {
         qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, checked, " << usbDevice1 << ", " << usbDevice0;
         populateFileCopyWidget(usbDevice1, usbDevice0);
-        ui->btnCopyToggleSource->setText("Source #2");
+        ui->btnCopyToggleSource->setText(tr("Source #2"));
     }
     else
     {
         qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, unchecked, " << usbDevice0 << ", " << usbDevice1;
         populateFileCopyWidget(usbDevice0, usbDevice1);
-        ui->btnCopyToggleSource->setText("Source #1");
+        ui->btnCopyToggleSource->setText(tr("Source #1"));
     }
 }
 
@@ -601,7 +601,7 @@ void CFrmAdminInfo::on_btnCopyFile_clicked()
     std::system(cmd.toStdString().c_str());
     std::system("sudo chmod +x /home/pi/kcb-config/bin/alpha_NEW");
 
-    QMessageBox::information(this, "File Copied", tr("New SafePak application copied.\nSystem requires reboot to run."));
+    QMessageBox::information(this, tr("File Copied"), tr("New KeyCodeBox application copied.\nSystem requires reboot to run."));
 }
 
 
@@ -850,15 +850,15 @@ void CFrmAdminInfo::createLockMenus()
                 QMenu* pmenu = new QMenu();
                 pmenu->setMinimumWidth(150);
                 if(_pLocksStatus->isLock(parseLockNumFromObjectName(pb->objectName()))) {
-                    QAction* pAction1 = new QAction("Open", pb);
-                    pAction1->setData("Open");
+                    QAction* pAction1 = new QAction(tr("Open"), pb);
+                    pAction1->setData(tr("Open"));
                     pAction1->setData((*itor)->objectName());
                     pmenu->addAction(pAction1);
                 }
-                QAction* pAction2 = new QAction("Codes", pb);
-                pAction2->setData("Codes");
-                QAction* pAction3 = new QAction("History", pb);
-                pAction3->setData("History");
+                QAction* pAction2 = new QAction(tr("Codes"), pb);
+                pAction2->setData(tr("Codes"));
+                QAction* pAction3 = new QAction(tr("History"), pb);
+                pAction3->setData(tr("History"));
                 pAction2->setData((*itor)->objectName());
                 pAction3->setData((*itor)->objectName());
                 pmenu->addAction(pAction2);
@@ -872,14 +872,14 @@ void CFrmAdminInfo::createLockMenus()
                     QList<QAction*> list = pmenu->actions();
                     for(QList<QAction*>::Iterator itor = list.begin(); itor != list.end(); itor++)
                     {
-                        if((*itor)->text() == "Open")
+                        if((*itor)->text() == tr("Open"))
                         {
                             bFound = true;
                         }
                     }
                     if(!bFound) {
-                        QAction* pAction1 = new QAction("Open", pb);
-                        pAction1->setData("Open");
+                        QAction* pAction1 = new QAction(tr("Open"), pb);
+                        pAction1->setData(tr("Open"));
                         pAction1->setData((*itor)->objectName());
                         pmenu->insertAction(pmenu->actions().first(), pAction1);
                     }
@@ -887,7 +887,7 @@ void CFrmAdminInfo::createLockMenus()
                     QList<QAction*> list = pmenu->actions();
                     for(QList<QAction*>::Iterator itor = list.begin(); itor != list.end(); itor++)
                     {
-                        if((*itor)->text() == "Open")
+                        if((*itor)->text() == tr("Open"))
                         {
                             pb->menu()->removeAction(*itor);
                         }
@@ -920,18 +920,18 @@ void CFrmAdminInfo::menuSelection(QAction *action)
 {
     int nLockNum = parseLockNumFromObjectName(action->parentWidget()->objectName());
     qDebug() << "Object: " << action->parentWidget()->objectName() << " Action!" << action->text();
-    if( action->text() == QString("Open"))
+    if( action->text() == QString(tr("Open")))
     {
         qDebug() << "Open Lock Num:" << QVariant(nLockNum).toString();
         emit __OnOpenLockRequest(nLockNum);
     } 
-    else if(action->text() == QString("Codes")) 
+    else if(action->text() == QString(tr("Codes"))) 
     {
         emit __LocalOnReadLockSet(nLockNum, _DATENONE, _DATENONE);
         // Switch tabs
         ui->tabWidget->setCurrentIndex(3);
     } 
-    else if(action->text() == QString("History")) 
+    else if(action->text() == QString(tr("History"))) 
     {
         emit __LocalOnReadLockHistorySet(nLockNum, _DATENONE, _DATENONE);
         ui->tabWidget->setCurrentIndex(4);
@@ -983,7 +983,7 @@ void CFrmAdminInfo::on_lblName_clicked()
     checkAndCreateCurrentLabelEdit();
 
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblName, "Administrator");
+    onStartEditLabel(ui->lblName, tr("Administrator"));
 
     qDebug() << "on_lblName_clicked()";
 }
@@ -993,7 +993,7 @@ void CFrmAdminInfo::on_lblEmail_clicked()
     checkAndCreateCurrentLabelEdit();
     qDebug() << "on_lblEmail_clicked()";
     _pcurrentLabelEdit->setEmailFilter();
-    onStartEditLabel(ui->lblEmail, "Administrator Email Address");
+    onStartEditLabel(ui->lblEmail, tr("Administrator Email Address"));
 }
 
 void CFrmAdminInfo::on_lblPhone_clicked()
@@ -1001,7 +1001,7 @@ void CFrmAdminInfo::on_lblPhone_clicked()
     checkAndCreateCurrentLabelEdit();
     qDebug() << "on_lblPhone_clicked()";
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblPhone, "Administrator Phone");
+    onStartEditLabel(ui->lblPhone, tr("Administrator Phone"));
 }
 
 void CFrmAdminInfo::on_lblAccessCode_clicked()
@@ -1009,7 +1009,7 @@ void CFrmAdminInfo::on_lblAccessCode_clicked()
     checkAndCreateCurrentLabelEdit();
     qDebug() << "on_lblAccessCode_clicked()";
     _pcurrentLabelEdit->setNumbersOnly();
-    onStartEditLabel(ui->lblAccessCode, "Administrator Code #1");
+    onStartEditLabel(ui->lblAccessCode, tr("Administrator Code #1"));
 }
 
 void CFrmAdminInfo::on_lblPassword_clicked()
@@ -1017,7 +1017,7 @@ void CFrmAdminInfo::on_lblPassword_clicked()
     checkAndCreateCurrentLabelEdit();
     qDebug() << "on_lblPassword_clicked()";
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblPassword, "Administrator Password");
+    onStartEditLabel(ui->lblPassword, tr("Administrator Password"));
 }
 
 void CFrmAdminInfo::on_lblAssistCode_clicked()
@@ -1025,7 +1025,7 @@ void CFrmAdminInfo::on_lblAssistCode_clicked()
     checkAndCreateCurrentLabelEdit();
     qDebug() << "on_lblAssistCode_clicked()";
     _pcurrentLabelEdit->setNumbersOnly();
-    onStartEditLabel(ui->lblAssistCode, "Assistant Code");
+    onStartEditLabel(ui->lblAssistCode, tr("Assistant Code"));
 }
 
 void CFrmAdminInfo::on_lblAssistPassword_clicked()
@@ -1033,7 +1033,7 @@ void CFrmAdminInfo::on_lblAssistPassword_clicked()
     checkAndCreateCurrentLabelEdit();
     qDebug() << "on_lblAssistPassword_clicked()";
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblAssistPassword, "Assistant Password");
+    onStartEditLabel(ui->lblAssistPassword, tr("Assistant Password"));
 }
 
 void CFrmAdminInfo::on_lblKey_clicked()
@@ -1041,7 +1041,7 @@ void CFrmAdminInfo::on_lblKey_clicked()
     checkAndCreateCurrentLabelEdit();
     qDebug() << "on_lblKey_clicked()";
     _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblKey, "Predictive Key");
+    onStartEditLabel(ui->lblKey, tr("Predictive Key"));
 }
 
 void CFrmAdminInfo::on_btnSaveSettings_clicked()
@@ -1268,14 +1268,14 @@ void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
     qDebug() << usbDevice0;
     qDebug() << usbDevice1;
 
-    ui->btnCopyToggleSource->setText("Source #1");
+    ui->btnCopyToggleSource->setText(tr("Source #1"));
 
-    if( !ui->btnCopyToggleSource->text().compare("Source #1") )
+    if( !ui->btnCopyToggleSource->text().compare(tr("Source #1")) )
     {
         populateFileCopyWidget(usbDevice0, usbDevice1);
         populateFileWidget(usbDevice0, usbDevice1);
     }
-    if( !ui->btnCopyToggleSource->text().compare("Source #2") )
+    if( !ui->btnCopyToggleSource->text().compare(tr("Source #2")) )
     {
         populateFileCopyWidget(usbDevice1, usbDevice0);
         populateFileWidget(usbDevice1, usbDevice0);
@@ -1303,7 +1303,7 @@ void CFrmAdminInfo::on_cbInternetTime_clicked()
     // Internet time set checked
     if(ui->cbInternetTime->isChecked())
     {
-        //we check this flag in safepakmain.cpp
+        //we check this flag in keycodeboxmain.cpp
         std::system("touch /home/pi/run/internetTime.flag");
 
         setTimeZone();
@@ -1906,8 +1906,8 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
         if (pState->getAccessType() == 0 /* ACCESS_ALWAYS */)
         {
-            table->setItem(nRow, nCol++, new QTableWidgetItem("ALWAYS"));
-            table->setItem(nRow, nCol++, new QTableWidgetItem("ACTIVE"));
+            table->setItem(nRow, nCol++, new QTableWidgetItem(tr("ALWAYS")));
+            table->setItem(nRow, nCol++, new QTableWidgetItem(tr("ACTIVE")));
         }
         else if (pState->getAccessType() == 1 /* ACCESS_TIMED */)
         {
@@ -1916,8 +1916,8 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         }
         else if (pState->getAccessType() == 2 /* ACCESS_LIMITED_USE */)
         {
-            table->setItem(nRow, nCol++, new QTableWidgetItem("LIMITED USE (" + QString::number(pState->getRemainingUses()) + " uses remaining)"));
-            table->setItem(nRow, nCol++, new QTableWidgetItem(pState->isActive() ? "ACTIVE" : "DISABLED"));
+            table->setItem(nRow, nCol++, new QTableWidgetItem(QString("%1 (%2) %3").arg(tr("LIMITED USE"), QString::number(pState->getRemainingUses()), tr("uses remaining"))));
+            table->setItem(nRow, nCol++, new QTableWidgetItem(pState->isActive() ? tr("ACTIVE") : tr("DISABLED")));
         }
 
         nRow++;
@@ -1930,9 +1930,9 @@ void CFrmAdminInfo::setupCodeTableContextMenu()
 
     /* Create a menu for adding, editing, and deleting codes */
     _pTableMenu = new QMenu(table);
-    _pTableMenu->addAction("Edit Code", this, SLOT(codeEditSelection()));
-    _pTableMenu->addAction("Add Code", this, SLOT(codeInitNew()));
-    _pTableMenu->addAction("Delete", this, SLOT(codeDeleteSelection()));
+    _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
+    _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
+    _pTableMenu->addAction(tr("Delete"), this, SLOT(codeDeleteSelection()));
     connect(table,SIGNAL(cellClicked(int,int)),this,SLOT(OnRowSelected(int, int)));
 
     /* Create a menu for adding codes and enabling 'limited use' access type codes */
@@ -1952,7 +1952,7 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     table->setColumnWidth(2, 100);
     table->setColumnWidth(3, 100);
     table->setColumnWidth(4, 350);
-    headers<<"Lock #"<<"Username"<<"Code#1"<<"Code#2"<<"Accessed";
+    headers<<tr("Lock #")<<tr("Username")<<tr("Code#1")<<tr("Code#2")<<tr("Accessed");
     table->setHorizontalHeaderLabels(headers);
 
     CLockHistorySet::Iterator itor;
@@ -2294,10 +2294,10 @@ void CFrmAdminInfo::on_btnToggleSource_clicked(bool checked)
 {
     if(checked) {
         populateFileWidget(usbDevice1, usbDevice0);
-        ui->btnToggleSource->setText("Source #2");
+        ui->btnToggleSource->setText(tr("Source #2"));
     } else {
         populateFileWidget(usbDevice0, usbDevice1);
-        ui->btnToggleSource->setText("Source #1");
+        ui->btnToggleSource->setText(tr("Source #1"));
     }
 }
 
@@ -2567,10 +2567,10 @@ void CFrmAdminInfo::OnHeaderSelected(int nHeader)
     */
 
     _pTableMenuAdd->clear();
-    _pTableMenuAdd->addAction("Add Code", this, SLOT(codeInitNew()));
+    _pTableMenuAdd->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
     if (nHeader == 5)
     {
-        _pTableMenuAdd->addAction("Enable All", this, SLOT(codeEnableAll()));
+        _pTableMenuAdd->addAction(tr("Enable All"), this, SLOT(codeEnableAll()));
     }
     _pTableMenuAdd->show();
 

@@ -1,4 +1,4 @@
-#include "safepakmain.h"
+#include "keycodeboxmain.h"
 #include "ui_mainwindow.h"
 
 #include <QDateTime>
@@ -322,7 +322,7 @@ void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
  */
 void MainWindow::OnAdminSecurityCheckFailed()
 {
-    _pfAdminPW->OnNewMessage("Incorrect Password", 5000);
+    _pfAdminPW->OnNewMessage(tr("Incorrect Password"), 5000);
 }
 
 void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)

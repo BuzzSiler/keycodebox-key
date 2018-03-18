@@ -152,7 +152,7 @@ void CFingerprintReader::enrollStageCb(struct fp_dev *dev, int result,
 
     switch (result) {
     case FP_ENROLL_COMPLETE:
-        tmp = "<b>Enrollment completed!</b>";
+        tmp = tr("<b>Enrollment completed!</b>");
         break;
     case FP_ENROLL_PASS:
         tmp = "";
@@ -160,23 +160,22 @@ void CFingerprintReader::enrollStageCb(struct fp_dev *dev, int result,
         qDebug() << "CFingerprintReader::enrollStageCB(), Step " << QString::number(current_enroll_stage) << " of " << QString::number(enroll_stages);
         break;
     case FP_ENROLL_FAIL:
-        tmp = "<b>Enrollment failed!</b>";
+        tmp = tr("<b>Enrollment failed!</b>");
         break;
     case FP_ENROLL_RETRY:
-        tmp = "<b>Bad scan. Please try again.</b>";
+        tmp = tr("<b>Bad scan. Please try again.</b>");
         break;
     case FP_ENROLL_RETRY_TOO_SHORT:
-        tmp = "<b>Bad scan: swipe was too short. Please try again.</b>";
+        tmp = tr("<b>Bad scan: swipe was too short. Please try again.</b>");
         break;
     case FP_ENROLL_RETRY_CENTER_FINGER:
-        tmp = "<b>Bad scan: finger was not centered on scanner. Please "
-              "try again.</b>";
+        tmp = tr("<b>Bad scan: finger was not centered on scanner. Please try again.</b>");
         break;
     case FP_ENROLL_RETRY_REMOVE_FINGER:
-        tmp = "<b>Bad scan: please remove finger before retrying.</b>";
+        tmp = tr("<b>Bad scan: please remove finger before retrying.</b>");
         break;
     default:
-        tmp = "Unknown state!";
+        tmp = tr("Unknown state!");
     }
 
     if (result == FP_ENROLL_COMPLETE || result == FP_ENROLL_FAIL)
@@ -288,27 +287,27 @@ void CFingerprintReader::identifyCb(struct fp_dev *dev, int result, size_t match
 
     switch(result) {
     case FP_VERIFY_NO_MATCH:
-        tmp = "<b>Finger does not match.</b>";
+        tmp = tr("<b>Finger does not match.</b>");
         break;
     case FP_VERIFY_MATCH:
-        tmp = "<b>Finger matches!</b>";
+        tmp = tr("<b>Finger matches!</b>");
         retResult = true;
         retryScan = false;
         break;
     case FP_VERIFY_RETRY:
-        tmp = "<b>Bad scan.</b>";
+        tmp = tr("<b>Bad scan.</b>");
         break;
     case FP_VERIFY_RETRY_TOO_SHORT:
-        tmp = "<b>Swipe was too short.</b>";
+        tmp = tr("<b>Swipe was too short.</b>");
         break;
     case FP_VERIFY_RETRY_CENTER_FINGER:
-        tmp = "<b>Finger was not centered on sensor.";
+        tmp = tr("<b>Finger was not centered on sensor.</b>");
         break;
     case FP_VERIFY_RETRY_REMOVE_FINGER:
-        tmp = "<b>Bad scan, remove finger.";
+        tmp = tr("<b>Bad scan, remove finger.</b>");
         break;
     default:
-        tmp = "<b>Unknown state! Click 'Cancel' and try again!</b>";
+        tmp = tr("<b>Unknown state! Click 'Cancel' and try again!</b>");
         break;
     }
 
