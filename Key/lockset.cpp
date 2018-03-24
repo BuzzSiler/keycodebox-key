@@ -75,10 +75,9 @@ bool CLockSet::setFromJsonObject(QJsonObject &jsonObj)
 }
 
 
-bool CLockSet::setFromJsonString(std::string strJson)
+bool CLockSet::setFromJsonString(QString strJson)
 {
-    QString     strIn = strJson.c_str();
-    QJsonDocument doc = QJsonDocument::fromJson(strIn.toUtf8());
+    QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
     QJsonObject     obj;
     // check validity of the document
     if(!doc.isNull())
@@ -96,7 +95,7 @@ bool CLockSet::setFromJsonString(std::string strJson)
     }
     else
     {
-        qDebug() << "Invalid JSON...\n" << strIn << endl;
+        qDebug() << "Invalid JSON...\n" << strJson << endl;
         return false;
     }
     return true;

@@ -23,7 +23,7 @@ void CLockHistorySet::clearSet()
 
 void CLockHistorySet::addToSet(CLockHistoryRec &lockHistoryRec)
 {
-    _mmapLocks.insert(lockHistoryRec.getLockNum(), &lockHistoryRec);
+    _mmapLocks.insert(lockHistoryRec.getLockNums(), &lockHistoryRec);
 }
 
 bool CLockHistorySet::setFromJsonObject(QJsonObject &jsonObj)
@@ -67,11 +67,11 @@ bool CLockHistorySet::setFromJsonObject(QJsonObject &jsonObj)
 }
 
 
-bool CLockHistorySet::setFromJsonString(std::string strJson)
+bool CLockHistorySet::setFromJsonString(QString strJson)
 {
-    QString     strIn = strJson.c_str();
-    QJsonDocument doc = QJsonDocument::fromJson(strIn.toUtf8());
+    QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
     QJsonObject     obj;
+    
     // check validity of the document
     if(!doc.isNull())
     {
@@ -88,7 +88,7 @@ bool CLockHistorySet::setFromJsonString(std::string strJson)
     }
     else
     {
-        qDebug() << "Invalid JSON...\n" << strIn << endl;
+        qDebug() << "Invalid JSON...\n" << strJson << endl;
         return false;
     }
     return true;

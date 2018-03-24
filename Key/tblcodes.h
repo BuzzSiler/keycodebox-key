@@ -4,36 +4,20 @@
 #include <iostream>
 #include <cstdlib>
 #include <QtSql>
-#include <QtDebug>
+#include <QDebug>
+//#include <QString>
 #include "lockstate.h"
 #include "lockset.h"
 
-/**
- * @brief The CTblCodes class
- * @table "codes" fields
- *      int ids; // integer primary key unique,
- *      std::string sequence;    // text,\
- *      int sequence_order;  // integer,
- *      int door;    // integer,
- *      std::string  description;    // text,
- *      std::string  code1;  // text,
- *      std::string  code2;  // text,\
- *      datetime     starttime;   // DATETIME,
- *      datetime     endtime; // DATETIME,
- *      bool fingerprint1;
- *      bool fingerprint2;
- *      std::string  status;  // text,
- *      int  access_count;   // integer,\
- *      int  retry_count; // integer,
- *      int  max_access; // integer,
- *      int  max_retry;  // integer)
- */
+
+class QString;
+
 class CTblCodes
 {
 public:
 
     // Constants
-    const std::string TABLENAME = "codes";
+    const QString TABLENAME = "codes";
 
     const char *datetimeFormat = "yyyy-MM-dd HH:mm:ss";
     const char *timeFormatShort = "HH:mm";
@@ -42,7 +26,7 @@ public:
     const char *fids = "ids";            // Record id // integer primary key unique, (if -1 then this is a new record)
     const char *fsequence = "sequence";    // Sequence // text,
     const char *fsequence_order = "sequence_order";  // integer,
-    const char *flocknum = "locknum";    // integer,
+    const char *flocknum = "locknums";    // text,
     const char *fdescription = "description";    // text,
     const char *fcode1 = "code1";  // text,
     const char *fcode2 = "code2";  // text,
@@ -84,28 +68,28 @@ public:
     void setLastCodeOne(QString code);
 
     int getLastSuccessfulIDS() { return _lastIDS; }
-    int checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &bFingerprintRequired, int &nDoorNum );
-    int checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &bQuestionsRequired, std::string &codeOne, int &nDoorNum, bool &bAskQuestions, QString &question1, QString &question2, QString &question3);
+    QString checkCodeOne(QString code, bool &bSecondCodeRequired, bool &bFingerprintRequired, QString &DoorNums );
+    QString checkCodeTwo(QString code, bool &bFingerprintRequired, bool &bQuestionsRequired, QString &codeOne, QString &DoorNums, bool &bAskQuestions, QString &question1, QString &question2, QString &question3);
 
-    int addLockCodeClear(int locknum, std::string code1, std::string code2="",
+    int addLockCodeClear(QString locknums, QString code1, QString code2="",
                          QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
                          QDateTime endtime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
                          bool fingerprint1=false, bool fingerprint2=false,
-                         bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
-                         std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
+                         bool askQuestions=false, QString question1="", QString question2="", QString question3="",
+                         QString status="",QString desc="", QString sequence="", int sequenceNum=0,
                          int maxAccess=0, int maxRetry=0, int accessType=0, int accessCount=0);
-    int addLockCode(int locknum, std::string code1, std::string code2="",
+    int addLockCode(QString locknums, QString code1, QString code2="",
                     QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
                     QDateTime endtime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),
                     bool fingerprint1=false, bool fingerprint2=false,
-                    bool askQuestions=false, std::string question1="", std::string question2="", std::string question3="",
-                    std::string status="",std::string desc="", std::string sequence="", int sequenceNum=0,
+                    bool askQuestions=false, QString question1="", QString question2="", QString question3="",
+                    QString status="",QString desc="", QString sequence="", int sequenceNum=0,
                     int maxAccess=0, int maxRetry=0, int accessType=0, int accessCount=0);
     void addJSONCodes(const CLockState *prec);
     void addJSONCodes(const CLockSet *pcodeSet);
     void addJSONCodes(std::iostream iofile);
     void addJSONCodes(QString jsonCodes);
-    void currentTimeFormat(std::string format, std::string strBuffer, int nExpectedLength);
+    void currentTimeFormat(QString format, QString strBuffer, int nExpectedLength);
 
     bool updateCode(CLockState *prec);
     bool updateCodeSet(CLockSet &codeSet);
@@ -120,11 +104,11 @@ public:
     bool updateQuestion3(int fids, QString question);
 
     bool deleteCode(CLockState &rec);
-    bool deleteCode(QString locknum, QString code1, QString code2,
+    bool deleteCode(QString locknums, QString code1, QString code2,
                     QDateTime starttime, QDateTime endtime);
     bool resetCodeLimitedUse(CLockState &rec);                    
 
-    void selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLockSet **pLockSet);
+    void selectCodeSet(QString &nLockNums, QDateTime start, QDateTime end, CLockSet **pLockSet);
     void selectCodeSet(int ids, CLockSet **pLockSet);
 
 private:

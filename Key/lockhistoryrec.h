@@ -2,6 +2,7 @@
 #define CLOCKHISTORYREC_H
 
 #include <QObject>
+#include <QString>
 #include "lockstate.h"
 
 
@@ -21,7 +22,7 @@ private:
 
     QDateTime   _access_time;
     bool        _adminNotificationSent;
-    std::string _userNotificationEmail;
+    QString _userNotificationEmail;
     bool        _userNotificationSent;
 
 public:
@@ -29,23 +30,23 @@ public:
     void setAccessTime(QDateTime dt) { _access_time = dt; }
     bool getAdminNotificationSent() { return _adminNotificationSent; }
     void setAdminNotificationSent(bool bSent) { _adminNotificationSent = bSent; }
-    std::string getUserNotificationEmail() { return _userNotificationEmail; }
-    void setUserNotificationEmail(std::string email) { _userNotificationEmail = email; }
+    QString getUserNotificationEmail() { return _userNotificationEmail; }
+    void setUserNotificationEmail(QString email) { _userNotificationEmail = email; }
     bool getUserNotificationSent() { return _userNotificationSent; }
     void setUserNotificationSent(bool bSent) { _userNotificationSent = bSent; }
 
-    std::string getDescription() { return CLockState::getDescription(); }   // text,
-    void setDescription(std::string desc) { CLockState::setDescription(desc); }
+    QString getDescription() { return CLockState::getDescription(); }   // text,
+    void setDescription(QString desc) { CLockState::setDescription(desc); }
 
-    std::string getQuestion1() { return CLockState::getQuestion1(); }
-    std::string getQuestion2() { return CLockState::getQuestion2(); }
-    std::string getQuestion3() { return CLockState::getQuestion3(); }
+    QString getQuestion1() { return CLockState::getQuestion1(); }
+    QString getQuestion2() { return CLockState::getQuestion2(); }
+    QString getQuestion3() { return CLockState::getQuestion3(); }
 
     virtual QJsonObject &jsonRecord(QJsonObject &json);
     virtual QString jsonRecordAsString();
 
     virtual bool setFromJsonObject(QJsonObject jsonObj);
-    virtual bool setFromJsonString(std::string strJson);
+    virtual bool setFromJsonString(QString strJson);
 
     void setFromLockState(CLockState &lockState);
 

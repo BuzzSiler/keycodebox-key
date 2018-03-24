@@ -43,7 +43,7 @@ public:
     ~CModelSecurity();
 
 signals:
-    void __QuestionUserDialog(int doorNum, QString question1, QString question2, QString question3);
+    void __QuestionUserDialog(QString doorNums, QString question1, QString question2, QString question3);
     
     // Parallels signal flow to model security
     void __EnrollFingerprint(QString sCode);
@@ -56,26 +56,26 @@ signals:
     void __OnRequireCodeTwo();
     void __OnAdminSecurityCheckOk(QString type);
     void __OnAdminSecurityCheckFailed();
-    void __OnSecurityCheckSuccess(int doorNum);
-    void __OnSecurityCheckSuccessWithAnswers(int doorNum, QString answer1, QString answer2, QString answer3);
+    void __OnSecurityCheckSuccess(QString locks);
+    void __OnSecurityCheckSuccessWithAnswers(QString doorNums, QString answer1, QString answer2, QString answer3);
     void __OnSecurityCheckedFailed();
 
     void __OnSecurityCheckTimedOut();
 
     void __OnRequestedCurrentAdmin(CAdminRec *adminInfo);
-    void __OnCreateHistoryRecordFromLastPredictiveLogin(int nLockNum, QString code);
+    void __OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code);
 signals:
     void __OnUpdatedCurrentAdmin(bool bSuccess);
     void __OnUpdatedCodeState(bool bSuccess);
 
 signals:
-    void __OnReadLockSet(int nLockNum);
+    void __OnReadLockSet(QString LockNums);
     void __OnLockSet(CLockSet *pLockSet);
 public slots:
-    void OnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
+    void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
 
 signals:
-    void __OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
+    void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
     void __OnLockHistorySet(CLockHistorySet *pLockSet);
 signals:
     void __OnLastSuccessfulLogin(CLockHistoryRec *);
@@ -88,7 +88,7 @@ public slots:
     void OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd);
 
 public slots:
-    void OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
+    void OnReadLockHistorySet(QString nLockNum, QDateTime start, QDateTime end);
 
 public slots:
     void OnUpdateCurrentAdmin(CAdminRec *adminInfo);
@@ -101,7 +101,7 @@ private slots:
 
     void OnCreateHistoryRecordFromLastSuccessfulLogin();
     void OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString answer1, QString answer2, QString answer3);
-    void OnCreateHistoryRecordFromLastPredictiveLogin(int nLockNum, QString code);
+    void OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code);
 
 public slots:
     void OnVerifyCodeOne(QString code);
@@ -110,7 +110,7 @@ public slots:
     void OnVerifyFingerprintCodeOne(QString code);
     void OnVerifyFingerprintCodeTwo(QString code);
 
-    void OnSuccessfulQuestionUsersAnswers(int doorNum, QString answer1, QString answer2, QString answer3);
+    void OnSuccessfulQuestionUsersAnswers(QString doorNums, QString answer1, QString answer2, QString answer3);
     void OnQuestionUserCancelled();
     
     void OnVerifyAdminPassword(QString code);

@@ -3,6 +3,7 @@
 #include <sqlite3ext.h>
 #include "encryption.h"
 
+#include <QtGlobal>
 #include <QApplication>
 #include <QFile>
 #include <QTextStream>
@@ -36,21 +37,24 @@ CModelSecurity::~CModelSecurity()
     removeCreatedObjects();
 }
 
-void CModelSecurity::OnReadLockSet(int nLockNum, QDateTime start, QDateTime end)
+void CModelSecurity::OnReadLockSet(QString LockNums, QDateTime start, QDateTime end)
 {
     CLockSet    *pLockSet;
     // Build the lock set for this lock num
     qDebug() << "CModelSecurity::OnReadLockSet";
-    _ptblCodes->selectCodeSet(nLockNum, start, end, &pLockSet);
 
+    _ptblCodes->selectCodeSet(LockNums, start, end, &pLockSet);
+    qDebug() << "Selected locks:" << LockNums;
     emit __OnLockSet(pLockSet);
 }
 
-void CModelSecurity::OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end)
+void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end)
 {
     CLockHistorySet *pLockHistorySet;
     // Build the lock history set for this locknum and date range
-    _ptblCodeHistory->selectLockCodeHistorySet(nLockNum, start, end, &pLockHistorySet);
+    _ptblCodeHistory->selectLockCodeHistorySet(LockNums, start, end, &pLockHistorySet);
+
+    Q_ASSERT_X(pLockHistorySet != nullptr, "CModelSecurity::OnReadLockHistorySet", "pLockHistorySet is null");
 
     emit __OnLockHistorySet(pLockHistorySet);
 }
@@ -79,6 +83,7 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 void CModelSecurity::OnUpdateCodeState(CLockState *rec)
 {
     qDebug() << "CModelSecurity::OnUpdateCodeState";
+    rec->show();
     bool bSuccess = _ptblCodes->updateCode(rec);
 
     emit __OnUpdatedCodeState(bSuccess);
@@ -142,7 +147,7 @@ bool CModelSecurity::CheckPredictiveAccessCode(QString code, int &nLockNum)
 {
     nLockNum = 0;
     QDateTime datetime = QDateTime::currentDateTime();
-    std::string skey;
+    QString skey;
     std::string outEncrypt = "";
     QString sTmp;
     QString filename="Data.txt";
@@ -154,14 +159,16 @@ bool CModelSecurity::CheckPredictiveAccessCode(QString code, int &nLockNum)
         datetime = CEncryption::roundDateTime(_ptblAdmin->getCurrentAdmin().getPredictiveResolution(), datetime);
         skey = _ptblAdmin->getCurrentAdmin().getPredictiveKey();
 
-        for(nLockNum=1; nLockNum<256; nLockNum++) {
+        for (nLockNum=1; nLockNum<256; nLockNum++) 
+        {
             // Round the current date up to the resolution specified
             sTmp = "Predictive Matching:" + QVariant(nLockNum).toString();
-            CEncryption::calculatePredictiveCodeOld(nLockNum, skey, datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
+            CEncryption::calculatePredictiveCodeOld(nLockNum, skey.toStdString().c_str(), datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
 
             stream << sTmp << endl;
 
-            if( outEncrypt == code.toStdString()) {
+            if( outEncrypt == code.toStdString()) 
+            {
                 stream << "MATCH: Predict for Lock# " << QVariant(nLockNum).toString() << " calculated:" << outEncrypt.c_str() << " code to match:" << code << endl;
                 return true;
             }
@@ -204,7 +211,11 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                 // Check again to see if we match a second code existing in the codes table
                 QString sCodeEnc = CEncryption::encryptString(code);
 
-                nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
+                QString door_str = _ptblCodes->checkCodeOne(sCodeEnc, 
+                                                            bSecondCodeRequired, 
+                                                            bFingerprintRequired, 
+                                                            door_str);
+                nDoorNum = door_str.toInt();
                 if( nDoorNum > 0 )
                 {
                     // need to check if fingerprint security is enabled
@@ -240,8 +251,9 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                                 emit __OnSecurityCheckedFailed();
                             return;
                         }
-                        emit __OnSecurityCheckSuccess(nDoorNum);
-                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(nDoorNum, code);
+
+                        emit __OnSecurityCheckSuccess(door_str);
+                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(door_str, code);
                     }
                 } else {
                     emit __OnSecurityCheckedFailed();
@@ -259,9 +271,9 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 
             qDebug() << "CModelSecurity::OnVerifyCodeOne Encrypted Code" << sCodeEnc;
 
-            nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
-            qDebug() << "CModelSecurity::OnVerifyCodeOne nDoorNum" << nDoorNum;
-            if( nDoorNum > 0 )
+            QString DoorNums = _ptblCodes->checkCodeOne(sCodeEnc, bSecondCodeRequired, bFingerprintRequired, DoorNums);
+            qDebug() << "CModelSecurity::OnVerifyCodeOne nDoorNum" << DoorNums;
+            if( DoorNums != "" )
             {
                 // need to check if fingerprint security is enabled
                 // if so, check for existence of existing fingerprints
@@ -277,9 +289,12 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 
                 // need to do check again for code 2
 
-                if( bSecondCodeRequired ) {
+                if( bSecondCodeRequired ) 
+                {
                     emit __OnRequireCodeTwo();
-                } else {
+                } 
+                else 
+                {
                     if( bFingerprintRequired == true)
                     {
                         //we need to check if a fingerprint directory already exists,
@@ -290,10 +305,13 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                             emit __EnrollFingerprint(code);
                         }
                         else
+                        {
                             emit __OnSecurityCheckedFailed();
+                        }
                         return;
                     }
-                    emit __OnSecurityCheckSuccess(nDoorNum);
+
+                    emit __OnSecurityCheckSuccess(DoorNums);
                 }
             } else {
                 emit __OnSecurityCheckedFailed();
@@ -328,7 +346,8 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
             qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
             CheckPredictiveAccessCode(code, nDoorNum);
 
-        } else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
+        } 
+        else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
         {
             // Store AnyAccessCode = code
             // Enter Secondary code - Verify against DB (second access code?)
@@ -337,7 +356,8 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
         {
             QString sCodeEnc = CEncryption::encryptString(code);
 
-            nDoorNum = _ptblCodes->checkCodeOne(sCodeEnc.toStdString(), bSecondCodeRequired, bFingerprintRequired, nDoorNum);
+            QString door_str = _ptblCodes->checkCodeOne(sCodeEnc, bSecondCodeRequired, bFingerprintRequired, door_str);
+            nDoorNum = door_str.toInt();
             if( nDoorNum > 0 )
             {
                 // need to check if fingerprint security is enabled
@@ -354,12 +374,27 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 
                 // need to do check again for code 2
 
-                if( bSecondCodeRequired ) {
+                if( bSecondCodeRequired ) 
+                {
                     emit __OnRequireCodeTwo();
-                } else {
-                    emit __OnSecurityCheckSuccess(nDoorNum);
+                } 
+                else 
+                {
+
+                    /* Allowing multiple boxes to be opened need to be handled here for 
+                        single code.  __OnSecurityCheckSuccess is connected to 
+                        SystemController::OnSecurityCheckRequest which accepts a single
+                        lock number and opens a single lock.  This could be expanded
+                        here to query for all of locks with matching first codes and
+                        then pass that list of locks to a new signal __OnSecurityCheckSuccessList
+                        or change the existing signal to always accept a list, even if
+                        there is just one.
+                    */
+                    emit __OnSecurityCheckSuccess(QString::number(nDoorNum));
                 }
-            } else {
+            } 
+            else 
+            {
                 emit __OnSecurityCheckedFailed();
             }
         }
@@ -370,14 +405,15 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
 {
     bool bFingerprintRequired = false;
     bool bQuestionsRequired = false;
-    std::string codeOne;
+    QString codeOne;
     bool bAskQuestions = false;
     QString question1 = "";
     QString question2 = "";
     QString question3 = "";
 
     _updateCodeLockboxState = false;
-    if(_type == "Admin" || _type == "Assist") {
+    if(_type == "Admin" || _type == "Assist") 
+    {
         if(_ptblAdmin->isPassword(code, _type))
         {
             emit __OnAdminSecurityCheckOk(_type);
@@ -389,8 +425,10 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     }
     else if( _type == "User" )
     {
-        int nDoorNum = -1;
-        if( _ptblCodes->checkCodeTwo(code.toStdString(), bFingerprintRequired, bQuestionsRequired, codeOne, nDoorNum, bAskQuestions, question1, question2, question3) > 0 )
+        QString DoorNums;
+
+        if( _ptblCodes->checkCodeTwo(code, bFingerprintRequired, bQuestionsRequired, codeOne, DoorNums, 
+                                     bAskQuestions, question1, question2, question3) > 0 )
         {
             //we need to check if a fingerprint directory already exists,
             // if they do, do not attempt enrollmesnt
@@ -402,13 +440,15 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                 // single code are of course stored like:
                 //   /home/pi/run/prints/<codeOne>/<codeOne>
 
-                if( !QDir(QString::fromStdString("/home/pi/run/prints/" + codeOne + "." + code.toStdString())).exists() )
+                if ( !QDir( QString("%1%2.%3").arg("/home/pi/run/prints/").arg(codeOne).arg(code) ).exists() )
                 {
-                    emit __EnrollFingerprintDialog(QString::fromStdString(codeOne + "." + code.toStdString()));
-                    emit __EnrollFingerprint(QString::fromStdString(codeOne + "." + code.toStdString()));
+                    emit __EnrollFingerprintDialog(codeOne + "." + code);
+                    emit __EnrollFingerprint(codeOne + "." + code);
                 }
                 else
+                {
                     emit __OnSecurityCheckedFailed();
+                }
 
                 return;
             }
@@ -420,10 +460,12 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                 qDebug() << "QUESTION2: " << question2;
                 qDebug() << "QUESTION3: " << question3;
 
-                emit __QuestionUserDialog(nDoorNum,question1,question2,question3);
+                emit __QuestionUserDialog(DoorNums,question1,question2,question3);
             }
             else
-                emit __OnSecurityCheckSuccess(nDoorNum);
+            {
+                emit __OnSecurityCheckSuccess(DoorNums);
+            }
         }
         else
         {
@@ -433,10 +475,10 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     // Might have timed out and cleared the _type
 }
 
-void CModelSecurity::OnSuccessfulQuestionUsersAnswers(int doorNum, QString answer1, QString answer2, QString answer3)
+void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString doorNums, QString answer1, QString answer2, QString answer3)
 {
     qDebug() << "CModelSecurity::OnSuccessfulQuestionUsersAnswers()";
-    emit __OnSecurityCheckSuccessWithAnswers(doorNum, answer1, answer2, answer3);
+    emit __OnSecurityCheckSuccessWithAnswers(doorNums, answer1, answer2, answer3);
 }
 
 void CModelSecurity::OnQuestionUserCancelled()
@@ -451,7 +493,7 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
     //    _timer.stop();
     bool bFingerprintRequired = false;
     bool bQuestionsRequired = false;
-    std::string codeOne;
+    QString codeOne;
     bool bAskQuestions = false;
     QString question1 = "";
     QString question2 = "";
@@ -470,10 +512,19 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
     }
     else if( _type == "User" )
     {
-        int nDoorNum = -1;
-        if( _ptblCodes->checkCodeTwo(code.toStdString(), bFingerprintRequired, bQuestionsRequired, codeOne, nDoorNum, bAskQuestions, question1, question2, question3) > 0 )
+        QString DoorNums;
+        if( _ptblCodes->checkCodeTwo(code, bFingerprintRequired, bQuestionsRequired, codeOne, DoorNums, bAskQuestions, question1, question2, question3) > 0 )
         {
-            emit __OnSecurityCheckSuccess(nDoorNum);
+            /* Allowing multiple boxes to be opened need to be handled here for 
+                single code.  __OnSecurityCheckSuccess is connected to 
+                SystemController::OnSecurityCheckRequest which accepts a single
+                lock number and opens a single lock.  This could be expanded
+                here to query for all of locks with matching first codes and
+                then pass that list of locks to a new signal __OnSecurityCheckSuccessList
+                or change the existing signal to always accept a list, even if
+                there is just one.
+            */            
+            emit __OnSecurityCheckSuccess(DoorNums);
         }
         else
         {
@@ -483,7 +534,7 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
     // Might have timed out and cleared the _type
 }
 
-void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(int nLockNum, QString code)
+void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code)
 {
     qDebug() << " ----------------------OnCreateHistoryRecordFromLastSuccessfulLogin()";
 
@@ -491,8 +542,8 @@ void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(int nLockNum, 
     CLockState  lockState;
 
     // Build the lock state for this lock num
-    lockState.setLockNum(nLockNum);
-    lockState.setCode1(code.toStdString());
+    lockState.setLockNums(LockNums);
+    lockState.setCode1(code);
     lockHistoryRec.setFromLockState(lockState);
     _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
 }
@@ -511,7 +562,8 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
         CLockHistoryRec lockHistoryRec;
         CLockState      *pState;
         nVal = 0;
-        for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) {
+        for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) 
+        {
             nVal++;
             pState = itor.value();
             lockHistoryRec.setFromLockState(*pState);
@@ -537,7 +589,8 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QSt
         CLockHistoryRec lockHistoryRec;
         CLockState      *pState;
         nVal = 0;
-        for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) {
+        for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) 
+        {
             nVal++;
             pState = itor.value();
             lockHistoryRec.setFromLockState(*pState);
@@ -565,7 +618,8 @@ void CModelSecurity::RequestLastSuccessfulLogin()
             CLockHistoryRec *plockHistoryRec;
             CLockState      *pState;
             nVal = 0;
-            for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) {
+            for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) 
+            {
                 nVal++;
                 pState = itor.value();
                 plockHistoryRec = new CLockHistoryRec();
@@ -587,16 +641,17 @@ void CModelSecurity::RequestLastSuccessfulLogin()
         QDateTime   time, now;
         time = time.currentDateTime().addSecs(-5);  // 5 Seconds ago
         now = now.currentDateTime();
-        int nLockNum = -1;
+        QString LockNums;
 
         qDebug() << ">>SENDING >>> Start:" << time.toString("yyyy-MM-dd HH:mm:ss") << "  End:" << now.toString("yyyy-MM-dd HH:mm:ss");
 
-        _ptblCodeHistory->selectLastLockCodeHistorySet(nLockNum, time, now, &_pHistorySet);
+        _ptblCodeHistory->selectLastLockCodeHistorySet(LockNums, time, now, &_pHistorySet);
 
         // Predictive - so history rec
         CLockHistoryRec *plockHistoryRec;
 
-        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++) {
+        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++) 
+        {
             plockHistoryRec = itor.value();
             //
             qDebug() << "  Found last successful login";
@@ -609,8 +664,8 @@ void CModelSecurity::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTi
 {
     CLockHistorySet     *pLockHistorySet = new CLockHistorySet();
     // Get the data
-    int nLockNum = -1;
-    _ptblCodeHistory->selectLockCodeHistorySet(nLockNum, dtStart, dtEnd, &pLockHistorySet);
+    QString LockNums;
+    _ptblCodeHistory->selectLockCodeHistorySet(LockNums, dtStart, dtEnd, &pLockHistorySet);
     // Send it back
     emit __OnCodeHistoryForDateRange(dtStart, dtEnd, pLockHistorySet);
 }

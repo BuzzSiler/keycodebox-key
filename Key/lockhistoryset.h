@@ -19,18 +19,18 @@ public:
     QString jsonArrayAsStringObject();  // Object containing the array of CLockHistoryRec objects { "lock_set":[],[],.. }
 
     bool setFromJsonObject(QJsonObject &jsonObj);    // Object containing array
-    bool setFromJsonString(std::string strJson); // Stringified object containing array of CLockHistoryRec objects "{ }"
+    bool setFromJsonString(QString strJson); // Stringified object containing array of CLockHistoryRec objects "{ }"
 
-    const QMultiMap<int, CLockHistoryRec*>        *getLockHistoryMap() { return &_mmapLocks; }
+    const QMultiMap<QString, CLockHistoryRec*>        *getLockHistoryMap() { return &_mmapLocks; }
 
-    typedef QMultiMap<int, CLockHistoryRec*>::Iterator   Iterator;
+    typedef QMultiMap<QString, CLockHistoryRec*>::Iterator   Iterator;
 
     Iterator    begin() { return _mmapLocks.begin(); }
     Iterator    end() { return _mmapLocks.end(); }
 
     void addToSet(CLockHistoryRec &lockHistoryRec);
 private:
-    QMultiMap<int, CLockHistoryRec*>       _mmapLocks;     // Container keyed off lock number
+    QMultiMap<QString, CLockHistoryRec*>       _mmapLocks;     // Container keyed off lock number
 
 signals:
 

@@ -1,6 +1,7 @@
 #include <QTime>
 #include <QDateTime>
-#include <string>
+#include <QString>
+//#include <string>
 #include "tblcodes.h"
 #include "encryption.h"
 #include "kcbcommon.h"
@@ -21,36 +22,28 @@ bool CTblCodes::isExpired(int access_type, int access_count, int max_access)
     return false;
 }
 
-/**
- * @brief CTblCodes::setLastCodeOne
- * @param code - unencrypted
- */
 void CTblCodes::setLastCodeOne(QString code)
 {
     _sCodeOne = code;
 }
 
-/**
- * @brief CTblCodes::checkCodeOne
- * @param code - encrypted
- */
-int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &bFingerprintRequired, int &nLockNum )
+QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &bFingerprintRequired, QString &LockNums )
 {
     qDebug() << "CTblCodes::checkCodeOne()";
     // get the time.
     QDateTime time = QDateTime::currentDateTime();
     // hold on to the code    
-    code = CEncryption::decryptString(code.c_str()).toStdString();
-    _sCodeOne = code.c_str();   // Unencrypted
-    nLockNum = -1;
+    code = CEncryption::decryptString(code);
+    _sCodeOne = code;   // Unencrypted
+    LockNums = "";
 
     if( _pDB && _pDB->isOpen() ) 
     {
         QSqlQuery qry(*_pDB);
-        QString sql = "SELECT ids, sequence, sequence_order, locknum, description, "
+        QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "       code1, code2, fingerprint1, fingerprint2, "
                       "       starttime, endtime, status, access_count, retry_count, max_access, max_retry, access_type "
-                      "  FROM " + QString(TABLENAME.c_str()) +
+                      "  FROM " + TABLENAME +
                       " WHERE ((starttime = :startNone and endtime = :endNone) "
                       "    OR (starttime <= :time and endtime >= :timeend))";
 
@@ -64,17 +57,17 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
         //qDebug() << "startNone/endNone" << _DATENONE_STR;
         //qDebug() << "time" << time.toString("yyyy-MM-dd HH:mm:ss") << "timeend" << time.toString("yyyy-MM-dd HH:mm:ss");
 
-        qry.bindValue(":startNone", _DATENONE_STR); // .toStdString().c_str());
-        qry.bindValue(":endNone", _DATENONE_STR); // .toStdString().c_str());
-        qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));   // .toStdString().c_str());
-        qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));    //.toStdString().c_str());
+        qry.bindValue(":startNone", _DATENONE_STR);
+        qry.bindValue(":endNone", _DATENONE_STR);
+        qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));
+        qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));
 
         //qDebug() << "SQL:" << sql;
 
-        nLockNum = -1;  // Just because we don't have a specific door number
+        LockNums = "";
         bSecondCodeRequired = true;
         int nSecondCode = 0;
-        std::string sCode1;
+        QString sCode1;
         QString sCode2;
         int nCount = 0; //
         int ids;    // temporarily hold the ids of last one
@@ -90,7 +83,7 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
             qDebug() << "exec() ok ";
 
             int fldIds = qry.record().indexOf("ids");
-            int fldLockNo = qry.record().indexOf("locknum");
+            int fldLockNo = qry.record().indexOf("locknums");
             int fldCode1No = qry.record().indexOf("code1");
             int fldCode2No = qry.record().indexOf("code2");
             int fldFingerprint1No = qry.record().indexOf("fingerprint1");
@@ -109,16 +102,16 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
                 //   - If no second required then signal Ok to open door
                 nCount++;
                 ids = qry.value(fldIds).toInt();
-                sCode1 = qry.value(fldCode1No).toString().toStdString();
-                sCode1 = CEncryption::decryptString(sCode1.c_str()).toStdString();
+                sCode1 = qry.value(fldCode1No).toString();
+                sCode1 = CEncryption::decryptString(sCode1);
 
 
-                //qDebug() << "sCode1" << sCode1.c_str() << "Code" << code.c_str();
+                //qDebug() << "sCode1" << sCode1 << "Code" << code;
 
                 /// first one in the set to match unencrypted
                 if( sCode1 == code ) 
                 {
-                    //qDebug() << "Code1:" << sCode1.c_str() << " == code:" << code.c_str();
+                    //qDebug() << "Code1:" << sCode1 << " == code:" << code;
 
                     /* Check for expiration */
                     access_type = qry.value(fldAccessType).toInt();
@@ -126,10 +119,10 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
                     max_access = qry.value(fldMaxAccess).toInt();
                     if (isExpired(access_type, access_count, max_access))
                     {
-                        return nLockNum;
+                        return LockNums;
                     }                    
 
-                    nLockNum = qry.value(fldLockNo).toInt();
+                    LockNums = qry.value(fldLockNo).toString();
                     if(qry.value(fldCode2No).isNull()) 
                     {
                         sCode2 = "";
@@ -139,7 +132,7 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
                         sCode2 = qry.value(fldCode2No).toString();
                         sCode2 = CEncryption::decryptString(sCode2);
                     }
-                    //qDebug() << "Code2:>" << sCode2 << "< and nLockNum=" << QVariant(nLockNum).toString();
+                    //qDebug() << "Code2:>" << sCode2 << "< and LockNums=" << LockNums;
                     if(!sCode2.trimmed().isEmpty())
                     {
                         nSecondCode++;
@@ -164,7 +157,7 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
 
                     bFingerprintRequired = qry.value(fldFingerprint1No).toInt() == 1 ? true : false;
 
-                    return nLockNum;
+                    return LockNums;
                 }
             }
             if(nSecondCode > 0 ) {
@@ -173,14 +166,14 @@ int CTblCodes::checkCodeOne(std::string code, bool &bSecondCodeRequired, bool &b
                 bSecondCodeRequired = false;
             }
 
-            //qDebug() << "CTblCodes::checkCodeOne nLockNum" << nLockNum;
-            return nLockNum;
+            //qDebug() << "CTblCodes::checkCodeOne LockNums" << LockNums;
+            return LockNums;
         }
         else {
             qDebug() << "query.exec() failed." << qry.lastError();
         }
     }
-    return nLockNum;
+    return LockNums;
 }
 
 bool CTblCodes::isWhiteSpace(const QString &str)
@@ -188,27 +181,36 @@ bool CTblCodes::isWhiteSpace(const QString &str)
     return QRegExp("\\s*").exactMatch(str);
 }
 
-int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &bQuestionsRequired, std::string &codeOne, int &nLockNum, bool &bAskQuestions, QString &question1, QString &question2, QString &question3)
+QString CTblCodes::checkCodeTwo(QString code, 
+                            bool &bFingerprintRequired, 
+                            bool &bQuestionsRequired, 
+                            QString &codeOne, 
+                            QString &LockNums, 
+                            bool &bAskQuestions, 
+                            QString &question1, 
+                            QString &question2, 
+                            QString &question3)
 {
     // Make sure both the first code and the second code match
     // use _sCodeOne
 
     qDebug() << "CTblCodes::checkCodeTwo()";
-    qDebug() << " code2:" << code.c_str();
+    qDebug() << " code2:" << code;
     // get the time.
     QDateTime time = QDateTime::currentDateTime();
     // hold on to the code
-    code = CEncryption::decryptString(code.c_str()).toStdString();
-    _sCodeTwo = code.c_str();
-    nLockNum = -1;
+    code = CEncryption::decryptString(code);
+    _sCodeTwo = code;
+    LockNums = "";
 
-    if( _pDB && _pDB->isOpen() ) {
+    if( _pDB && _pDB->isOpen() ) 
+    {
         QSqlQuery qry(*_pDB);
-        QString sql = "SELECT ids, sequence, sequence_order, locknum, description, "
+        QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "code1, code2, fingerprint2, "
                       " starttime, endtime, status, access_count, retry_count, max_access, max_retry, lockbox_state, "
                       " ask_questions, question1, question2, question3, access_type"
-                      " from " + QString(TABLENAME.c_str()) +
+                      " from " + TABLENAME +
                       " WHERE ((starttime = :startNone and endtime = :endNone) "
                       " or (starttime <= :time and endtime >= :timeend))";
 
@@ -223,18 +225,21 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
         qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));
         qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));
 
-        nLockNum = -1;  // Just because we don't have a specific door number
-        std::string sCode1;
-        std::string sCode2;
+        LockNums = "";
+        QString sCode1;
+        QString sCode2;
         int nCount = 0; //
         _lastIDS = -1;
         // Selection
+
+        qry.setForwardOnly(true);
+
         if(qry.exec())
         {
             qDebug() << "exec() ok 2";
 
             int fldIDS = qry.record().indexOf("ids");
-            int fldLockNo = qry.record().indexOf("locknum");
+            int fldLockNo = qry.record().indexOf("locknums");
             int fldCode1No = qry.record().indexOf("code1");
             int fldCode2No = qry.record().indexOf("code2");
             int fldFingerprint2 = qry.record().indexOf("fingerprint2");
@@ -248,6 +253,18 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
             qDebug() << "fldLockNo:" << fldLockNo << "  fldCode1No:" << fldCode1No << "  fldCode2No:" << fldCode2No;
             qDebug() << "Count: " << qry.size() << "   fldFingerprint2:" << fldFingerprint2 << "   fldLockboxStatus:" << fldLockboxStatus;
 
+            /* I think we need to loop over all records and collect all matching records
+                while (qry.next())
+                {
+                    // get code1 and code2 and decrypt
+                    // if code1 and code2 match then
+                    //     evaluate whether the lock should be added to the list
+                    //     if codes not expired add to lock list
+                    //     else add to lock list
+                }
+
+            */
+
             if(qry.first())
             {
                 qDebug() << "qry.first()";
@@ -258,20 +275,20 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
                     //   - If second code then signal that the second code is required.
                     //   - If no second required then signal Ok to open door
                     nCount++;
-                    sCode1 = qry.value(fldCode1No).toString().toStdString();
-                    sCode1 = CEncryption::decryptString(sCode1.c_str()).toStdString();
-                    sCode2 = qry.value(fldCode2No).toString().toStdString();
-                    sCode2 = CEncryption::decryptString(sCode2.c_str()).toStdString();
+                    sCode1 = qry.value(fldCode1No).toString();
+                    sCode1 = CEncryption::decryptString(sCode1);
+                    sCode2 = qry.value(fldCode2No).toString();
+                    sCode2 = CEncryption::decryptString(sCode2);
 
-                    //qDebug() << "Code1:" << sCode1.c_str() << " == _sCodeOne:" << _sCodeOne;
-                    //qDebug() << "Code2:" << sCode2.c_str() << " == _sCodeTwo:" << _sCodeTwo;
+                    //qDebug() << "Code1:" << sCode1 << " == _sCodeOne:" << _sCodeOne;
+                    //qDebug() << "Code2:" << sCode2 << " == _sCodeTwo:" << _sCodeTwo;
 
                     // first one in the set to match unencrypted
                     // Both codes must match
-                    if( sCode1 == _sCodeOne.toStdString() && sCode2 == code)
+                    if( sCode1 == _sCodeOne && sCode2 == code)
                     {
                         _lastIDS = qry.value(fldIDS).toInt();
-                        //qDebug() << "_lastIDS: " << QString::number(_lastIDS) << " Code2:" << sCode2.c_str() << " == code:" << code.c_str();
+                        //qDebug() << "_lastIDS: " << QString::number(_lastIDS) << " Code2:" << sCode2 << " == code:" << code;
 
 
                         int access_type = qry.value(fldAccessType).toInt();
@@ -280,10 +297,10 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
                         /* Check for expiration */
                         if (isExpired(access_type, access_count, max_access))
                         {
-                            return nLockNum;
+                            return LockNums;
                         }                    
 
-                        nLockNum = qry.value(fldLockNo).toInt();
+                        LockNums = qry.value(fldLockNo).toInt();
 
                         bFingerprintRequired = qry.value(fldFingerprint2).toInt() == 1 ? true : false;
                         if( bFingerprintRequired )
@@ -334,7 +351,7 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
                             updateLockboxState(_lastIDS, false);
                         }
 
-                        return nLockNum;
+                        return LockNums;
                     }
                 } while(qry.next());
             } else {
@@ -345,44 +362,40 @@ int CTblCodes::checkCodeTwo(std::string code, bool &bFingerprintRequired, bool &
             qDebug() << "query.exec() failed." << qry.lastError();
         }
     }
-    return nLockNum;
+    return LockNums;
 }
 
-/**
- * @brief CTblCodes::selectCodeSet
- * @param nLockNum
- * @param start
- * @param end
- * @param pLockSet - allocated if not null on return - must be freed by caller
- */
-void CTblCodes::selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLockSet **pLockSet)
+void CTblCodes::selectCodeSet(QString &LockNums, QDateTime start, QDateTime end, CLockSet **pLockSet)
 {
-    qDebug() << "CTblCodes::selectCodeSet(nLockNum, start, end, pLockSet)";
+    qDebug() << "CTblCodes::selectCodeSet(LockNums, start, end, pLockSet)";
     // hold on to the code
     CLockState  *pLock;
     *pLockSet = 0;
 
     if( _pDB && _pDB->isOpen() ) {
         QSqlQuery qry(*_pDB);
-        QString sql = "SELECT ids, sequence, sequence_order, locknum, description, "
+        QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "code1, code2, fingerprint1, fingerprint2, ask_questions, question1, question2, question3, "
                       " starttime, endtime, status, access_count, retry_count, max_access, max_retry, access_type"
-                      " from " + QString(TABLENAME.c_str()) +
+                      " from " + TABLENAME +
                       " WHERE ";
-        if(nLockNum != -1 ) {
-            sql += " locknum = :lockNum and ";
+        if(LockNums != "" ) 
+        {
+            sql += " locknums = :lockNums and ";
         }
         sql += " ((starttime = :startNone and endtime = :endNone) "
                " or (starttime >= :stime and endtime <= :etime))";
 
         qDebug() << "SQL:" << sql;
 
-        if( !qry.prepare(sql) ) {
+        if( !qry.prepare(sql) ) 
+        {
             qDebug() << "qry.prepare fails!" << qry.lastError();
         }
 
-        if(nLockNum != -1 ) {
-            qry.bindValue(":lockNum", nLockNum);
+        if(LockNums != "" ) 
+        {
+            qry.bindValue(":lockNums", LockNums);
         }
         qry.bindValue(":startNone", _DATENONE_STR);
         qry.bindValue(":endNone", _DATENONE_STR);
@@ -397,8 +410,8 @@ void CTblCodes::selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLo
             qDebug() << " : " << (*itor).typeName() << " value:" << (*itor).toString();
         }
 
-        std::string sCode1;
-        std::string sCode2;
+        QString sCode1;
+        QString sCode2;
         int nCount = 0;
         // Selection
         if(qry.exec())
@@ -407,7 +420,7 @@ void CTblCodes::selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLo
             int fldID = qry.record().indexOf("ids");
             int fldSeq = qry.record().indexOf("sequence");
             int fldSeqOrder = qry.record().indexOf("sequence_order");
-            int fldLockNo = qry.record().indexOf("locknum");
+            int fldLockNo = qry.record().indexOf("locknums");
             int fldDesc = qry.record().indexOf("description");
             int fldCode1No = qry.record().indexOf("code1");
             int fldCode2No = qry.record().indexOf("code2");
@@ -443,23 +456,23 @@ void CTblCodes::selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLo
                     //   - If second code then signal that the second code is required.
                     //   - If no second required then signal Ok to open door
                     nCount++;
-                    sCode1 = qry.value(fldCode1No).toString().toStdString();
-                    sCode2 = qry.value(fldCode2No).toString().toStdString();
-                    sCode1 = CEncryption::decryptString(sCode1.c_str()).toStdString();
-                    sCode2 = CEncryption::decryptString(sCode2.c_str()).toStdString();
+                    sCode1 = qry.value(fldCode1No).toString();
+                    sCode2 = qry.value(fldCode2No).toString();
+                    sCode1 = CEncryption::decryptString(sCode1);
+                    sCode2 = CEncryption::decryptString(sCode2);
 
-                    nLockNum = qry.value(fldLockNo).toInt();
+                    LockNums = qry.value(fldLockNo).toString();
 
                     pLock->setID(qry.value(fldID).toInt());
-                    pLock->setSequence(qry.value(fldSeq).toString().toStdString());
+                    pLock->setSequence(qry.value(fldSeq).toString());
                     pLock->setSequenceOrder(qry.value(fldSeqOrder).toInt());
-                    pLock->setLockNum(qry.value(fldLockNo).toInt());
-                    pLock->setDescription(qry.value(fldDesc).toString().toStdString());
+                    pLock->setLockNums(qry.value(fldLockNo).toString());
+                    pLock->setDescription(qry.value(fldDesc).toString());
                     pLock->setCode1(sCode1);    // unencrypted
                     pLock->setCode2(sCode2);    // unencrypted
                     pLock->setStartTime(qry.value(fldStart).toDateTime());
                     pLock->setEndTime(qry.value(fldEnd).toDateTime());
-                    pLock->setStatus(qry.value(fldStatus).toString().toStdString());
+                    pLock->setStatus(qry.value(fldStatus).toString());
                     pLock->setAccessCount(qry.value(fldAccessCount).toInt());
                     pLock->setRetryCount(qry.value(fldRetryCount).toInt());
                     pLock->setMaxAccess(qry.value(fldMaxAccess).toInt());
@@ -480,9 +493,9 @@ void CTblCodes::selectCodeSet(int &nLockNum, QDateTime start, QDateTime end, CLo
                     pLock->setAskQuestions(aq);
 
                     pLock->setAskQuestions(qry.value(fldAskQuestions).toInt());
-                    pLock->setQuestion1(qry.value(fldQuestion1).toString().toStdString());
-                    pLock->setQuestion2(qry.value(fldQuestion2).toString().toStdString());
-                    pLock->setQuestion3(qry.value(fldQuestion3).toString().toStdString());
+                    pLock->setQuestion1(qry.value(fldQuestion1).toString());
+                    pLock->setQuestion2(qry.value(fldQuestion2).toString());
+                    pLock->setQuestion3(qry.value(fldQuestion3).toString());
 
                     pLock->setAccessType(qry.value(fldAccessType).toInt());
 
@@ -507,10 +520,10 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
 
     if( _pDB && _pDB->isOpen() ) {
         QSqlQuery qry(*_pDB);
-        QString sql = "SELECT ids, sequence, sequence_order, locknum, description, "
+        QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "code1, code2, fingerprint1, fingerprint2, ask_questions, question1, question2, question3, "
                       " starttime, endtime, status, access_count, retry_count, max_access, max_retry, access_type"
-                      " from " + QString(TABLENAME.c_str()) +
+                      " from " + TABLENAME +
                       " WHERE ids = :id";
 
         qDebug() << "SQL:" << sql;
@@ -529,8 +542,8 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
             qDebug() << " : " << (*itor).typeName() << " value:" << (*itor).toString();
         }
 
-        std::string sCode1;
-        std::string sCode2;
+        QString sCode1;
+        QString sCode2;
         int nCount = 0; //
         // Selection
         if(qry.exec())
@@ -539,7 +552,7 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
             int fldID = qry.record().indexOf("ids");
             int fldSeq = qry.record().indexOf("sequence");
             int fldSeqOrder = qry.record().indexOf("sequence_order");
-            int fldLockNo = qry.record().indexOf("locknum");
+            int fldLockNo = qry.record().indexOf("locknums");
             int fldDesc = qry.record().indexOf("description");
             int fldCode1No = qry.record().indexOf("code1");
             int fldCode2No = qry.record().indexOf("code2");
@@ -571,23 +584,23 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
                     //   - If second code then signal that the second code is required.
                     //   - If no second required then signal Ok to open door
                     nCount++;
-                    sCode1 = qry.value(fldCode1No).toString().toStdString();
-                    sCode2 = qry.value(fldCode2No).toString().toStdString();
-                    sCode1 = CEncryption::decryptString(sCode1.c_str()).toStdString();
-                    sCode2 = CEncryption::decryptString(sCode2.c_str()).toStdString();
+                    sCode1 = qry.value(fldCode1No).toString();
+                    sCode2 = qry.value(fldCode2No).toString();
+                    sCode1 = CEncryption::decryptString(sCode1);
+                    sCode2 = CEncryption::decryptString(sCode2);
 
-                    //nLockNum = qry.value(fldLockNo).toInt();
+                    //LockNums = qry.value(fldLockNo).toString();
 
                     pLock->setID(qry.value(fldID).toInt());
-                    pLock->setSequence(qry.value(fldSeq).toString().toStdString());
+                    pLock->setSequence(qry.value(fldSeq).toString());
                     pLock->setSequenceOrder(qry.value(fldSeqOrder).toInt());
-                    pLock->setLockNum(qry.value(fldLockNo).toInt());
-                    pLock->setDescription(qry.value(fldDesc).toString().toStdString());
+                    pLock->setLockNums(qry.value(fldLockNo).toString());
+                    pLock->setDescription(qry.value(fldDesc).toString());
                     pLock->setCode1(sCode1);    // unencrypted
                     pLock->setCode2(sCode2);    // unencrypted
                     pLock->setStartTime(qry.value(fldStart).toDateTime());
                     pLock->setEndTime(qry.value(fldEnd).toDateTime());
-                    pLock->setStatus(qry.value(fldStatus).toString().toStdString());
+                    pLock->setStatus(qry.value(fldStatus).toString());
                     pLock->setAccessCount(qry.value(fldAccessCount).toInt());
                     pLock->setRetryCount(qry.value(fldRetryCount).toInt());
                     pLock->setMaxAccess(qry.value(fldMaxAccess).toInt());
@@ -607,9 +620,9 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
                     bool aq = qry.value(fldAskQuestions).toInt() == 1 ? true : false;
                     pLock->setAskQuestions(aq);
 
-                    pLock->setQuestion1(qry.value(fldQuestion1).toString().toStdString());
-                    pLock->setQuestion2(qry.value(fldQuestion2).toString().toStdString());
-                    pLock->setQuestion3(qry.value(fldQuestion3).toString().toStdString());
+                    pLock->setQuestion1(qry.value(fldQuestion1).toString());
+                    pLock->setQuestion2(qry.value(fldQuestion2).toString());
+                    pLock->setQuestion3(qry.value(fldQuestion3).toString());
 
                     pLock->setAccessType(qry.value(fldAccessType).toInt());
 
@@ -628,17 +641,28 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
 
 bool CTblCodes::tableExists()
 {
-    QStringList lstTables = _pDB->tables();
-    QStringList::iterator  itor;
+    QStringList tables = _pDB->tables();
 
-    for(itor = lstTables.begin(); itor != lstTables.end(); itor++)
+    foreach (auto table, tables)
     {
-        if((*itor).toStdString() == TABLENAME) {
-            //
+        if (table == TABLENAME)
+        {
             return true;
         }
     }
+
     return false;
+
+    // QStringList::iterator  itor;
+
+    // for (itor = lstTables.begin(); itor != lstTables.end(); itor++)
+    // {
+    //     if((*itor).toStdString() == TABLENAME) {
+    //         //
+    //         return true;
+    //     }
+    // }
+    // return false;
 }
 
 bool CTblCodes::columnExists(QString column)
@@ -720,9 +744,9 @@ void CTblCodes::createTable()
 
 
         QString sql("CREATE TABLE IF NOT EXISTS ");
-        sql += QString(TABLENAME.c_str());
+        sql += TABLENAME;
         sql += "(ids integer primary key unique, sequence text,"
-               "sequence_order integer, locknum integer, description text, "
+               "sequence_order integer, locknums text, description text, "
                "code1 text, code2 text,"
                " starttime DATETIME, endtime DATETIME, fingerprint1 integer, fingerprint2 integer, status text, access_count integer,"
                " retry_count integer, max_access integer, max_retry integer, lockbox_state integer, ask_questions integer,"
@@ -748,7 +772,7 @@ void CTblCodes::createColumn(QString column, QString fieldType)
         QSqlQuery qry(*_pDB);
 
         QString sql("ALTER TABLE  ");
-        sql += QString(TABLENAME.c_str());
+        sql += TABLENAME;
         sql += " ADD ";
         sql += column;
         sql += " ";
@@ -801,23 +825,26 @@ void CTblCodes::addJSONCodes(QString jsonCodes)
  * @param maxAccess
  * @param maxRetry
  */
-int CTblCodes::addLockCodeClear(int locknum, std::string code1, std::string code2,
+int CTblCodes::addLockCodeClear(QString locknums, QString code1, QString code2,
                                 QDateTime starttime, QDateTime endtime, bool fingerprint1, bool fingerprint2,
-                                bool askQuestions, std::string question1, std::string question2, std::string question3,
-                                std::string status, std::string desc,
-                                std::string sequence, int sequenceNum,
+                                bool askQuestions, QString question1, QString question2, QString question3,
+                                QString status, QString desc,
+                                QString sequence, int sequenceNum,
                                 int maxAccess, int maxRetry, int accessType, int accessCount)
 {
     qDebug() << "CTblCodes::addLockCodeClear()";
-    std::string     encCode1, encCode2;
-    if(!code1.empty()) {
-        encCode1 = CEncryption::decryptString(code1.c_str()).toStdString();
-    }
-    if(!code2.empty()) {
-        encCode2 = CEncryption::decryptString(code2.c_str()).toStdString();
+    QString     encCode1, encCode2;
+    if(code1.length() > 0)
+    {
+        encCode1 = CEncryption::decryptString(code1);
     }
 
-    return addLockCode(locknum, encCode1, encCode2,
+    if(code2.length() > 0) 
+    {
+        encCode2 = CEncryption::decryptString(code2);
+    }
+
+    return addLockCode(locknums, encCode1, encCode2,
                        starttime, endtime,
                        fingerprint1, fingerprint2,
                        askQuestions, question1, question2, question3,
@@ -826,63 +853,111 @@ int CTblCodes::addLockCodeClear(int locknum, std::string code1, std::string code
                        maxAccess, maxRetry, accessType, accessCount);
 }
 
-/**
- * @brief CTblCodes::addLockCode
- * @param locknum
- * @param code1
- * @param code2
- * @param starttime
- * @param endtime
- * @param fingerprint1
- * @param fingerprint2
- * @param status
- * @param desc
- * @param sequence
- * @param sequenceNum
- * @param maxAccess
- * @param maxRetry
- * @return
- */
-int CTblCodes::addLockCode(int locknum, std::string code1, std::string code2,
+// int CTblCodes::addLockCode(QString locknums, QString code1, QString code2,
+//                            QDateTime starttime, QDateTime endtime,
+//                            bool fingerprint1, bool fingerprint2,
+//                            bool askQuestions, QString question1, QString question2, QString question3,
+//                            QString status, QString desc,
+//                            QString sequence, int sequenceNum,
+//                            int maxAccess, int maxRetry, int accessType, int accessCount)
+// {
+//     qDebug() << "CTblCodes::addLockCode()";
+
+//     QSqlQuery qry(*_pDB);
+//     qry.prepare(QString("INSERT INTO ") + TABLENAME +
+//                 QString(" (sequence, sequence_order, "
+//                         "locknums, description, code1, "
+//                         "code2, starttime, endtime, fingerprint1, fingerprint2, ask_questions, question1, question2, question3, status, access_count,"
+//                         "retry_count, max_access, max_retry, lockbox_state, access_type)"
+//                         " VALUES (:seqDesc, :seqOrder, :lockNums, :desc, :codeOne, :codeTwo,"
+//                         " :start, :end, :fingerprint1, :fingerprint2, :ask_questions, :question1, :question2, :question3,"
+//                         " :stat, :access_count, 0, :maxAccess, :maxRetry, 0, :accessType)"));
+
+//     qDebug() << "Query:" << qry.lastQuery();
+
+//     code1 = CEncryption::encryptString(code1);
+//     code2 = CEncryption::encryptString(code2);
+
+//     qry.bindValue(":seqDesc", sequence);
+//     qry.bindValue(":seqOrder", sequenceNum);
+//     qry.bindValue(":lockNums", locknums);
+//     qry.bindValue(":desc", desc);
+//     qry.bindValue(":codeOne", code1);
+//     qry.bindValue(":codeTwo", code2);
+//     qry.bindValue(":start", starttime.toString(datetimeFormat));
+//     qry.bindValue(":end", endtime.toString(datetimeFormat));
+//     qry.bindValue(":stat", status);
+//     qry.bindValue(":fingerprint1", (int) fingerprint1);
+//     qry.bindValue(":fingerprint2", (int) fingerprint2);
+//     qry.bindValue(":ask_questions", (int) askQuestions);
+//     qry.bindValue(":question1", question1);
+//     qry.bindValue(":question2", question2);
+//     qry.bindValue(":question3", question3);
+//     qry.bindValue(":maxAccess", maxAccess);
+//     qry.bindValue(":maxRetry", maxRetry);
+//     qry.bindValue(":accessType", accessType);
+//     qry.bindValue(":access_count", accessCount);
+
+//     QMap<QString, QVariant> mapVals = qry.boundValues();
+//     qDebug() << "Mapped count:" << mapVals.count();
+
+//     if( !qry.exec() ) {
+//         qDebug() << "CTblCodes::addLockCode():" << qry.lastError();
+//         qDebug() << "Query After:" << qry.lastQuery();
+//         return -1;
+//     }
+//     else {
+//         qDebug( "Inserted!" );
+//         QVariant var = qry.lastInsertId();
+//         if(var.isValid())
+//         {    int nId = var.toInt();
+//             return nId;
+//         } else {
+//             return -1;
+//         }
+//     }
+// }
+
+int CTblCodes::addLockCode(QString locknums, QString code1, QString code2,
                            QDateTime starttime, QDateTime endtime,
                            bool fingerprint1, bool fingerprint2,
-                           bool askQuestions, std::string question1, std::string question2, std::string question3,
-                           std::string status, std::string desc,
-                           std::string sequence, int sequenceNum,
+                           bool askQuestions, QString question1, QString question2, QString question3,
+                           QString status, QString desc,
+                           QString sequence, int sequenceNum,
                            int maxAccess, int maxRetry, int accessType, int accessCount)
 {
     qDebug() << "CTblCodes::addLockCode()";
 
     QSqlQuery qry(*_pDB);
-    qry.prepare(QString("INSERT INTO ") + QString(TABLENAME.c_str()) +
+    qry.prepare(QString("INSERT INTO ") + TABLENAME +
                 QString(" (sequence, sequence_order, "
-                        "locknum, description, code1, "
+                        "locknums, description, code1, "
                         "code2, starttime, endtime, fingerprint1, fingerprint2, ask_questions, question1, question2, question3, status, access_count,"
                         "retry_count, max_access, max_retry, lockbox_state, access_type)"
-                        " VALUES (:seqDesc, :seqOrder, :lockNum, :desc, :codeOne, :codeTwo,"
+                        " VALUES (:seqDesc, :seqOrder, :lockNums, :desc, :codeOne, :codeTwo,"
                         " :start, :end, :fingerprint1, :fingerprint2, :ask_questions, :question1, :question2, :question3,"
                         " :stat, :access_count, 0, :maxAccess, :maxRetry, 0, :accessType)"));
 
     qDebug() << "Query:" << qry.lastQuery();
 
-    code1 = CEncryption::encryptString(code1.c_str()).toStdString();
-    code2 = CEncryption::encryptString(code2.c_str()).toStdString();
+    code1 = CEncryption::encryptString(code1);
+    code2 = CEncryption::encryptString(code2);
 
-    qry.bindValue(":seqDesc", sequence.c_str());
+    qry.bindValue(":seqDesc", sequence);
     qry.bindValue(":seqOrder", sequenceNum);
-    qry.bindValue(":lockNum", locknum);
-    qry.bindValue(":desc", desc.c_str());
-    qry.bindValue(":codeOne", code1.c_str());
-    qry.bindValue(":codeTwo", code2.c_str());
+    qry.bindValue(":lockNums", locknums);
+    qry.bindValue(":desc", desc);
+    qry.bindValue(":codeOne", code1);
+    qry.bindValue(":codeTwo", code2);
     qry.bindValue(":start", starttime.toString(datetimeFormat));
     qry.bindValue(":end", endtime.toString(datetimeFormat));
-    qry.bindValue(":stat", status.c_str());
+    qry.bindValue(":stat", status);
     qry.bindValue(":fingerprint1", (int) fingerprint1);
     qry.bindValue(":fingerprint2", (int) fingerprint2);
     qry.bindValue(":ask_questions", (int) askQuestions);
-    qry.bindValue(":question1", question1.c_str());
-    qry.bindValue(":question2", question2.c_str());
-    qry.bindValue(":question3", question3.c_str());
+    qry.bindValue(":question1", question1);
+    qry.bindValue(":question2", question2);
+    qry.bindValue(":question3", question3);
     qry.bindValue(":maxAccess", maxAccess);
     qry.bindValue(":maxRetry", maxRetry);
     qry.bindValue(":accessType", accessType);
@@ -911,15 +986,15 @@ int CTblCodes::addLockCode(int locknum, std::string code1, std::string code2,
 bool CTblCodes::createTestDefault()
 {
     qDebug() << "CTblCodes::createTestDefault()";
-    std::string s = CEncryption::encryptString("192837").toStdString();
-    QString     encCode1(s.c_str());
-    s = CEncryption::encryptString("2837465").toStdString();
-    QString     encCode2(s.c_str());
+    QString s = CEncryption::encryptString("192837");
+    QString     encCode1(s);
+    s = CEncryption::encryptString("2837465");
+    QString     encCode2(s);
 
     QSqlQuery qry(*_pDB);
-    qry.prepare(QString("INSERT OR IGNORE INTO ") + QString(TABLENAME.c_str()) +
+    qry.prepare(QString("INSERT OR IGNORE INTO ") + TABLENAME +
                 QString(" (sequence, sequence_order, "
-                        "locknum, description, code1, "
+                        "locknums, description, code1, "
                         "code2, starttime, endtime, fingerprint1, fingerprint2, status, access_count,"
                         "retry_count, max_access, max_retry, lockbox_state, access_type"
                         " VALUES ('', 0, 3, 'test lock', :codeOne, "
@@ -957,7 +1032,7 @@ bool CTblCodes::createTestDefault()
  * @param strBuffer
  * @param nExpectedLength = expected length of the return string
  */
-void CTblCodes::currentTimeFormat(std::string format, std::string strBuffer, int nExpectedLength)
+void CTblCodes::currentTimeFormat(QString format, QString strBuffer, int nExpectedLength)
 {
     time_t rawtime;
     struct tm *currentTime;
@@ -965,7 +1040,7 @@ void CTblCodes::currentTimeFormat(std::string format, std::string strBuffer, int
     currentTime = gmtime( &rawtime );
     char buffer [nExpectedLength+1];
 
-    strftime(buffer, nExpectedLength, format.c_str(), currentTime);
+    strftime(buffer, nExpectedLength, format.toStdString().c_str(), currentTime);
 
     strBuffer = buffer;
 }
@@ -977,11 +1052,11 @@ bool CTblCodes::readTestDefault()
 
     QSqlQuery query(*_pDB);
     QString sql = "SELECT sequence, sequence_order, "\
-                  "locknum, description, code1,"\
+                  "locknums, description, code1,"\
                   "code2, starttime, endtime, status, access_count,"\
                   "retry_count, max_access, max_retry, access_type"
                   " FROM ";
-    sql += QString(TABLENAME.c_str());
+    sql += TABLENAME;
     sql += QString(" WHERE description = 'test lock'");
 
     if( query.exec(sql)) {
@@ -1012,10 +1087,10 @@ bool CTblCodes::readTestDefault()
 }
 
 
-bool CTblCodes::deleteCode(QString locknum, QString code1, QString code2,
+bool CTblCodes::deleteCode(QString locknums, QString code1, QString code2,
                            QDateTime starttime, QDateTime endtime)
 {
-    Q_UNUSED(locknum);
+    Q_UNUSED(locknums);
     Q_UNUSED(code1);
     Q_UNUSED(code2);
     Q_UNUSED(starttime);
@@ -1039,7 +1114,7 @@ bool CTblCodes::deleteCode(CLockState &rec)
     }
 
     QSqlQuery query(*_pDB);
-    QString sql = "DELETE FROM " + QString(TABLENAME.c_str()) +
+    QString sql = "DELETE FROM " + TABLENAME +
             QString(" WHERE ids = :fids");
 
     qDebug() << "CTblCodes::deleteCode sql:" << sql;
@@ -1065,7 +1140,7 @@ bool CTblCodes::resetCodeLimitedUse(CLockState &rec)
     }
 
     QSqlQuery qry(*_pDB);
-    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+    QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("access_count=0, max_access=2 "
                               " WHERE access_type=2 and access_count > 0 and ids=:fids");
     // Limit reset to 'limited use' codes (access type 2)                              
@@ -1094,7 +1169,7 @@ bool CTblCodes::updateLockboxState(int fids, bool lockstate)
     qDebug() << "CTblCodes::updateLockboxState()";
 
     QSqlQuery qry(*_pDB);
-    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+    QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("lockbox_state=:lockbox_state, access_count = access_count + 1 "
                               " WHERE ids=:fids");
 
@@ -1119,7 +1194,7 @@ bool CTblCodes::updateAskQuestions(int fids, bool askQuestions)
     qDebug() << "CTblAdmin::updateAskQuestions()";
 
     QSqlQuery qry(*_pDB);
-    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+    QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("ask_questions=:ask_questions"
                               " WHERE ids=:fids");
 
@@ -1144,7 +1219,7 @@ bool CTblCodes::updateQuestion1(int fids, QString question)
     qDebug() << "CTblCodes::updateQuestion1()";
 
     QSqlQuery qry(*_pDB);
-    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+    QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("question1=:question1"
                               " WHERE ids=:fids");
 
@@ -1169,7 +1244,7 @@ bool CTblCodes::updateQuestion2(int fids, QString question)
     qDebug() << "CTblCodes::updateQuestio2()";
 
     QSqlQuery qry(*_pDB);
-    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+    QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("question2=:question2"
                               " WHERE ids=:fids");
 
@@ -1194,7 +1269,7 @@ bool CTblCodes::updateQuestion3(int fids, QString question)
     qDebug() << "CTblCodes::updateQuestion3()";
 
     QSqlQuery qry(*_pDB);
-    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+    QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("question3=:question3"
                               " WHERE ids=:fids");
 
@@ -1219,9 +1294,9 @@ bool CTblCodes::updateRecord(CLockState &rec)
     qDebug() << "CTblAdmin::updateRecord()";
 
     QSqlQuery qry(*_pDB);
-    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+    QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("sequence=:seqDesc, sequence_order=:seqOrder, "
-                              "locknum=:lockNum, description=:desc, code1=:codeOne, "
+                              "locknums=:lockNums, description=:desc, code1=:codeOne, "
                               "code2=:codeTwo, starttime=:start, endtime=:end, fingerprint1=:fingerprinone, fingerprint2=:fingerprintwo, "
                               "ask_questions=:askQuestions, question1=:question1, question2=:question2, question3=:question3, "
                               "status=:stat, access_count=:accessCount,"
@@ -1231,27 +1306,27 @@ bool CTblCodes::updateRecord(CLockState &rec)
 
     qry.prepare(sql);
 
-    std::string code1 = CEncryption::encryptString( rec.getCode1().c_str()).toStdString();
-    std::string code2 = CEncryption::encryptString( rec.getCode2().c_str()).toStdString();
+    QString code1 = CEncryption::encryptString( rec.getCode1());
+    QString code2 = CEncryption::encryptString( rec.getCode2());
 
-    qry.bindValue(":codeOne", rec.getCode1().c_str());
-    qry.bindValue(":codeTwo", rec.getCode2().c_str());
+    qry.bindValue(":codeOne", rec.getCode1());
+    qry.bindValue(":codeTwo", rec.getCode2());
 
-    qry.bindValue(":seqDesc", rec.getSequence().c_str());
+    qry.bindValue(":seqDesc", rec.getSequence());
     qry.bindValue(":seqOrder", rec.getSequenceOrder());
-    qry.bindValue(":lockNum", rec.getLockNum());
-    qry.bindValue(":desc", rec.getDescription().c_str());
-    qry.bindValue(":codeOne", code1.c_str());
-    qry.bindValue(":codeTwo", code2.c_str());
+    qry.bindValue(":lockNums", rec.getLockNums());
+    qry.bindValue(":desc", rec.getDescription());
+    qry.bindValue(":codeOne", code1);
+    qry.bindValue(":codeTwo", code2);
     qry.bindValue(":start", rec.getStartTime().toString(datetimeFormat));
     qry.bindValue(":end", rec.getEndTime().toString(datetimeFormat));
     qry.bindValue(":fingerprinone", (int) rec.getFingerprint1());
     qry.bindValue(":fingerprintwo", (int) rec.getFingerprint2());
     qry.bindValue(":askQuestions", (int) rec.getAskQuestions());
-    qry.bindValue(":question1", rec.getQuestion1().c_str());
-    qry.bindValue(":question2", rec.getQuestion2().c_str());
-    qry.bindValue(":question3", rec.getQuestion3().c_str());
-    qry.bindValue(":stat", rec.getStatus().c_str());
+    qry.bindValue(":question1", rec.getQuestion1());
+    qry.bindValue(":question2", rec.getQuestion2());
+    qry.bindValue(":question3", rec.getQuestion3());
+    qry.bindValue(":stat", rec.getStatus());
     qry.bindValue(":accessCount", rec.getAccessCount());
     qry.bindValue(":maxAccess", rec.getMaxAccess());
     qry.bindValue(":maxRetry", rec.getMaxRetry());
@@ -1274,17 +1349,20 @@ bool CTblCodes::updateCode(CLockState *prec)
     // update
     if(prec->isMarkedForDeletion()) 
     {
+        qDebug() << "CTblCodes::deleteCode";
         return deleteCode(*prec);
     } 
     else if (prec->isMarkedForReset())
     {        
+        qDebug() << "CTblCodes::resetCodeLimitedUse";
         return resetCodeLimitedUse(*prec);        
     }
     else 
     {
         if(prec->getID() == -1 ) 
         {
-            int nId = addLockCode(prec->getLockNum(),prec->getCode1(),prec->getCode2(),
+            qDebug() << "CTblCodes::addLockCode";
+            int nId = addLockCode(prec->getLockNums(),prec->getCode1(),prec->getCode2(),
                                   prec->getStartTime(), prec->getEndTime(),
                                   prec->getFingerprint1(), prec->getFingerprint2(),
                                   prec->getAskQuestions(), prec->getQuestion1(), prec->getQuestion2(), prec->getQuestion3(),
@@ -1294,11 +1372,14 @@ bool CTblCodes::updateCode(CLockState *prec)
             if(nId != -1 )
             {
                 return false;
-            } else {
+            } 
+            else 
+            {
                 prec->setID(nId);
                 return true;
             }
         }
+
         if (prec->getID() > 0) 
         {
             if (prec->isModified())
@@ -1361,7 +1442,7 @@ bool CTblCodes::incrementAccessCount(int fids)
     qDebug() << "CTblCodes::incrementAccessCount()";
 
     QSqlQuery qry(*_pDB);
-    QString sql = QString("UPDATE ") + QString(TABLENAME.c_str()) +
+    QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("access_count = access_count + 1 "
                               " WHERE ids=:fids");
 

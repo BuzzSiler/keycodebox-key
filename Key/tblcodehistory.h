@@ -34,7 +34,7 @@
  */
 class CTblCodeHistory
 {
-    const std::string TABLENAME = "codesHistory";
+    const QString TABLENAME = "codesHistory";
 
     const char *datetimeFormat = "yyyy-MM-dd HH:mm:ss";
     const char *timeFormatShort = "HH:mm";
@@ -43,7 +43,7 @@ class CTblCodeHistory
     const char *fids = "ids";            // Record id // integer primary key unique, (if -1 then this is a new record)
     const char *fsequence = "sequence";    // Sequence // text,
     const char *fsequence_order = "sequence_order";  // integer,
-    const char *flocknum = "locknum";    // integer,
+    const char *flocknum = "locknums";    // text,
     const char *fdescription = "description";    // text,
     const char *fcode1 = "code1";  // text,
     const char *fcode2 = "code2";  // text,
@@ -79,49 +79,50 @@ private:
     bool updateLockCodeHistory(CLockHistoryRec &rec);
 public:
     CTblCodeHistory(QSqlDatabase *db) {
-        std::cout << "CTblCodeHistory constructor\n";
+        qDebug() << "CTblCodeHistory constructor\n";
         setDatabase(db);
         // make sure the table is created if it does not exist.
         initialize();
     }
 
-    void setDatabase(QSqlDatabase *db) {
+    void setDatabase(QSqlDatabase *db) 
+    {
         _pDB = db;
     }
 
     bool addLockCodeHistory(CLockHistoryRec &lockHistoryRec);
 
-    bool addLockCodeHistory(int locknum, std::string code1, std::string code2,
+    bool addLockCodeHistory(QString locknums, QString code1, QString code2,
                        QDateTime starttime, QDateTime endtime, int maxAccess,
-                       std::string status, std::string desc, std::string sequence, int sequenceNum,
+                       QString status, QString desc, QString sequence, int sequenceNum,
                        int maxRetry, QDateTime accesstime,
-                       bool adminNotificationSent, std::string userNotificationEmail,
+                       bool adminNotificationSent, QString userNotificationEmail,
                        bool userNotificationSent);
 
     bool addLockCodeHistoryWithAnswers(CLockHistoryRec &lockHistoryRec, QString answer1, QString answer2, QString answer3);
 
-    bool addLockCodeHistoryWithAnswers(int locknum, std::string code1, std::string code2,
+    bool addLockCodeHistoryWithAnswers(QString locknums, QString code1, QString code2,
                        QDateTime starttime, QDateTime endtime, int maxAccess,
-                       std::string status, std::string desc, std::string sequence, int sequenceNum,
+                       QString status, QString desc, QString sequence, int sequenceNum,
                        int maxRetry, QDateTime accesstime,
-                       bool adminNotificationSent, std::string userNotificationEmail,
+                       bool adminNotificationSent, QString userNotificationEmail,
 				       bool userNotificationSent, QString answer1, QString answer2, QString answer3);
 
-    void currentTimeFormat(std::string format, std::string strBuffer, int nExpectedLength);
+    void currentTimeFormat(QString format, QString strBuffer, int nExpectedLength);
 
     bool deleteLockCodeHistory(CLockHistoryRec &rec);
-    bool deleteLockCodeHistory(int locknum, QDateTime starttime, QDateTime endtime);
+    bool deleteLockCodeHistory(QString locknums, QDateTime starttime, QDateTime endtime);
 
-    bool deleteLockCodeHistory(int locknum, QString code1, QString code2,
+    bool deleteLockCodeHistory(QString locknums, QString code1, QString code2,
                                QDateTime starttime, QDateTime endtime, QDateTime accesstime);
     bool deleteLockCodeHistory(QDateTime accesstime);
     bool deleteLockCodeHistory(QDateTime starttime, QDateTime endtime);
 
     bool updateRecord(CLockHistoryRec &rec);
-    void selectLockCodeHistorySet(int &nLockNum, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet);
+    void selectLockCodeHistorySet(QString &LockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet);
     bool updateLockCodeHistorySet(CLockHistorySet &lockHistorySet);
     bool updateLockCodeHistorySet(QJsonObject &jsonObj);
-    void selectLastLockCodeHistorySet(int &nLockNum, QDateTime &start, QDateTime &end, CLockHistorySet **pLockHistorySet);
+    void selectLastLockCodeHistorySet(QString &LockNums, QDateTime &start, QDateTime &end, CLockHistorySet **pLockHistorySet);
 };
 
 #endif // CTBLCODEHISTORY_H

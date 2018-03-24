@@ -59,7 +59,8 @@ private:
     CHWKeyboardReader       *_phidReader = 0;
     CFingerprintReader      *_fingerprintReader = 0;
 
-    uint32_t        _lockNum;
+    int             _lockNum;
+    QString    _locks;
     SystemState     _systemState;
     SystemState     _systemStateDisplay;
     bool            _bCurrentAdminRetrieved;
@@ -84,7 +85,7 @@ signals:
     void __verifyUserAccessTwo(QString sCode1, QString sCode2);
     void __verifyAdminAccess(QString sCode1, QString sCode2);
 
-    void __openDoor(int nDoor);
+    void __openDoor(QString DoorNums);
 
     // For Entry dialogs
     void __OnDisplayTimeoutScreen();
@@ -125,7 +126,7 @@ signals:
     void __onUserCodes(QString sCode1, QString sCode2);
 
 signals:
-    void __OnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
+    void __OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
     void __OnLockSet(CLockSet *pLockSet);
     void __OnSendEmail(const QString SMTPServer, const int &SMTPPort, const int &SMTPType,
                        const QString &SMTPUsername, const QString &SMTPPassword,
@@ -136,18 +137,18 @@ signals:
 
     void __onEnrollFingerprintDialog(QString sCode);
 
-    void __onQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3);
-    void __onQuestionUser(int doorNum, QString question1, QString question2, QString question3);
-    void __onQuestionUserAnswers(int doorNum, QString answer1, QString answer2, QString answer3);
+    void __onQuestionUserDialog(QString doorNums, QString question1, QString question2, QString question3);
+    void __onQuestionUser(QString doorNums, QString question1, QString question2, QString question3);
+    void __onQuestionUserAnswers(QString doorNums, QString answer1, QString answer2, QString answer3);
     void __onQuestionUserCancel();
 
 public slots:
 
-    void TrigQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(doorNum, question1, question2, question3);}
+    void TrigQuestionUserDialog(QString doorNums, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(doorNums, question1, question2, question3);}
 
-    void TrigQuestionUser(int doorNum, QString question1, QString question2, QString question3);
+    void TrigQuestionUser(QString doorNums, QString question1, QString question2, QString question3);
     void QuestionUserCancel();
-    void AnswerUserSave(int doorNum, QString question1, QString question2, QString question3);
+    void AnswerUserSave(QString doorNums, QString question1, QString question2, QString question3);
 
     void TrigEnrollFingerprint(QString sCode);
     void TrigEnrollFingerprintDialog(QString sCode) { emit __onEnrollFingerprintDialog(sCode); }
@@ -160,19 +161,25 @@ public slots:
     void OnVerifyFingerprintDialogCancel();
     void OnFingerprintVerifyComplete(bool result, QString message) { emit __onUpdateVerifyFingerprintDialog(result, message); };
 
-    void OnReadLockSet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockSet(nLockNum, start, end); }
-    void OnLockSet(CLockSet *pSet) { emit __OnLockSet(pSet); }
+    void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end) { 
+        qDebug() << "SLOT: System Controller -> OnReadLockSet";
+        emit __OnReadLockSet(LockNums, start, end); 
+    }
+    void OnLockSet(CLockSet *pSet) { 
+        qDebug() << "SLOT: System Controller -> OnLockSet";
+        emit __OnLockSet(pSet); 
+    }
     void OnIdentifiedFingerprint(QString sCode, QString sCode2);
 
 signals:
-    void __OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
+    void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
     void __OnLockHistorySet(CLockHistorySet *pLockSet);
 
 public slots:
-    void OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(nLockNum, start, end); }
+    void OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(LockNums, start, end); }
     void OnLockHistorySet(CLockHistorySet *pSet) { emit __OnLockHistorySet(pSet); }
 
-    void OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, int nLockNum);
+    void OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums);
 
 signals:
     void __RequestLastSuccessfulLogin();
@@ -205,7 +212,7 @@ private slots:
 
     void OnUserCodeCancel();
 
-    void OnOpenLockRequest(int nLockNum);
+    void OnOpenLockRequest(QString LockNums, bool is_user);
     void OnReadLockStatus();
 
     void OnTouchScreenTouched();
@@ -227,9 +234,10 @@ public slots:
     void    OnRequireCodeTwo();
     void    OnAdminSecurityCheckOk(QString type);
     void    OnAdminSecurityCheckFailed();
-    void    OnSecurityCheckSuccess(int doorNum);
+    void    OnSecurityCheckSuccess(QString locks);
     void    OnSecurityCheckedFailed();
     void    OnSecurityCheckTimedOut();
+
 
     void resetToTimeoutScreen();
 

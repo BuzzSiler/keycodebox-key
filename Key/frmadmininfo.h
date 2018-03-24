@@ -21,7 +21,7 @@
 #include "currentedit.h"
 #include "dlgsmtp.h"
 #include "dlgvnc.h"
-#include "frmcodeedit.h"
+#include "frmcodeeditmulti.h"
 
 namespace Ui {
 class CFrmAdminInfo;
@@ -33,6 +33,9 @@ class CFrmAdminInfo;
 #define COL_CODE2   3
 #define COL_START   4
 #define COL_END     5
+
+class SelectLocksWidget;
+
 
 class CFrmAdminInfo : public QDialog
 {
@@ -55,12 +58,12 @@ public:
 
 
 signals:
-    void __OnDoneSave(int nRow, int nId, int nLockNum, 
-                      QString sAccessCode, QString sSecondCode, QString sDescription, 
-                      QDateTime dtStart, QDateTime dtEnd, 
-                      bool fingerprint1, bool fingerprint2, 
-                      bool askQuestions, QString question1, QString question2, QString question3,
-                      int access_type);
+    // void __OnDoneSave(int nRow, int nId, int nLockNum, 
+    //                   QString sAccessCode, QString sSecondCode, QString sDescription, 
+    //                   QDateTime dtStart, QDateTime dtEnd, 
+    //                   bool fingerprint1, bool fingerprint2, 
+    //                   bool askQuestions, QString question1, QString question2, QString question3,
+    //                   int access_type);
     void __OnCloseFrmAdmin();
     void __TextEntered(QString sText);
     void __KeyPressed(char key);
@@ -68,17 +71,17 @@ signals:
     void __OnRequestCurrentAdmin();
     void __UpdateCurrentAdmin(CAdminRec *adminInfo);
     void __OnUpdatedCurrentAdmin(bool bSuccess);
-    void __OnOpenLockRequest(int nLockNum);
+    void __OnOpenLockRequest(QString LockNums, bool is_user);
     void __OnReadDoorLocksState();
     void __OnBrightnessChanged(int nValue);
-    void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, int nLockNum);
+    void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums);
     void __OnAdminInfoCodes(QString code1, QString code2);
 
-    void __LocalOnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
-    void __LocalOnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
-    void __OnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
+    void __LocalOnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
+    void __LocalOnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
+    void __OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
     void __OnLockSet(CLockSet *pLockSet);
-    void __OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
+    void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
     void __OnLockHistorySet(CLockHistorySet *pLockSet);
     void __OnUpdateCodeState(CLockState *rec);
     void __OnSendTestEmail(int test_type);
@@ -88,9 +91,9 @@ signals:
 public slots:
     void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
     void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
-    void OnReadLockSet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockSet(nLockNum, start, end); }
+    void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end) { emit __OnReadLockSet(LockNums, start, end); }
     void OnLockSet(CLockSet *pSet);
-    void OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(nLockNum, start, end); }
+    void OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(LockNums, start, end); }
     void OnLockHistorySet(CLockHistorySet *pSet);
     void OnUpdateCurrentAdmin(CAdminRec *adminInfo) {emit __UpdateCurrentAdmin(adminInfo);}
     void OnUpdatedCurrentAdmin(bool bSuccess);
@@ -103,7 +106,7 @@ public slots:
     void onStartEditLabel(QLabel* pLabel, QString sLabelText);
 
     void onStopEdit();
-    void OnCodeEditDoneSave(int nRow, int nId, int nLockNum, 
+    void OnCodeEditDoneSave(int nRow, int nId, QString LockNums, 
                             QString sAccessCode, QString sSecondCode, QString sDescription, 
                             QDateTime dtStart, QDateTime dtEnd, 
                             bool fingerprint1, bool fingerprint2, 
@@ -113,13 +116,14 @@ public slots:
     void OnTabSelected(int index);
     void OnDisplayFingerprintButton(bool);
     void OnDisplayShowHideButton(bool);
+    void OnRequestLockOpen(QString lockNums);
     
 private slots:
     void OnCodes(QString code1, QString code2);
-    void LocalReadLockSet(int nLock, QDateTime dtStart, QDateTime dtEnd);
-    void LocalReadLockHistorySet(int nLock, QDateTime dtStart, QDateTime dtEnd);
+    void LocalReadLockSet(QString Locks, QDateTime dtStart, QDateTime dtEnd);
+    void LocalReadLockHistorySet(QString Locks, QDateTime dtStart, QDateTime dtEnd);
 
-    void menuSelection(QAction *action);
+    //void menuSelection(QAction *action);
     void OnLockStatusUpdated(CLocksStatus *pLocksStatus);
 
     void codeDeleteSelection();
@@ -145,73 +149,6 @@ private slots:
     void on_cbInternetTime_clicked();
     void on_btnSetTime_clicked();
 
-    void on_btnOpenDoor_clicked();
-
-    void on_cbBox1_clicked();
-    void on_cbBox2_clicked();
-    void on_cbBox3_clicked();
-    void on_cbBox4_clicked();
-    void on_cbBox5_clicked();
-    void on_cbBox6_clicked();
-    void on_cbBox7_clicked();
-    void on_cbBox8_clicked();
-    void on_cbBox9_clicked();
-    void on_cbBox10_clicked();
-    void on_cbBox11_clicked();
-    void on_cbBox12_clicked();
-    void on_cbBox13_clicked();
-    void on_cbBox14_clicked();
-    void on_cbBox15_clicked();
-    void on_cbBox16_clicked();
-    void on_cbBox17_clicked();
-    void on_cbBox18_clicked();
-    void on_cbBox19_clicked();
-    void on_cbBox20_clicked();
-    void on_cbBox21_clicked();
-    void on_cbBox22_clicked();
-    void on_cbBox23_clicked();
-    void on_cbBox24_clicked();
-    void on_cbBox25_clicked();
-    void on_cbBox26_clicked();
-    void on_cbBox27_clicked();
-    void on_cbBox28_clicked();
-    void on_cbBox29_clicked();
-    void on_cbBox30_clicked();
-    void on_cbBox31_clicked();
-    void on_cbBox32_clicked();
-    void on_cbBox33_clicked();
-    void on_cbBox34_clicked();
-    void on_cbBox35_clicked();
-    void on_cbBox36_clicked();
-    void on_cbBox37_clicked();
-    void on_cbBox38_clicked();
-    void on_cbBox39_clicked();
-    void on_cbBox40_clicked();
-    void on_cbBox41_clicked();
-    void on_cbBox42_clicked();
-    void on_cbBox43_clicked();
-    void on_cbBox44_clicked();
-    void on_cbBox45_clicked();
-    void on_cbBox46_clicked();
-    void on_cbBox47_clicked();
-    void on_cbBox48_clicked();
-    void on_cbBox49_clicked();
-    void on_cbBox50_clicked();
-    void on_cbBox51_clicked();
-    void on_cbBox52_clicked();
-    void on_cbBox53_clicked();
-    void on_cbBox54_clicked();
-    void on_cbBox55_clicked();
-    void on_cbBox56_clicked();
-    void on_cbBox57_clicked();
-    void on_cbBox58_clicked();
-    void on_cbBox59_clicked();
-    void on_cbBox60_clicked();
-    void on_cbBox61_clicked();
-    void on_cbBox62_clicked();
-    void on_cbBox63_clicked();
-    void on_cbBox64_clicked();
-
     void on_dialBright_valueChanged(int value);
     void on_btnReadCodes_clicked();
     void codeTableCellSelected(int nRow, int nCol);
@@ -236,8 +173,6 @@ private slots:
     void onModelDirectoryLoaded(QString path);
     void onRootPathChanged(QString path);
     void on_btnOpenAllDoors_2_clicked(bool checked);
-    void OpenDoorTimer();
-    void on_btnReadDoorLocks_2_clicked();
     void on_btnToggleSource_clicked(bool checked);
     void on_tblCodesList_doubleClicked(const QModelIndex &index);
     void on_tblCodesList_cellDoubleClicked(int row, int column);
@@ -262,6 +197,10 @@ private slots:
 
     void on_btnTestEmail_clicked();
     void on_btnTestUserEmail_clicked();
+
+    void OnCodeEditReject();
+    void OnCodeEditAccept();
+
 
 private:
     Ui::CFrmAdminInfo   *ui;
@@ -316,7 +255,7 @@ private:
     CDlgFullKeyboard    *_pKeyboard = 0;
     CCurrentEdit        *_pcurrentLabelEdit = 0;
 
-    CFrmCodeEdit        *_pFrmCodeEdit = 0;
+    FrmCodeEditMulti    *_pFrmCodeEditMulti = 0;
 
     QString             _reportDirectory;
     QString             _copyDirectory;
@@ -325,6 +264,8 @@ private:
     bool                _bContinueOpenLoop, _bStopOpen;
 
     bool                _testEmail;
+
+    SelectLocksWidget& m_select_locks;
 
     void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
     std::string rtrim(std::string &s);
@@ -335,14 +276,13 @@ private:
     void onBackSpace();
     void hideKeyboard(bool bHide);
     void onDelete();
-    void populateAvailableDoors();
-    void open_single_door(int nLockNum);
-    void createLockMenus();
+    //void populateAvailableDoors();
+    //void createLockMenus();
 
     void initializeConnections();
-    int parseLockNumFromObjectName(QString objectName);
-    int isLock(uint16_t nLockNum);
-    void openAllDoors();
+    //int parseLockNumFromObjectName(QString objectName);
+    //int isLock(uint16_t nLockNum);
+    //void openAllDoors();
     void displayInTable(CLockSet *pSet);
     void setupCodeTableContextMenu();
     void displayInHistoryTable(CLockHistorySet *pSet);
@@ -356,6 +296,8 @@ private:
     void getSystemIPAddressAndStatus();
     void populateFileCopyWidget(QString sDirectory, QString sFilter);
     void purgeCodes();
+
+    void HandleCodeUpdate();
 
 
 protected:
