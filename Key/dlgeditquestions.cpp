@@ -78,7 +78,8 @@ void CDlgEditQuestions::on_edtQuestion3_clicked()
 
 void CDlgEditQuestions::checkAndCreateCurrentLineEdit()
 {
-    if(!_pcurrentLineEdit) {
+    if(!_pcurrentLineEdit) 
+    {
         _pcurrentLineEdit = new CCurrentEdit();
         connect(this, SIGNAL(__OnCodes(QString)), _pcurrentLineEdit, SLOT(OnStringEntry(QString)));
     }
@@ -86,15 +87,18 @@ void CDlgEditQuestions::checkAndCreateCurrentLineEdit()
 
 void CDlgEditQuestions::onStartEditLine(QLineEdit* pLine, QString sLabelText)
 {
-    if(!_pKeyboard) {
+    if(!_pKeyboard) 
+    {
         _pKeyboard = new CDlgFullKeyboard();
         connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*,CCurrentEdit*)),
                 this, SLOT(OnKeyboardTextEntered(CDlgFullKeyboard*, CCurrentEdit*)));
     }
-    if(!_pcurrentLineEdit) {
+    if(!_pcurrentLineEdit) 
+    {
         _pcurrentLineEdit = new CCurrentEdit();
     }
-    if(_pKeyboard && _pcurrentLineEdit) {
+    if(_pKeyboard && _pcurrentLineEdit) 
+    {
         _pKeyboard->setCurrentEdit(_pcurrentLineEdit);
         _pcurrentLineEdit->setLineToBeEdited(pLine);
         _pcurrentLineEdit->setOriginalTextToEdit(pLine->text());

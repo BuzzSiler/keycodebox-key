@@ -222,9 +222,9 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         {
             _pQuestions = new CDlgQuestions();
             _pQuestions->hide();
-            connect(psysController, SIGNAL(__onQuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
+            connect(psysController, SIGNAL(__onQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(QString,QString,QString,QString)));
             connect(_pQuestions, SIGNAL(__OnQuestionsCancel()), psysController, SLOT(QuestionUserCancel()));
-            connect(_pQuestions, SIGNAL(__OnQuestionsSave(int,QString,QString,QString)), psysController, SLOT(AnswerUserSave(int,QString,QString,QString)));
+            connect(_pQuestions, SIGNAL(__OnQuestionsSave(QString,QString,QString,QString)), psysController, SLOT(AnswerUserSave(QString,QString,QString,QString)));
             connect(_pQuestions, SIGNAL(__OnQuestionsClose()), this, SLOT(OnQuestionUserDialogClose()));
         }
 
@@ -332,7 +332,7 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
         _pfAdminInfo = new CFrmAdminInfo();
         _pfAdminInfo->setSystemController((CSystemController*)psysController);
     }
-    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(int)), _psystemController, SLOT(OnOpenLockRequest(int)));
+    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(QString, bool)), _psystemController, SLOT(OnOpenLockRequest(QString, bool)));
     connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
     connect(_pfAdminInfo, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(_pfAdminInfo, SIGNAL(__OnDisplayShowHideButton(bool)), _pfUsercode, SIGNAL(__OnDisplayShowHideButton(bool)));

@@ -27,7 +27,8 @@ void CFrmCodeEdit::setMaxLocks(int nLocks)
 CFrmCodeEdit::~CFrmCodeEdit()
 {
     delete ui;
-    if(_pcurrentLineEdit) {
+    if(_pcurrentLineEdit) 
+    {
         delete _pcurrentLineEdit;
     }
 }
@@ -226,7 +227,8 @@ void CFrmCodeEdit::on_edtDescription_clicked()
 
 void CFrmCodeEdit::checkAndCreateCurrentLineEdit()
 {
-    if(!_pcurrentLineEdit) {
+    if(!_pcurrentLineEdit) 
+    {
         _pcurrentLineEdit = new CCurrentEdit();
         connect(this, SIGNAL(__OnCodes(QString)), _pcurrentLineEdit, SLOT(OnStringEntry(QString)));
     }
@@ -234,15 +236,18 @@ void CFrmCodeEdit::checkAndCreateCurrentLineEdit()
 
 void CFrmCodeEdit::onStartEditLine(QLineEdit* pLine, QString sLabelText)
 {
-    if(!_pKeyboard) {
+    if(!_pKeyboard) 
+    {
         _pKeyboard = new CDlgFullKeyboard();
         connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*,CCurrentEdit*)),
                 this, SLOT(OnKeyboardTextEntered(CDlgFullKeyboard*, CCurrentEdit*)));
     }
-    if(!_pcurrentLineEdit) {
+    if(!_pcurrentLineEdit) 
+    {
         _pcurrentLineEdit = new CCurrentEdit();
     }
-    if(_pKeyboard && _pcurrentLineEdit) {
+    if(_pKeyboard && _pcurrentLineEdit) 
+    {
         _pKeyboard->setCurrentEdit(_pcurrentLineEdit);
         _pcurrentLineEdit->setLineToBeEdited(pLine);
         _pcurrentLineEdit->setOriginalTextToEdit(pLine->text());
@@ -342,7 +347,9 @@ void CFrmCodeEdit::on_chkFingerPrint2_clicked(bool checked)
 {
     Q_UNUSED(checked);
     if( ui->chkFingerPrint1->isChecked() )
+    {
         ui->chkFingerPrint1->setChecked(false);
+    }
     ui->edtAccessCode->setDisabled(false);
 
     if( ui->chkFingerPrint2->isChecked() )
@@ -401,7 +408,7 @@ void CFrmCodeEdit::on_clrDescription_clicked()
 void CFrmCodeEdit::OnQuestionEditSave()
 {
     qDebug() << "CFrmAdminInfo::OnQuestionEditSave()";
-    if(_pDlgEditQuestions)
+    if (_pDlgEditQuestions)
     {
         _pDlgEditQuestions->getValues(&_question1, &_question2, &_question3);
     }
@@ -410,7 +417,7 @@ void CFrmCodeEdit::OnQuestionEditSave()
 void CFrmCodeEdit::OnQuestionEditClose()
 {
     qDebug() << "CFrmAdminInfo::OnQuestionEditClose()";
-    if(_pDlgEditQuestions)
+    if (_pDlgEditQuestions)
     {
         _pDlgEditQuestions->close();
         delete _pDlgEditQuestions;
@@ -490,6 +497,11 @@ void CFrmCodeEdit::on_spinLocksToCreate_valueChanged(int arg1)
 void CFrmCodeEdit::on_edtAccessCode_textEdited(const QString &arg1)
 {
     Q_UNUSED(arg1);
+
+    // Check if code already exists
+    // If the code exists then change color to red and don't enable save button
+    // Requires a list of codes 1
+
     EnableSaveButton();
 }
 

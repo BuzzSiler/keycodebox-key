@@ -17,20 +17,30 @@
 #include "lockstate.h"
 #include "version.h"
 #include "usbprovider.h"
+#include "frmselectlocks.h"
 
-CSystemController::CSystemController(QObject *parent)
+CSystemController::CSystemController(QObject *parent) :
+    QObject(parent)
 {
     Q_UNUSED(parent);
+
+    qRegisterMetaType<QVector<int> >("QVector<int>");
 }
 
 CSystemController::~CSystemController()
 {
     if(_pmagTekReader)
+    {
         delete _pmagTekReader;
+    }
     if(_phidReader)
+    {
         delete _phidReader;
+    }
     if(_fingerprintReader)
+    {
         delete _fingerprintReader;
+    }
 }
 
 void CSystemController::initialize(QThread *pthread)
@@ -44,13 +54,14 @@ void CSystemController::initialize(QThread *pthread)
 
     _fingerprintReader = 0;
 
-    if( _LCDGraphicsController.isLCDAttached() ) {
+    if( _LCDGraphicsController.isLCDAttached() ) 
+    {
         qDebug() << "CSystemController::initialize moveToThread.";
         _LCDGraphicsController.setBrightness(75);
     }
 
 
-    qDebug() << "Starting up KeyCodeBox Alpha " VERSION;
+    qDebug() << "Starting up KeyCodeBox Alpha " << VERSION;
 
     UsbProvider::Initialize();
     initializeSecurityConnections();
@@ -64,7 +75,9 @@ void CSystemController::TrigEnrollFingerprint(QString sCode)
 {
     qDebug() << "CSystemController::TrigEnrollFingerprint(), code: " << sCode;
     if(_fingerprintReader)
+    {
         _fingerprintReader->initEnrollment(sCode);
+    }
     startTimeoutTimer(15000);
 }
 
@@ -72,7 +85,9 @@ void CSystemController::EnrollFingerprintDialogCancel()
 {
     qDebug() << "CSystemController::EnrollFingerprintCancel()";
     if(_fingerprintReader)
+    {
         _fingerprintReader->cancelEnrollment();
+    }
     startTimeoutTimer(1000);
 }
 
@@ -80,7 +95,9 @@ void CSystemController::EnrollFingerprintResetStageCount()
 {
     qDebug() << "CSystemController::EnrollFingerprintResetStageCount()";
     if(_fingerprintReader)
+    {
         _fingerprintReader->resetEnrollmentStage();
+    }
 }
 
 void CSystemController::OnVerifyFingerprint()
@@ -89,20 +106,24 @@ void CSystemController::OnVerifyFingerprint()
 
     startTimeoutTimer(10000);
     if(_fingerprintReader)
+    {
         _fingerprintReader->initVerify();
+    }
 }
 
 void CSystemController::OnVerifyFingerprintDialogCancel()
 {
     qDebug() << "CSystemController::OnFingerprintFingerprintCancel()";
     if(_fingerprintReader)
+    {
         _fingerprintReader->cancelVerify();
+    }
     startTimeoutTimer(1000);
 }
 
-void CSystemController::TrigQuestionUser(int doorNum, QString question1, QString question2, QString question3)
+void CSystemController::TrigQuestionUser(QString doorNums, QString question1, QString question2, QString question3)
 {
-    Q_UNUSED(doorNum);
+    Q_UNUSED(doorNums);
     Q_UNUSED(question1);
     Q_UNUSED(question2);
     Q_UNUSED(question3);
@@ -110,12 +131,12 @@ void CSystemController::TrigQuestionUser(int doorNum, QString question1, QString
     stopTimeoutTimer();
 }
 
-void CSystemController::AnswerUserSave(int doorNum, QString question1, QString question2, QString question3)
+void CSystemController::AnswerUserSave(QString doorNums, QString question1, QString question2, QString question3)
 {
     qDebug() << "CSystemController::QuestionUserSave()";
     //emit signal to security model/controller here
-    qDebug() << "CSystemController::AnswerUserSave(), emitting AnswerUserSave(): " << QString::number(doorNum) << ", " << question1 << ", " << question2 << ", " << question3;
-    emit __onQuestionUserAnswers(doorNum, question1, question2, question3);
+    qDebug() << "CSystemController::AnswerUserSave(), emitting AnswerUserSave(): " << doorNums << ", " << question1 << ", " << question2 << ", " << question3;
+    emit __onQuestionUserAnswers(doorNums, question1, question2, question3);
 }
 
 void CSystemController::QuestionUserCancel()
@@ -181,12 +202,14 @@ void CSystemController::initializeReaders()
         connect(_fingerprintReader, SIGNAL(__onIdentifiedFingerprint(QString,QString)), this, SLOT(OnIdentifiedFingerprint(QString,QString)));
     }
     else
+    {
         _fingerprintReader = 0;
+    }
 
-    connect(&_securityController, SIGNAL(__TrigQuestionUserDialog(int,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(int,QString,QString,QString)));
-    connect(&_securityController, SIGNAL(__TrigQuestionUser(int,QString,QString,QString)), this, SLOT(TrigQuestionUser(int,QString,QString,QString)));
-    connect(this, SIGNAL(__onQuestionUser(int,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(int,QString,QString,QString)));
-    connect(this, SIGNAL(__onQuestionUserAnswers(int,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(int,QString,QString,QString)));
+    connect(&_securityController, SIGNAL(__TrigQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
+    connect(&_securityController, SIGNAL(__TrigQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUser(QString,QString,QString,QString)));
+    connect(this, SIGNAL(__onQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
+    connect(this, SIGNAL(__onQuestionUserAnswers(QString,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserCancel()), &_securityController, SLOT(OnQuestionUserCancel()));
 }
 
@@ -194,9 +217,12 @@ void CSystemController::initializeReaders()
 QString CSystemController::getCodeToUse(QString code1, QString code2) {
     code1 = code1.trimmed();
 
-    if(code1.length() == 0) {
+    if(code1.length() == 0) 
+    {
         return code2.trimmed();
-    } else {
+    } 
+    else 
+    {
         return code1;
     }
 }
@@ -206,10 +232,13 @@ void CSystemController::OnCardSwipe(QString sCode1, QString sCode2)
     QString sCodeToUse = getCodeToUse(sCode1, sCode2);
 
     qDebug() << "CSystemController::OnCardSwipe(" << sCodeToUse << ")";
-    if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) {
+    if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
+    {
         qDebug() << "...ETimeoutScreen || EUserCodeOne:" << sCodeToUse;
         emit __onUserCodeOne(sCodeToUse);
-    } else if( _systemState == EUserCodeTwo) {
+    } 
+    else if( _systemState == EUserCodeTwo) 
+    {
         qDebug() << "... EUserCodeTwo: " << sCode2;
         emit __onUserCodeTwo(sCode2);
     }
@@ -268,7 +297,7 @@ void CSystemController::initializeSecurityConnections()
     connect(&_securityController, SIGNAL(__OnRequireCodeTwo()), this, SLOT(OnRequireCodeTwo()));
     connect(&_securityController, SIGNAL(__OnAdminSecurityCheckOk(QString)), this, SLOT(OnAdminSecurityCheckOk(QString)));
     connect(&_securityController, SIGNAL(__OnAdminSecurityCheckFailed()), this, SLOT(OnAdminSecurityCheckFailed()));
-    connect(&_securityController, SIGNAL(__OnSecurityCheckSuccess(int)), this, SLOT(OnSecurityCheckSuccess(int)));
+    connect(&_securityController, SIGNAL(__OnSecurityCheckSuccess(QString)), this, SLOT(OnSecurityCheckSuccess(QString)));
     connect(&_securityController, SIGNAL(__OnSecurityCheckedFailed()), this, SLOT(OnSecurityCheckedFailed()));
     connect(&_securityController, SIGNAL(__OnSecurityCheckTimedOut()), this, SLOT(OnSecurityCheckTimedOut()));
 
@@ -277,10 +306,10 @@ void CSystemController::initializeSecurityConnections()
     connect(this, SIGNAL(__UpdateCurrentAdmin(CAdminRec*)), &_securityController, SLOT(OnUpdateCurrentAdmin(CAdminRec*)));
     connect(&_securityController, SIGNAL(__OnUpdatedCurrentAdmin(bool)), this, SLOT(OnUpdatedCurrentAdmin(bool)));
 
-    connect(this, SIGNAL(__OnReadLockSet(int,QDateTime,QDateTime)), &_securityController, SLOT(OnReadLockSet(int,QDateTime,QDateTime)));
+    connect(this, SIGNAL(__OnReadLockSet(QString,QDateTime,QDateTime)), &_securityController, SLOT(OnReadLockSet(QString,QDateTime,QDateTime)));
     connect(&_securityController, SIGNAL(__OnLockSet(CLockSet*)), this, SLOT(OnLockSet(CLockSet*)));
 
-    connect(this, SIGNAL(__OnReadLockHistorySet(int,QDateTime,QDateTime)), &_securityController, SLOT(OnReadLockHistorySet(int,QDateTime,QDateTime)));
+    connect(this, SIGNAL(__OnReadLockHistorySet(QString,QDateTime,QDateTime)), &_securityController, SLOT(OnReadLockHistorySet(QString,QDateTime,QDateTime)));
     connect(&_securityController, SIGNAL(__OnLockHistorySet(CLockHistorySet*)), this, SLOT(OnLockHistorySet(CLockHistorySet*)));
 
     connect(this, SIGNAL(__OnRequestCurrentAdmin()), &_securityController, SLOT(OnRequestCurrentAdmin()));
@@ -434,26 +463,16 @@ void CSystemController::OnUserCodeCancel()
     emit __OnClearEntry();
 }
 
-/**
- * @brief CSystemController::OnOpenLockRequest
- * This is the administrator screen open lock selection.
- * Kept separate from the user open lock process so
- * separate reporting may occur.
- * @param nLockNum
- */
-void CSystemController::OnOpenLockRequest(int nLockNum)
+void CSystemController::OnOpenLockRequest(QString LockNums, bool is_user)
 {
-    int nRC = _LockController.isLock(nLockNum);
-    qDebug() << "LockController.isLock() returns: " << QVariant(nRC).toString();
-    if( nRC == 1 )
+    // Open the lock
+    qDebug() << "Lock Open";
+    emit __OnCodeMessage(tr("Lock Open"));
+    _LockController.openLocks(LockNums);
+    qDebug() << "SystemController: reportActivity";
+    if (is_user)
     {
-        // Open the lock
-        qDebug() << "Lock Open";
-        emit __OnCodeMessage(tr("Lock Open"));
-        _LockController.openLock(nLockNum);
-        qDebug() << "SystemController: reportActivity";
-    } else {
-        qDebug() << QString(nLockNum) << " is not a connected lock.";
+        reportActivity();
     }
 }
 
@@ -465,9 +484,9 @@ void CSystemController::reportActivity()
     emit __RequestLastSuccessfulLogin();
 }
 
-void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, int nLockNum)
+void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums)
 {
-    _ReportController.processImmediateReport(dtReportStart, dtReportEnd, nLockNum);
+    _ReportController.processImmediateReport(dtReportStart, dtReportEnd, LockNums);
 }
 
 void CSystemController::OnReadLockStatus()
@@ -477,20 +496,111 @@ void CSystemController::OnReadLockStatus()
     emit __OnLockStatusUpdated(_LockController.getLockStatus());
 }
 
-void CSystemController::OnSecurityCheckSuccess(int lockNum)
-{
-    _systemState = EThankYou;
-    _lockNum = lockNum;
-    qDebug() << "Opening Lock:" << QVariant(lockNum).toString();
-    if( _LockController.isLock(lockNum) )
+void CSystemController::OnSecurityCheckSuccess(QString locks)
+{    
+    qDebug() << "CSystemController::OnSecurityCheckSuccess" << locks;
+    _locks = locks;
+
+    if (!locks.contains(','))
     {
-        // Open the lock
-        qDebug() << "Lock Open";
-        emit __OnCodeMessage(tr("Lock Open"));
-        _LockController.openLock(lockNum);
-        reportActivity();
+        OnOpenLockRequest(locks, true);
+        _systemState = EThankYou;
+    }
+    else
+    {
+        // Put up the select locks dialog
+        // select locks dialog/widget will generate a list of locks to be opened
+        // and emit a NotifyRequestLockOpen signal from widget to dialog, emit
+        // signal __OnOpenLock... which calls slot OnOpenLockRequest to open
+        // the lock.
+        // When all the locks have been opened, select locks widget will emit
+        // signal completed and select locks widget will return.  But how
+        // are we returning?
+        // If we exec the dialog can signals still be received?  If so, that
+        // simplifies this code.  We just exec and wait for an accepted or
+        // rejected return code.  Accepted will be returned if open was selected
+        // and rejected will be returned if closed was selected.
+        //
+        CFrmSelectLocks dlg;
+
+        connect(&dlg, SIGNAL(NotifyOpenLockRequest(QString, bool)), this, SLOT(OnOpenLockRequest(QString, bool)));
+
+        dlg.setLocks(locks);
+        if (dlg.exec())
+        {
+            // We get here, when open finished and calls done(Accepted)
+            // What is our system state here?
+            _locks = dlg.getLocks();
+            qDebug() << "Selected locks - " << _locks;
+            _systemState = EThankYou;
+        }
+        else
+        {
+            // We get here, if close is clicked
+            // What is our system state here?
+            _systemState = ETimeoutScreen;
+        }
+
+        disconnect(&dlg, SIGNAL(NotifyOpenLockRequest(QString, bool)), this, SLOT(OnOpenLockRequest(QString, bool)));
+    }
+
+}
+#ifdef MULTILOCK
+void CSystemController::OnSecurityCheckSuccess(QVector<int> locks)
+{
+    /* At this point, we have authorization to open the specified lock; however,
+       that was probably the first code in the table.  Also, at this point,
+       if two codes were required, then both were authorized.
+
+       Instead of a single lock, we would like to get a list of all the locks
+
+       Create an instance of SelectLocksWidget and display
+
+       Wait for open click
+
+       Send signal to start opening locks like below.
+
+       Let's not block this thread.
+       Let's instantiate SelectLocksWidget, set the locks, connect signal/slot, show it and return
+       
+    */    
+    locks.append(1);
+    locks.append(3);
+
+
+    qDebug() << "CSystemController::OnSecurityCheckSuccess" << locks.count();
+    if (locks.count() == 1)
+    {
+        OnOpenSelectedLock(locks[0]);
+        OnOpenLocksCompleted();
+    }
+    else
+    {
+        SelectLocksDialog dlg;
+
+        dlg.setLocks(locks);
+        if (dlg.exec())
+        {
+            OnOpenLocksCompleted();
+        }
     }
 }
+
+void CSystemController::OnOpenSelectedLock(int lockNum)
+{
+    qDebug() << "Opening Lock:" << lockNum;
+    _LockController.openLock(lockNum);
+    _locks.append(lockNum);
+    qDebug() << "Lock Open";
+}
+
+void CSystemController::OnOpenLocksCompleted()
+{
+    _systemState = EThankYou;
+    emit __OnCodeMessage(tr("Lock Open"));
+    reportActivity();
+}
+#endif
 
 void CSystemController::OnSecurityCheckedFailed()
 {
@@ -726,9 +836,13 @@ void CSystemController::looprun()
             qDebug() << "CSystemController::EnrollFingerprintCancel()";
 
             if(_fingerprintReader)
+            {
                 _fingerprintReader->cancelEnrollment();
+            }
             if(_fingerprintReader)
+            {
                 _fingerprintReader->cancelVerify();
+            }
 
             emit __OnCodeMessage(QString("<%1 #1>").arg(tr("Please Enter Code")));
             emit __OnDisplayCodeDialog(this);
@@ -776,8 +890,20 @@ void CSystemController::looprun()
             _systemStateDisplay = EThankYou;
             stopTimeoutTimer();
 
-            QString str = QString("%1 %2 #%3 %4.").arg(
-                tr("Thank you!"), tr("Lock"), QVariant(_lockNum).toString(), tr("open"));
+            // Convert the list of locks into a string
+            QString locks_str;
+            if (!_locks.contains(','))
+            {
+                locks_str = QString("%1 #%2").arg(tr("Lock")).arg(_locks);
+            }
+            else
+            {
+                QStringList locks_list = _locks.split(',');
+                locks_str = QString("%1 #%2").arg(tr("Locks")).arg(locks_list.join(", #"));
+            }
+            _locks.clear();
+
+            QString str = QString("%1 %2 %3.").arg(tr("Thank you!"), locks_str, tr("open"));
             emit __OnClearEntry();
             emit __OnCodeMessage(str);
             emit __OnNewMessage("");
@@ -875,22 +1001,22 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
                     (_padminInfo->getSMTPType() >= 0 && _padminInfo->getSMTPType() <= 2) &&
                     _padminInfo->getSMTPUsername().length() > 0)
                 {
-                    SMTPSvr = _padminInfo->getSMTPServer().c_str();
+                    SMTPSvr = _padminInfo->getSMTPServer();
                     SMTPPort = _padminInfo->getSMTPPort();
                     SMTPType = _padminInfo->getSMTPType();
-                    SMTPUser = _padminInfo->getSMTPUsername().c_str();
-                    SMTPPW = _padminInfo->getSMTPPassword().c_str();
-                    from = _padminInfo->getSMTPUsername().c_str();
+                    SMTPUser = _padminInfo->getSMTPUsername();
+                    SMTPPW = _padminInfo->getSMTPPassword();
+                    from = _padminInfo->getSMTPUsername();
                 }
-                QString to = _padminInfo->getAdminEmail().c_str();
+                QString to = _padminInfo->getAdminEmail();
                 QString subject = tr("Lock Box Event");
 
                 QDateTime dtAccess = pLockHistory->getAccessTime();
 
-                QString sDesc = pLockHistory->getDescription().c_str();
-                int nLockNum = pLockHistory->getLockNum();
+                QString sDesc = pLockHistory->getDescription();
+                QString LockNums = pLockHistory->getLockNums();
 
-                QString body = QString("%1 #%2").arg(tr("Lock"), QVariant(nLockNum).toString());
+                QString body = QString("%1 #%2").arg(tr("Lock")).arg(LockNums);
 
                 if( sDesc.size() > 0 )
                 {
@@ -939,15 +1065,15 @@ void CSystemController::OnSendTestEmail(int test_type)
         The email will also be BCC'd to kcb@keycodebox.com
         */
 
-        SMTPSvr = _padminInfo->getSMTPServer().c_str();
+        SMTPSvr = _padminInfo->getSMTPServer();
         SMTPPort = _padminInfo->getSMTPPort();
         SMTPType = _padminInfo->getSMTPType();
 
-        SMTPUser = _padminInfo->getSMTPUsername().c_str();
-        SMTPPW = _padminInfo->getSMTPPassword().c_str();
+        SMTPUser = _padminInfo->getSMTPUsername();
+        SMTPPW = _padminInfo->getSMTPPassword();
 
-        from = _padminInfo->getSMTPUsername().c_str();
-        to = _padminInfo->getAdminEmail().c_str();
+        from = _padminInfo->getSMTPUsername();
+        to = _padminInfo->getAdminEmail();
         subject = tr("Testing Email Configuration");
 
         body = tr("You have successfully configured the email settings!");
@@ -966,7 +1092,7 @@ void CSystemController::OnSendTestEmail(int test_type)
         SMTPPW = "keycodebox";
 
         from = "test@keycodebox.com";
-        to = _padminInfo->getAdminEmail().c_str();
+        to = _padminInfo->getAdminEmail();
         subject = tr("Testing Administrator Email");
 
         body = tr("You have successfully configured the Administrator email!");

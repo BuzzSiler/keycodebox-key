@@ -49,7 +49,6 @@ SOURCES += main.cpp\
     clickablelabel.cpp \
     lockhistoryset.cpp \
     lockhistoryrec.cpp \
-    frmcodeedit.cpp \
     dlgfullkeyboard.cpp \
     currentedit.cpp \
     reportcontroller.cpp \
@@ -76,7 +75,11 @@ SOURCES += main.cpp\
     hidreader.cpp \
     simplecrypt.cpp \
     usbprovider.cpp \
-    serialport.cpp
+    serialport.cpp \
+    selectlockswidget.cpp \
+    frmselectlocks.cpp \
+    frmcodeeditmulti.cpp \
+    lockcabinetwidget.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -108,7 +111,6 @@ HEADERS  += keycodeboxmain.h \
     clickablelabel.h \
     lockhistoryset.h \
     lockhistoryrec.h \
-    frmcodeedit.h \
     dlgfullkeyboard.h \
     currentedit.h \
     reportcontroller.h \
@@ -137,10 +139,13 @@ HEADERS  += keycodeboxmain.h \
     hidreader.h \
     simplecrypt.h \
     usbprovider.h \
-    serialport.h
+    serialport.h \
+    selectlockswidget.h \
+    frmselectlocks.h \
+    frmcodeeditmulti.h \
+    lockcabinetwidget.h
 
 FORMS    += mainwindow.ui \
-    frmcodeentry.ui \
     qwerty_keypad.ui \
     alpha_keypad.ui \
     number_keypad.ui \
@@ -154,7 +159,11 @@ FORMS    += mainwindow.ui \
     dlgfingerprint.ui\
     dlgfingerprintverify.ui \
     dlgeditquestions.ui \
-    dlgquestions.ui
+    dlgquestions.ui \
+    selectlockswidget.ui \
+    frmselectlocks.ui \
+    frmcodeeditmulti.ui \
+    lockcabinetwidget.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/debug/ -lqsqlite
