@@ -6,25 +6,29 @@
 #include <QMessageBox>
 #include "lockcabinetwidget.h"
 #include "lockstate.h"
+#include "dlgnumberpad.h"
 
 FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     QDialog(parent),
     m_access_type(0),
     m_lock_cab(* new LockCabinetWidget(this, 2)),
+    m_num_pad(* new DlgNumberPad(this)),
     ui(new Ui::FrmCodeEditMulti)
 {
     ui->setupUi(this);
+
+    ui->bbSaveCancel->button(QDialogButtonBox::Save)->setDisabled(true);
+
     FrmCodeEditMulti::showFullScreen();
 
-    setAttribute(Qt::WA_AcceptTouchEvents, true);
+    connect(ui->edCode1, SIGNAL(clicked()), this, SLOT(on_edCode1_clicked()));
+    connect(ui->edCode2, SIGNAL(clicked()), this, SLOT(on_edCode2_clicked()));
+    connect(ui->edUsername, SIGNAL(clicked()), this, SLOT(on_edUsername_clicked()));
 
-    ui->edCode1->setAttribute(Qt::WA_AcceptTouchEvents, true);
-    ui->edCode1->installEventFilter(this);
-    ui->edCode2->setAttribute(Qt::WA_AcceptTouchEvents, true);
-    ui->edCode2->installEventFilter(this);
-    ui->edUsername->setAttribute(Qt::WA_AcceptTouchEvents, true);
-    ui->edUsername->installEventFilter(this);
+    connect(&m_num_pad, SIGNAL(NotifyAccepted()), this, SLOT(OnAccepted()));
+    connect(&m_num_pad, SIGNAL(NotifyRejected()), this, SLOT(OnRejected()));
 
+    connect(&m_lock_cab, SIGNAL(NotifyLockSelected(QString, bool)), this, SLOT(OnNotifyLockSelected(QString, bool)));
 
     ui->hloLockCabinet->addWidget(&m_lock_cab);
 
@@ -35,6 +39,8 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     ui->edCode2->setText("");
     ui->edUsername->setText("");
     m_questions.clear();
+
+    updateUi();
 }
 
 FrmCodeEditMulti::~FrmCodeEditMulti()
@@ -50,11 +56,15 @@ void FrmCodeEditMulti::setValues(CLockState * const state)
     m_lock_cab.clrAllLocks();
 
     ui->edCode1->setText(state->getCode1());
-    ui->edCode2->setText(state->getCode2());
+    if (state->getCode2() != "")
+    {
+        ui->edCode2->setText(state->getCode2());
+        ui->cbEnableCode2->setEnabled(true);
+    }
     ui->edUsername->setText(state->getDescription());
     ui->dtStartAccess->setDateTime(state->getStartTime());
     ui->dtEndAccess->setDateTime(state->getEndTime());
-    ui->cbFingerprint->setEnabled(state->getFingerprint1());
+    //ui->cbFingerprint->setEnabled(state->getFingerprint1());
 
     m_questions.clear();
     ui->pbQuestions->setEnabled(state->getAskQuestions());
@@ -68,7 +78,11 @@ void FrmCodeEditMulti::setValues(CLockState * const state)
     updateAccessType(state->getAccessType());
 
     m_lock_cab.enableAllLocks();
+    m_lock_cab.clrAllLocks();
     m_lock_cab.setSelectedLocks(state->getLockNums());
+
+    updateUi();
+    updateExitState();
 }
 
 void FrmCodeEditMulti::getValues(CLockState * const state)
@@ -88,10 +102,8 @@ void FrmCodeEditMulti::getValues(CLockState * const state)
     }
 
     state->setAccessType(ui->cbAccessType->currentIndex());
-
     state->setLockNums(m_lock_cab.getSelectedLocks());
-
-    state->show();
+    //state->show();
 }
 
 void FrmCodeEditMulti::updateAccessType(int index)
@@ -124,16 +136,20 @@ void FrmCodeEditMulti::updateAccessType(int index)
 void FrmCodeEditMulti::on_pbClearCode1_clicked()
 {
     ui->edCode1->setText("");
+    ui->edCode2->setText("");
+    updateUi();
 }
 
 void FrmCodeEditMulti::on_pbClearCode2_clicked()
 {
     ui->edCode2->setText("");
+    updateUi();
 }
 
 void FrmCodeEditMulti::on_pbClearUsername_clicked()
 {
     ui->edUsername->setText("");
+    updateUi();
 }
 
 void FrmCodeEditMulti::on_pbQuestions_clicked()
@@ -162,54 +178,95 @@ void FrmCodeEditMulti::on_dtEndAccess_dateTimeChanged(const QDateTime &dateTime)
     // update end access date/time
 }
 
-void FrmCodeEditMulti::on_bbSaveCancel_accepted()
+void FrmCodeEditMulti::on_edCode1_clicked()
 {
-    emit accepted();
+    // In the short term, we are using the number pad to enter a manual code.
+    // Thinking forward, we can add a 'code source' drop down box in which the
+    // user will select the 'code source', e.g., manual, hid, barcode, fingerprint,
+    // magstipe, etc., and then we can prompt with an appropriate dialog which
+    // can then be wired to the appropriate device input.
+    m_num_pad.setValue(ui->edCode1->text());
+    m_num_pad.show();
+    m_p_line_edit = ui->edCode1;        
 }
 
-void FrmCodeEditMulti::on_bbSaveCancel_rejected()
+void FrmCodeEditMulti::on_edCode2_clicked()
 {
-    emit rejected();
-}
-
-void FrmCodeEditMulti::on_edCode1_cursorPositionChanged(int arg1, int arg2)
-{
-    qDebug() << "Code 1 text edited";
-}
-
-void FrmCodeEditMulti::touchEvent(QTouchEvent *ev)
-{
-    qDebug() << "Received touch event";
-}
-
-bool FrmCodeEditMulti::eventFilter(QObject *target, QEvent *event)
-{
-    QMessageBox msgBox;
-    //qDebug() << "eventFilter. Event type:" << QVariant(event->type()).toString();
-    if (event->type() == QEvent::MouseButtonPress)
+    if (ui->edCode2->isEnabled())
     {
-        if (ui->edCode1 == target)
-        {
-            qDebug() << "Code 1 Selected";
-            return false;
-        }
-        else if (ui->edCode2 == target)
-        {
-            qDebug() << "Code 2 Selected";
-            return false;
-        }
-        else if (ui->edUsername == target)
-        {
-            qDebug() << "Username Selected";
-            return false;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    else
-    {
-        return QDialog::eventFilter(target, event);
+        m_num_pad.setValue(ui->edCode2->text());
+        m_num_pad.show();
+        m_p_line_edit = ui->edCode2;
     }
 }
+
+void FrmCodeEditMulti::on_edUsername_clicked()
+{
+    m_num_pad.setValue(ui->edUsername->text());
+    m_num_pad.show();
+    m_p_line_edit = ui->edUsername;
+}
+
+void FrmCodeEditMulti::OnAccepted()
+{
+    qDebug() << "Received NotifyAccepted";
+
+    QString value;
+    m_num_pad.getValue(value);
+
+    if (value != m_p_line_edit->text())
+    {
+        m_p_line_edit->setText(value);
+    }
+    m_num_pad.hide();
+
+    updateUi();
+    updateExitState();
+}
+
+void FrmCodeEditMulti::OnRejected()
+{
+    qDebug() << "Receved NotifyRejected";
+    m_num_pad.hide();
+}
+
+void FrmCodeEditMulti::OnNotifyLockSelected(QString lock, bool is_selected)
+{
+    qDebug() << "Lock:" << lock << "Is Selected:" << is_selected;
+    updateExitState();
+}
+
+void FrmCodeEditMulti::on_cbEnableCode2_stateChanged(int arg1)
+{
+    bool result = arg1 == Qt::Checked ? true : false;
+    ui->edCode2->setEnabled(result);
+    if (!result)
+    {
+        ui->edCode2->setText("");
+    }
+
+    updateUi();
+    updateExitState();
+}
+
+void FrmCodeEditMulti::updateExitState()
+{
+    bool code1_valid = ui->edCode1->text() != "";
+    bool code2_valid = !ui->cbEnableCode2->isChecked() || (ui->cbEnableCode2->isChecked() && ui->edCode2->text() != "");
+
+    bool result = code1_valid && code2_valid && m_lock_cab.getSelectedLocks() != "";
+
+    qDebug() << "updateExitState" << result;
+    ui->bbSaveCancel->button(QDialogButtonBox::Save)->setEnabled(result);
+}
+
+void FrmCodeEditMulti::updateUi()
+{
+    ui->cbEnableCode2->setDisabled(ui->edCode1->text() == "");
+    ui->edCode2->setEnabled(ui->cbEnableCode2->isChecked() && ui->edCode1->text() != "");
+
+    ui->pbClearCode1->setDisabled(ui->edCode1->text() == "");
+    ui->pbClearCode2->setDisabled(ui->edCode2->text() == "");
+    ui->pbClearUsername->setDisabled(ui->edUsername->text() == "");
+}
+

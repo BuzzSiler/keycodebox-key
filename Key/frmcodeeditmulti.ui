@@ -204,7 +204,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="edCode1">
+     <widget class="CClickableLineEdit" name="edCode1">
       <property name="font">
        <font>
         <pointsize>12</pointsize>
@@ -252,7 +252,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="edCode2">
+     <widget class="CClickableLineEdit" name="edCode2">
       <property name="font">
        <font>
         <pointsize>12</pointsize>
@@ -300,7 +300,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="edUsername">
+     <widget class="CClickableLineEdit" name="edUsername">
       <property name="font">
        <font>
         <pointsize>12</pointsize>
@@ -374,6 +374,13 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CClickableLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">clickablelineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -205,11 +205,16 @@ void LockCabinetWidget::clrSelectedLocks(const QString& lock)
 
 void LockCabinetWidget::selectClearAllLocks(bool select_clear)
 {
+    m_selected_locks.clear();
     CAB_STATE* p_cab = &m_cabs[m_current_cab];
     for (int ii = 0; ii < p_cab->states.count(); ++ii)
     {
         p_cab->states[ii] = select_clear;
         m_lock_buttons[ii]->setChecked(select_clear);
+        if (select_clear)
+        {
+            m_selected_locks.append(ii + 1);
+        }
         emit NotifyLockSelected(QString::number(ii + 1), select_clear);
     }
 }

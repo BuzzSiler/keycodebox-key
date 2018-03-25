@@ -77,8 +77,8 @@ signals:
     void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums);
     void __OnAdminInfoCodes(QString code1, QString code2);
 
-    void __LocalOnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
-    void __LocalOnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
+    //void __LocalOnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
+    //void __LocalOnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
     void __OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
     void __OnLockSet(CLockSet *pLockSet);
     void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
@@ -106,12 +106,12 @@ public slots:
     void onStartEditLabel(QLabel* pLabel, QString sLabelText);
 
     void onStopEdit();
-    void OnCodeEditDoneSave(int nRow, int nId, QString LockNums, 
-                            QString sAccessCode, QString sSecondCode, QString sDescription, 
-                            QDateTime dtStart, QDateTime dtEnd, 
-                            bool fingerprint1, bool fingerprint2, 
-                            bool askQuestions, QString question1, QString question2, QString question3,
-                            int access_type);
+    // void OnCodeEditDoneSave(int nRow, int nId, QString LockNums, 
+    //                         QString sAccessCode, QString sSecondCode, QString sDescription, 
+    //                         QDateTime dtStart, QDateTime dtEnd, 
+    //                         bool fingerprint1, bool fingerprint2, 
+    //                         bool askQuestions, QString question1, QString question2, QString question3,
+    //                         int access_type);
     void OnCodeEditClose();
     void OnTabSelected(int index);
     void OnDisplayFingerprintButton(bool);
@@ -120,8 +120,8 @@ public slots:
     
 private slots:
     void OnCodes(QString code1, QString code2);
-    void LocalReadLockSet(QString Locks, QDateTime dtStart, QDateTime dtEnd);
-    void LocalReadLockHistorySet(QString Locks, QDateTime dtStart, QDateTime dtEnd);
+    //void LocalReadLockSet(QString Locks, QDateTime dtStart, QDateTime dtEnd);
+    //void LocalReadLockHistorySet(QString Locks, QDateTime dtStart, QDateTime dtEnd);
 
     //void menuSelection(QAction *action);
     void OnLockStatusUpdated(CLocksStatus *pLocksStatus);

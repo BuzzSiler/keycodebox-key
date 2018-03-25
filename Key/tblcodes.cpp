@@ -367,12 +367,13 @@ QString CTblCodes::checkCodeTwo(QString code,
 
 void CTblCodes::selectCodeSet(QString &LockNums, QDateTime start, QDateTime end, CLockSet **pLockSet)
 {
-    qDebug() << "CTblCodes::selectCodeSet(LockNums, start, end, pLockSet)";
+    qDebug() << "CTblCodes::selectCodeSet(LockNums" << LockNums << ", start" << start.toString() << ", end" << end.toString() << ", pLockSet)";
     // hold on to the code
     CLockState  *pLock;
     *pLockSet = 0;
 
-    if( _pDB && _pDB->isOpen() ) {
+    if( _pDB && _pDB->isOpen() ) 
+    {
         QSqlQuery qry(*_pDB);
         QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "code1, code2, fingerprint1, fingerprint2, ask_questions, question1, question2, question3, "
@@ -501,11 +502,14 @@ void CTblCodes::selectCodeSet(QString &LockNums, QDateTime start, QDateTime end,
 
                     (*pLockSet)->addToSet(pLock);
                 } while(qry.next());
-            } else {
+            } 
+            else 
+            {
                 qDebug() << "No FIRST record found!";
             }
         }
-        else {
+        else 
+        {
             qDebug() << "query.exec() failed." << qry.lastError();
         }
     }

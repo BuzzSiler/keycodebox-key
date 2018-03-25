@@ -12,6 +12,8 @@ class QPushButton;
 class QTouchEvent;
 class LockCabinetWidget;
 class CLockState;
+class DlgNumberPad;
+class CClickableLineEdit;
 
 class FrmCodeEditMulti : public QDialog
 {
@@ -26,36 +28,32 @@ class FrmCodeEditMulti : public QDialog
                        
     private slots:
         void on_pbClearCode1_clicked();
-
         void on_pbClearCode2_clicked();
-
         void on_pbClearUsername_clicked();
-
         void on_pbQuestions_clicked();
-
         void on_cbAccessType_currentIndexChanged(int index);
-
         void on_dtStartAccess_dateTimeChanged(const QDateTime &dateTime);
-
         void on_dtEndAccess_dateTimeChanged(const QDateTime &dateTime);
+        void on_edCode1_clicked();
+        void on_edCode2_clicked();
+        void on_edUsername_clicked();
+        void on_cbEnableCode2_stateChanged(int arg1);
 
-        void on_bbSaveCancel_accepted();
-
-        void on_bbSaveCancel_rejected();
-        
-        void on_edCode1_cursorPositionChanged(int arg1, int arg2);
+        void OnAccepted();
+        void OnRejected();
+        void OnNotifyLockSelected(QString lock, bool is_selected);
 
     private:
         QVector<QString> m_questions;
         int m_access_type;
         LockCabinetWidget& m_lock_cab;
+        DlgNumberPad& m_num_pad;
+        CClickableLineEdit *m_p_line_edit;
         Ui::FrmCodeEditMulti *ui;
 
         void updateAccessType(int index);
-
-    protected:
-        void touchEvent(QTouchEvent *ev);
-        bool eventFilter(QObject *target, QEvent *event);
+        void updateExitState();
+        void updateUi();
 };
 
 #endif // FRMCODEEDITMULTI_H
