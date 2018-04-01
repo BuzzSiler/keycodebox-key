@@ -19,7 +19,7 @@ class DlgNumberPad : public QDialog
         explicit DlgNumberPad(QWidget *parent = 0);
         ~DlgNumberPad();
 
-        void setValue(QString value);
+        void setValue(const QString value);
         void getValue(QString& value);
 
     signals:

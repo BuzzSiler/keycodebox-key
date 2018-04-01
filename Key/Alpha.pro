@@ -80,7 +80,9 @@ SOURCES += main.cpp\
     frmselectlocks.cpp \
     frmcodeeditmulti.cpp \
     lockcabinetwidget.cpp \
-    dlgnumberpad.cpp
+    dlgnumberpad.cpp \
+    kcbkeyboardwidget.cpp \
+    kcbkeyboarddialog.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -145,7 +147,10 @@ HEADERS  += keycodeboxmain.h \
     frmselectlocks.h \
     frmcodeeditmulti.h \
     lockcabinetwidget.h \
-    dlgnumberpad.h
+    dlgnumberpad.h \
+    kcbcommon.h \
+    kcbkeyboardwidget.h \
+    kcbkeyboarddialog.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \
@@ -154,7 +159,6 @@ FORMS    += mainwindow.ui \
     frmusercode.ui \
     frmadmininfo.ui \
     frmadminpassword.ui \
-    frmcodeedit.ui \
     dlgfullkeyboard.ui \
     dlgsmtp.ui \
     dlgvnc.ui \
@@ -166,7 +170,9 @@ FORMS    += mainwindow.ui \
     frmselectlocks.ui \
     frmcodeeditmulti.ui \
     lockcabinetwidget.ui \
-    dlgnumberpad.ui
+    dlgnumberpad.ui \
+    kcbkeyboardwidget.ui \
+    kcbkeyboarddialog.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/debug/ -lqsqlite

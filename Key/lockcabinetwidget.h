@@ -27,6 +27,8 @@ class LockCabinetWidget : public QWidget
         void disableAllLocks();
         void setSelectedCabinet(const QString& cab);
         void clrSelectedLocks(const QString& lock);
+        void setWarning();
+        void clrWarning();
 
     signals:
         void NotifyLockSelected(QString lock, bool is_selected);
@@ -54,6 +56,7 @@ class LockCabinetWidget : public QWidget
         QList<QPushButton *> m_lock_buttons;
 
         QSignalMapper& m_mapper;
+        QPalette m_default_palette;
         Ui::LockCabinetWidget *ui;
         void selectClearAllLocks(bool select_clear);
         void updateUi();

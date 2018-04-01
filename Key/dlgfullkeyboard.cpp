@@ -6,6 +6,8 @@
 #include <QKeyEvent>
 #include <QPushButton>
 
+#include "kcbcommon.h"
+
 
 CDlgFullKeyboard::CDlgFullKeyboard(QWidget *parent) :
     QDialog(parent),
@@ -13,10 +15,8 @@ CDlgFullKeyboard::CDlgFullKeyboard(QWidget *parent) :
 {
     ui->setupUi(this);
     CDlgFullKeyboard::showFullScreen();
-    qDebug() << "CDlgFullKeyboard::CDlgFullKeyboard(QWidget *parent)";
 
-//    setWindowFlags(Qt::WindowDoesNotAcceptFocus | Qt::Tool |
-//                       Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    qDebug() << Q_FUNC_INFO;
 
     ui->edText->setFocus();
 
@@ -26,12 +26,12 @@ CDlgFullKeyboard::CDlgFullKeyboard(QWidget *parent) :
     QPushButton*        pb;
     QList<QPushButton*> lstWidgets;
     QList<QPushButton*>::Iterator   itor;
-    lstWidgets = ui->widgetKeyboard->findChildren<QPushButton *>();
+    lstWidgets = ui->wgKeyboard->findChildren<QPushButton *>();
     for(itor = lstWidgets.begin(); itor != lstWidgets.end(); itor++)
     {
         pb = (QPushButton*)(*itor);
-        //qDebug() << "Mapping key:" << pb->text();
-        if(pb->text().length()==1) {
+        if(pb->text().length()==1)
+        {
             _pmapper->setMapping(pb, pb);
         }
     }
@@ -45,15 +45,24 @@ CDlgFullKeyboard::~CDlgFullKeyboard()
 
 void CDlgFullKeyboard::setCurrentEdit(CCurrentEdit *pEdit)
 {
+    KCB_DEBUG_ENTRY;
     _pcurrentEdit = pEdit;
+    KCB_DEBUG_TRACE("pEdit" << pEdit);
     _pcurrentEdit->setKeyboardEditLine(this->ui->edText);
+    KCB_DEBUG_TRACE("setKeyboardEditLine" << this->ui->edText->text());
     _pcurrentEdit->setKeyboardLabel(this->ui->lblCurrentEditFieldName);
+    KCB_DEBUG_TRACE("setKeyboardLabel" << this->ui->lblCurrentEditFieldName->text());
+    KCB_DEBUG_EXIT;
 }
-
 
 void CDlgFullKeyboard::onDelete()
 {
     // Destructive - Not yet implemented
+}
+
+void CDlgFullKeyboard::numbersOnly(bool state)
+{
+    this->ui->wgKeyboard->setDisabled(state);
 }
 
 const QLineEdit &CDlgFullKeyboard::getLineEdit()
@@ -100,31 +109,46 @@ void CDlgFullKeyboard::buttonClicked(QWidget *btn)
     QPushButton *pb = (QPushButton*)btn;
     qDebug() << "buttonClicked: " << pb->text();
 
-    if(pb->text() == "Enter") {
+    if(pb->text() == "Enter")
+    {
         onButtonClick(0x0D);
-    } else if(pb->text() == "Space") {
+    }
+    else if(pb->text() == "Space")
+    {
         onButtonClick(0x20);
-    } else if(pb->text() == "Del") {
+    }
+    else if(pb->text() == "Del")
+    {
         onButtonClick(0x7F);
-    } else if(pb->text() == "Clear") {
+    }
+    else if(pb->text() == "Clear")
+    {
         onButtonClick(0x00);
-    } else if(pb->text() == "Close") {
+    }
+    else if(pb->text() == "Close")
+    {
         on_btn_Close_clicked();
-    } else if(pb->text() == "Back") {
+    }
+    else if(pb->text() == "Back")
+    {
         onBackSpace();
-    } else {
+    }
+    else
+    {
         onButtonClick(pb->text().at(0).toLatin1());
     }
 
 }
 
-void CDlgFullKeyboard::onButtonClick(char key) {
+void CDlgFullKeyboard::onButtonClick(char key)
+{
     QString qkey(key);
     QString sCurrKey;
     bool    bKey = true;
     // Central button handling.
     // Process local
-    switch(key) {
+    switch(key)
+    {
         case 0x00:  // This is clear
             OnClearCodeDisplay();
             break;
@@ -136,7 +160,7 @@ void CDlgFullKeyboard::onButtonClick(char key) {
             break;
         case 0x7F:  // Del Forware
             onDelete();
-            break;
+            break;            
         case '0':
         case '1':
         case '2':
@@ -150,23 +174,28 @@ void CDlgFullKeyboard::onButtonClick(char key) {
             sCurrKey = ui->edText->text() + qkey;
             ui->edText->setText(sCurrKey);
         break;
-    default:    // Any
-        sCurrKey = ui->edText->text() + qkey;
-        int nPos;
-        if(_pcurrentEdit->isNumbersOnly()) {
-            qDebug() << "  >> Curr Edit is NumbersOnly";
-            if(QValidator::Acceptable == _pcurrentEdit->pregExpNums->validate(sCurrKey, nPos))
-                ui->edText->setText(sCurrKey);
+
+        default:    // Any
+            sCurrKey = ui->edText->text() + qkey;
+            int nPos;
+            if(_pcurrentEdit->isNumbersOnly())
+            {
+                qDebug() << "  >> Curr Edit is NumbersOnly";
+                if(QValidator::Acceptable == _pcurrentEdit->pregExpNums->validate(sCurrKey, nPos))
+                    ui->edText->setText(sCurrKey);
+                else
+                    bKey = false;
+            }
             else
-                bKey = false;
-        } else {
-            qDebug() << "  >> Curr Edit is any character";
-            ui->edText->setText(sCurrKey);
-        }
-        break;
+            {
+                qDebug() << "  >> Curr Edit is any character";
+                ui->edText->setText(sCurrKey);
+            }
+            break;
     }
 
-    if(bKey) {
+    if(bKey)
+    {
         // Process through controller
         this->__KeyPressed(key);
     }
@@ -176,43 +205,43 @@ void CDlgFullKeyboard::keyPressEvent( QKeyEvent* event )
 {
     switch ( event->key() )
     {
-    case Qt::Key_Enter:
-        onButtonClick(0x0D);
-        break;
-    case Qt::Key_Delete:
-        onButtonClick(0x08);
-        break;
-    case Qt::Key_Shift:
-    case Qt::Key_Home:
-    case Qt::Key_End:
-    case Qt::Key_PageUp:
-    case Qt::Key_PageDown:
-    case Qt::Key_Left:
-    case Qt::Key_Right:
-    case Qt::Key_NumLock:
-    case Qt::Key_Escape:
-    case Qt::Key_Tab:
-        on_btn_Upper_Lower_clicked(false);
-        break;
-    case Qt::Key_CapsLock:
-        on_btn_Upper_Lower_clicked(true);
+        case Qt::Key_Enter:
+            onButtonClick(0x0D);
+            break;
+        case Qt::Key_Delete:
+            onButtonClick(0x08);
+            break;
+        case Qt::Key_Shift:
+        case Qt::Key_Home:
+        case Qt::Key_End:
+        case Qt::Key_PageUp:
+        case Qt::Key_PageDown:
+        case Qt::Key_Left:
+        case Qt::Key_Right:
+        case Qt::Key_NumLock:
+        case Qt::Key_Escape:
+        case Qt::Key_Tab:
+            on_btn_Upper_Lower_clicked(false);
+            break;
+        case Qt::Key_CapsLock:
+            on_btn_Upper_Lower_clicked(true);
 
-        break;
-    default:
-        onButtonClick(event->key());
+            break;
+        default:
+            onButtonClick(event->key());
     }
 }
 
-void CDlgFullKeyboard::hideKeyboard(bool bHide) {
-    ui->widgetEdit->setVisible(bHide);
+void CDlgFullKeyboard::hideKeyboard(bool bHide)
+{
+    ui->wgEdit->setVisible(bHide);
 }
 
 void CDlgFullKeyboard::onTextEntered()
 {
     _pcurrentEdit->retrieveEditedText();
     _pcurrentEdit->stopEdit();
-    qDebug() << "onTextEntered(): " << _pcurrentEdit->newText;
-    emit __TextEntered(this, _pcurrentEdit);     // Signal that the code was entered.
+    emit __TextEntered(this, _pcurrentEdit);
     hide();
 }
 
@@ -221,7 +250,8 @@ void CDlgFullKeyboard::onBackSpace()
     // Destructive Backspace
     QString sCode = ui->edText->text();
     int nLen = sCode.length();
-    if( nLen > 0 ) {
+    if( nLen > 0 )
+    {
         sCode = sCode.left(nLen - 1);
         this->ui->edText->setText(sCode);
     }
@@ -244,7 +274,8 @@ void CDlgFullKeyboard::on_btnB_clicked()
     {
         onButtonClick('B');
     }
-    else {
+    else
+    {
         onButtonClick('b');
     }
 }
@@ -255,7 +286,8 @@ void CDlgFullKeyboard::on_btnC_clicked()
     {
         onButtonClick('C');
     }
-    else {
+    else
+    {
         onButtonClick('c');
     }
 }
@@ -265,7 +297,8 @@ void CDlgFullKeyboard::on_btnD_clicked()
     {
         onButtonClick('D');
     }
-    else {
+    else
+    {
         onButtonClick('d');
     }
 }
@@ -275,7 +308,8 @@ void CDlgFullKeyboard::on_btnE_clicked()
     {
         onButtonClick('E');
     }
-    else {
+    else
+    {
         onButtonClick('e');
     }
 }
@@ -285,7 +319,8 @@ void CDlgFullKeyboard::on_btnF_clicked()
     {
         onButtonClick('F');
     }
-    else {
+    else
+    {
         onButtonClick('f');
     }
 }
@@ -295,7 +330,8 @@ void CDlgFullKeyboard::on_btnG_clicked()
     {
         onButtonClick('G');
     }
-    else {
+    else
+    {
         onButtonClick('g');
     }
 }
@@ -305,7 +341,8 @@ void CDlgFullKeyboard::on_btnH_clicked()
     {
         onButtonClick('H');
     }
-    else {
+    else
+    {
         onButtonClick('h');
     }
 }
@@ -315,7 +352,8 @@ void CDlgFullKeyboard::on_btnI_clicked()
     {
         onButtonClick('I');
     }
-    else {
+    else
+    {
         onButtonClick('i');
     }
 }
@@ -326,7 +364,8 @@ void CDlgFullKeyboard::on_btnJ_clicked()
     {
         onButtonClick('J');
     }
-    else {
+    else
+    {
         onButtonClick('j');
     }
 }
@@ -337,7 +376,8 @@ void CDlgFullKeyboard::on_btnK_clicked()
     {
         onButtonClick('K');
     }
-    else {
+    else
+    {
         onButtonClick('k');
     }
 }
@@ -347,7 +387,8 @@ void CDlgFullKeyboard::on_btnL_clicked()
     {
         onButtonClick('L');
     }
-    else {
+    else
+    {
         onButtonClick('l');
     }
 }
@@ -357,7 +398,8 @@ void CDlgFullKeyboard::on_btnM_clicked()
     {
         onButtonClick('M');
     }
-    else {
+    else
+    {
         onButtonClick('m');
     }
 }
@@ -367,7 +409,8 @@ void CDlgFullKeyboard::on_btnN_clicked()
     {
         onButtonClick('N');
     }
-    else {
+    else
+    {
         onButtonClick('n');
     }
 }
@@ -377,7 +420,8 @@ void CDlgFullKeyboard::on_btnO_clicked()
     {
         onButtonClick('O');
     }
-    else {
+    else
+    {
         onButtonClick('o');
     }
 
@@ -388,7 +432,8 @@ void CDlgFullKeyboard::on_btnP_clicked()
     {
         onButtonClick('P');
     }
-    else {
+    else
+    {
         onButtonClick('p');
     }
 }
@@ -398,7 +443,8 @@ void CDlgFullKeyboard::on_btnQ_clicked()
     {
         onButtonClick('Q');
     }
-    else {
+    else
+    {
         onButtonClick('q');
     }
 }
@@ -408,7 +454,8 @@ void CDlgFullKeyboard::on_btnR_clicked()
     {
         onButtonClick('R');
     }
-    else {
+    else
+    {
         onButtonClick('r');
     }
 }
@@ -418,7 +465,8 @@ void CDlgFullKeyboard::on_btnS_clicked()
     {
         onButtonClick('S');
     }
-    else {
+    else
+    {
         onButtonClick('s');
     }
 }
@@ -428,7 +476,8 @@ void CDlgFullKeyboard::on_btnT_clicked()
     {
         onButtonClick('T');
     }
-    else {
+    else
+    {
         onButtonClick('t');
     }
 }
@@ -438,7 +487,8 @@ void CDlgFullKeyboard::on_btnU_clicked()
     {
         onButtonClick('U');
     }
-    else {
+    else
+    {
         onButtonClick('u');
     }
 }
@@ -448,7 +498,8 @@ void CDlgFullKeyboard::on_btnV_clicked()
     {
         onButtonClick('V');
     }
-    else {
+    else
+    {
         onButtonClick('v');
     }
 }
@@ -458,7 +509,8 @@ void CDlgFullKeyboard::on_btnW_clicked()
     {
         onButtonClick('W');
     }
-    else {
+    else
+    {
         onButtonClick('w');
     }
 }
@@ -468,7 +520,8 @@ void CDlgFullKeyboard::on_btnX_clicked()
     {
         onButtonClick('X');
     }
-    else {
+    else
+    {
         onButtonClick('x');
     }
 }
@@ -478,7 +531,8 @@ void CDlgFullKeyboard::on_btnY_clicked()
     {
         onButtonClick('Y');
     }
-    else {
+    else
+    {
         onButtonClick('y');
     }
 }
@@ -488,7 +542,8 @@ void CDlgFullKeyboard::on_btnZ_clicked()
     {
         onButtonClick('Z');
     }
-    else {
+    else
+    {
         onButtonClick('z');
     }
 }
@@ -673,7 +728,6 @@ void CDlgFullKeyboard::on_btn_Close_clicked()
 
 void CDlgFullKeyboard::on_btn_Clear_clicked()
 {
-    //
     onButtonClick(0x00);
 }
 
@@ -788,7 +842,8 @@ void CDlgFullKeyboard::on_btn_Upper_Lower_clicked(bool checked)
     {
         makeLower();
     }
-    else {
+    else
+    {
         makeUpper();
     }
 

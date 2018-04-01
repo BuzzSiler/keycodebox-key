@@ -28,7 +28,8 @@ DlgNumberPad::DlgNumberPad(QWidget *parent) :
     }
     connect(&m_mapper, SIGNAL(mapped(int)), this, SLOT(buttonClicked(int)));
 
-
+    ui->pbEnter->setDisabled(true);
+    ui->pbCancel->setEnabled(true);
     ui->edValue->setCursorPosition(ui->edValue->text().length()-1);
 }
 
@@ -37,47 +38,49 @@ DlgNumberPad::~DlgNumberPad()
     delete ui;
 }
 
-void DlgNumberPad::setValue(QString value)
+void DlgNumberPad::setValue(const QString value)
 {
     m_value = value;
-    ui->edValue->setText(m_value);
-    m_only_once = false;
+    ui->edValue->setText(value);
+    ui->pbEnter->setDisabled(true);
 }
 
 void DlgNumberPad::getValue(QString& value)
 {
-    value = m_value;
-    setValue("");
+    value = ui->edValue->text();
 }
 
 void DlgNumberPad::on_pbBack_clicked()
 {
-    m_value.truncate(m_value.length()-1);
-    setValue(m_value);
+    QString value = ui->edValue->text();
+    value.truncate(value.length()-1);
+    ui->edValue->setText(value);
+    ui->pbEnter->setEnabled(value != "" && value != m_value);
 }
 
 void DlgNumberPad::on_pbClear_clicked()
 {
-    setValue("");
+    ui->edValue->setText("");
+    ui->pbEnter->setEnabled(ui->edValue->text() != "" && ui->edValue->text() != m_value);
 }
 
 void DlgNumberPad::on_pbCancel_clicked()
 {
     emit NotifyRejected();
+    m_value = "";
 }
 
 void DlgNumberPad::on_pbEnter_clicked()
 {
     qDebug() << "on_pbEnter_clicked";
-    if (!m_only_once)
-    {
-        m_only_once = true;
-        emit NotifyAccepted();
-    }
+    emit NotifyAccepted();
+    m_value = "";
 }
 
 void DlgNumberPad::buttonClicked(int index)
 {
-    m_value += m_buttons[index]->text();
-    setValue(m_value);
+    QString value = ui->edValue->text();
+    value += m_buttons[index]->text();
+    ui->edValue->setText(value);
+    ui->pbEnter->setEnabled(ui->edValue->text() != "" && ui->edValue->text() != m_value);
 }

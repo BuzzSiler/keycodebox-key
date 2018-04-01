@@ -44,6 +44,8 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
                       "       code1, code2, fingerprint1, fingerprint2, "
                       "       starttime, endtime, status, access_count, retry_count, max_access, max_retry, access_type "
                       "  FROM " + TABLENAME +
+                      // Note: Consider changing this query to check access type instead of xxxNone
+                      // ((access_type = 0 or access_type = 2) "
                       " WHERE ((starttime = :startNone and endtime = :endNone) "
                       "    OR (starttime <= :time and endtime >= :timeend))";
 
@@ -211,6 +213,8 @@ QString CTblCodes::checkCodeTwo(QString code,
                       " starttime, endtime, status, access_count, retry_count, max_access, max_retry, lockbox_state, "
                       " ask_questions, question1, question2, question3, access_type"
                       " from " + TABLENAME +
+                      // Note: Consider changing this query to check access type instead of xxxNone
+                      // ((access_type = 0 or access_type = 2) "                      
                       " WHERE ((starttime = :startNone and endtime = :endNone) "
                       " or (starttime <= :time and endtime >= :timeend))";
 
@@ -380,12 +384,49 @@ void CTblCodes::selectCodeSet(QString &LockNums, QDateTime start, QDateTime end,
                       " starttime, endtime, status, access_count, retry_count, max_access, max_retry, access_type"
                       " from " + TABLENAME +
                       " WHERE ";
-        if(LockNums != "" ) 
+        if(LockNums != "" && LockNums != "All Locks")
         {
-            sql += " locknums = :lockNums and ";
+            /* Lock nums is a string with either a single value or comma-separated values.
+             * Entries in the database may be single values or comma-separated values.
+             * Find all entries with all matching values.
+             */
+
+            sql += " ( ";
+            if (LockNums.contains(','))
+            {
+                QStringList sl = LockNums.split(',');
+                foreach (auto s, sl)
+                {
+                    sql += QString("instr(locknums, %1) > 0 and ").arg(s);
+                }
+            }
+            // Note: This handles the case of a single number.  It is redundant for
+            // comma-separated values, but eliminates an 'else'
+            sql += "instr(locknums, :lockNums) > 0";
+            sql += " ) and ";
         }
-        sql += " ((starttime = :startNone and endtime = :endNone) "
-               " or (starttime >= :stime and endtime <= :etime))";
+
+        sql += " ( (access_type = 0 or access_type = 2) or"
+               " ((starttime between :stime and :etime) or"
+               " (endtime between :stime and :etime)))";
+
+        // Select codes where the start/end access doesn't matter (always and limited user) OR
+        // codes where there is an overlap between start/end range and the code start/end
+        //
+        // Display Window Date/time:
+        //                                          |-----  window  -----|
+        //                                         ST                    ET
+        // Code Window Date/Time:     ^         ^       ^ ^          ^       ^  ^         ^
+        //                            |-Ignored-|       | |          |       |  |         |
+        //                           ST         ET      | |          |       |  |         |
+        //                            |----Selected-----| |          |       |  |         |
+        //                           ST                 ET|          |       |  |         |
+        //                                                |-Selected-|       |  |         |
+        //                                               ST          ET      |  |         |
+        //                                                |-----Selected-----|  |         |
+        //                                               ST                  ET |         |
+        //                                                                      |-Ignored-|
+        //                                                                     ST         ET
 
         qDebug() << "SQL:" << sql;
 
@@ -394,12 +435,11 @@ void CTblCodes::selectCodeSet(QString &LockNums, QDateTime start, QDateTime end,
             qDebug() << "qry.prepare fails!" << qry.lastError();
         }
 
-        if(LockNums != "" ) 
+        if (LockNums != "" && LockNums != "All Locks")
+        //if(LockNums != "" )
         {
             qry.bindValue(":lockNums", LockNums);
         }
-        qry.bindValue(":startNone", _DATENONE_STR);
-        qry.bindValue(":endNone", _DATENONE_STR);
         qry.bindValue(":stime", start);
         qry.bindValue(":etime", end);
 

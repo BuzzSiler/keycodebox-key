@@ -15,17 +15,7 @@ private:
     bool _bNumbersOnly = false;
 
 public:
-    explicit CCurrentEdit()
-    {
-        pregExpNums = new QRegExpValidator(QRegExp("[0-9]*$"));
-
-        QRegExp mailREX(QRegExp("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b"));
-        mailREX.setCaseSensitivity(Qt::CaseInsensitive);
-        mailREX.setPatternSyntax(QRegExp::RegExp);
-        pregExpEmail = new QRegExpValidator(mailREX);
-
-        _sInputMask = "";
-    }
+    explicit CCurrentEdit();
 
     QObject             *parent;
     QString             labelText;
@@ -43,91 +33,42 @@ public:
     QLabel              *pLabelCurrentlyBeingEdited;
     QLineEdit           *_pLineCurrentlyBeingEdited;
 
-    bool isNumbersOnly() { return _bNumbersOnly; }
-    bool setNumbersOnly(bool bNumsOnly) { return _bNumbersOnly == bNumsOnly; }
+    bool isNumbersOnly();
+    bool setNumbersOnly(bool bNumsOnly);
 
-    void setKeyboardEditLine(QLineEdit *pEd)
-    {
-        pEditLine = pEd;
-        if( _bNumbersOnly )
-        {
-            pEditLine->setValidator(pregExpNums);
-        } else
-        {
-            pEditLine->setValidator(NULL);
-        }
-    }
+    void setKeyboardEditLine(QLineEdit *pEd);
 
-    void setKeyboardLabel(QLabel *pLabel)
-    {
-        pLabelTitle = pLabel;
-    }
+    void setKeyboardLabel(QLabel *pLabel);
 
-    void setLabelToBeEdited(QLabel *pLabel)
-    {
-        _pLineCurrentlyBeingEdited = NULL;      // Clear the label object
-        pLabelCurrentlyBeingEdited = pLabel;
-    }
+    void setLabelToBeEdited(QLabel *pLabel);
 
-    QLabel *getLabelBeingEdited()
-    {
-        return pLabelCurrentlyBeingEdited;
-    }
+    QLabel *getLabelBeingEdited();
 
-    void setLabelText(QString newValue)
-    {
-        labelText = newValue;
-        pLabelTitle->setText(labelText);
-    }
+    void setLabelText(QString newValue);
 
-    void setLineToBeEdited(QLineEdit *pLine)
-    {
-        pLabelCurrentlyBeingEdited = NULL;      // Clear the line edit object
-        _pLineCurrentlyBeingEdited = pLine;
-    }
+    void setLineToBeEdited(QLineEdit *pLine);
 
-    QLineEdit* getLineBeingEdited()
-    {
-        return _pLineCurrentlyBeingEdited;
-    }
+    QLineEdit* getLineBeingEdited();
 
-    QString getLabelText() { return labelText; }
+    QString getLabelText();
 
-    void setOriginalTextToEdit( QString text )
-    {
-        originalText = text;
-        pEditLine->setText(originalText);
-    }
+    void setOriginalTextToEdit( QString text );
 
-    void setNewText(QString text) { newText = text; }
+    void setNewText(QString text);
 
-    QString getNewText() { return newText; }
+    QString getNewText();
 
-    QString retrieveEditedText() { newText = pEditLine->text(); return newText; }
+    QString retrieveEditedText();
 
-    void clearInputMasks()
-    {
-        _sInputMask = "";
-        _bNumbersOnly = false;
-        emit __onNumbersOnly(false);
-    }
+    void clearInputMasks();
 
-    void setNumbersOnly()
-    {
-    }
+    void setNumbersOnly();
 
-    void setEmailFilter()
-    {
-    }
+    void setEmailFilter();
 
-    void setMaxLength(int nLen)
-    {
-        pEditLine->setMaxLength(nLen);
-    }
+    void setMaxLength(int nLen);
 
-    void stopEdit()
-    {
-    }
+    void stopEdit();
 
 signals:
     void __onNumbersOnly(bool bSet);

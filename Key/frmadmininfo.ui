@@ -1495,204 +1495,186 @@
       </font>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dtStartCodeList">
-     <property name="geometry">
-      <rect>
-       <x>195</x>
-       <y>0</y>
-       <width>221</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::UpDownArrows</enum>
-     </property>
-     <property name="accelerated">
-      <bool>true</bool>
-     </property>
-     <property name="showGroupSeparator" stdset="0">
-      <bool>false</bool>
-     </property>
-     <property name="dateTime">
-      <datetime>
-       <hour>0</hour>
-       <minute>0</minute>
-       <second>0</second>
-       <year>2016</year>
-       <month>6</month>
-       <day>1</day>
-      </datetime>
-     </property>
-     <property name="minimumDateTime">
-      <datetime>
-       <hour>0</hour>
-       <minute>0</minute>
-       <second>0</second>
-       <year>2016</year>
-       <month>1</month>
-       <day>1</day>
-      </datetime>
-     </property>
-     <property name="maximumDate">
-      <date>
-       <year>2055</year>
-       <month>12</month>
-       <day>31</day>
-      </date>
-     </property>
-     <property name="minimumDate">
-      <date>
-       <year>2016</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="currentSection">
-      <enum>QDateTimeEdit::MonthSection</enum>
-     </property>
-     <property name="displayFormat">
-      <string>MMM dd yyyy hh:mm AP</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lblCodeFrom">
-     <property name="geometry">
-      <rect>
-       <x>135</x>
-       <y>17</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>From</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lblCodeTo">
-     <property name="geometry">
-      <rect>
-       <x>442</x>
-       <y>15</y>
-       <width>41</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>To</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btnReadCodes">
-     <property name="geometry">
-      <rect>
-       <x>723</x>
-       <y>0</y>
-       <width>71</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Read</string>
-     </property>
-    </widget>
-    <widget class="QDateTimeEdit" name="dtEndCodeList">
-     <property name="geometry">
-      <rect>
-       <x>490</x>
-       <y>0</y>
-       <width>221</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::UpDownArrows</enum>
-     </property>
-     <property name="accelerated">
-      <bool>true</bool>
-     </property>
-     <property name="showGroupSeparator" stdset="0">
-      <bool>false</bool>
-     </property>
-     <property name="dateTime">
-      <datetime>
-       <hour>0</hour>
-       <minute>0</minute>
-       <second>0</second>
-       <year>2016</year>
-       <month>6</month>
-       <day>1</day>
-      </datetime>
-     </property>
-     <property name="minimumDateTime">
-      <datetime>
-       <hour>0</hour>
-       <minute>0</minute>
-       <second>0</second>
-       <year>2016</year>
-       <month>1</month>
-       <day>1</day>
-      </datetime>
-     </property>
-     <property name="maximumDate">
-      <date>
-       <year>2055</year>
-       <month>12</month>
-       <day>31</day>
-      </date>
-     </property>
-     <property name="minimumDate">
-      <date>
-       <year>2016</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="currentSection">
-      <enum>QDateTimeEdit::MonthSection</enum>
-     </property>
-     <property name="displayFormat">
-      <string>MMM dd yyyy hh:mm AP</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="cbLockNum">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>4</x>
-       <y>0</y>
-       <width>121</width>
-       <height>51</height>
+       <y>10</y>
+       <width>781</width>
+       <height>41</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <item>
-      <property name="text">
-       <string>All Locks</string>
-      </property>
-     </item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QComboBox" name="cbLockNum">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <item>
+         <property name="text">
+          <string>All Locks</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblCodeFrom">
+        <property name="text">
+         <string>From</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="dtStartCodeList">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::UpDownArrows</enum>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="dateTime">
+         <datetime>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+          <year>2016</year>
+          <month>6</month>
+          <day>1</day>
+         </datetime>
+        </property>
+        <property name="minimumDateTime">
+         <datetime>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+          <year>2016</year>
+          <month>1</month>
+          <day>1</day>
+         </datetime>
+        </property>
+        <property name="maximumDate">
+         <date>
+          <year>2055</year>
+          <month>12</month>
+          <day>31</day>
+         </date>
+        </property>
+        <property name="minimumDate">
+         <date>
+          <year>2016</year>
+          <month>1</month>
+          <day>1</day>
+         </date>
+        </property>
+        <property name="currentSection">
+         <enum>QDateTimeEdit::MonthSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>MMM dd yyyy hh:mm AP</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblCodeTo">
+        <property name="text">
+         <string>To</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="dtEndCodeList">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::UpDownArrows</enum>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>false</bool>
+        </property>
+        <property name="dateTime">
+         <datetime>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+          <year>2016</year>
+          <month>6</month>
+          <day>1</day>
+         </datetime>
+        </property>
+        <property name="minimumDateTime">
+         <datetime>
+          <hour>0</hour>
+          <minute>0</minute>
+          <second>0</second>
+          <year>2016</year>
+          <month>1</month>
+          <day>1</day>
+         </datetime>
+        </property>
+        <property name="maximumDate">
+         <date>
+          <year>2055</year>
+          <month>12</month>
+          <day>31</day>
+         </date>
+        </property>
+        <property name="minimumDate">
+         <date>
+          <year>2016</year>
+          <month>1</month>
+          <day>1</day>
+         </date>
+        </property>
+        <property name="currentSection">
+         <enum>QDateTimeEdit::MonthSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>MMM dd yyyy hh:mm AP</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnReadCodes">
+        <property name="text">
+         <string>Read</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QWidget" name="tabHistory">

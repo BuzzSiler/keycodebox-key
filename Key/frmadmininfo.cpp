@@ -8,6 +8,7 @@
 
 #include "kcbcommon.h"
 #include <QtGlobal>
+#include <QDebug>
 #include <QVariant>
 #include <QMenu>
 #include <QList>
@@ -29,7 +30,6 @@
 #include "encryption.h"
 #include "linux/reboot.h"
 #include <unistd.h>
-#include <QDebug>
 #include "selectlockswidget.h"
 
 
@@ -60,6 +60,9 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
 
 {
     ui->setupUi(this);
+
+    ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
+
     CFrmAdminInfo::showFullScreen();
     _pcurrentLabelEdit = 0;
 
@@ -206,7 +209,7 @@ void CFrmAdminInfo::initialize()
     ui->widgetImmediateReport->setVisible(true);
 
     populateTimeZoneSelection(ui->cbTimeZone);
-    populateCodeLockSelection();
+    //populateCodeLockSelection();
     populateCodeLockHistorySelection();
     startMediaTimer();
 
@@ -439,12 +442,16 @@ void CFrmAdminInfo::setTimeZone()
 
 void CFrmAdminInfo::populateBoxListSelection(QComboBox *cbox)
 {
+    // Change this to retrieve a list of values from the locknums field
+    // Rather than put all locks into a combo box, just put the entries that
+    // are available in the database.
+
     cbox->clear();
     cbox->addItem(QString(tr("All Locks")));
-    for(int i=1;i<65;i++)
-    {
-        cbox->addItem(QString(tr("Lock") + " #" + QVariant(i).toString()));
-    }
+    //for(int i=1;i<65;i++)
+    //{
+    //    cbox->addItem(QString(tr("Lock") + " #" + QVariant(i).toString()));
+    //}
 }
 
 void CFrmAdminInfo::populateCodeLockSelection()
@@ -760,7 +767,7 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
                While they are initialized above, it is possible that a customer will put a start/end
                datetime in the XML file.               
             */
-            if (access_type == 0 || access_type == 2)
+            if (access_type == ACCESS_TYPE_ALWAYS || access_type == ACCESS_TYPE_LIMITED_USE)
             {
                 dtStart = _DATENONE;
                 dtEnd = _DATENONE;
@@ -809,7 +816,8 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
     int nRC = QMessageBox::warning(this, tr("Verify Branding Image Reset"),
                                    tr("The branding image will be reset to the default.\nDo you want to continue?"),
                                    QMessageBox::Yes, QMessageBox::Cancel);
-    if(nRC == QMessageBox::Yes) {
+    if(nRC == QMessageBox::Yes) 
+    {
         sync();
         std::system("cp /home/pi/kcb-config/images/alpha_logo_touch.jpg /home/pi/kcb-config/images/alpha_logo.jpg");
     }
@@ -817,23 +825,25 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
 
 void CFrmAdminInfo::onStartEditLabel(QLabel* pLabel, QString sLabelText)
 {
-    //    ui->tabWidget->hide();
-    if(!_pKeyboard) {
-        _pKeyboard = new CDlgFullKeyboard();
-        connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*,CCurrentEdit*)),
-                this, SLOT(OnKeyboardTextEntered(CDlgFullKeyboard*, CCurrentEdit*)));
-    }
-    if(!_pcurrentLabelEdit) {
-        _pcurrentLabelEdit = new CCurrentEdit();
-    }
-    if(_pKeyboard && _pcurrentLabelEdit) {
-        _pKeyboard->setCurrentEdit(_pcurrentLabelEdit);
-        _pcurrentLabelEdit->setLabelToBeEdited(pLabel);
-        _pcurrentLabelEdit->setOriginalTextToEdit(pLabel->text());
-        _pcurrentLabelEdit->setLabelText(sLabelText);
+//    if(!_pKeyboard)
+//    {
+//        _pKeyboard = new CDlgFullKeyboard();
+//        connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*,CCurrentEdit*)),
+//                this, SLOT(OnKeyboardTextEntered(CDlgFullKeyboard*, CCurrentEdit*)));
+//    }
+//    if(!_pcurrentLabelEdit)
+//    {
+//        _pcurrentLabelEdit = new CCurrentEdit();
+//    }
+//    if(_pKeyboard && _pcurrentLabelEdit)
+//    {
+//        _pKeyboard->setCurrentEdit(_pcurrentLabelEdit);
+//        _pcurrentLabelEdit->setLabelToBeEdited(pLabel);
+//        _pcurrentLabelEdit->setOriginalTextToEdit(pLabel->text());
+//        _pcurrentLabelEdit->setLabelText(sLabelText);
 
-        _pKeyboard->setActive();
-    }
+//        _pKeyboard->setActive();
+//    }
 }
 
 void CFrmAdminInfo::OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *currEdit)
@@ -850,7 +860,8 @@ void CFrmAdminInfo::onStopEdit()
 
 void CFrmAdminInfo::checkAndCreateCurrentLabelEdit()
 {
-    if(!_pcurrentLabelEdit) {
+    if(!_pcurrentLabelEdit)
+    {
         _pcurrentLabelEdit = new CCurrentEdit();
     }
 }
@@ -923,25 +934,39 @@ void CFrmAdminInfo::on_lblKey_clicked()
 
 void CFrmAdminInfo::on_btnSaveSettings_clicked()
 {
-    qDebug() << "on_btnSaveSettings_clicked()";
+    KCB_DEBUG_ENTRY;
     QDateTime   freq;
     bool    bNever = false;
     QString sFreq = ui->cbReportFreq->currentText();
-    if(sFreq.compare(fNever) == 0) {
+
+    if(sFreq.compare(fNever) == 0)
+    {
         freq = QDateTime(QDate(), QTime(0,0));
         bNever = true;
-    } else if(sFreq.compare(fEach) == 0) {
+    }
+    else if(sFreq.compare(fEach) == 0)
+    {
         freq = QDateTime(QDate(1,1,1), QTime(0,0));
         bNever = false;
-    } else if(sFreq.compare(fHourly) == 0) {
+    }
+    else if(sFreq.compare(fHourly) == 0)
+    {
         freq = QDateTime(QDate(1,1,1), QTime(1,0));
-    } else if(sFreq.compare(fEvery12Hours) == 0) {
+    }
+    else if(sFreq.compare(fEvery12Hours) == 0)
+    {
         freq = QDateTime(QDate(1,1,1), QTime(12,0));
-    } else if(sFreq.compare(fDaily) == 0) {
+    }
+    else if(sFreq.compare(fDaily) == 0)
+    {
         freq = QDateTime(QDate(1,1,1), QTime(23,59));
-    } else if(sFreq.compare(fWeekly) == 0) {
+    }
+    else if(sFreq.compare(fWeekly) == 0)
+    {
         freq = QDateTime(QDate(1,1,7), QTime(0,0));
-    } else if(sFreq.compare(fMonthly) == 0) {
+    }
+    else if(sFreq.compare(fMonthly) == 0)
+    {
         freq = QDateTime(QDate(1,12,1), QTime(0,0));
     }
     // Update the Admin Info and close the dialog - syscontroller needs to switch
@@ -969,6 +994,7 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
 
     _bClose = false;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_btnDone_clicked()
@@ -976,21 +1002,34 @@ void CFrmAdminInfo::on_btnDone_clicked()
     QDateTime   freq;
     bool    bNever = false;
     QString sFreq = ui->cbReportFreq->currentText();
-    if(sFreq.compare(fNever) == 0) {
+    if(sFreq.compare(fNever) == 0)
+    {
         freq = QDateTime(QDate(), QTime(0,0));
         bNever = true;
-    } else if(sFreq.compare(fEach) == 0) {
+    }
+    else if(sFreq.compare(fEach) == 0)
+    {
         freq = QDateTime(QDate(1,1,1), QTime(0,0));
         bNever = false;
-    } else if(sFreq.compare(fHourly) == 0) {
+    }
+    else if(sFreq.compare(fHourly) == 0)
+    {
         freq = QDateTime(QDate(1,1,1), QTime(1,0));
-    } else if(sFreq.compare(fEvery12Hours) == 0) {
+    }
+    else if(sFreq.compare(fEvery12Hours) == 0)
+    {
         freq = QDateTime(QDate(1,1,1), QTime(12,0));
-    } else if(sFreq.compare(fDaily) == 0) {
+    }
+    else if(sFreq.compare(fDaily) == 0)
+    {
         freq = QDateTime(QDate(1,1,1), QTime(23,59));
-    } else if(sFreq.compare(fWeekly) == 0) {
+    }
+    else if(sFreq.compare(fWeekly) == 0)
+    {
         freq = QDateTime(QDate(1,1,7), QTime(0,0));
-    } else if(sFreq.compare(fMonthly) == 0) {
+    }
+    else if(sFreq.compare(fMonthly) == 0)
+    {
         freq = QDateTime(QDate(1,12,1), QTime(0,0));
     }
     // Update the Admin Info and close the dialog - syscontroller needs to switch
@@ -1034,7 +1073,8 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
     // New Admin info to display...
     // Display to the ui
-    if(adminInfo) {
+    if(adminInfo)
+    {
         qDebug() << "Admin Info received.";
         _tmpAdminRec = *adminInfo;
 
@@ -1098,14 +1138,17 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
         ui->tabWidget->setCurrentIndex(0);
         
-    } else {
+    }
+    else
+    {
         qDebug() << "Admin Info received is blank.";
     }
 }
 
 void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
 {
-    if( bSuccess ) {
+    if( bSuccess )
+    {
         qDebug() << "Succeeded in updating Current Admin Info";
 
         /* Note: This is such an ugly hack.  I hate it. 
@@ -1123,10 +1166,13 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
         qDebug() << "Failed to update Current Admin Info";
     }
 
-    if(_bClose) {
+    if(_bClose)
+    {
         emit __OnCloseFrmAdmin();
         this->close();
-    } else {
+    }
+    else
+    {
         emit __OnRequestCurrentAdmin();
     }
 }
@@ -1232,7 +1278,8 @@ void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
 void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
 {
     // Display
-    qDebug() << "CFrmAdminInfo::OnLockSet(). Count:" << pSet->getLockMap()->size();
+    KCB_DEBUG_TRACE("Count" << pSet->getLockMap()->size());
+    //qDebug() << "CFrmAdminInfo::OnLockSet(). Count:" << pSet->getLockMap()->size();
 
     displayInTable(pSet);
 
@@ -1242,7 +1289,7 @@ void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
 void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
 {
     qDebug() << "OnLockHistorySet()";
-    Q_ASSERT_X(pSet != nullptr, "CFrmAdminInfo::OnLockHistorySet", "pSet is null");
+    Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
     displayInHistoryTable(pSet);
     pSet = NULL;
 }
@@ -1262,7 +1309,7 @@ void CFrmAdminInfo::codeHistoryTableCellSelected(int nRow, int nCol)
 
 void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 {
-    qDebug() << "CFrmAdminInfo::displayInTable";
+    KCB_DEBUG_ENTRY;
 
     QTableWidget *table = ui->tblCodesList;
 
@@ -1301,6 +1348,11 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     int nRow = 0;
     int nCol = 0;
 
+    ui->cbLockNum->clear();
+    ui->cbLockNum->addItem(QString(tr("All Locks")));
+
+    QSet<QString> lock_items;
+
     QDateTime alwaysActiveStart = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
     QDateTime alwaysActiveEnd = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
 
@@ -1308,24 +1360,40 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     {
         pState = itor.value();
         qDebug() << "Adding row of Lock State - Codes. Lock Nums:" << QVariant(pState->getLockNums());
+
+        // Locks can be single or comma-separated.  We will add the comma-separated value as well as
+        // the individual locks for filtering purposes
+        QString locks = pState->getLockNums();
+        lock_items.insert(locks);
+        QStringList sl = locks.split(',');
+        foreach (auto s, sl)
+        {
+            lock_items.insert(s);
+        }
+
         nCol = 0;
         table->setItem(nRow, nCol++, new QTableWidgetItem(QVariant(nRow + 1).toString()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getLockNums()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getDescription()));
-        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode1()));
+        QString code1 = pState->getCode1();
+        if (pState->getFingerprint1())
+        {
+            code1 += tr(" (FP)");
+        }
+        table->setItem(nRow, nCol++, new QTableWidgetItem(code1));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2()));
 
-        if (pState->getAccessType() == 0 /* ACCESS_ALWAYS */)
+        if (pState->getAccessType() == ACCESS_TYPE_ALWAYS)
         {
             table->setItem(nRow, nCol++, new QTableWidgetItem(tr("ALWAYS")));
             table->setItem(nRow, nCol++, new QTableWidgetItem(tr("ACTIVE")));
         }
-        else if (pState->getAccessType() == 1 /* ACCESS_TIMED */)
+        else if (pState->getAccessType() == ACCESS_TYPE_TIMED)
         {
             table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getStartTime().toString("MMM dd yyyy hh:mm:ss AP")));
             table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getEndTime().toString("MMM dd yyyy hh:mm:ss AP")));
         }
-        else if (pState->getAccessType() == 2 /* ACCESS_LIMITED_USE */)
+        else if (pState->getAccessType() == ACCESS_TYPE_LIMITED_USE)
         {
             table->setItem(nRow, nCol++, new QTableWidgetItem(QString("%1 (%2) %3").arg(tr("LIMITED USE"), QString::number(pState->getRemainingUses()), tr("uses remaining"))));
             table->setItem(nRow, nCol++, new QTableWidgetItem(pState->isActive() ? tr("ACTIVE") : tr("DISABLED")));
@@ -1333,6 +1401,10 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
         nRow++;
     }
+
+    QStringList sl(lock_items.toList());
+    sl.sort();
+    ui->cbLockNum->addItems(sl);
 }
 
 void CFrmAdminInfo::setupCodeTableContextMenu() 
@@ -1444,11 +1516,7 @@ void CFrmAdminInfo::codeAddNew()
 void CFrmAdminInfo::codeInitNew()
 {
     qDebug() << "codeInitNew";
-
-    int row = ui->cbLockNum->currentIndex();
-    qDebug() << " " << row << "\n";
-    Q_ASSERT_X(row > -1, "CFrmAdminInfo::codeInitNew", "row must be 0 or more");
-    addCodeByRow(row == -1 ? 1 : row);
+    addCodeByRow(-1);
 }
 
 void CFrmAdminInfo::codeEnableAll()
@@ -1461,7 +1529,11 @@ void CFrmAdminInfo::codeEnableAll()
     */
     CLockSet::Iterator itor;
     int nRow = 0;
-    _pState = 0;
+    if (_pState)
+    {
+        qDebug() << "Freeing _pState in CFrmAdminInfo::codeEnableAll";
+        _pState = 0;
+    }
 
     if(!_pworkingSet) 
     {
@@ -1543,14 +1615,15 @@ void CFrmAdminInfo::on_dialBright_valueChanged(int value)
 
 void CFrmAdminInfo::on_btnReadCodes_clicked()
 {
-    qDebug() << "SLOT: on_btnReadCodes_clicked";
+    KCB_DEBUG_ENTRY;
+
     QDateTime dtStart = ui->dtStartCodeList->dateTime();
     QDateTime dtEnd = ui->dtEndCodeList->dateTime();
-    int lock_index = ui->cbLockNum->currentIndex();
-    Q_ASSERT_X(lock_index > -1, "CFrmAdminInfo::on_btnReadCodes_clicked", "lock_index must be > 0");
-    // Need to map lock select combo to a string representation
+    QString locks = ui->cbLockNum->currentText();
 
-    emit __OnReadLockSet(lock_index == 0 ? "" : QString::number(lock_index + 1), dtStart, dtEnd);
+    KCB_DEBUG_TRACE(locks);
+
+    emit __OnReadLockSet(locks, dtStart, dtEnd);
 }
 
 // void CFrmAdminInfo::LocalReadLockSet(QString Locks, QDateTime dtStart, QDateTime dtEnd)
@@ -1571,13 +1644,11 @@ void CFrmAdminInfo::on_btnReadCodes_clicked()
 
 void CFrmAdminInfo::on_btnRead_clicked()
 {
-    //
     QDateTime dtStart = ui->dtStartCodeHistoryList->dateTime();
     QDateTime dtEnd = ui->dtEndCodeHistoryList->dateTime();
-    int lock_index = ui->cbLockNumHistory->currentIndex();
-    Q_ASSERT_X(lock_index > -1, "CFrmAdminInfo::on_btnRead_clicked", "lock_index must be > 0");
+    QString locks = ui->cbLockNumHistory->currentText();
     
-    emit __OnReadLockHistorySet(lock_index == 0 ? "" : QString::number(lock_index + 1), dtStart, dtEnd);
+    emit __OnReadLockHistorySet(locks, dtStart, dtEnd);
 }
 
 void CFrmAdminInfo::onSMTPDialogComplete(CDlgSMTP *dlg)
@@ -1800,6 +1871,9 @@ void CFrmAdminInfo::HandleCodeUpdate()
             item = table->item(_nRowSelected, nCol++);
             item->setText(_pState->getCode2());
             item = table->item(_nRowSelected, nCol++);
+
+            qDebug() << "start time" << _pState->getStartTime().toString() << "end time" << _pState->getEndTime().toString();
+
             item->setText(_pState->getStartTime().toString("MMM dd yyyy hh:mm AP"));
             item = table->item(_nRowSelected, nCol++);
             item->setText(_pState->getEndTime().toString("MMM dd yyyy hh:mm AP"));
@@ -1811,134 +1885,18 @@ void CFrmAdminInfo::HandleCodeUpdate()
     }
 }
 
-// void CFrmAdminInfo::OnCodeEditDoneSave(int nRow, int nId, QString LockNums, 
-//                                        QString sAccessCode,
-//                                        QString sSecondCode, 
-//                                        QString sDescription, 
-//                                        QDateTime dtStart, 
-//                                        QDateTime dtEnd, 
-//                                        bool fingerprint1, bool fingerprint2,
-//                                        bool askQuestions, 
-//                                        QString question1, 
-//                                        QString question2, 
-//                                        QString question3,
-//                                        int access_type)
-// {
-//     Q_UNUSED(fingerprint2);
-
-//     qDebug() << "-------------------CFrmAdminInfo::OnCodeEditDoneSave()-----------------------";
-//     qDebug() << "Parameters:";
-//     qDebug() << "    nRow: " << QString::number(nRow);
-//     qDebug() << "    nId: " << QString::number(nId);
-//     qDebug() << "   LockNums: " << LockNums;
-//     qDebug() << "    sAccessCode: " << sAccessCode;
-//     qDebug() << "    sSecondCode: " << sSecondCode;
-//     qDebug() << "    sDescription: " << sDescription;
-//     qDebug() << "    dtStart: " << dtStart.toString();
-//     qDebug() << "    dtEnd: " << dtEnd.toString();
-//     qDebug() << "    fingerprint1: " << fingerprint1;
-//     qDebug() << "    fingerprint2: " << fingerprint2;
-//     qDebug() << "    askQuestions: " << askQuestions;
-//     qDebug() << "    question1: " << question1;
-//     qDebug() << "    question2: " << question2;
-//     qDebug() << "    question3: " << question3;
-//     qDebug() << "    access_type: " << access_type;
-//     qDebug() << "-------------------CFrmAdminInfo::OnCodeEditDoneSave()-----------------------";
-
-//     _pState->setLockNums(LockNums);
-//     _pState->setCode1(sAccessCode);
-//     _pState->setCode2(sSecondCode);
-//     _pState->setDescription(sDescription);
-//     _pState->setStartTime(dtStart);
-//     _pState->setEndTime(dtEnd);
-
-//     if(fingerprint1)
-//     {
-//         _pState->setFingerprint1();
-//     }
-//     else
-//     {
-//         _pState->clearFingerprint1();
-//     }
-
-//     //qDebug() << "------------------------QUESTION 1: " << question1;
-//     //qDebug() << "------------------------QUESTION 2: " << question2;
-//     //qDebug() << "------------------------QUESTION 3: " << question3;
-
-//     _pState->setAskQuestions(askQuestions);
-//     _pState->setQuestion1(question1);
-//     _pState->setQuestion2(question2);
-//     _pState->setQuestion3(question3);
-
-//     _pState->setMaxAccess(-1); 
-//     _pState->setAccessCount(0);
-//     _pState->setAccessType(access_type);
-
-//     if (access_type == 2)
-//     {
-//         _pState->setMaxAccess(2);
-//     }
-
-//     //qDebug() << "isNew" << _pState->isNew();
-
-//     if(_pState->isNew())
-//     {
-//         qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave() new _pState";
-//         if(_pworkingSet)
-//         {
-//             qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave() adding _pState to _pworkingSet";
-//             _pworkingSet->addToSet(_pState);
-//         }
-//         qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave() emitting __OnUpdateCodeState";
-//         emit __OnUpdateCodeState(_pState);
-//     } 
-//     else 
-//     {
-//         nRow = 0;
-//         int nCol = 0;
-//         QTableWidget    *table = ui->tblCodesList;
-//         QTableWidgetItem    *item;
-//         item = table->item(nRow, nCol++);
-
-//         /* Note: The following code seems to assume dtStart/dtEnd will be datetime, but what about ALWAYS? */
-//         qDebug() << "CFrmAdminInfo::OnCodeEditDoneSave() not new _pState";
-
-//         if(item) {
-//             item->setText(LockNums);
-//             item = table->item(nRow, nCol++);
-//             item->setText(sDescription);
-//             item = table->item(nRow, nCol++);
-//             item->setText(sAccessCode);
-//             item = table->item(nRow, nCol++);
-//             item->setText(sSecondCode);
-//             item = table->item(nRow, nCol++);
-//             qDebug() << "We're assuming start and end are date/time";
-//             item->setText(dtStart.toString("MMM dd yyyy hh:mm AP"));
-//             item = table->item(nRow, nCol++);
-//             item->setText(dtEnd.toString("MMM dd yyyy hh:mm AP"));
-//             item=table->item(nRow, nCol++);
-//         }
-//         _pState->setModified();
-//         emit __OnUpdateCodeState(_pState);
-//     }
-// }
-
 CLockState* CFrmAdminInfo::createNewLockState()
 {
-    int lock_index = ui->cbLockNum->currentIndex();
-    qDebug() << "CFrmAdminInfo::createNewLockState" << lock_index;
-    
-
     CLockState  *pState;
     pState = new CLockState();
     pState->setID(-1);
-    //pState->setLockNum(lockNum);
-    pState->setLockNums(lock_index == 0 ? "" : QString::number(lock_index + 1));
+    pState->setLockNums("");
     pState->setCode1("");
     pState->setCode2("");
     pState->setDescription("");
     pState->setStartTime(QDateTime().currentDateTime());
     pState->setEndTime(QDateTime().currentDateTime());
+    pState->setAskQuestions(false);
 
     /* Set the access type: default is ACCESS_ALWAYS */
     pState->setAccessType(0 /*ACCESS_ALWAYS*/);
@@ -2059,12 +2017,9 @@ void CFrmAdminInfo::OnHeaderSelected(int nHeader)
 
 void CFrmAdminInfo::checkAndCreateCodeEditForm()
 {
-    //if(!_pFrmCodeEdit)
     if(!_pFrmCodeEditMulti)
     {
-        //_pFrmCodeEdit = new CFrmCodeEdit(this);
         _pFrmCodeEditMulti = new FrmCodeEditMulti(this);
-        //_pFrmCodeEdit->setMaxLocks(_tmpAdminRec.getMaxLocks());
         connect(_pFrmCodeEditMulti, SIGNAL(rejected()), this, SLOT(OnCodeEditReject()));
         connect(_pFrmCodeEditMulti, SIGNAL(accepted()), this, SLOT(OnCodeEditAccept()));
 //        connect(_pFrmCodeEdit, SIGNAL(OnDoneSave(int,int,int,QString,QString,QString,QDateTime,QDateTime,bool,bool,bool,QString,QString,QString,int)),
@@ -2082,7 +2037,11 @@ void CFrmAdminInfo::addCodeByRow(int row)
 
     // Get line values
     CLockSet::Iterator itor;
-    _pState = 0;
+    if (_pState)
+    {
+        qDebug() << "Freeing _pState in CFrmAdminInfo::addCodeByRow";
+        _pState = 0;
+    }
 
     _pState = createNewLockState();
     if(!_pworkingSet) 
@@ -2091,7 +2050,6 @@ void CFrmAdminInfo::addCodeByRow(int row)
     }
 
     _pFrmCodeEditMulti->setValues(_pState);                             
-    //_pFrmCodeEdit->setEditingRow(-1);
     _pFrmCodeEditMulti->show();
 }
 
@@ -2101,9 +2059,15 @@ void CFrmAdminInfo::editCodeByRow(int row)
     
     checkAndCreateCodeEditForm();
 
+    qDebug() << "Created CodeEditForm";
+
     // Get line values
     CLockSet::Iterator itor;
-    _pState = 0;
+    if (_pState)
+    {
+        qDebug() << "Freeing _pState in CFrmAdminInfo::editCodeByRow";
+        _pState = 0;
+    }
     int nRow = 0;
 
     qDebug() << "before loop iterator cellClicked";
@@ -2122,7 +2086,6 @@ void CFrmAdminInfo::editCodeByRow(int row)
     if(_pState)
     {
         _pFrmCodeEditMulti->setValues(_pState);                                     
-        //_pFrmCodeEdit->setEditingRow(row);
         _pFrmCodeEditMulti->show();
     }
     else
@@ -2131,7 +2094,6 @@ void CFrmAdminInfo::editCodeByRow(int row)
         _pworkingSet->addToSet(_pState);
 
         _pFrmCodeEditMulti->setValues(_pState);                                     
-        //_pFrmCodeEdit->setEditingRow(-1);
         _pFrmCodeEditMulti->show();
     }
 }
@@ -2142,7 +2104,11 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
 
     // Get line values
     CLockSet::Iterator itor;
-    _pState = 0;
+    if (_pState)
+    {
+        qDebug() << "Freeing _pState in CFrmAdminInfo::deleteCodeByRow";
+        _pState = 0;
+    }
     int nRow = 0;
 
     qDebug() << "before loop iterator cellClicked";
@@ -2181,7 +2147,11 @@ void CFrmAdminInfo::purgeCodes()
 
     // Get line values
     CLockSet::Iterator itor;
-    _pState = 0;
+    if (_pState)
+    {
+        qDebug() << "Freeing _pState in CFrmAdminInfo::purgeCodes";
+        _pState = 0;
+    }
     int nRow = 0;
 
     if(!_pworkingSet)
@@ -2223,9 +2193,10 @@ void CFrmAdminInfo::on_tblCodesList_cellClicked(int row, int column)
 void CFrmAdminInfo::on_btnRebootSystem_clicked()
 {
     int nRC = QMessageBox::warning(this, tr("Verify System Reboot"),
-                                   tr("System is about to be restarted.\nDo you want to restart?"),
+                                   tr("System will be restarted.\nDo you want to restart?"),
                                    QMessageBox::Yes, QMessageBox::Cancel);
-    if(nRC == QMessageBox::Yes) {
+    if(nRC == QMessageBox::Yes)
+    {
         sync();
         std::system("sudo shutdown -r now");
     }
@@ -2233,15 +2204,16 @@ void CFrmAdminInfo::on_btnRebootSystem_clicked()
 
 void CFrmAdminInfo::on_btnPurgeCodes_clicked()
 {
-    qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
+    KCB_DEBUG_ENTRY;
 
     on_btnReadCodes_clicked();
 
     int nRC = QMessageBox::warning(this, tr("Verify Remove All Codes"),
                                    tr("All access codes will be removed from the system\nDo you want to continue?"),
                                    QMessageBox::Yes, QMessageBox::Cancel);
-    if(nRC == QMessageBox::Yes) {
-        qDebug() << "CFrmAdminInfo::on_btnPurgeCodes_clicked()";
+    if(nRC == QMessageBox::Yes)
+    {
+        KCB_DEBUG_TRACE("Yes Selected");
         purgeCodes();
         usleep(50000);
 
@@ -2262,7 +2234,7 @@ void CFrmAdminInfo::OnTabSelected(int index)
     ui->dtEndCodeList->setDateTime(dt);
 
     // Force the codes to be read into the codes tab
-    //emit ui->btnReadCodes->clicked();
+    emit ui->btnReadCodes->clicked();
     emit ui->btnRead->clicked();
 
 }

@@ -47,11 +47,11 @@
     <enum>Qt::Vertical</enum>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbQuestions">
+  <widget class="QPushButton" name="pbEditQuestions">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>160</y>
+     <x>80</x>
+     <y>220</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -62,7 +62,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Questions</string>
+    <string>Edit Questions</string>
    </property>
   </widget>
   <widget class="QWidget" name="horizontalLayoutWidget">
@@ -80,7 +80,7 @@
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>150</y>
+     <y>130</y>
      <width>70</width>
      <height>23</height>
     </rect>
@@ -97,7 +97,7 @@
   <widget class="QLabel" name="lblStartAccess">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>20</x>
      <y>330</y>
      <width>101</width>
      <height>31</height>
@@ -131,7 +131,7 @@
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>60</y>
+     <y>50</y>
      <width>100</width>
      <height>23</height>
     </rect>
@@ -151,7 +151,7 @@
   <widget class="QLabel" name="lblEndAccess">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>20</x>
      <y>375</y>
      <width>101</width>
      <height>31</height>
@@ -233,7 +233,7 @@
    <property name="geometry">
     <rect>
      <x>13</x>
-     <y>100</y>
+     <y>90</y>
      <width>401</width>
      <height>41</height>
     </rect>
@@ -281,7 +281,7 @@
    <property name="geometry">
     <rect>
      <x>12</x>
-     <y>220</y>
+     <y>170</y>
      <width>401</width>
      <height>29</height>
     </rect>
@@ -372,6 +372,72 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QCheckBox" name="cbEnableQuestions">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>220</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Enable</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblStartAccessTextOverlay">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>320</y>
+     <width>301</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Start Access Text Overlay</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblEndAccessTextOverlay">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>360</y>
+     <width>301</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>End Access Text Overlay</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
   </widget>
  </widget>
  <customwidgets>

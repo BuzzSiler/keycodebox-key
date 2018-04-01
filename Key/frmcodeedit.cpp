@@ -268,7 +268,9 @@ void CFrmCodeEdit::on_chkFingerPrint1_clicked(bool checked)
 {
     Q_UNUSED(checked);
     if( ui->chkFingerPrint2->isChecked() )
+    {
         ui->chkFingerPrint2->setChecked(false);
+    }
 
     ui->edtAccessCode->setDisabled(false);
     ui->edtSecondCode->setDisabled(false);

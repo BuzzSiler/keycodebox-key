@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QLineEdit>
 
+class QMouseEvent;
+
 class CClickableLineEdit : public QLineEdit
 {
     Q_OBJECT

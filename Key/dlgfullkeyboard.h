@@ -20,13 +20,10 @@ public:
     explicit CDlgFullKeyboard(QWidget *parent = 0);
     ~CDlgFullKeyboard();
 
-public:
     void setCurrentEdit(CCurrentEdit *pEdit);
-//    {
-//        _pcurrentEdit = pEdit;
-//        _pcurrentEdit->setKeyboardEditLine(this->ui->);
-//    }
     CCurrentEdit* getCurrentEdit() { return _pcurrentEdit; }
+
+    void numbersOnly(bool state);
 
 private:
     Ui::CDlgFullKeyboard *ui;
@@ -40,14 +37,12 @@ private:
     void onTextEntered();
     void hideKeyboard(bool bHide);
     void onDelete();
-
     void makeLower();
-
     void makeUpper();
 
 public:
-    const QLineEdit &getLineEdit(); // { return ui->edText; }
-    const QLabel &getLabel(); // { return ui->lblCurrentEditFieldName; }
+    const QLineEdit &getLineEdit();
+    const QLabel &getLabel();
     void setActive();
 
 public slots:

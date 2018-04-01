@@ -4,15 +4,19 @@
 #include <QDebug>
 #include <QTouchEvent>
 #include <QMessageBox>
+#include <QDir>
 #include "lockcabinetwidget.h"
 #include "lockstate.h"
 #include "dlgnumberpad.h"
+#include "dlgfullkeyboard.h"
+#include "currentedit.h"
+#include "kcbcommon.h"
+#include "kcbkeyboarddialog.h"
+#include "dlgeditquestions.h"
 
 FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     QDialog(parent),
-    m_access_type(0),
     m_lock_cab(* new LockCabinetWidget(this, 2)),
-    m_num_pad(* new DlgNumberPad(this)),
     ui(new Ui::FrmCodeEditMulti)
 {
     ui->setupUi(this);
@@ -21,24 +25,30 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
 
     FrmCodeEditMulti::showFullScreen();
 
-    connect(ui->edCode1, SIGNAL(clicked()), this, SLOT(on_edCode1_clicked()));
-    connect(ui->edCode2, SIGNAL(clicked()), this, SLOT(on_edCode2_clicked()));
-    connect(ui->edUsername, SIGNAL(clicked()), this, SLOT(on_edUsername_clicked()));
-
-    connect(&m_num_pad, SIGNAL(NotifyAccepted()), this, SLOT(OnAccepted()));
-    connect(&m_num_pad, SIGNAL(NotifyRejected()), this, SLOT(OnRejected()));
-
     connect(&m_lock_cab, SIGNAL(NotifyLockSelected(QString, bool)), this, SLOT(OnNotifyLockSelected(QString, bool)));
 
     ui->hloLockCabinet->addWidget(&m_lock_cab);
 
+    updateAccessType(ACCESS_TYPE_ALWAYS);
     ui->dtStartAccess->setDateTime(QDateTime::currentDateTime());
+    ui->dtStartAccess->setVisible(false);
     ui->dtEndAccess->setDateTime(QDateTime::currentDateTime());
-    updateAccessType(0);
+    ui->dtEndAccess->setVisible(false);
+
+    ui->lblStartAccessTextOverlay->setText(tr("ALWAYS"));
+    ui->lblStartAccessTextOverlay->setVisible(true);
+    ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
+    ui->lblEndAccessTextOverlay->setVisible(true);
+
     ui->edCode1->setText("");
     ui->edCode2->setText("");
+    ui->cbEnableCode2->setChecked(false);
     ui->edUsername->setText("");
-    m_questions.clear();
+
+    ui->cbEnableQuestions->setEnabled(true);
+    ui->cbEnableQuestions->setChecked(false);
+    ui->pbEditQuestions->setDisabled(true);
+    resetQuestions();
 
     updateUi();
 }
@@ -48,41 +58,71 @@ FrmCodeEditMulti::~FrmCodeEditMulti()
     delete ui;
 }
 
+void FrmCodeEditMulti::resetQuestions()
+{
+    m_questions.clear();
+    m_questions.append("");
+    m_questions.append("");
+    m_questions.append("");
+}
+
+void FrmCodeEditMulti::displayWarning(QWidget* p_widget, bool is_valid)
+{
+    QPalette palette;
+    palette.setColor(QPalette::Base, is_valid ? Qt::white : Qt::red);
+    p_widget->setPalette(palette);
+}
+
 void FrmCodeEditMulti::setValues(CLockState * const state)
 {
     qDebug() << "FrmCodeEditMulti::setValues";
     state->show();
 
-    m_lock_cab.clrAllLocks();
+    // Set the code state to the current values Lock State for tracking changes
+    m_code_state.code1 = state->getCode1();
+    m_code_state.code2_enabled = state->getCode2() != "";
+    m_code_state.code2 = state->getCode2();
+    m_code_state.username = state->getDescription();
+    m_code_state.start_datetime = state->getStartTime();
+    m_code_state.end_datetime = state->getEndTime();
+    m_code_state.questions_enabled = state->getAskQuestions();
+    m_code_state.question1 = "";
+    m_code_state.question2 = "";
+    m_code_state.question3 = "";
+    m_code_state.fp_enabled = state->getFingerprint1();
+    m_code_state.access_type = state->getAccessType();
+    m_code_state.locks = state->getLockNums();
+    m_code_state.question1 = state->getQuestion1();
+    m_code_state.question2 = state->getQuestion2();
+    m_code_state.question3 = state->getQuestion3();
 
-    ui->edCode1->setText(state->getCode1());
-    if (state->getCode2() != "")
-    {
-        ui->edCode2->setText(state->getCode2());
-        ui->cbEnableCode2->setEnabled(true);
-    }
-    ui->edUsername->setText(state->getDescription());
-    ui->dtStartAccess->setDateTime(state->getStartTime());
-    ui->dtEndAccess->setDateTime(state->getEndTime());
-    //ui->cbFingerprint->setEnabled(state->getFingerprint1());
+    // Set up the UI based on current Lock State
+    ui->edCode1->setText(m_code_state.code1);
+    ui->edCode2->setText(m_code_state.code2);
+    ui->cbEnableCode2->setEnabled(m_code_state.code2_enabled);
+    ui->cbEnableCode2->setChecked(m_code_state.code2_enabled);
+    ui->edCode2->setEnabled(m_code_state.code2_enabled);
+    ui->edUsername->setText(m_code_state.username);
 
-    m_questions.clear();
-    ui->pbQuestions->setEnabled(state->getAskQuestions());
-    if (state->getAskQuestions())
-    {
-        m_questions.append(state->getQuestion1());
-        m_questions.append(state->getQuestion2());
-        m_questions.append(state->getQuestion3());
-    }
+    // Note: updateAccessType controls date/time and text overlays including
+    // setting the start/end date/time to the current date/time.  We want to
+    // leverage that functionality.  But, since we want to set the start/end
+    // date/time to the provided values, we set the start/end date/time after
+    // calling updateAccessType [just in case you were wondering :-)].
+    updateAccessType(m_code_state.access_type);
+    ui->dtStartAccess->setDateTime(m_code_state.start_datetime);
+    ui->dtEndAccess->setDateTime(m_code_state.end_datetime);
 
-    updateAccessType(state->getAccessType());
+    ui->cbFingerprint->setChecked(m_code_state.fp_enabled);
+    ui->cbEnableQuestions->setChecked(m_code_state.questions_enabled);
+    ui->pbEditQuestions->setEnabled(m_code_state.questions_enabled);
+    resetQuestions();
 
     m_lock_cab.enableAllLocks();
     m_lock_cab.clrAllLocks();
-    m_lock_cab.setSelectedLocks(state->getLockNums());
+    m_lock_cab.setSelectedLocks(m_code_state.locks);
 
     updateUi();
-    updateExitState();
 }
 
 void FrmCodeEditMulti::getValues(CLockState * const state)
@@ -93,44 +133,68 @@ void FrmCodeEditMulti::getValues(CLockState * const state)
     state->setStartTime(ui->dtStartAccess->dateTime());
     state->setEndTime(ui->dtEndAccess->dateTime());
     ui->cbFingerprint->isChecked() ? state->setFingerprint1() : state->clearFingerprint1();
-    state->setAskQuestions(ui->pbQuestions->isChecked());
-    if (ui->pbQuestions->isChecked())
-    {
-        state->setQuestion1(m_questions[0]);
-        state->setQuestion2(m_questions[1]);
-        state->setQuestion3(m_questions[2]);
-    }
+    state->setAskQuestions(ui->cbEnableQuestions->isChecked());
+    state->setQuestion1(m_questions[0]);
+    state->setQuestion2(m_questions[1]);
+    state->setQuestion3(m_questions[2]);
 
+    state->setStartTime(ui->dtStartAccess->dateTime());
+    state->setEndTime(ui->dtEndAccess->dateTime());
+    state->setAccessCount(0);
+    state->setMaxAccess(ui->cbAccessType->currentIndex() == ACCESS_TYPE_LIMITED_USE ? 2 : -1);
     state->setAccessType(ui->cbAccessType->currentIndex());
     state->setLockNums(m_lock_cab.getSelectedLocks());
-    //state->show();
+    state->show();
 }
 
 void FrmCodeEditMulti::updateAccessType(int index)
 {
-    m_access_type = index;
 
-    switch (m_access_type)
+    Q_ASSERT_X(index >= ACCESS_TYPE_ALWAYS && index <= ACCESS_TYPE_LIMITED_USE,
+               Q_FUNC_INFO,
+               "access type index out of range");
+
+    bool is_timed = index == ACCESS_TYPE_TIMED;
+
+    ui->cbAccessType->setCurrentIndex(index);
+
+    ui->dtStartAccess->setEnabled(is_timed);
+    ui->dtEndAccess->setEnabled(is_timed);
+    ui->dtStartAccess->setVisible(is_timed);
+    ui->dtEndAccess->setVisible(is_timed);
+
+    ui->lblStartAccessTextOverlay->setVisible(!is_timed);
+    ui->lblStartAccessTextOverlay->setEnabled(!is_timed);
+    ui->lblEndAccessTextOverlay->setVisible(!is_timed);
+    ui->lblEndAccessTextOverlay->setEnabled(!is_timed);
+
+    switch (index)
     {
-        case 0: // ALWAYS
-            ui->cbAccessType->setCurrentIndex(0);
-            ui->dtStartAccess->setDisabled(true);
-            ui->dtEndAccess->setDisabled(true);
+        case ACCESS_TYPE_TIMED:
+            {
+            QDateTime curr = QDateTime::currentDateTime();
+            // Note: There are checks for start/end access so we set the same date/time to both
+            ui->dtStartAccess->setDateTime(curr);
+            ui->dtEndAccess->setDateTime(curr);
+            }
             break;
-        case 1: // TIMED
-            ui->cbAccessType->setCurrentIndex(1);
-            ui->dtStartAccess->setEnabled(true);
-            ui->dtEndAccess->setEnabled(true);
+
+        case ACCESS_TYPE_LIMITED_USE:
+            ui->lblStartAccessTextOverlay->setText(tr("LIMITED USE (Take/Return only)"));
+            ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
+            ui->dtStartAccess->setDateTime(_DATENONE);
+            ui->dtEndAccess->setDateTime(_DATENONE);
             break;
-        case 2: // LIMITED_USE
-            ui->cbAccessType->setCurrentIndex(2);
-            ui->dtStartAccess->setDisabled(true);
-            ui->dtEndAccess->setDisabled(true);
-            break;
+
+        case ACCESS_TYPE_ALWAYS:
         default:
-            ui->cbAccessType->setCurrentIndex(0);
+            ui->lblStartAccessTextOverlay->setText(tr("ALWAYS"));
+            ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
+            ui->dtStartAccess->setDateTime(_DATENONE);
+            ui->dtEndAccess->setDateTime(_DATENONE);
             break;
     }
+
 }
 
 void FrmCodeEditMulti::on_pbClearCode1_clicked()
@@ -152,93 +216,140 @@ void FrmCodeEditMulti::on_pbClearUsername_clicked()
     updateUi();
 }
 
-void FrmCodeEditMulti::on_pbQuestions_clicked()
+void FrmCodeEditMulti::on_pbEditQuestions_clicked()
 {
-    // Show Questions dialog
-    // CDlgQuestions dlg;
-    // dlg.setQuestions(m_questions);
-    // if (dlg.exec())
-    // {
-    //     m_questions = dlg.getQuestions();
-    // }
+    CDlgEditQuestions *eq = new CDlgEditQuestions();
+    eq->setValues(m_questions);
+    if (eq->exec())
+    {
+        eq->getValues(m_questions);
+    }
+
+    updateUi();
+}
+
+void FrmCodeEditMulti::on_cbEnableQuestions_stateChanged(int arg1)
+{
+    bool result = arg1 == Qt::Checked ? true : false;
+
+    ui->pbEditQuestions->setEnabled(result);
+    if (!result)
+    {
+        resetQuestions();
+    }
+
+    updateUi();
 }
 
 void FrmCodeEditMulti::on_cbAccessType_currentIndexChanged(int index)
 {
     updateAccessType(index);
+    updateUi();
 }
 
 void FrmCodeEditMulti::on_dtStartAccess_dateTimeChanged(const QDateTime &dateTime)
 {
-    // update start access date/time
+    Q_UNUSED(dateTime);
+    if (ui->dtStartAccess->isEnabled())
+    {
+        updateUi();
+    }
 }
 
 void FrmCodeEditMulti::on_dtEndAccess_dateTimeChanged(const QDateTime &dateTime)
 {
-    // update end access date/time
+    Q_UNUSED(dateTime);
+    if (ui->dtEndAccess->isEnabled())
+    {
+        updateUi();
+    }
 }
+
+//void FrmCodeEditMulti::showKeyboard(CClickableLineEdit* ple, bool numOnly)
+//{
+//    KCB_DEBUG_ENTRY;
+//    CCurrentEdit *curr_edit = new CCurrentEdit();
+//    Q_ASSERT_X(curr_edit != nullptr, Q_FUNC_INFO, "current is null");
+//    KCB_DEBUG_TRACE("curr_edit" << curr_edit);
+//    curr_edit->setKeyboardEditLine(ple);
+//    KCB_DEBUG_TRACE("setKeyboardEditLine");
+//    curr_edit->setOriginalTextToEdit(ple->text());
+//    KCB_DEBUG_TRACE("setOriginalTextToEdit");
+//    m_keyboard->setCurrentEdit(curr_edit);
+//    KCB_DEBUG_TRACE("setCurrentEdit");
+//    m_keyboard->numbersOnly(numOnly);
+//    KCB_DEBUG_TRACE("numbersOnly");
+//    m_keyboard->setActive();
+//    KCB_DEBUG_TRACE("setActive");
+//    KCB_DEBUG_EXIT;
+//}
 
 void FrmCodeEditMulti::on_edCode1_clicked()
 {
-    // In the short term, we are using the number pad to enter a manual code.
-    // Thinking forward, we can add a 'code source' drop down box in which the
-    // user will select the 'code source', e.g., manual, hid, barcode, fingerprint,
-    // magstipe, etc., and then we can prompt with an appropriate dialog which
-    // can then be wired to the appropriate device input.
-    m_num_pad.setValue(ui->edCode1->text());
-    m_num_pad.show();
-    m_p_line_edit = ui->edCode1;        
+    KcbKeyboardDialog kkd;
+
+    kkd.numbersOnly(true);
+    kkd.setValue(ui->edCode1->text());
+    if (kkd.exec())
+    {
+        ui->edCode1->setText(kkd.getValue());
+    }
 }
 
 void FrmCodeEditMulti::on_edCode2_clicked()
 {
     if (ui->edCode2->isEnabled())
     {
-        m_num_pad.setValue(ui->edCode2->text());
-        m_num_pad.show();
-        m_p_line_edit = ui->edCode2;
+        KcbKeyboardDialog kkd;
+
+        kkd.numbersOnly(true);
+        kkd.setValue(ui->edCode2->text());
+        if (kkd.exec())
+        {
+            ui->edUsername->setText(kkd.getValue());
+        }
     }
 }
 
 void FrmCodeEditMulti::on_edUsername_clicked()
 {
-    m_num_pad.setValue(ui->edUsername->text());
-    m_num_pad.show();
-    m_p_line_edit = ui->edUsername;
-}
+    KcbKeyboardDialog kkd;
 
-void FrmCodeEditMulti::OnAccepted()
-{
-    qDebug() << "Received NotifyAccepted";
-
-    QString value;
-    m_num_pad.getValue(value);
-
-    if (value != m_p_line_edit->text())
+    kkd.numbersOnly(false);
+    kkd.setValue(ui->edUsername->text());
+    if (kkd.exec())
     {
-        m_p_line_edit->setText(value);
+        ui->edUsername->setText(kkd.getValue());
     }
-    m_num_pad.hide();
-
-    updateUi();
-    updateExitState();
 }
 
-void FrmCodeEditMulti::OnRejected()
-{
-    qDebug() << "Receved NotifyRejected";
-    m_num_pad.hide();
-}
+//void FrmCodeEditMulti::OnKeyboardTextEntered(CDlgFullKeyboard* keyboard, CCurrentEdit* currEdit)
+//{
+//    //Q_UNUSED(keyboard);
+//    //Q_UNUSED(currEdit);
+
+//    Q_ASSERT_X(keyboard != nullptr, Q_FUNC_INFO, "keyboard is null");
+//    Q_ASSERT_X(currEdit != nullptr, Q_FUNC_INFO, "currEdit is null");
+
+//    KCB_DEBUG_ENTRY;
+
+//    currEdit->getLineBeingEdited()->setText(currEdit->getNewText());
+//    keyboard->hide();
+//    updateUi();
+
+//    KCB_DEBUG_EXIT;
+//}
 
 void FrmCodeEditMulti::OnNotifyLockSelected(QString lock, bool is_selected)
 {
-    qDebug() << "Lock:" << lock << "Is Selected:" << is_selected;
-    updateExitState();
+    qDebug() << "Lock:" << lock << "Is Selected:" << is_selected << "Locks:" << m_lock_cab.getSelectedLocks();
+    updateUi();
 }
 
 void FrmCodeEditMulti::on_cbEnableCode2_stateChanged(int arg1)
 {
     bool result = arg1 == Qt::Checked ? true : false;
+
     ui->edCode2->setEnabled(result);
     if (!result)
     {
@@ -246,27 +357,171 @@ void FrmCodeEditMulti::on_cbEnableCode2_stateChanged(int arg1)
     }
 
     updateUi();
-    updateExitState();
 }
 
-void FrmCodeEditMulti::updateExitState()
+bool FrmCodeEditMulti::isModified()
 {
-    bool code1_valid = ui->edCode1->text() != "";
-    bool code2_valid = !ui->cbEnableCode2->isChecked() || (ui->cbEnableCode2->isChecked() && ui->edCode2->text() != "");
+    bool code1_changed = m_code_state.code1 != ui->edCode1->text();
+    bool fp_changed = m_code_state.fp_enabled != ui->cbFingerprint->isChecked();
+    bool code2_changed = m_code_state.code2_enabled != ui->cbEnableCode2->isChecked() || m_code_state.code2 != ui->edCode2->text();
+    bool username_changed = m_code_state.username != ui->edUsername->text();
+    bool locks_changed = m_code_state.locks != m_lock_cab.getSelectedLocks();
+    bool accesstype_changed = m_code_state.access_type != ui->cbAccessType->currentIndex();
+    bool datetime_changed = (ui->dtStartAccess->isEnabled() && (m_code_state.start_datetime != ui->dtStartAccess->dateTime())) ||
+                            (ui->dtEndAccess->isEnabled() && (m_code_state.end_datetime != ui->dtEndAccess->dateTime()));
+    bool questions_changed = m_code_state.questions_enabled != ui->cbEnableQuestions->isChecked() ||
+                             m_code_state.question1 != m_questions[0] ||
+                             m_code_state.question2 != m_questions[1] ||
+                             m_code_state.question3 != m_questions[2];
 
-    bool result = code1_valid && code2_valid && m_lock_cab.getSelectedLocks() != "";
+    qDebug() << "Code1 Changed" << code1_changed;
+    qDebug() << "FP Changed" << fp_changed;
+    qDebug() << "Code2 Changed" << code2_changed;
+    qDebug() << "Username Changed" << username_changed;
+    qDebug() << "Locks Changed" << locks_changed;
+    qDebug() << "Access Type Changed" << accesstype_changed;
+    qDebug() << "DateTime Changed" << datetime_changed;
+    qDebug() << "Questions Changed" << questions_changed;
 
-    qDebug() << "updateExitState" << result;
-    ui->bbSaveCancel->button(QDialogButtonBox::Save)->setEnabled(result);
+    return code1_changed || fp_changed || code2_changed || username_changed ||
+           accesstype_changed || locks_changed || questions_changed ||
+           datetime_changed;
 }
 
 void FrmCodeEditMulti::updateUi()
 {
+    // Update UI
     ui->cbEnableCode2->setDisabled(ui->edCode1->text() == "");
     ui->edCode2->setEnabled(ui->cbEnableCode2->isChecked() && ui->edCode1->text() != "");
 
     ui->pbClearCode1->setDisabled(ui->edCode1->text() == "");
     ui->pbClearCode2->setDisabled(ui->edCode2->text() == "");
     ui->pbClearUsername->setDisabled(ui->edUsername->text() == "");
+
+    // Note:
+    // If fingerprint is enabled, code 2 is not allowed and will be cleared
+    if (ui->cbFingerprint->isChecked())
+    {
+        ui->edCode2->setText("");
+        ui->edCode2->setDisabled(true);
+        ui->cbEnableCode2->setDisabled(true);
+    }
+
+    // Update exit condition
+    bool code1_valid_text = ui->edCode1->text() != "";
+    bool code2_valid_text = ui->edCode2->text() != "";
+    bool code2_valid = !ui->cbEnableCode2->isChecked() || (ui->cbEnableCode2->isChecked() && code2_valid_text);
+    bool fp_valid = !ui->cbFingerprint->isChecked() || (ui->cbFingerprint->isChecked() && code1_valid_text);
+    bool locks_valid = m_lock_cab.getSelectedLocks() != "";    
+    bool start_end_valid = ui->cbAccessType->currentIndex() == ACCESS_TYPE_ALWAYS ||
+                           ui->cbAccessType->currentIndex() == ACCESS_TYPE_LIMITED_USE ||
+                           (
+                               (ui->cbAccessType->currentIndex() == ACCESS_TYPE_TIMED) &&
+                               (ui->dtEndAccess->dateTime() > ui->dtStartAccess->dateTime())
+                           );
+    bool questions_valid = !ui->cbEnableQuestions->isChecked() ||
+                           (ui->cbEnableQuestions->isChecked() &&
+                            (m_questions[0] != "" || m_questions[1] != "" || m_questions[2] != ""));
+
+    displayWarning(qobject_cast<QWidget *>(ui->edCode1), code1_valid_text);
+    displayWarning(qobject_cast<QWidget *>(ui->cbFingerprint), fp_valid);
+    displayWarning(qobject_cast<QWidget *>(ui->edCode2), code2_valid);
+    displayWarning(qobject_cast<QWidget *>(ui->cbEnableCode2), code2_valid);
+    displayWarning(qobject_cast<QWidget *>(ui->dtStartAccess), start_end_valid);
+    displayWarning(qobject_cast<QWidget *>(ui->dtEndAccess), start_end_valid);
+    displayWarning(qobject_cast<QWidget *>(ui->cbEnableQuestions), questions_valid);
+    displayWarning(qobject_cast<QWidget *>(ui->pbEditQuestions), questions_valid);
+    if (locks_valid)
+    {
+        m_lock_cab.clrWarning();
+    }
+    else
+    {
+        m_lock_cab.setWarning();
+    }
+
+    qDebug() << "Exit Condition:";
+//    qDebug() << "\tModified:" << isModified();
+//    qDebug() << "\tCode1 Text:" << code1_valid_text;
+//    qDebug() << "\tCode2 Text:" << code2_valid_text;
+//    qDebug() << "\tCode2 Valid:" << code2_valid;
+//    qDebug() << "\tFP Valid:" << fp_valid;
+//    qDebug() << "\tSelected Locks:" << locks_valid;
+//    qDebug() << "\tStart/End:" << start_end_valid;
+    qDebug() << "\tQuestions:" << questions_valid;
+
+    bool valid_exit = isModified() &&
+                      code1_valid_text &&
+                      code2_valid &&
+                      fp_valid &&
+                      locks_valid &&
+                      start_end_valid &&
+                      questions_valid;
+
+    ui->bbSaveCancel->button(QDialogButtonBox::Save)->setEnabled(valid_exit);
 }
 
+void FrmCodeEditMulti::clrCodeState()
+{
+    m_code_state.code1 = "";
+    m_code_state.code2 = "";
+    m_code_state.code2_enabled = false;
+    m_code_state.fp_enabled = false;
+    m_code_state.access_type = 0;
+    m_code_state.locks = "";
+    m_code_state.question1 = "";
+    m_code_state.question2 = "";
+    m_code_state.question3 = "";
+    m_code_state.questions_enabled = false;
+}
+
+void FrmCodeEditMulti::on_bbSaveCancel_accepted()
+{
+    clrCodeState();
+}
+
+void FrmCodeEditMulti::on_bbSaveCancel_rejected()
+{
+    clrCodeState();
+}
+
+void FrmCodeEditMulti::on_cbFingerprint_clicked()
+{
+    if (ui->cbFingerprint->isChecked())
+    {
+        QString title = tr("Warning! Adding Fingerprint Authentication");
+        QString message = tr("You are enabling fingerprint authentication.\n"
+                             "Fingerprint authentication is allowed only for Code #1.\n"
+                             "If Code #2 is set, it will be cleared and disabled.\n"
+                             "Do you want to continue?");
+
+        int nRC = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::Cancel);
+
+        if( nRC == QMessageBox::Cancel )
+        {
+            ui->cbFingerprint->setChecked(false);
+        }
+    }
+    else
+    {
+        QString printDirectory = "/home/pi/run/prints/" + ui->edCode1->text();
+        if( QDir(printDirectory).exists() )
+        {
+            QString title = tr("Verify Fingerprint Scan Removal");
+            QString message = tr("Saved fingerprint scan exists for this code.\n"
+                                 "Do you want to remove it?");
+            int nRC = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::Cancel);
+            if (nRC == QMessageBox::Yes)
+            {
+                std::system( ("sudo rm -rf " + printDirectory.toStdString()).c_str());
+            }
+            else
+            {
+                ui->cbFingerprint->setChecked(true);
+            }
+
+        }
+    }
+
+    updateUi();
+}
