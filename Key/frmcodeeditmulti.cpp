@@ -78,6 +78,8 @@ void FrmCodeEditMulti::setValues(CLockState * const state)
     qDebug() << "FrmCodeEditMulti::setValues";
     state->show();
 
+    resetQuestions();
+
     // Set the code state to the current values Lock State for tracking changes
     m_code_state.code1 = state->getCode1();
     m_code_state.code2_enabled = state->getCode2() != "";
@@ -116,7 +118,9 @@ void FrmCodeEditMulti::setValues(CLockState * const state)
     ui->cbFingerprint->setChecked(m_code_state.fp_enabled);
     ui->cbEnableQuestions->setChecked(m_code_state.questions_enabled);
     ui->pbEditQuestions->setEnabled(m_code_state.questions_enabled);
-    resetQuestions();
+    m_questions[0] = m_code_state.question1;
+    m_questions[1] = m_code_state.question2;
+    m_questions[2] = m_code_state.question3;
 
     m_lock_cab.enableAllLocks();
     m_lock_cab.clrAllLocks();
@@ -265,25 +269,6 @@ void FrmCodeEditMulti::on_dtEndAccess_dateTimeChanged(const QDateTime &dateTime)
     }
 }
 
-//void FrmCodeEditMulti::showKeyboard(CClickableLineEdit* ple, bool numOnly)
-//{
-//    KCB_DEBUG_ENTRY;
-//    CCurrentEdit *curr_edit = new CCurrentEdit();
-//    Q_ASSERT_X(curr_edit != nullptr, Q_FUNC_INFO, "current is null");
-//    KCB_DEBUG_TRACE("curr_edit" << curr_edit);
-//    curr_edit->setKeyboardEditLine(ple);
-//    KCB_DEBUG_TRACE("setKeyboardEditLine");
-//    curr_edit->setOriginalTextToEdit(ple->text());
-//    KCB_DEBUG_TRACE("setOriginalTextToEdit");
-//    m_keyboard->setCurrentEdit(curr_edit);
-//    KCB_DEBUG_TRACE("setCurrentEdit");
-//    m_keyboard->numbersOnly(numOnly);
-//    KCB_DEBUG_TRACE("numbersOnly");
-//    m_keyboard->setActive();
-//    KCB_DEBUG_TRACE("setActive");
-//    KCB_DEBUG_EXIT;
-//}
-
 void FrmCodeEditMulti::on_edCode1_clicked()
 {
     KcbKeyboardDialog kkd;
@@ -323,23 +308,6 @@ void FrmCodeEditMulti::on_edUsername_clicked()
     }
 }
 
-//void FrmCodeEditMulti::OnKeyboardTextEntered(CDlgFullKeyboard* keyboard, CCurrentEdit* currEdit)
-//{
-//    //Q_UNUSED(keyboard);
-//    //Q_UNUSED(currEdit);
-
-//    Q_ASSERT_X(keyboard != nullptr, Q_FUNC_INFO, "keyboard is null");
-//    Q_ASSERT_X(currEdit != nullptr, Q_FUNC_INFO, "currEdit is null");
-
-//    KCB_DEBUG_ENTRY;
-
-//    currEdit->getLineBeingEdited()->setText(currEdit->getNewText());
-//    keyboard->hide();
-//    updateUi();
-
-//    KCB_DEBUG_EXIT;
-//}
-
 void FrmCodeEditMulti::OnNotifyLockSelected(QString lock, bool is_selected)
 {
     qDebug() << "Lock:" << lock << "Is Selected:" << is_selected << "Locks:" << m_lock_cab.getSelectedLocks();
@@ -374,14 +342,14 @@ bool FrmCodeEditMulti::isModified()
                              m_code_state.question2 != m_questions[1] ||
                              m_code_state.question3 != m_questions[2];
 
-    qDebug() << "Code1 Changed" << code1_changed;
-    qDebug() << "FP Changed" << fp_changed;
-    qDebug() << "Code2 Changed" << code2_changed;
-    qDebug() << "Username Changed" << username_changed;
-    qDebug() << "Locks Changed" << locks_changed;
-    qDebug() << "Access Type Changed" << accesstype_changed;
-    qDebug() << "DateTime Changed" << datetime_changed;
-    qDebug() << "Questions Changed" << questions_changed;
+//    qDebug() << "Code1 Changed" << code1_changed;
+//    qDebug() << "FP Changed" << fp_changed;
+//    qDebug() << "Code2 Changed" << code2_changed;
+//    qDebug() << "Username Changed" << username_changed;
+//    qDebug() << "Locks Changed" << locks_changed;
+//    qDebug() << "Access Type Changed" << accesstype_changed;
+//    qDebug() << "DateTime Changed" << datetime_changed;
+//    qDebug() << "Questions Changed" << questions_changed;
 
     return code1_changed || fp_changed || code2_changed || username_changed ||
            accesstype_changed || locks_changed || questions_changed ||
@@ -421,7 +389,9 @@ void FrmCodeEditMulti::updateUi()
                            );
     bool questions_valid = !ui->cbEnableQuestions->isChecked() ||
                            (ui->cbEnableQuestions->isChecked() &&
-                            (m_questions[0] != "" || m_questions[1] != "" || m_questions[2] != ""));
+                            (m_questions[0] != "" ||
+                             m_questions[1] != "" ||
+                             m_questions[2] != ""));
 
     displayWarning(qobject_cast<QWidget *>(ui->edCode1), code1_valid_text);
     displayWarning(qobject_cast<QWidget *>(ui->cbFingerprint), fp_valid);
