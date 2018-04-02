@@ -121,9 +121,9 @@ void CSystemController::OnVerifyFingerprintDialogCancel()
     startTimeoutTimer(1000);
 }
 
-void CSystemController::TrigQuestionUser(QString doorNums, QString question1, QString question2, QString question3)
+void CSystemController::TrigQuestionUser(QString lockNums, QString question1, QString question2, QString question3)
 {
-    Q_UNUSED(doorNums);
+    Q_UNUSED(lockNums);
     Q_UNUSED(question1);
     Q_UNUSED(question2);
     Q_UNUSED(question3);
@@ -131,12 +131,12 @@ void CSystemController::TrigQuestionUser(QString doorNums, QString question1, QS
     stopTimeoutTimer();
 }
 
-void CSystemController::AnswerUserSave(QString doorNums, QString question1, QString question2, QString question3)
+void CSystemController::AnswerUserSave(QString lockNums, QString question1, QString question2, QString question3)
 {
     qDebug() << "CSystemController::QuestionUserSave()";
     //emit signal to security model/controller here
-    qDebug() << "CSystemController::AnswerUserSave(), emitting AnswerUserSave(): " << doorNums << ", " << question1 << ", " << question2 << ", " << question3;
-    emit __onQuestionUserAnswers(doorNums, question1, question2, question3);
+    qDebug() << "CSystemController::AnswerUserSave(), emitting AnswerUserSave(): " << lockNums << ", " << question1 << ", " << question2 << ", " << question3;
+    emit __onQuestionUserAnswers(lockNums, question1, question2, question3);
 }
 
 void CSystemController::QuestionUserCancel()
@@ -523,8 +523,6 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
         //
         CFrmSelectLocks dlg;
 
-        connect(&dlg, SIGNAL(NotifyOpenLockRequest(QString, bool)), this, SLOT(OnOpenLockRequest(QString, bool)));
-
         dlg.setLocks(locks);
         if (dlg.exec())
         {
@@ -540,8 +538,6 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
             // What is our system state here?
             _systemState = ETimeoutScreen;
         }
-
-        disconnect(&dlg, SIGNAL(NotifyOpenLockRequest(QString, bool)), this, SLOT(OnOpenLockRequest(QString, bool)));
     }
 
 }

@@ -37,10 +37,10 @@ void CDlgQuestions::getValues(QString *question1, QString *question2, QString *q
   *question3 = ui->edtAnswer3->text();
 }
 
-void CDlgQuestions::setValues(int doorNum, QString question1, QString question2, QString question3)
+void CDlgQuestions::setValues(QString lockNum, QString question1, QString question2, QString question3)
 {
   qDebug() << "Editing Questions, " << " question1: " << question1 << " question2: " << question2 << " question3: " << question3;
-  _doorNum = doorNum;
+  _lockNum = lockNum;
   ui->label_question1->setText(question1);
   ui->label_question2->setText(question2);
   ui->label_question3->setText(question3);
@@ -53,7 +53,7 @@ void CDlgQuestions::setValues(int doorNum, QString question1, QString question2,
 void CDlgQuestions::on_buttonBoxQuestions_accepted()
 {
     qDebug() << "on_buttonBoxQuestions_accepted()";
-    emit __OnQuestionsSave(_doorNum, ui->edtAnswer1->text(), ui->edtAnswer2->text(), ui->edtAnswer3->text());
+    emit __OnQuestionsSave(_lockNum, ui->edtAnswer1->text(), ui->edtAnswer2->text(), ui->edtAnswer3->text());
     emit __OnQuestionsClose();
 }
 

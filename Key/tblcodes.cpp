@@ -54,17 +54,13 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
         if( !qry.prepare(sql) ) 
         {
             qDebug() << "qry.prepare fails!" << qry.lastError();
+            return "";
         }
-
-        //qDebug() << "startNone/endNone" << _DATENONE_STR;
-        //qDebug() << "time" << time.toString("yyyy-MM-dd HH:mm:ss") << "timeend" << time.toString("yyyy-MM-dd HH:mm:ss");
 
         qry.bindValue(":startNone", _DATENONE_STR);
         qry.bindValue(":endNone", _DATENONE_STR);
         qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));
         qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));
-
-        //qDebug() << "SQL:" << sql;
 
         LockNums = "";
         bSecondCodeRequired = true;
@@ -79,22 +75,19 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
 
         _lastIDS = -1;
 
-        // Selection
         if(qry.exec())
         {
-            qDebug() << "exec() ok ";
-
             int fldIds = qry.record().indexOf("ids");
             int fldLockNo = qry.record().indexOf("locknums");
             int fldCode1No = qry.record().indexOf("code1");
             int fldCode2No = qry.record().indexOf("code2");
             int fldFingerprint1No = qry.record().indexOf("fingerprint1");
-            qDebug() << "fldLockNo:" << fldLockNo << "  fldCode1No:" << fldCode1No << "  fldCode2No:" << fldCode2No;
-            qDebug() << "Count: " << qry.size() << " Fingerprint1: " << fldFingerprint1No;
 
             int fldAccessType = qry.record().indexOf("access_type");            
             int fldMaxAccess = qry.record().indexOf("max_access");
             int fldAccessCount = qry.record().indexOf("access_count");
+
+            // Note: Duplicate code1 entries are not allowed.  So, we can return on the first match
 
             while(qry.next())
             {
@@ -108,13 +101,8 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
                 sCode1 = CEncryption::decryptString(sCode1);
 
 
-                //qDebug() << "sCode1" << sCode1 << "Code" << code;
-
-                /// first one in the set to match unencrypted
                 if( sCode1 == code ) 
                 {
-                    //qDebug() << "Code1:" << sCode1 << " == code:" << code;
-
                     /* Check for expiration */
                     access_type = qry.value(fldAccessType).toInt();
                     access_count = qry.value(fldAccessCount).toInt();
@@ -125,6 +113,7 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
                     }                    
 
                     LockNums = qry.value(fldLockNo).toString();
+
                     if(qry.value(fldCode2No).isNull()) 
                     {
                         sCode2 = "";
@@ -134,7 +123,7 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
                         sCode2 = qry.value(fldCode2No).toString();
                         sCode2 = CEncryption::decryptString(sCode2);
                     }
-                    //qDebug() << "Code2:>" << sCode2 << "< and LockNums=" << LockNums;
+
                     if(!sCode2.trimmed().isEmpty())
                     {
                         nSecondCode++;
@@ -148,6 +137,7 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
                         /* Increment access_count */
                         incrementAccessCount(ids);
                     }
+
                     if(nSecondCode > 0 ) 
                     {
                         bSecondCodeRequired = true;
@@ -162,19 +152,24 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
                     return LockNums;
                 }
             }
-            if(nSecondCode > 0 ) {
+
+            if(nSecondCode > 0 )
+            {
                 bSecondCodeRequired = true;
-            } else {
+            }
+            else
+            {
                 bSecondCodeRequired = false;
             }
 
-            //qDebug() << "CTblCodes::checkCodeOne LockNums" << LockNums;
             return LockNums;
         }
-        else {
+        else
+        {
             qDebug() << "query.exec() failed." << qry.lastError();
         }
     }
+
     return LockNums;
 }
 
@@ -782,7 +777,8 @@ void CTblCodes::initialize()
 void CTblCodes::createTable()
 {
     std::cout << "CTblCodes::createTable\n";
-    if( _pDB && _pDB->isOpen() ) {
+    if( _pDB && _pDB->isOpen() ) 
+    {
         std::cout << "Creating table \n";
         QSqlQuery qry(*_pDB);
 
@@ -799,10 +795,16 @@ void CTblCodes::createTable()
         qry.prepare( sql );
 
         if( !qry.exec() )
+        {
             qDebug() << qry.lastError();
+        }
         else
+        {
             qDebug() << "Table created!";
-    } else {
+        }
+    } 
+    else 
+    {
         std::cout << "Either _pDB is NULL or _pDB is not open\n";
     }
 
@@ -811,7 +813,8 @@ void CTblCodes::createTable()
 void CTblCodes::createColumn(QString column, QString fieldType)
 {
     qDebug() << "CTblCodes::createColumn\n";
-    if( _pDB && _pDB->isOpen() ) {
+    if( _pDB && _pDB->isOpen() ) 
+    {
         std::cout << "Creating table \n";
         QSqlQuery qry(*_pDB);
 
@@ -825,10 +828,16 @@ void CTblCodes::createColumn(QString column, QString fieldType)
         qry.prepare( sql );
 
         if( !qry.exec() )
+        {
             qDebug() << qry.lastError();
+        }
         else
+        {
             qDebug() << "Table altered!";
-    } else {
+        }
+    } 
+    else 
+    {
         std::cout << "Either _pDB is NULL or _pDB is not open\n";
     }
 }

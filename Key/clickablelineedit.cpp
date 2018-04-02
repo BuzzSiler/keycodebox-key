@@ -14,7 +14,6 @@ CClickableLineEdit::~CClickableLineEdit()
 
 void CClickableLineEdit::mousePressEvent(QMouseEvent* event)
 {
-    qDebug() << event->type();
-    //QEvent::MouseButtonPress, QEvent::MouseButtonRelease, QEvent::MouseButtonDblClick, or QEvent::MouseMove
+    Q_UNUSED(event);
     emit clicked();
 }

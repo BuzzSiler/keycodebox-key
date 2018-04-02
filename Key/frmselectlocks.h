@@ -7,33 +7,27 @@ namespace Ui {
 class CFrmSelectLocks;
 }
 
-class LockCabinetWidget;
+class SelectLocksWidget;
 
 class CFrmSelectLocks : public QDialog
 {
     Q_OBJECT
 
-public:
-    explicit CFrmSelectLocks(QWidget *parent = 0);
-    ~CFrmSelectLocks();
+    public:
+        explicit CFrmSelectLocks(QWidget *parent = 0);
+        ~CFrmSelectLocks();
 
-    void setLocks(QString locks);
-    QString getLocks();
+        void setLocks(QString locks);
+        QString getLocks();
 
-    signals:
-    void NotifyOpenLockRequest(QString locks, bool is_user);
-
-    public slots:
-    void OnNotifyRequestLockOpen(QString lock);
-    void OnNotifyLockOpenComplete();
+//    public slots:
+//        void OnNotifyRequestLockOpen(QString lock);
+//        void OnNotifyLockOpenComplete();
     
-    private slots:
-    void on_pbClose_clicked();
-
     private:
-    LockCabinetWidget& m_lock_cab;
-    QStringList m_selected_locks;
-    Ui::CFrmSelectLocks *ui;
+        SelectLocksWidget& m_select_locks;
+        QStringList m_selected_locks;
+        Ui::CFrmSelectLocks *ui;
 };
 
 #endif // FRMSELECTLOCKS_H

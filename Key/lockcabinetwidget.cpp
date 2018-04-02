@@ -105,13 +105,20 @@ void LockCabinetWidget::selectClearAllLocks(bool select_clear)
     CAB_STATE* p_cab = &m_cabs[m_current_cab];
     for (int ii = 0; ii < p_cab->states.count(); ++ii)
     {
-        p_cab->states[ii] = select_clear;
-        m_lock_buttons[ii]->setChecked(select_clear);
-        if (select_clear)
+        if (p_cab->enabled[ii])
         {
-            m_selected_locks.append(ii + 1);
+            bool changed = p_cab->states[ii] != select_clear;
+            p_cab->states[ii] = select_clear;
+            m_lock_buttons[ii]->setChecked(select_clear);
+            if (changed)
+            {
+                if (select_clear)
+                {
+                    m_selected_locks.append(ii + 1);
+                }
+                emit NotifyLockSelected(QString::number(ii + 1), select_clear);
+            }
         }
-        emit NotifyLockSelected(QString::number(ii + 1), select_clear);
     }
 
     updateUi();

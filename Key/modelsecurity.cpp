@@ -211,12 +211,11 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                 // Check again to see if we match a second code existing in the codes table
                 QString sCodeEnc = CEncryption::encryptString(code);
 
-                QString door_str = _ptblCodes->checkCodeOne(sCodeEnc, 
-                                                            bSecondCodeRequired, 
-                                                            bFingerprintRequired, 
-                                                            door_str);
-                nDoorNum = door_str.toInt();
-                if( nDoorNum > 0 )
+                QString lock_nums = _ptblCodes->checkCodeOne(sCodeEnc,
+                                                             bSecondCodeRequired,
+                                                             bFingerprintRequired,
+                                                             lock_nums);
+                if( lock_nums != "" )
                 {
                     // need to check if fingerprint security is enabled
                     // if so, check for existence of existing fingerprints
@@ -252,14 +251,17 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                             return;
                         }
 
-                        emit __OnSecurityCheckSuccess(door_str);
-                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(door_str, code);
+                        emit __OnSecurityCheckSuccess(lock_nums);
+                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(lock_nums, code);
                     }
-                } else {
+                }
+                else
+                {
                     emit __OnSecurityCheckedFailed();
                 }
             }
-        } else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
+        }
+        else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
         {
             // Store AnyAccessCode = code
             // Enter Secondary code - Verify against DB (second access code?)            
@@ -271,9 +273,9 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 
             qDebug() << "CModelSecurity::OnVerifyCodeOne Encrypted Code" << sCodeEnc;
 
-            QString DoorNums = _ptblCodes->checkCodeOne(sCodeEnc, bSecondCodeRequired, bFingerprintRequired, DoorNums);
-            qDebug() << "CModelSecurity::OnVerifyCodeOne nDoorNum" << DoorNums;
-            if( DoorNums != "" )
+            QString lock_nums = _ptblCodes->checkCodeOne(sCodeEnc, bSecondCodeRequired, bFingerprintRequired, lock_nums);
+            qDebug() << "CModelSecurity::OnVerifyCodeOne" << lock_nums;
+            if( lock_nums != "" )
             {
                 // need to check if fingerprint security is enabled
                 // if so, check for existence of existing fingerprints
@@ -311,7 +313,7 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                         return;
                     }
 
-                    emit __OnSecurityCheckSuccess(DoorNums);
+                    emit __OnSecurityCheckSuccess(lock_nums);
                 }
             } else {
                 emit __OnSecurityCheckedFailed();
@@ -356,9 +358,8 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
         {
             QString sCodeEnc = CEncryption::encryptString(code);
 
-            QString door_str = _ptblCodes->checkCodeOne(sCodeEnc, bSecondCodeRequired, bFingerprintRequired, door_str);
-            nDoorNum = door_str.toInt();
-            if( nDoorNum > 0 )
+            QString lock_str = _ptblCodes->checkCodeOne(sCodeEnc, bSecondCodeRequired, bFingerprintRequired, lock_str);
+            if( lock_str != "" )
             {
                 // need to check if fingerprint security is enabled
                 // if so, check for existence of existing fingerprints
@@ -390,7 +391,7 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
                         or change the existing signal to always accept a list, even if
                         there is just one.
                     */
-                    emit __OnSecurityCheckSuccess(QString::number(nDoorNum));
+                    emit __OnSecurityCheckSuccess(lock_str);
                 }
             } 
             else 
@@ -425,9 +426,9 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     }
     else if( _type == "User" )
     {
-        QString DoorNums;
+        QString lockNums;
 
-        if( _ptblCodes->checkCodeTwo(code, bFingerprintRequired, bQuestionsRequired, codeOne, DoorNums, 
+        if( _ptblCodes->checkCodeTwo(code, bFingerprintRequired, bQuestionsRequired, codeOne, lockNums, 
                                      bAskQuestions, question1, question2, question3) > 0 )
         {
             //we need to check if a fingerprint directory already exists,
@@ -460,11 +461,11 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                 qDebug() << "QUESTION2: " << question2;
                 qDebug() << "QUESTION3: " << question3;
 
-                emit __QuestionUserDialog(DoorNums,question1,question2,question3);
+                emit __QuestionUserDialog(lockNums,question1,question2,question3);
             }
             else
             {
-                emit __OnSecurityCheckSuccess(DoorNums);
+                emit __OnSecurityCheckSuccess(lockNums);
             }
         }
         else
@@ -475,10 +476,10 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     // Might have timed out and cleared the _type
 }
 
-void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString doorNums, QString answer1, QString answer2, QString answer3)
+void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
     qDebug() << "CModelSecurity::OnSuccessfulQuestionUsersAnswers()";
-    emit __OnSecurityCheckSuccessWithAnswers(doorNums, answer1, answer2, answer3);
+    emit __OnSecurityCheckSuccessWithAnswers(lockNums, answer1, answer2, answer3);
 }
 
 void CModelSecurity::OnQuestionUserCancelled()
@@ -512,8 +513,8 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
     }
     else if( _type == "User" )
     {
-        QString DoorNums;
-        if( _ptblCodes->checkCodeTwo(code, bFingerprintRequired, bQuestionsRequired, codeOne, DoorNums, bAskQuestions, question1, question2, question3) > 0 )
+        QString lockNums;
+        if( _ptblCodes->checkCodeTwo(code, bFingerprintRequired, bQuestionsRequired, codeOne, lockNums, bAskQuestions, question1, question2, question3) > 0 )
         {
             /* Allowing multiple boxes to be opened need to be handled here for 
                 single code.  __OnSecurityCheckSuccess is connected to 
@@ -524,7 +525,7 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
                 or change the existing signal to always accept a list, even if
                 there is just one.
             */            
-            emit __OnSecurityCheckSuccess(DoorNums);
+            emit __OnSecurityCheckSuccess(lockNums);
         }
         else
         {

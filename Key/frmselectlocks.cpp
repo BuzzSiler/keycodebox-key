@@ -2,24 +2,21 @@
 #include "ui_frmselectlocks.h"
 #include <QObject>
 #include <QDebug>
-#include "lockcabinetwidget.h"
+#include "selectlockswidget.h"
 
 
 CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
     QDialog(parent),
-    m_lock_cab(* new LockCabinetWidget(this)),
+    m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::USER)),
     ui(new Ui::CFrmSelectLocks)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint);
 
-    ui->vloLockCabinet->addWidget(&m_lock_cab);
+    ui->vloSelectLocks->addWidget(&m_select_locks);
 
-    // Connect to the lock cabinet widget to get the selected
-    // locks.
-
-    //connect(&m_selectLocks, SIGNAL(NotifyRequestLockOpen(QString)), this, SLOT(OnNotifyRequestLockOpen(QString)));
-    //connect(&m_selectLocks, SIGNAL(NotifyLockOpenComplete()), this, SLOT(OnNotifyLockOpenComplete()));
+    connect(&m_select_locks, &SelectLocksWidget::NotifyClose, this, &CFrmSelectLocks::reject);
+    connect(&m_select_locks, &SelectLocksWidget::NotifyOpen, this, &CFrmSelectLocks::accept);
 }
 
 CFrmSelectLocks::~CFrmSelectLocks()
@@ -29,29 +26,10 @@ CFrmSelectLocks::~CFrmSelectLocks()
 
 void CFrmSelectLocks::setLocks(QString locks)
 {
-    //m_selectLocks.setLocks(locks);
-    m_selected_locks.clear();
+    m_select_locks.setLocks(locks);
 }
 
 QString CFrmSelectLocks::getLocks()
 {
-    return m_selected_locks.join(',');
-}
-
-void CFrmSelectLocks::OnNotifyRequestLockOpen(QString locks)
-{
-    // emit signal to let system control know that the lock(s) have been opened
-    m_selected_locks.append(locks);
-    emit NotifyOpenLockRequest(locks, false);
-}
-
-void CFrmSelectLocks::on_pbClose_clicked()
-{
-    done(QDialog::Rejected);
-}
-
-void CFrmSelectLocks::OnNotifyLockOpenComplete()
-{
-    // Open is complete, return Accepted
-    done(QDialog::Accepted);
+    return m_select_locks.getLocks();
 }

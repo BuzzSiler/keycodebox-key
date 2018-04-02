@@ -85,7 +85,7 @@ signals:
     void __verifyUserAccessTwo(QString sCode1, QString sCode2);
     void __verifyAdminAccess(QString sCode1, QString sCode2);
 
-    void __openDoor(QString DoorNums);
+    void __openDoor(QString lockNums);
 
     // For Entry dialogs
     void __OnDisplayTimeoutScreen();
@@ -137,18 +137,18 @@ signals:
 
     void __onEnrollFingerprintDialog(QString sCode);
 
-    void __onQuestionUserDialog(QString doorNums, QString question1, QString question2, QString question3);
-    void __onQuestionUser(QString doorNums, QString question1, QString question2, QString question3);
-    void __onQuestionUserAnswers(QString doorNums, QString answer1, QString answer2, QString answer3);
+    void __onQuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3);
+    void __onQuestionUser(QString lockNums, QString question1, QString question2, QString question3);
+    void __onQuestionUserAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
     void __onQuestionUserCancel();
 
 public slots:
 
-    void TrigQuestionUserDialog(QString doorNums, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(doorNums, question1, question2, question3);}
+    void TrigQuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(lockNums, question1, question2, question3);}
 
-    void TrigQuestionUser(QString doorNums, QString question1, QString question2, QString question3);
+    void TrigQuestionUser(QString lockNums, QString question1, QString question2, QString question3);
     void QuestionUserCancel();
-    void AnswerUserSave(QString doorNums, QString question1, QString question2, QString question3);
+    void AnswerUserSave(QString lockNums, QString question1, QString question2, QString question3);
 
     void TrigEnrollFingerprint(QString sCode);
     void TrigEnrollFingerprintDialog(QString sCode) { emit __onEnrollFingerprintDialog(sCode); }

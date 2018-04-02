@@ -279,6 +279,8 @@ void FrmCodeEditMulti::on_edCode1_clicked()
     {
         ui->edCode1->setText(kkd.getValue());
     }
+
+    updateUi();
 }
 
 void FrmCodeEditMulti::on_edCode2_clicked()
@@ -294,6 +296,8 @@ void FrmCodeEditMulti::on_edCode2_clicked()
             ui->edUsername->setText(kkd.getValue());
         }
     }
+
+    updateUi();
 }
 
 void FrmCodeEditMulti::on_edUsername_clicked()
@@ -306,6 +310,8 @@ void FrmCodeEditMulti::on_edUsername_clicked()
     {
         ui->edUsername->setText(kkd.getValue());
     }
+
+    updateUi();
 }
 
 void FrmCodeEditMulti::OnNotifyLockSelected(QString lock, bool is_selected)
@@ -411,13 +417,13 @@ void FrmCodeEditMulti::updateUi()
     }
 
     qDebug() << "Exit Condition:";
-//    qDebug() << "\tModified:" << isModified();
-//    qDebug() << "\tCode1 Text:" << code1_valid_text;
-//    qDebug() << "\tCode2 Text:" << code2_valid_text;
-//    qDebug() << "\tCode2 Valid:" << code2_valid;
-//    qDebug() << "\tFP Valid:" << fp_valid;
-//    qDebug() << "\tSelected Locks:" << locks_valid;
-//    qDebug() << "\tStart/End:" << start_end_valid;
+    qDebug() << "\tModified:" << isModified();
+    qDebug() << "\tCode1 Text:" << code1_valid_text;
+    qDebug() << "\tCode2 Text:" << code2_valid_text;
+    qDebug() << "\tCode2 Valid:" << code2_valid;
+    qDebug() << "\tFP Valid:" << fp_valid;
+    qDebug() << "\tSelected Locks:" << locks_valid;
+    qDebug() << "\tStart/End:" << start_end_valid;
     qDebug() << "\tQuestions:" << questions_valid;
 
     bool valid_exit = isModified() &&

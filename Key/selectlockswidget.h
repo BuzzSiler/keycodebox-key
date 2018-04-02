@@ -24,10 +24,15 @@ class SelectLocksWidget : public QWidget
         ~SelectLocksWidget();
 
         void setLocks(QString locks);
+        QString getLocks();
+
 
     signals:
         void NotifyRequestLockOpen(QString lockNum);
         void NotifyLockOpenComplete();
+
+        void NotifyClose();
+        void NotifyOpen();
 
     private slots:
         void openDoorTimer();
@@ -96,6 +101,7 @@ class SelectLocksWidget : public QWidget
         void getCabinetLockFromStr(QString& str, QString& cab, QString& lock);
         void createLockListStr(QString cab, QString lock, QString& str);
         void addLockToList(QString lock);
+        void addLocksToList(QString locks);
         void removeLockFromList(QString lock);
 
 };

@@ -43,7 +43,7 @@ public:
     ~CModelSecurity();
 
 signals:
-    void __QuestionUserDialog(QString doorNums, QString question1, QString question2, QString question3);
+    void __QuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3);
     
     // Parallels signal flow to model security
     void __EnrollFingerprint(QString sCode);
@@ -57,7 +57,7 @@ signals:
     void __OnAdminSecurityCheckOk(QString type);
     void __OnAdminSecurityCheckFailed();
     void __OnSecurityCheckSuccess(QString locks);
-    void __OnSecurityCheckSuccessWithAnswers(QString doorNums, QString answer1, QString answer2, QString answer3);
+    void __OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
     void __OnSecurityCheckedFailed();
 
     void __OnSecurityCheckTimedOut();
@@ -110,7 +110,7 @@ public slots:
     void OnVerifyFingerprintCodeOne(QString code);
     void OnVerifyFingerprintCodeTwo(QString code);
 
-    void OnSuccessfulQuestionUsersAnswers(QString doorNums, QString answer1, QString answer2, QString answer3);
+    void OnSuccessfulQuestionUsersAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
     void OnQuestionUserCancelled();
     
     void OnVerifyAdminPassword(QString code);

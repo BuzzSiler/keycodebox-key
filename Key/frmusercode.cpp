@@ -83,7 +83,8 @@ void CFrmUserCode::onCodeEntered()
     qDebug() << "CFrmUserCode::onCodeEntered" << sCode;
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
-    if(sCode.length() > 0 ) {
+    if(sCode.length() > 0 )
+    {
         this->enableKeypad(false);     // disable the keypad (momentarily)
         emit __CodeEntered(sCode);     // Signal that the code was entered.
     }

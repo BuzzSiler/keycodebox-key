@@ -1265,7 +1265,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="text">
-      <string>Lower</string>
+      <string>Upper</string>
      </property>
      <property name="checkable">
       <bool>true</bool>

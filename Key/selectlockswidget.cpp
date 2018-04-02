@@ -21,8 +21,9 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role, int num_cabs) :
     connect(&m_lock_cab, SIGNAL(NotifyLockSelected(QString, bool)), this, SLOT(OnNotifyLockSelected(QString, bool)));
 
     
-    if (m_role == ADMIN)
+    if (m_role == USER)
     {
+        ui->btnCancelOpen->setEnabled(true);
     }
 }
 
@@ -41,7 +42,26 @@ void SelectLocksWidget::setLocks(QString locks)
     m_lock_cab.disableAllLocks();
     m_lock_cab.setEnabledLocks(locks);
     m_lock_cab.setSelectedLocks(locks);
+    addLocksToList(locks);
     ui->btnOpenSelected->setEnabled(locks.length() > 0 ? true : false);
+}
+
+QString SelectLocksWidget::getLocks()
+{
+    QStringList locks;
+    QString lock;
+    QString str;
+    QString cab;
+    int num_items = ui->lstSelectedLocks->count();
+
+    for (int ii = 0; ii < num_items; ++ii)
+    {
+        str = ui->lstSelectedLocks->item(ii)->text();
+        getCabinetLockFromStr(str, cab, lock);
+        locks.append(lock);
+    }
+
+    return locks.join(",");
 }
 
 void SelectLocksWidget::createLockListStr(QString cab, QString lock, QString& str)
@@ -60,6 +80,23 @@ void SelectLocksWidget::addLockToList(QString lock)
 
     ui->lstSelectedLocks->addItem(item_str);
     ui->lstSelectedLocks->sortItems();
+}
+
+void SelectLocksWidget::addLocksToList(QString locks)
+{
+    if (locks.contains(","))
+    {
+        QStringList sl = locks.split(",");
+
+        foreach (auto s, sl)
+        {
+            addLockToList(s);
+        }
+    }
+    else
+    {
+        addLockToList(locks);
+    }
 }
 
 void SelectLocksWidget::removeLockFromList(QString lock)
@@ -125,17 +162,8 @@ void SelectLocksWidget::openDoorTimer()
 
     if (m_cancel_open || ui->lstSelectedLocks->count() == 0)
     {
-        if (m_role == ADMIN)
-        {
-            ui->btnOpenSelected->setEnabled(ui->lstSelectedLocks->count() > 0 ? true : false);
-            ui->btnCancelOpen->setEnabled(false);
-        }
-        else if (m_role == USER)
-        {
-            // If we are in user role, we're inside a dialog.
-            // Let the dialog know that we are done.
-            emit NotifyLockOpenComplete();
-        }
+        ui->btnOpenSelected->setEnabled(ui->lstSelectedLocks->count() > 0 ? true : false);
+        ui->btnCancelOpen->setEnabled(false);
     }
     else
     {
@@ -145,13 +173,27 @@ void SelectLocksWidget::openDoorTimer()
 
 void SelectLocksWidget::on_btnOpenSelected_clicked()
 {
-    m_cancel_open = false;
-    ui->btnOpenSelected->setEnabled(false);
-    ui->btnCancelOpen->setEnabled(true);
-    openDoorTimer();
+    if (m_role == ADMIN)
+    {
+        m_cancel_open = false;
+        ui->btnOpenSelected->setEnabled(false);
+        ui->btnCancelOpen->setEnabled(true);
+        openDoorTimer();
+    }
+    else // m_role == USER
+    {
+        emit NotifyOpen();
+    }
 }
 
 void SelectLocksWidget::on_btnCancelOpen_clicked()
 {
-    m_cancel_open = true;
+    if (m_role == ADMIN)
+    {
+        m_cancel_open = true;
+    }
+    else // m_role == USER
+    {
+        emit NotifyClose();
+    }
 }

@@ -195,7 +195,7 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
 
         connect(psysController, SIGNAL(__onEnrollFingerprintDialog(QString)), this, SLOT(OnEnrollFingerprintDialog(QString)));
-        connect(psysController, SIGNAL(__onQuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
+        connect(psysController, SIGNAL(__onQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(QString,QString,QString,QString)));
 
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprint()), psysController, SLOT(OnVerifyFingerprint()));
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
@@ -397,10 +397,10 @@ void MainWindow::OnEnrollFingerprintDialog(QString sCode)
     _pdFingerprint->setOkDisabled(true);
 }
 
-void MainWindow::OnQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3)
+void MainWindow::OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3)
 {
     qDebug() << "MainWindow::OnQuestionUserDialog()";
-    _pQuestions->setValues(doorNum, question1, question2, question3);
+    _pQuestions->setValues(lockNum, question1, question2, question3);
     _pQuestions->show();
 }
 

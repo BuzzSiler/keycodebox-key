@@ -67,7 +67,7 @@ KcbKeyboardWidget::~KcbKeyboardWidget()
 
 void KcbKeyboardWidget::setValue(const QString value)
 {
-    qDebug() << Q_FUNC_INFO << value;
+//    qDebug() << Q_FUNC_INFO << value;
 
     m_value = value;
     ui->edText->setText(value);
@@ -98,21 +98,21 @@ void KcbKeyboardWidget::updateValue(QString value)
 
 void KcbKeyboardWidget::digitClicked(QString value)
 {
-    qDebug() << Q_FUNC_INFO << value;
+//    qDebug() << Q_FUNC_INFO << value;
 
     updateValue(value);
 }
 
 void KcbKeyboardWidget::alphaClicked(QString value)
 {
-    qDebug() << Q_FUNC_INFO << value;
+//    qDebug() << Q_FUNC_INFO << value;
 
     updateValue(value);
 }
 
 void KcbKeyboardWidget::controlClicked(QString value)
 {
-    qDebug() << Q_FUNC_INFO << value;
+//    qDebug() << Q_FUNC_INFO << value;
 
     if (value == "Back")
     {

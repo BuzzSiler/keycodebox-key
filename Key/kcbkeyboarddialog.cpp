@@ -28,14 +28,14 @@ KcbKeyboardDialog::~KcbKeyboardDialog()
 
 void KcbKeyboardDialog::setValue(const QString value)
 {
-    qDebug() << Q_FUNC_INFO << value;
+//    qDebug() << Q_FUNC_INFO << value;
     m_keyboard.setValue(value);
 }
 
 QString KcbKeyboardDialog::getValue()
 {
     QString value = m_keyboard.getValue();
-    qDebug() << Q_FUNC_INFO << value;
+//    qDebug() << Q_FUNC_INFO << value;
     return value;
 }
 

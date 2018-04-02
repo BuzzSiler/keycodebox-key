@@ -89,7 +89,7 @@ private slots:
     void OnEnrollFingerprintDialog(QString sCode);
     void OnVerifyFingerprintDialog();
 
-    void OnQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3);
+    void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3);
     void OnQuestionUserDialogClose();
     
 private:

@@ -22,7 +22,7 @@ public:
     ~CDlgQuestions();
 
     void getValues(QString *question1, QString *question2, QString *question3);
-    void setValues(int doorNum, QString question1, QString question2, QString question3);
+    void setValues(QString lockNum, QString question1, QString question2, QString question3);
 
     void setMaxLocks(int nLocks);
     void setEditingRow(int nRow) { _nRow = nRow; }
@@ -36,14 +36,14 @@ private:
 
     int _id;
     int _nRow;
-    int _doorNum;
+    QString _lockNum;
     
     void checkAndCreateCurrentLineEdit();
 signals:
     
     void __OnQuestionsClose();
     void __OnQuestionsCancel();
-    void __OnQuestionsSave(int doorNum, QString question1, QString question2, QString question3);
+    void __OnQuestionsSave(QString lockNum, QString question1, QString question2, QString question3);
     
     void OnClose();
     void __OnCodes(QString code1);

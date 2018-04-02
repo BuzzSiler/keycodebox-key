@@ -49,7 +49,7 @@ signals:
     void    __OnAdminSecurityCheckFailed();
     void __OnSecurityCheckSuccess(QString);
 
-    void    __OnSecurityCheckSuccessWithAnswers(QString doorNums, QString answer1, QString answer2, QString answer3);
+    void    __OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
     
     void    __OnSecurityCheckedFailed();
     void    __OnSecurityCheckTimedOut();
@@ -86,22 +86,22 @@ signals:
     void __TrigQuestionUserDialog(QString,QString,QString,QString);
     void __TrigQuestionUser(QString,QString,QString,QString);
 
-    void __OnSuccessfulQuestionUsersAnswers(QString doorNum, QString answer1, QString answer2, QString answer3);
+    void __OnSuccessfulQuestionUsersAnswers(QString lockNum, QString answer1, QString answer2, QString answer3);
     void __OnQuestionUserCancelled();
     public slots:
   
   void OnEnrollFingerprint(QString sCode) { emit __TrigEnrollFingerprint(sCode); }
   void OnEnrollFingerprintDialog(QString sCode) { emit __TrigEnrollFingerprintDialog(sCode); }
   
-  void OnQuestionUserDialog(QString doorNum, QString question1, QString question2, QString question3)
+  void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3)
   {
-    emit __TrigQuestionUser(doorNum,question1,question2,question3);
-    emit __TrigQuestionUserDialog(doorNum,question1,question2,question3);
+    emit __TrigQuestionUser(lockNum,question1,question2,question3);
+    emit __TrigQuestionUserDialog(lockNum,question1,question2,question3);
   }
 
-  void OnQuestionUserAnswers(QString doorNum, QString answer1, QString answer2, QString answer3)
+  void OnQuestionUserAnswers(QString lockNum, QString answer1, QString answer2, QString answer3)
   {
-    emit __OnSuccessfulQuestionUsersAnswers(doorNum,answer1,answer2,answer3);
+    emit __OnSuccessfulQuestionUsersAnswers(lockNum,answer1,answer2,answer3);
   }
 
   void OnQuestionUserCancel()
@@ -158,8 +158,8 @@ public slots:
     void OnRequireCodeTwo();
     void OnAdminSecurityCheckOk(QString type);
     void OnAdminSecurityCheckFailed();
-    void OnSecurityCheckSuccess(QString doorNums);
-    void OnSecurityCheckSuccessWithAnswers(QString doorNums, QString answer1, QString answer2, QString answer3);
+    void OnSecurityCheckSuccess(QString lockNums);
+    void OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
     void OnSecurityCheckedFailed();
     void OnSecurityCheckTimedOut();
 

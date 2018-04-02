@@ -33,7 +33,7 @@ void CSecurityController::initializeSignals()
     connect(&_modelSecurity, SIGNAL(__EnrollFingerprint(QString)), this, SLOT(OnEnrollFingerprint(QString)));
     connect(&_modelSecurity, SIGNAL(__EnrollFingerprintDialog(QString)), this, SLOT(OnEnrollFingerprintDialog(QString)));
 
-    connect(&_modelSecurity, SIGNAL(__QuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
+    connect(&_modelSecurity, SIGNAL(__QuestionUserDialog(QString,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(QString,QString,QString,QString)));
     
     connect(this, SIGNAL(__VerifyCodeTwo(QString)), &_modelSecurity, SLOT(OnVerifyCodeTwo(QString)));
 
@@ -267,10 +267,10 @@ void CSecurityController::OnSecurityCheckSuccess(QString locks)
     emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
 }
 
-void CSecurityController::OnSecurityCheckSuccessWithAnswers(QString doorNums, QString answer1, QString answer2, QString answer3)
+void CSecurityController::OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
     qDebug() << "CSecurityController::OnSecurityCheckSuccessWithAnswers, " << answer1 << ", " << answer2 << ", " << answer3;
-    emit __OnSecurityCheckSuccess(doorNums);
+    emit __OnSecurityCheckSuccess(lockNums);
     emit __OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(answer1, answer2, answer3);
 }
 
