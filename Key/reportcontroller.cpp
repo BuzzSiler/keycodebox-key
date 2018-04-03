@@ -124,7 +124,7 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
     }
 }
 
-void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums)
+void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd)
 {
     requestCurrentAdminRecord();
 
@@ -140,7 +140,7 @@ void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTim
     {
         QFile       *pFile = NULL;
         CLockHistorySet *pHistorySet = NULL;
-        processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, LockNums);
+        processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         if(pHistorySet) delete pHistorySet;
         if(pFile) delete pFile;
     }
@@ -149,13 +149,11 @@ void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTim
 void CReportController::processLockCodeHistoryReport(CLockHistorySet *_pHistorySet, 
                                                      QFile *pFile, 
                                                      QDateTime &dtReportStart, 
-                                                     QDateTime &dtReportEnd, 
-                                                     QString LockNums)
+                                                     QDateTime &dtReportEnd)
 {
     qDebug() << "CReportController::processLockCodeHistoryReport()";
 
     Q_UNUSED(_pHistorySet);
-    Q_UNUSED(LockNums);
 
     _pFile = pFile;
     _dtReportStart = dtReportStart;
@@ -238,7 +236,7 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
             dtReportEnd = date.currentDateTime();
             QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, LockNums);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     } else if(dtFreq == QDateTime(QDate(1,1,1), QTime(12,0)))
     { // Every 12 hours
@@ -249,7 +247,7 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
             dtReportEnd = date.currentDateTime();
             QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, LockNums);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     } else if(dtFreq == QDateTime(QDate(1,1,1), QTime(23,59)))
     {  // Daily
@@ -260,7 +258,7 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
             dtReportEnd = date.currentDateTime();
             QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, LockNums);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     } else if(dtFreq == QDateTime(QDate(1,1,7), QTime(0,0)))
     {   // Weekly
@@ -271,7 +269,7 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
             dtReportEnd = date.currentDateTime();
             QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, LockNums);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     } else if(dtFreq == QDateTime(QDate(1,12,1), QTime(0,0)))
     {   // Monthly
@@ -282,7 +280,7 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
             dtReportEnd = date.currentDateTime();
             QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, LockNums);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     }
     if(pHistorySet)

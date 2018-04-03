@@ -5,6 +5,15 @@
 #include "tblcodehistory.h"
 #include "encryption.h"
 #include "lockhistoryrec.h"
+#include "kcbcommon.h"
+
+CTblCodeHistory::CTblCodeHistory(QSqlDatabase *db) 
+{
+    KCB_DEBUG_ENTRY;
+    _pDB = db;
+    initialize();
+    KCB_DEBUG_EXIT;
+}
 
 /**
  * @brief CTblCodeHistory::selectCodeSet
@@ -12,13 +21,21 @@
  */
 void CTblCodeHistory::selectLockCodeHistorySet(QString &LockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet)
 {
-    qDebug() << "CTblCodes::selectLockCodeHistorySet()";
+    KCB_DEBUG_ENTRY;
     // hold on to the code
     CLockHistoryRec  *pLockHistory;
     *pLockHistorySet = 0;
 
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+
+
     if( _pDB && _pDB->isOpen() ) 
     {
+        KCB_DEBUG_TRACE("Creating query");
+
         QSqlQuery qry(*_pDB);
         QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "code1, code2, "
@@ -33,12 +50,13 @@ void CTblCodeHistory::selectLockCodeHistorySet(QString &LockNums, QDateTime star
         }
         sql += "(access_time >= :stime and access_time <= :etime)";
 
-        qDebug() << ">>SQL:" << sql;
-        qDebug() << ">>Start:" << start.toString("yyyy-MM-dd HH:mm:ss") << "  End:" << end.toString("yyyy-MM-dd HH:mm:ss");
+        KCB_DEBUG_TRACE("SQL:" << sql);
 
         if( !qry.prepare(sql) ) 
         {
-            qDebug() << "qry.prepare fails!" << qry.lastError();
+            KCB_DEBUG_TRACE("qry.prepare fails!" << qry.lastError());
+            KCB_DEBUG_EXIT;
+            return;
         }
 
         if(LockNums != "" ) 
@@ -146,12 +164,19 @@ void CTblCodeHistory::selectLockCodeHistorySet(QString &LockNums, QDateTime star
  */
 void CTblCodeHistory::selectLastLockCodeHistorySet(QString &LockNums, QDateTime &start, QDateTime &end, CLockHistorySet **pLockHistorySet)
 {
-    qDebug() << "CTblCodes::selectLastLockCodeHistorySet(..)";
+    KCB_DEBUG_ENTRY;
+
     // hold on to the code
     CLockHistoryRec  *pLockHistory = NULL;
     *pLockHistorySet = 0;
 
-    if( _pDB && _pDB->isOpen() ) {
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+
+    if( _pDB && _pDB->isOpen() ) 
+    {
         QSqlQuery qry(*_pDB);
         QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "code1, code2, "
@@ -170,11 +195,13 @@ void CTblCodeHistory::selectLastLockCodeHistorySet(QString &LockNums, QDateTime 
         qDebug() << ">>SQL:" << sql;
         qDebug() << ">>Start:" << start.toString("yyyy-MM-dd HH:mm:ss") << "  End:" << end.toString("yyyy-MM-dd HH:mm:ss");
 
-        if( !qry.prepare(sql) ) {
+        if( !qry.prepare(sql) ) 
+        {
             qDebug() << "qry.prepare fails!" << qry.lastError();
         }
 
-        if(LockNums != "" ) {
+        if(LockNums != "" ) 
+        {
             qry.bindValue(":lockNums", LockNums);
         }
         qry.bindValue(":stime", start.toString("yyyy-MM-dd HH:mm:ss"));
@@ -267,7 +294,8 @@ void CTblCodeHistory::selectLastLockCodeHistorySet(QString &LockNums, QDateTime 
                 (*pLockHistorySet)->addToSet(*pLockHistory);
             }
         }
-        else {
+        else 
+        {
             qDebug() << "query.exec() failed." << qry.lastError();
         }
     }
@@ -276,6 +304,8 @@ void CTblCodeHistory::selectLastLockCodeHistorySet(QString &LockNums, QDateTime 
 
 bool CTblCodeHistory::tableExists()
 {
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    
     QStringList tables = _pDB->tables();
 
     foreach (auto table, tables)
@@ -291,10 +321,18 @@ bool CTblCodeHistory::tableExists()
 
 bool CTblCodeHistory::columnExists(QString column)
 {
-    qDebug() << "CTblCodeHistory::columnExists()";
+    KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    
     QStringList::iterator  itor;
     QSqlQuery qry(*_pDB);
     bool foundColumn = false;
+
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
 
     if( _pDB && _pDB->isOpen() )
     {
@@ -318,16 +356,25 @@ bool CTblCodeHistory::columnExists(QString column)
         else
             qDebug() << qry.lastError();
 
-    } else {
-        std::cout << "Either _pDB is NULL or _pDB is not open\n";
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
     }
     return foundColumn;
 }
 
 void CTblCodeHistory::createColumn(QString column, QString fieldType)
 {
-    qDebug() << "CTblCodeHistory::createColumn\n";
-    if( _pDB && _pDB->isOpen() ) {
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+    
+    if( _pDB && _pDB->isOpen() ) 
+    {
         std::cout << "Creating table \n";
         QSqlQuery qry(*_pDB);
 
@@ -341,11 +388,17 @@ void CTblCodeHistory::createColumn(QString column, QString fieldType)
         qry.prepare( sql );
 
         if( !qry.exec() )
+        {
             qDebug() << qry.lastError();
+        }
         else
+        {
             qDebug() << "Table altered!";
-    } else {
-        std::cout << "Either _pDB is NULL or _pDB is not open\n";
+        }
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
     }
 }
 
@@ -366,18 +419,31 @@ void CTblCodeHistory::initialize()
     QString column3 = "answer3";
 
     if(!columnExists(column1))
+    {
         createColumn(column1, "text");
+    }
     if(!columnExists(column2))
+    {
         createColumn(column2, "text");
+    }
     if(!columnExists(column3))
+    {
         createColumn(column3, "text");
+    }
 }
 
 void CTblCodeHistory::createTable()
 {
-    std::cout << "CTblCodeHistory::createTable\n";
-    if( _pDB && _pDB->isOpen() ) {
-        std::cout << "Creating table \n";
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+    
+    if( _pDB && _pDB->isOpen() ) 
+    {
+        KCB_DEBUG_TRACE("Creating table");
         QSqlQuery qry(*_pDB);
 
         QString sql("CREATE TABLE IF NOT EXISTS ");
@@ -393,11 +459,17 @@ void CTblCodeHistory::createTable()
         qry.prepare( sql );
 
         if( !qry.exec() )
+        {
             qDebug() << qry.lastError();
+        }
         else
+        {
             qDebug() << "Table created!";
-    } else {
-        std::cout << "Either _pDB is NULL or _pDB is not open\n";
+        }
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
     }
 
 }
@@ -413,21 +485,6 @@ bool CTblCodeHistory::addLockCodeHistory(CLockHistoryRec &lockHistoryRec)
                               lockHistoryRec.getUserNotificationSent());
 }
 
-/**
- * @brief CTblCodeHistory::addLockCodeHistory
- * @param locknum
- * @param code1
- * @param code2
- * @param starttime
- * @param endtime
- * @param status
- * @param desc
- * @param sequence
- * @param sequenceNum
- * @param maxAccess
- * @param maxRetry
- * @return
- */
 bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QString code2,
                                          QDateTime starttime, QDateTime endtime, int maxAccess,
                                          QString status, QString desc, QString sequence, int sequenceNum,
@@ -435,7 +492,9 @@ bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QStrin
                                          bool adminNotificationSent, QString userNotificationEmail,
                                          bool userNotificationSent)
 {
-    qDebug() << "CTblCodeHistory::addLockCodeHistory()";
+    KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + TABLENAME +
@@ -472,12 +531,14 @@ bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QStrin
     QMap<QString, QVariant> mapVals = qry.boundValues();
     qDebug() << "Mapped count:" << mapVals.count();
 
-    if( !qry.exec() ) {
+    if( !qry.exec() ) 
+    {
         qDebug() << "CTblCodeHistory::addLockCodeHistory():" << qry.lastError();
         qDebug() << "Query After:" << qry.lastQuery();
         return false;
     }
-    else {
+    else 
+    {
         qDebug( "Inserted!" );
         return true;
     }
@@ -501,7 +562,9 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString co
                                                     bool adminNotificationSent, QString userNotificationEmail,
                                                     bool userNotificationSent, QString answer1, QString answer2, QString answer3)
 {
-    qDebug() << "CTblCodeHistory::addLockCodeHistory()";
+    KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + TABLENAME +
@@ -577,7 +640,9 @@ void CTblCodeHistory::currentTimeFormat(QString format, QString strBuffer, int n
 
 bool CTblCodeHistory::readTestDefault()
 {
-    qDebug( )<< "CTblCodeHistory::readTestDefault()";
+    KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
     QSqlQuery query(*_pDB);
     QString sql = "SELECT sequence, sequence_order, "\
@@ -590,7 +655,8 @@ bool CTblCodeHistory::readTestDefault()
     sql += TABLENAME;
     sql += QString(" WHERE description = 'test history lock'");
 
-    if( query.exec(sql)) {
+    if( query.exec(sql)) 
+    {
         int fldCode1 = query.record().indexOf("code1");
         int fldCode2 = query.record().indexOf("code2");
         int fldStart = query.record().indexOf("starttime");
@@ -616,79 +682,51 @@ bool CTblCodeHistory::readTestDefault()
     return false;
 }
 
-bool CTblCodeHistory::deleteLockCodeHistory(QString locknums, QDateTime starttime, QDateTime endtime)
-{
-    Q_UNUSED(locknums);
-    Q_UNUSED(starttime);
-    Q_UNUSED(endtime);
-    return false;
-}
-
-bool CTblCodeHistory::deleteLockCodeHistory(QString locknums, QString code1, QString code2,
-                                            QDateTime starttime, QDateTime endtime, QDateTime accesstime)
-{
-    Q_UNUSED(locknums);
-    Q_UNUSED(code1);
-    Q_UNUSED(code2);
-    Q_UNUSED(starttime);
-    Q_UNUSED(endtime);
-    Q_UNUSED(accesstime);
-    return false;
-}
-
-bool CTblCodeHistory::deleteLockCodeHistory(QDateTime accesstime)
-{   
-    Q_UNUSED(accesstime);
-    return false;
-}
-
-bool CTblCodeHistory::deleteLockCodeHistory(QDateTime starttime, QDateTime endtime)
-{
-    Q_UNUSED(starttime);
-    Q_UNUSED(endtime);
-    return false;
-}
-
-/**
- * @brief CTblCodeHistory::deleteCode
- *  For now will just delete based on the ids field
- * @param rec
- * @return
- */
 bool CTblCodeHistory::deleteLockCodeHistory(CLockHistoryRec &rec)
 {
-    qDebug( )<< "CTblCodeHistory::deleteCode(CLockState)";
+    KCB_DEBUG_ENTRY;
 
-    if( rec.getID() == -1 ) {
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+
+    if( rec.getID() == -1 ) 
+    {
         return false;
     }
 
     QSqlQuery query(*_pDB);
     QString sql;
-    if(rec.getID() == -1 ) {
+    if(rec.getID() == -1 ) 
+    {
         sql = "DELETE FROM " + TABLENAME +
                 QString(" WHERE access_time = :faccessTime and "
                         " locknums=:lockNums");
         query.prepare(sql);
         query.bindValue("faccessTime", rec.getAccessTime().toString(datetimeFormat));
         query.bindValue(":locknums", rec.getLockNums());
-    } else {
+    } 
+    else 
+    {
         sql = "DELETE FROM " + TABLENAME +
                 QString(" WHERE ids = :fids");
         query.prepare(sql);
         query.bindValue("fids", rec.getID());
     }
 
-    if( query.exec(sql)) {
+    if( query.exec(sql)) 
+    {
         return true;
-    } else {
+    } 
+    else 
+    {
         return false;
     }
 }
 
 bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
 {
-    qDebug() << "CTblCodeHistory::updateRecord()";
+    KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
@@ -720,25 +758,17 @@ bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
 
     qry.bindValue(":fids", rec.getID());
 
-    if(qry.exec()) {
+    if(qry.exec()) 
+    {
         return true;
-    } else {
+    } 
+    else 
+    {
         qDebug() << "CTblCodeHistory::updateRecord() failed";
         return false;
     }
 }
 
-bool CTblCodeHistory::updateLockCodeHistory(CLockHistoryRec &rec)
-{
-    Q_UNUSED(rec);
-    return false;
-}
-
-/**
- * @brief CTblCodeHistory::updateCodeSet
- * @param codeSet
- * @return true if all were updated successfully, false if any fail (note: some may have updated if false is returned BAD!)
- */
 bool CTblCodeHistory::updateLockCodeHistorySet(CLockHistorySet &lockHistorySet)
 {
     bool    bRC = true;

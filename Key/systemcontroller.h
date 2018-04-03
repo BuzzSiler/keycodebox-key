@@ -179,7 +179,7 @@ public slots:
     void OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(LockNums, start, end); }
     void OnLockHistorySet(CLockHistorySet *pSet) { emit __OnLockHistorySet(pSet); }
 
-    void OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums);
+    void OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd);
 
 signals:
     void __RequestLastSuccessfulLogin();

@@ -13,6 +13,7 @@
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
 #include "dlgeditquestions.h"
+#include "kcbutils.h"
 
 FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     QDialog(parent),
@@ -55,6 +56,7 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
 
 FrmCodeEditMulti::~FrmCodeEditMulti()
 {
+    Kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 

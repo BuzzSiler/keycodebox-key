@@ -76,19 +76,8 @@ private:
 
     bool readTestDefault();
     bool createTestDefault();
-    bool updateLockCodeHistory(CLockHistoryRec &rec);
 public:
-    CTblCodeHistory(QSqlDatabase *db) {
-        qDebug() << "CTblCodeHistory constructor\n";
-        setDatabase(db);
-        // make sure the table is created if it does not exist.
-        initialize();
-    }
-
-    void setDatabase(QSqlDatabase *db) 
-    {
-        _pDB = db;
-    }
+    CTblCodeHistory(QSqlDatabase *db);
 
     bool addLockCodeHistory(CLockHistoryRec &lockHistoryRec);
 
@@ -111,12 +100,6 @@ public:
     void currentTimeFormat(QString format, QString strBuffer, int nExpectedLength);
 
     bool deleteLockCodeHistory(CLockHistoryRec &rec);
-    bool deleteLockCodeHistory(QString locknums, QDateTime starttime, QDateTime endtime);
-
-    bool deleteLockCodeHistory(QString locknums, QString code1, QString code2,
-                               QDateTime starttime, QDateTime endtime, QDateTime accesstime);
-    bool deleteLockCodeHistory(QDateTime accesstime);
-    bool deleteLockCodeHistory(QDateTime starttime, QDateTime endtime);
 
     bool updateRecord(CLockHistoryRec &rec);
     void selectLockCodeHistorySet(QString &LockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet);

@@ -4,6 +4,7 @@
 #include <QDebug>
 
 #include "kcbkeyboardwidget.h"
+#include "kcbutils.h"
 
 KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent) :
     QDialog(parent),
@@ -23,6 +24,7 @@ KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent) :
 
 KcbKeyboardDialog::~KcbKeyboardDialog()
 {
+    Kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 

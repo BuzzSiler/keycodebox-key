@@ -38,9 +38,9 @@ public:
     void start();
     void setCodeHistoryTable(CTblCodeHistory *pTable);
     QString createNewFileName();
-    void processLockCodeHistoryReport(CLockHistorySet *_pHistorySet, QFile *pFile, QDateTime &dtReportStart, QDateTime &dtReportEnd, QString LockNums);
+    void processLockCodeHistoryReport(CLockHistorySet *_pHistorySet, QFile *pFile, QDateTime &dtReportStart, QDateTime &dtReportEnd);
 
-    void processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums);
+    void processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd);
 signals:
     void __EmailFailed();
     void __EmailSucceeded();

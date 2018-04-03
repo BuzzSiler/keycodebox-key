@@ -31,6 +31,7 @@
 #include "linux/reboot.h"
 #include <unistd.h>
 #include "selectlockswidget.h"
+#include "kcbcommon.h"
 
 
 static const char CMD_REMOVE_ALL_FP_FILES[] = "sudo rm -rf /home/pi/run/prints/*";
@@ -120,7 +121,7 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(this, SIGNAL(__OnReadLockHistorySet(QString,QDateTime,QDateTime)), _psysController, SLOT(OnReadLockHistorySet(QString,QDateTime,QDateTime)));
     connect(_psysController, SIGNAL(__OnLockHistorySet(CLockHistorySet*)), this, SLOT(OnLockHistorySet(CLockHistorySet*)));
-    connect(this, SIGNAL(__OnImmediateReportRequest(QDateTime,QDateTime,QString)), _psysController, SLOT(OnImmediateReportRequest(QDateTime,QDateTime,QString)));
+    connect(this, SIGNAL(__OnImmediateReportRequest(QDateTime,QDateTime)), _psysController, SLOT(OnImmediateReportRequest(QDateTime,QDateTime)));
 
     //connect(this, SIGNAL(__LocalOnReadLockSet(QString,QDateTime,QDateTime)), this, SLOT(LocalReadLockSet(QString,QDateTime,QDateTime)));
     //connect(this, SIGNAL(__LocalOnReadLockHistorySet(QString, QDateTime, QDateTime)), this, SLOT(LocalReadLockHistorySet(QString, QDateTime, QDateTime)));
@@ -140,6 +141,8 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(ui->chkDisplayFingerprintButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(ui->chkDisplayShowHideButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayShowHideButton(bool)));
+
+    connect(&m_select_locks, &SelectLocksWidget::NotifyRequestLockOpen, this, &CFrmAdminInfo::OnOpenLockRequest);
 
 }
 
@@ -210,7 +213,7 @@ void CFrmAdminInfo::initialize()
 
     populateTimeZoneSelection(ui->cbTimeZone);
     //populateCodeLockSelection();
-    populateCodeLockHistorySelection();
+    //populateCodeLockHistorySelection();
     startMediaTimer();
 
     ui->dtStartCodeList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
@@ -456,12 +459,12 @@ void CFrmAdminInfo::populateBoxListSelection(QComboBox *cbox)
 
 void CFrmAdminInfo::populateCodeLockSelection()
 {
-    populateBoxListSelection(ui->cbLockNum);
+//    populateBoxListSelection(ui->cbLockNum);
 }
 
 void CFrmAdminInfo::populateCodeLockHistorySelection()
 {
-    populateBoxListSelection(ui->cbLockNumHistory);
+//    populateBoxListSelection(ui->cbLockNumHistory);
 }
 
 void CFrmAdminInfo::populateFileWidget(QString sDirectory, QString sFilter)
@@ -778,6 +781,8 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
 
             _pState = createNewLockState();
 
+			// KCB TODO: fill in _pState and call Handlexxx to update
+
             // OnCodeEditDoneSave(-1, -1, QString::number(lock), code1, code2, description, 
             //                   dtStart, dtEnd, false, false, false, 
             //                   question1, question2, question3,
@@ -825,25 +830,25 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
 
 void CFrmAdminInfo::onStartEditLabel(QLabel* pLabel, QString sLabelText)
 {
-//    if(!_pKeyboard)
-//    {
-//        _pKeyboard = new CDlgFullKeyboard();
-//        connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*,CCurrentEdit*)),
-//                this, SLOT(OnKeyboardTextEntered(CDlgFullKeyboard*, CCurrentEdit*)));
-//    }
-//    if(!_pcurrentLabelEdit)
-//    {
-//        _pcurrentLabelEdit = new CCurrentEdit();
-//    }
-//    if(_pKeyboard && _pcurrentLabelEdit)
-//    {
-//        _pKeyboard->setCurrentEdit(_pcurrentLabelEdit);
-//        _pcurrentLabelEdit->setLabelToBeEdited(pLabel);
-//        _pcurrentLabelEdit->setOriginalTextToEdit(pLabel->text());
-//        _pcurrentLabelEdit->setLabelText(sLabelText);
+    if(!_pKeyboard)
+    {
+        _pKeyboard = new CDlgFullKeyboard();
+        connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*,CCurrentEdit*)),
+                this, SLOT(OnKeyboardTextEntered(CDlgFullKeyboard*, CCurrentEdit*)));
+    }
+    if(!_pcurrentLabelEdit)
+    {
+        _pcurrentLabelEdit = new CCurrentEdit();
+    }
+    if(_pKeyboard && _pcurrentLabelEdit)
+    {
+        _pKeyboard->setCurrentEdit(_pcurrentLabelEdit);
+        _pcurrentLabelEdit->setLabelToBeEdited(pLabel);
+        _pcurrentLabelEdit->setOriginalTextToEdit(pLabel->text());
+        _pcurrentLabelEdit->setLabelText(sLabelText);
 
-//        _pKeyboard->setActive();
-//    }
+        _pKeyboard->setActive();
+    }
 }
 
 void CFrmAdminInfo::OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *currEdit)
@@ -1309,7 +1314,7 @@ void CFrmAdminInfo::codeHistoryTableCellSelected(int nRow, int nCol)
 
 void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QTableWidget *table = ui->tblCodesList;
 
@@ -1359,7 +1364,7 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
-        qDebug() << "Adding row of Lock State - Codes. Lock Nums:" << QVariant(pState->getLockNums());
+        // qDebug() << "Adding row of Lock State - Codes. Lock Nums:" << QVariant(pState->getLockNums());
 
         // Locks can be single or comma-separated.  We will add the comma-separated value as well as
         // the individual locks for filtering purposes
@@ -1405,6 +1410,8 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     QStringList sl(lock_items.toList());
     sl.sort();
     ui->cbLockNum->addItems(sl);
+
+    // KCB_DEBUG_EXIT();
 }
 
 void CFrmAdminInfo::setupCodeTableContextMenu() 
@@ -1510,13 +1517,13 @@ void CFrmAdminInfo::codeDeleteSelection()
 void CFrmAdminInfo::codeAddNew()
 {
     qDebug() << "codeAddNew";
-    addCodeByRow(_nRowSelected);
+    addCodeByRow();
 }
 
 void CFrmAdminInfo::codeInitNew()
 {
     qDebug() << "codeInitNew";
-    addCodeByRow(-1);
+    addCodeByRow();
 }
 
 void CFrmAdminInfo::codeEnableAll()
@@ -1591,20 +1598,6 @@ void CFrmAdminInfo::codeCellSelected( int row, int col)
     }
 }
 
-// int CFrmAdminInfo::isLock(uint16_t nLockNum)
-// {
-//     // Test
-//     uint64_t    un64Mask = 0x0000000000000001;
-//     uint64_t    un64LockNum = (unsigned long long)nLockNum - 1LL;  // Set Lock num to zero based number
-//     if ((_un64LockLocks & (un64Mask << un64LockNum)) != 0 )
-//     {
-//         return 1;
-//     } 
-//     else 
-//     {
-//         return 0;
-//     }
-// }
 
 void CFrmAdminInfo::on_dialBright_valueChanged(int value)
 {
@@ -1625,22 +1618,6 @@ void CFrmAdminInfo::on_btnReadCodes_clicked()
 
     emit __OnReadLockSet(locks, dtStart, dtEnd);
 }
-
-// void CFrmAdminInfo::LocalReadLockSet(QString Locks, QDateTime dtStart, QDateTime dtEnd)
-// {
-//     ui->cbLockNum->setCurrentIndex( Locks.toInt() );
-//     ui->dtStartCodeList->setDateTime(dtStart);
-//     ui->dtEndCodeList->setDateTime(dtEnd);
-//     emit __OnReadLockSet(Locks, _DATENONE, _DATENONE);
-// }
-
-// void CFrmAdminInfo::LocalReadLockHistorySet(QString Locks, QDateTime dtStart, QDateTime dtEnd)
-// {
-//     ui->cbLockNumHistory->setCurrentIndex( Locks.toInt() );
-//     ui->dtStartCodeHistoryList->setDateTime(dtStart);
-//     ui->dtEndCodeHistoryList->setDateTime(dtEnd);
-//     emit __OnReadLockSet(Locks, _DATENONE, _DATENONE);
-// }
 
 void CFrmAdminInfo::on_btnRead_clicked()
 {
@@ -1744,23 +1721,7 @@ void CFrmAdminInfo::on_btnPrintReport_clicked()
     _bClose = false;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
 
-    emit __OnImmediateReportRequest(dtStart, dtEnd, QString::number(-1));
-}
-
-void CFrmAdminInfo::on_btnOpenAllDoors_2_clicked(bool checked)
-{
-    if( checked ) 
-    {
-        _bContinueOpenLoop = true;
-        _bStopOpen = false;
-        //openAllDoors();
-    } 
-    else 
-    {
-        // Stop
-        _bContinueOpenLoop = true;
-        _bStopOpen = true;
-    }
+    emit __OnImmediateReportRequest(dtStart, dtEnd);
 }
 
 void CFrmAdminInfo::on_btnToggleSource_clicked(bool checked)
@@ -1837,13 +1798,13 @@ void CFrmAdminInfo::HandleCodeUpdate()
 
     if(_pState->isNew())
     {
-        qDebug() << "CFrmAdminInfo::HandleCodeUpdate() new _pState";
+        KCB_DEBUG_TRACE("new _pState");
         if(_pworkingSet)
         {
-            qDebug() << "CFrmAdminInfo::HandleCodeUpdate() adding _pState to _pworkingSet";
+            KCB_DEBUG_TRACE("adding _pState to _pworkingSet");
             _pworkingSet->addToSet(_pState);
         }
-        qDebug() << "CFrmAdminInfo::HandleCodeUpdate() emitting __OnUpdateCodeState";
+        KCB_DEBUG_TRACE("emitting __OnUpdateCodeState");
         emit __OnUpdateCodeState(_pState);
     } 
     else 
@@ -1857,7 +1818,7 @@ void CFrmAdminInfo::HandleCodeUpdate()
 
 
         /* Note: The following code seems to assume dtStart/dtEnd will be datetime, but what about ALWAYS? */
-        qDebug() << "CFrmAdminInfo::HandleCodeUpdate() not new _pState";
+        KCB_DEBUG_TRACE("not new _pState");
 
         QString locks = _pState->getLockNums();
 
@@ -1922,7 +1883,7 @@ void CFrmAdminInfo::OnRowSelected(int row, int column)
 {
     Q_UNUSED(column);
     _nRowSelected = row;
-    qDebug() << "Row Selected:" << QString::number(_nRowSelected);
+    KCB_DEBUG_TRACE(_nRowSelected);
     _pTableMenu->show();
 
     QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
@@ -2028,18 +1989,16 @@ void CFrmAdminInfo::checkAndCreateCodeEditForm()
     }
 }
 
-void CFrmAdminInfo::addCodeByRow(int row)
+void CFrmAdminInfo::addCodeByRow()
 {
-    Q_UNUSED(row);
-
-    qDebug() << "CFrmAdminInfo::addCodeByRow";
+    KCB_DEBUG_ENTRY;
     checkAndCreateCodeEditForm();
 
     // Get line values
     CLockSet::Iterator itor;
     if (_pState)
     {
-        qDebug() << "Freeing _pState in CFrmAdminInfo::addCodeByRow";
+        KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
 
@@ -2051,11 +2010,12 @@ void CFrmAdminInfo::addCodeByRow(int row)
 
     _pFrmCodeEditMulti->setValues(_pState);                             
     _pFrmCodeEditMulti->show();
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::editCodeByRow(int row)
 {
-    qDebug() << "CFrmAdminInfo::editCodeByRow" << row;
+    KCB_DEBUG_TRACE(row);
     
     checkAndCreateCodeEditForm();
 
@@ -2065,7 +2025,7 @@ void CFrmAdminInfo::editCodeByRow(int row)
     CLockSet::Iterator itor;
     if (_pState)
     {
-        qDebug() << "Freeing _pState in CFrmAdminInfo::editCodeByRow";
+        KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
     int nRow = 0;
@@ -2106,7 +2066,7 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
     CLockSet::Iterator itor;
     if (_pState)
     {
-        qDebug() << "Freeing _pState in CFrmAdminInfo::deleteCodeByRow";
+        KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
     int nRow = 0;
@@ -2149,7 +2109,7 @@ void CFrmAdminInfo::purgeCodes()
     CLockSet::Iterator itor;
     if (_pState)
     {
-        qDebug() << "Freeing _pState in CFrmAdminInfo::purgeCodes";
+        KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
     int nRow = 0;
@@ -2262,7 +2222,7 @@ void CFrmAdminInfo::OnDisplayShowHideButton(bool state)
     ui->chkDisplayShowHideButton->setChecked(state);
 }
 
-void CFrmAdminInfo::OnRequestLockOpen(QString lockNums)
+void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
 {
-    emit __OnOpenLockRequest(lockNums, false);
+    emit __OnOpenLockRequest(lock, is_user);
 }

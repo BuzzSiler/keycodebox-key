@@ -82,7 +82,8 @@ SOURCES += main.cpp\
     lockcabinetwidget.cpp \
     dlgnumberpad.cpp \
     kcbkeyboardwidget.cpp \
-    kcbkeyboarddialog.cpp
+    kcbkeyboarddialog.cpp \
+    kcbutils.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -150,7 +151,8 @@ HEADERS  += keycodeboxmain.h \
     dlgnumberpad.h \
     kcbcommon.h \
     kcbkeyboardwidget.h \
-    kcbkeyboarddialog.h
+    kcbkeyboarddialog.h \
+    kcbutils.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

@@ -28,8 +28,7 @@ class SelectLocksWidget : public QWidget
 
 
     signals:
-        void NotifyRequestLockOpen(QString lockNum);
-        void NotifyLockOpenComplete();
+        void NotifyRequestLockOpen(QString lockNum, bool is_user);
 
         void NotifyClose();
         void NotifyOpen();

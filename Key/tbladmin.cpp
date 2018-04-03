@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include "encryption.h"
 #include <exception>
+#include "kcbcommon.h"
 
 const char *fid = "ids";
 const char *fname = "admin_name";
@@ -306,6 +307,14 @@ bool CAdminRec::setFromJsonString(QString strJson)
     return true;
 }
 
+CTblAdmin::CTblAdmin(QSqlDatabase *db)
+{
+    KCB_DEBUG_ENTRY;
+    _pDB = db;
+    initialize();
+    KCB_DEBUG_EXIT;
+}
+
 QString CTblAdmin::isAccessCode(QString code)
 {
     qDebug() << "CTblAdmin::isAccessCode():" << code << " =? " << _currentAdmin.getAccessCode();
@@ -496,7 +505,8 @@ bool CTblAdmin::readAdmin()
                   " FROM ";
     sql += TABLENAME;
 
-    if( query.exec(sql)) {
+    if( query.exec(sql)) 
+    {
         int fldAdmin_name= query.record().indexOf(fname);
         int fldAdmin_email = query.record().indexOf(femail);
         int fldAdmin_phone = query.record().indexOf(fphone);

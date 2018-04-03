@@ -2,6 +2,7 @@
 #include "securitycontroller.h"
 #include "modelsecurity.h"
 #include "encryption.h"
+#include "kcbcommon.h"
 
 
 CSecurityController::CSecurityController(QObject *parent) : QObject(parent),
@@ -180,20 +181,21 @@ void CSecurityController::CheckPredictiveAccessCode(QString code)
  */
 void CSecurityController::CheckAccessCodeOne(QString code1)
 {
+    KCB_DEBUG_TRACE(code1);
+
     // Use the CModelSecurity class
     _sCode1 = code1;
     _sCode2 = "";       // clear code2
-    qDebug() << "CSecurityController::CheckAccessCodeOne:" << code1;
 
     emit(__VerifyCodeOne(code1));       // This should cross thread to the _modelSecurity object
 }
 
 void CSecurityController::CheckAccessCodeTwo(QString code2)
 {
-    // Use the CModelSecurity class
+    KCB_DEBUG_TRACE(code2);
+
     _sCode2 = code2;
 
-    qDebug() << "CSecurityController::CheckAccessCodeTwo\n";
     QString sCodeEnc(CEncryption::encryptString(code2));
 
     emit(__VerifyCodeTwo(sCodeEnc));       // This should cross thread to the _modelSecurity object
@@ -262,14 +264,14 @@ void CSecurityController::OnAdminSecurityCheckFailed()
 
 void CSecurityController::OnSecurityCheckSuccess(QString locks)
 {
-    qDebug() << "CSecurityController::OnSecurityCheckSuccess" << locks.count() << "locks";
+    KCB_DEBUG_TRACE("locks:" << locks);
     emit __OnSecurityCheckSuccess(locks);
     emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
 }
 
 void CSecurityController::OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
-    qDebug() << "CSecurityController::OnSecurityCheckSuccessWithAnswers, " << answer1 << ", " << answer2 << ", " << answer3;
+    KCB_DEBUG_TRACE(answer1 << ", " << answer2 << ", " << answer3);
     emit __OnSecurityCheckSuccess(lockNums);
     emit __OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(answer1, answer2, answer3);
 }

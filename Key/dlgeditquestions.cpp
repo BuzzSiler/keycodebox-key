@@ -1,6 +1,7 @@
 #include "dlgeditquestions.h"
 #include "ui_dlgeditquestions.h"
 #include <QDebug>
+#include "kcbutils.h"
 #include "kcbkeyboarddialog.h"
 
 CDlgEditQuestions::CDlgEditQuestions(QWidget *parent) :
@@ -15,6 +16,7 @@ CDlgEditQuestions::CDlgEditQuestions(QWidget *parent) :
 
 CDlgEditQuestions::~CDlgEditQuestions()
 {
+    Kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 

@@ -9,6 +9,7 @@
 #include <QTextStream>
 #include <QIODevice>
 #include <QDateTime>
+#include "kcbcommon.h"
 
 void CModelSecurity::openDatabase()
 {
@@ -83,7 +84,6 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 void CModelSecurity::OnUpdateCodeState(CLockState *rec)
 {
     qDebug() << "CModelSecurity::OnUpdateCodeState";
-    rec->show();
     bool bSuccess = _ptblCodes->updateCode(rec);
 
     emit __OnUpdatedCodeState(bSuccess);
@@ -180,16 +180,11 @@ bool CModelSecurity::CheckPredictiveAccessCode(QString code, int &nLockNum)
     return false;
 }
 
-/**
- * @brief CModelSecurity::OnVerifyCodeOne
- * @param code - encrypted
- */
 void CModelSecurity::OnVerifyCodeOne(QString code)
 {
-    // Check the DB
-    _type = "";  // "User" or "Admin" or "Assist" or ""
+    KCB_DEBUG_TRACE(code);
 
-    qDebug() << "CModelSecurity::OnVerifyCodeOne. Code:" << code;
+    _type = "";  // "User" or "Admin" or "Assist" or ""
 
     _type = _ptblAdmin->isAccessCode(code);
     if(_type == "Admin" || _type == "Assist")
@@ -210,12 +205,13 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
             {
                 // Check again to see if we match a second code existing in the codes table
                 QString sCodeEnc = CEncryption::encryptString(code);
+                QString lockNums;
 
-                QString lock_nums = _ptblCodes->checkCodeOne(sCodeEnc,
-                                                             bSecondCodeRequired,
-                                                             bFingerprintRequired,
-                                                             lock_nums);
-                if( lock_nums != "" )
+                int result = _ptblCodes->checkCodeOne(sCodeEnc,
+                                                      bSecondCodeRequired,
+                                                      bFingerprintRequired,
+                                                      lockNums);
+                if( result == KCB_SUCCESS && lockNums != "" )
                 {
                     // need to check if fingerprint security is enabled
                     // if so, check for existence of existing fingerprints
@@ -247,12 +243,14 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                                 emit __EnrollFingerprint(code);
                             }
                             else
+                            {
                                 emit __OnSecurityCheckedFailed();
+                            }
                             return;
                         }
 
-                        emit __OnSecurityCheckSuccess(lock_nums);
-                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(lock_nums, code);
+                        emit __OnSecurityCheckSuccess(lockNums);
+                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(lockNums, code);
                     }
                 }
                 else
@@ -270,12 +268,16 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
         {
             
             QString sCodeEnc = CEncryption::encryptString(code);
+            QString lockNums;
 
-            qDebug() << "CModelSecurity::OnVerifyCodeOne Encrypted Code" << sCodeEnc;
+            KCB_DEBUG_TRACE("Encrypted Code" << sCodeEnc);
 
-            QString lock_nums = _ptblCodes->checkCodeOne(sCodeEnc, bSecondCodeRequired, bFingerprintRequired, lock_nums);
-            qDebug() << "CModelSecurity::OnVerifyCodeOne" << lock_nums;
-            if( lock_nums != "" )
+            int result = _ptblCodes->checkCodeOne(sCodeEnc,
+                                                  bSecondCodeRequired,
+                                                  bFingerprintRequired,
+                                                  lockNums);
+            KCB_DEBUG_TRACE(lockNums);
+            if( result == KCB_SUCCESS && lockNums != "" )
             {
                 // need to check if fingerprint security is enabled
                 // if so, check for existence of existing fingerprints
@@ -310,22 +312,23 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                         {
                             emit __OnSecurityCheckedFailed();
                         }
+                        KCB_DEBUG_TRACE("fingerprint required");
                         return;
                     }
 
-                    emit __OnSecurityCheckSuccess(lock_nums);
+                    emit __OnSecurityCheckSuccess(lockNums);
                 }
-            } else {
+            }
+            else
+            {
                 emit __OnSecurityCheckedFailed();
             }
         }
     }
+
+    KCB_DEBUG_EXIT;
 }
 
-/**
- * @brief CModelSecurity::OnVerifyCodeOne
- * @param code - encrypted
- */
 void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 {
     // Check the DB
@@ -334,7 +337,8 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
     qDebug() << "CModelSecurity::OnVerifyFingerprintCodeOne. Code:" << code;
 
     _type = _ptblAdmin->isAccessCode(code);
-    if(_type == "Admin" || _type == "Assist") {
+    if(_type == "Admin" || _type == "Assist") 
+    {
         emit __OnRequireAdminPassword();
     }
     else
@@ -345,7 +349,7 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 
         if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
         {
-            qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
+            KCB_DEBUG_TRACE("Predictive Code:" << code);
             CheckPredictiveAccessCode(code, nDoorNum);
 
         } 
@@ -357,9 +361,13 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
         else
         {
             QString sCodeEnc = CEncryption::encryptString(code);
+            QString lockNums = "";
 
-            QString lock_str = _ptblCodes->checkCodeOne(sCodeEnc, bSecondCodeRequired, bFingerprintRequired, lock_str);
-            if( lock_str != "" )
+            int result = _ptblCodes->checkCodeOne(sCodeEnc,
+                                                  bSecondCodeRequired,
+                                                  bFingerprintRequired,
+                                                  lockNums);
+            if( result == KCB_SUCCESS && lockNums != "" )
             {
                 // need to check if fingerprint security is enabled
                 // if so, check for existence of existing fingerprints
@@ -382,16 +390,7 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
                 else 
                 {
 
-                    /* Allowing multiple boxes to be opened need to be handled here for 
-                        single code.  __OnSecurityCheckSuccess is connected to 
-                        SystemController::OnSecurityCheckRequest which accepts a single
-                        lock number and opens a single lock.  This could be expanded
-                        here to query for all of locks with matching first codes and
-                        then pass that list of locks to a new signal __OnSecurityCheckSuccessList
-                        or change the existing signal to always accept a list, even if
-                        there is just one.
-                    */
-                    emit __OnSecurityCheckSuccess(lock_str);
+                    emit __OnSecurityCheckSuccess(lockNums);
                 }
             } 
             else 
@@ -404,6 +403,8 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 
 void CModelSecurity::OnVerifyCodeTwo(QString code)
 {
+    KCB_DEBUG_TRACE(code);
+
     bool bFingerprintRequired = false;
     bool bQuestionsRequired = false;
     QString codeOne;
@@ -428,8 +429,16 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     {
         QString lockNums;
 
-        if( _ptblCodes->checkCodeTwo(code, bFingerprintRequired, bQuestionsRequired, codeOne, lockNums, 
-                                     bAskQuestions, question1, question2, question3) > 0 )
+        int result = _ptblCodes->checkCodeTwo(code,
+                                             bFingerprintRequired,
+                                             bQuestionsRequired,
+                                             codeOne,
+                                             lockNums,
+                                             bAskQuestions,
+                                             question1,
+                                             question2,
+                                             question3);
+		if (result == KCB_SUCCESS && lockNums != "")
         {
             //we need to check if a fingerprint directory already exists,
             // if they do, do not attempt enrollmesnt
@@ -514,17 +523,17 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
     else if( _type == "User" )
     {
         QString lockNums;
-        if( _ptblCodes->checkCodeTwo(code, bFingerprintRequired, bQuestionsRequired, codeOne, lockNums, bAskQuestions, question1, question2, question3) > 0 )
-        {
-            /* Allowing multiple boxes to be opened need to be handled here for 
-                single code.  __OnSecurityCheckSuccess is connected to 
-                SystemController::OnSecurityCheckRequest which accepts a single
-                lock number and opens a single lock.  This could be expanded
-                here to query for all of locks with matching first codes and
-                then pass that list of locks to a new signal __OnSecurityCheckSuccessList
-                or change the existing signal to always accept a list, even if
-                there is just one.
-            */            
+        int result = _ptblCodes->checkCodeTwo(code,
+                                              bFingerprintRequired,
+                                              bQuestionsRequired,
+                                              codeOne,
+                                              lockNums,
+                                              bAskQuestions,
+                                              question1,
+                                              question2,
+                                              question3);
+		if (result == KCB_SUCCESS && lockNums != "")
+		{
             emit __OnSecurityCheckSuccess(lockNums);
         }
         else
@@ -537,7 +546,7 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
 
 void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code)
 {
-    qDebug() << " ----------------------OnCreateHistoryRecordFromLastSuccessfulLogin()";
+    KCB_DEBUG_ENTRY;
 
     CLockHistoryRec lockHistoryRec;
     CLockState  lockState;
@@ -547,11 +556,12 @@ void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNu
     lockState.setCode1(code);
     lockHistoryRec.setFromLockState(lockState);
     _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
 {
-    qDebug() << " ----------------------OnCreateHistoryRecordFromLastSuccessfulLogin()";
+    KCB_DEBUG_ENTRY;
     int ids = _ptblCodes->getLastSuccessfulIDS();
     if(ids != -1)
     {
@@ -570,15 +580,17 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
             lockHistoryRec.setFromLockState(*pState);
             _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
         }
-        if(nVal > 1) {
-            qDebug() << "Error: CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin() has more than 1 record";
+        if(nVal > 1) 
+        {
+            KCB_DEBUG_TRACE("Error has more than 1 record");
         }
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString answer1, QString answer2, QString answer3)
 {
-    qDebug() << " ----------------------OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString, QString, QString)";
+    KCB_DEBUG_ENTRY;
     int ids = _ptblCodes->getLastSuccessfulIDS();
     if(ids != -1)
     {
@@ -598,18 +610,21 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QSt
             _ptblCodeHistory->addLockCodeHistoryWithAnswers(lockHistoryRec, answer1, answer2, answer3);
         }
         if(nVal > 1) {
-            qDebug() << "Error: CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers() has more than 1 record";
+            KCB_DEBUG_TRACE("Error has more than 1 record");
         }
     }
+    KCB_DEBUG_EXIT;
+    
 }
 
 void CModelSecurity::RequestLastSuccessfulLogin()
 {
-    qDebug() << " ----------------------RequestLastSuccessfulLogin()";
+    KCB_DEBUG_ENTRY;
     if( !_ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
     {
         int ids = _ptblCodes->getLastSuccessfulIDS();
-        if(ids != -1){
+        if(ids != -1)
+        {
             qDebug() << "--------lastSuccessfulIDS ids != -1";
             int         nVal;
             CLockSet    *pLockSet;
@@ -628,14 +643,18 @@ void CModelSecurity::RequestLastSuccessfulLogin()
                 //
                 emit __OnLastSuccessfulLogin(plockHistoryRec);
             }
-            if(nVal > 1) {
-                qDebug() << "Error: CModelSecurity::RequestLastSuccessfulLogin() has more than 1 record";
+            if(nVal > 1) 
+            {
+                KCB_DEBUG_TRACE("Error has more than 1 record");
             }
-        } else {
+        } 
+        else 
+        {
             qDebug() << "ids == -1)";
         }
     }
-    else {
+    else 
+    {
         qDebug() << "RequestLastSuccessfulLogin( Predictive )";
         CLockHistorySet *_pHistorySet = NULL;
 
@@ -659,6 +678,8 @@ void CModelSecurity::RequestLastSuccessfulLogin()
             emit __OnLastSuccessfulLogin(plockHistoryRec);
         }
     }
+
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd)

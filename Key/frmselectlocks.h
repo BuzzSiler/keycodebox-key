@@ -7,6 +7,7 @@ namespace Ui {
 class CFrmSelectLocks;
 }
 
+class QTimer;
 class SelectLocksWidget;
 
 class CFrmSelectLocks : public QDialog
@@ -20,14 +21,13 @@ class CFrmSelectLocks : public QDialog
         void setLocks(QString locks);
         QString getLocks();
 
-//    public slots:
-//        void OnNotifyRequestLockOpen(QString lock);
-//        void OnNotifyLockOpenComplete();
-    
     private:
         SelectLocksWidget& m_select_locks;
         QStringList m_selected_locks;
+        QTimer& m_timer;
         Ui::CFrmSelectLocks *ui;
+
+        void update();
 };
 
 #endif // FRMSELECTLOCKS_H

@@ -74,7 +74,7 @@ signals:
     void __OnOpenLockRequest(QString LockNums, bool is_user);
     void __OnReadDoorLocksState();
     void __OnBrightnessChanged(int nValue);
-    void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums);
+    void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd);
     void __OnAdminInfoCodes(QString code1, QString code2);
 
     //void __LocalOnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
@@ -116,7 +116,9 @@ public slots:
     void OnTabSelected(int index);
     void OnDisplayFingerprintButton(bool);
     void OnDisplayShowHideButton(bool);
-    void OnRequestLockOpen(QString lockNums);
+//    void OnRequestLockOpen(QString lockNums);
+    void OnOpenLockRequest(QString lock, bool is_user);
+
     
 private slots:
     void OnCodes(QString code1, QString code2);
@@ -172,14 +174,13 @@ private slots:
     void OnMediaCheckTimeout();
     void onModelDirectoryLoaded(QString path);
     void onRootPathChanged(QString path);
-    void on_btnOpenAllDoors_2_clicked(bool checked);
     void on_btnToggleSource_clicked(bool checked);
     void on_tblCodesList_doubleClicked(const QModelIndex &index);
     void on_tblCodesList_cellDoubleClicked(int row, int column);
     void on_tblCodesList_cellClicked(int row, int column);
     void OnRowSelected(int row, int column);
     void deleteCodeByRow(int row);
-    void addCodeByRow(int row);
+    void addCodeByRow();
     void OnHeaderSelected(int nHeader);
     void on_treeViewCopy_clicked(const QModelIndex &index);
     void onCopyRootPathChanged(QString path);
@@ -259,9 +260,6 @@ private:
 
     QString             _reportDirectory;
     QString             _copyDirectory;
-
-    int                 _tmpDoorOpen;
-    bool                _bContinueOpenLoop, _bStopOpen;
 
     bool                _testEmail;
 

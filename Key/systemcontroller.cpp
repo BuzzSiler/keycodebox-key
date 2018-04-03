@@ -18,6 +18,7 @@
 #include "version.h"
 #include "usbprovider.h"
 #include "frmselectlocks.h"
+#include "kcbcommon.h"
 
 CSystemController::CSystemController(QObject *parent) :
     QObject(parent)
@@ -347,7 +348,7 @@ void CSystemController::OnIdentifiedFingerprint(QString sCode, QString sCode2)
 
 void CSystemController::OnCodeEntered(QString sCode)
 {
-    qDebug() << "SystemController::OnCodeEntered:" << sCode;
+    KCB_DEBUG_TRACE(sCode);
 
     //force enrollment step count reset
     EnrollFingerprintResetStageCount();
@@ -357,7 +358,7 @@ void CSystemController::OnCodeEntered(QString sCode)
 
 void CSystemController::OnCodeEnteredTwo(QString sCode)
 {
-    qDebug() << "SystemController::OnCodeEnteredTwo:" << sCode;
+    KCB_DEBUG_TRACE(sCode);
 
     //if( _securityController.CheckAccessCodeTwoFingerprint() )
     //  check to see if the directory exists with fingerprintreader class
@@ -465,13 +466,14 @@ void CSystemController::OnUserCodeCancel()
 
 void CSystemController::OnOpenLockRequest(QString LockNums, bool is_user)
 {
+    KCB_DEBUG_TRACE(LockNums << is_user);
     // Open the lock
     qDebug() << "Lock Open";
     emit __OnCodeMessage(tr("Lock Open"));
     _LockController.openLocks(LockNums);
-    qDebug() << "SystemController: reportActivity";
     if (is_user)
     {
+        qDebug() << "SystemController: reportActivity";
         reportActivity();
     }
 }
@@ -484,9 +486,9 @@ void CSystemController::reportActivity()
     emit __RequestLastSuccessfulLogin();
 }
 
-void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd, QString LockNums)
+void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd)
 {
-    _ReportController.processImmediateReport(dtReportStart, dtReportEnd, LockNums);
+    _ReportController.processImmediateReport(dtReportStart, dtReportEnd);
 }
 
 void CSystemController::OnReadLockStatus()
@@ -498,48 +500,42 @@ void CSystemController::OnReadLockStatus()
 
 void CSystemController::OnSecurityCheckSuccess(QString locks)
 {    
-    qDebug() << "CSystemController::OnSecurityCheckSuccess" << locks;
+    KCB_DEBUG_TRACE(locks);
     _locks = locks;
 
-    if (!locks.contains(','))
-    {
-        OnOpenLockRequest(locks, true);
-        _systemState = EThankYou;
-    }
-    else
-    {
-        // Put up the select locks dialog
-        // select locks dialog/widget will generate a list of locks to be opened
-        // and emit a NotifyRequestLockOpen signal from widget to dialog, emit
-        // signal __OnOpenLock... which calls slot OnOpenLockRequest to open
-        // the lock.
-        // When all the locks have been opened, select locks widget will emit
-        // signal completed and select locks widget will return.  But how
-        // are we returning?
-        // If we exec the dialog can signals still be received?  If so, that
-        // simplifies this code.  We just exec and wait for an accepted or
-        // rejected return code.  Accepted will be returned if open was selected
-        // and rejected will be returned if closed was selected.
-        //
-        CFrmSelectLocks dlg;
+     if (!locks.contains(','))
+     {
+         OnOpenLockRequest(locks, true);
+         _systemState = EThankYou;
+     }
+     else
+     {
+         CFrmSelectLocks dlg;
 
-        dlg.setLocks(locks);
-        if (dlg.exec())
-        {
-            // We get here, when open finished and calls done(Accepted)
-            // What is our system state here?
-            _locks = dlg.getLocks();
-            qDebug() << "Selected locks - " << _locks;
-            _systemState = EThankYou;
-        }
-        else
-        {
-            // We get here, if close is clicked
-            // What is our system state here?
-            _systemState = ETimeoutScreen;
-        }
-    }
+         dlg.setLocks(locks);
+         if (dlg.exec())
+         {
+             // We get here, when open finished and calls done(Accepted)
+             // What is our system state here?
+             _locks = dlg.getLocks();
+             qDebug() << "Selected locks - " << _locks;
 
+             QStringList sl = _locks.split(",");
+
+             foreach (auto s, sl)
+             {
+                 OnOpenLockRequest(s, true);
+             }
+
+             _systemState = EThankYou;
+         }
+         else
+         {
+             // We get here, if close is clicked
+             // What is our system state here?
+             _systemState = ETimeoutScreen;
+         }
+     }
 }
 #ifdef MULTILOCK
 void CSystemController::OnSecurityCheckSuccess(QVector<int> locks)

@@ -6,6 +6,7 @@
 #include <QSignalMapper>
 #include <QVector>
 #include "lockcabinetwidget.h"
+#include "kcbutils.h"
 
 SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role, int num_cabs) :
     QWidget(parent),
@@ -29,6 +30,7 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role, int num_cabs) :
 
 SelectLocksWidget::~SelectLocksWidget()
 {
+    Kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 
@@ -158,7 +160,7 @@ void SelectLocksWidget::openDoorTimer()
 
     m_lock_cab.setSelectedCabinet(cab);
     m_lock_cab.clrSelectedLocks(lock);
-    emit NotifyRequestLockOpen(lock);
+    emit NotifyRequestLockOpen(lock, false);
 
     if (m_cancel_open || ui->lstSelectedLocks->count() == 0)
     {

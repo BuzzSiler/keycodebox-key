@@ -151,23 +151,6 @@ private:
     QString report_directory;
 };
 
-/**
- * @brief The CTblAdmin class
- *
- * @table "admin" fields
- *      ids integer primary key unique,
- *      admin_name text,
- *      admin_email text,
- *      admin_phone text,
- *      email_report_active,
- *      default_report_freq TIME,
- *      default_report_start DATETIME,
- *      password text,
- *      access_code text,
- *      assist_code text,
- *      assist_password text
- */
-
 class CTblAdmin
 {
     const QString TABLENAME = "admin";
@@ -187,15 +170,7 @@ private:
     bool readAdmin();
 
 public:
-    CTblAdmin(QSqlDatabase *db)
-    {
-        setDatabase(db);
-        initialize();
-    }
-
-    void setDatabase(QSqlDatabase *db) {
-        _pDB = db;
-    }
+    CTblAdmin(QSqlDatabase *db);
 
     void addAdmin();
     bool updateAdmin(QString name, QString email, QString phone,

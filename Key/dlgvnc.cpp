@@ -65,7 +65,8 @@ void CDlgVNC::getValues(int &nVNCPort, QString &sPassword)
 void CDlgVNC::onStartEditLabel(QLabel* pLabel, QString sLabelText)
 {
     qDebug() << "onStartEditLabel()";
-    if(!_pKeyboard) {
+    if(!_pKeyboard) 
+    {
         qDebug() << "initializing keyboard()";
         initializeKeyboard();
     }
@@ -80,9 +81,13 @@ void CDlgVNC::onStartEditLabel(QLabel* pLabel, QString sLabelText)
 
         qDebug() << "onStartEditLabel(): Showing Keyboard";
         _pKeyboard->show();
-    } else if(!_pKeyboard) {
+    } 
+    else if(!_pKeyboard) 
+    {
         qDebug() << "No keyboard";
-    } else if(!_pcurrentLabelEdit) {
+    } 
+    else if(!_pcurrentLabelEdit) 
+    {
         qDebug() << "No CurrentEdit";
     }
 }

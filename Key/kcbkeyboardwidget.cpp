@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QSignalMapper>
+#include "kcbutils.h"
 
 KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
     QWidget(parent),
@@ -62,6 +63,7 @@ KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
 
 KcbKeyboardWidget::~KcbKeyboardWidget()
 {
+    Kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 

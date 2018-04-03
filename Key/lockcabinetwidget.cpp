@@ -4,6 +4,7 @@
 #include <QtGlobal>
 #include <QDebug>
 #include <QSignalMapper>
+#include "kcbutils.h"
 
 LockCabinetWidget::LockCabinetWidget(QWidget *parent, quint8 num_cabs, quint8 locks_per_cab) :
     QWidget(parent),
@@ -56,6 +57,7 @@ LockCabinetWidget::LockCabinetWidget(QWidget *parent, quint8 num_cabs, quint8 lo
 
 LockCabinetWidget::~LockCabinetWidget()
 {
+    Kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 

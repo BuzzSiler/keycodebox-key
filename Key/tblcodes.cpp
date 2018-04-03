@@ -27,9 +27,10 @@ void CTblCodes::setLastCodeOne(QString code)
     _sCodeOne = code;
 }
 
-QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &bFingerprintRequired, QString &LockNums )
+int CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &bFingerprintRequired, QString &LockNums )
 {
-    qDebug() << "CTblCodes::checkCodeOne()";
+    KCB_DEBUG_ENTRY;
+
     // get the time.
     QDateTime time = QDateTime::currentDateTime();
     // hold on to the code    
@@ -37,8 +38,12 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
     _sCodeOne = code;   // Unencrypted
     LockNums = "";
 
+    KCB_DEBUG_TRACE("Opening database:" << _pDB << _pDB->isOpen());
+
     if( _pDB && _pDB->isOpen() ) 
     {
+        KCB_DEBUG_TRACE("Creating query");
+
         QSqlQuery qry(*_pDB);
         QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "       code1, code2, fingerprint1, fingerprint2, "
@@ -46,21 +51,22 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
                       "  FROM " + TABLENAME +
                       // Note: Consider changing this query to check access type instead of xxxNone
                       // ((access_type = 0 or access_type = 2) "
-                      " WHERE ((starttime = :startNone and endtime = :endNone) "
-                      "    OR (starttime <= :time and endtime >= :timeend))";
+                      " WHERE "
+                      "    ((access_type = 0 or access_type = 2) "
+                      "     OR "
+                      "     (starttime <= :time and :time <= endtime))";
 
-        qDebug() << "SQL:" << sql;
+        KCB_DEBUG_TRACE("SQL:" << sql);
 
         if( !qry.prepare(sql) ) 
         {
-            qDebug() << "qry.prepare fails!" << qry.lastError();
-            return "";
+            KCB_DEBUG_TRACE("qry.prepare fails!" << qry.lastError());
+            return KCB_FAILED;
         }
 
-        qry.bindValue(":startNone", _DATENONE_STR);
-        qry.bindValue(":endNone", _DATENONE_STR);
+        KCB_DEBUG_TRACE("query is good");
+
         qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));
-        qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));
 
         LockNums = "";
         bSecondCodeRequired = true;
@@ -77,6 +83,8 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
 
         if(qry.exec())
         {
+            KCB_DEBUG_TRACE("qry.exec");
+
             int fldIds = qry.record().indexOf("ids");
             int fldLockNo = qry.record().indexOf("locknums");
             int fldCode1No = qry.record().indexOf("code1");
@@ -89,8 +97,13 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
 
             // Note: Duplicate code1 entries are not allowed.  So, we can return on the first match
 
+            KCB_DEBUG_TRACE("Active" << qry.isActive() << "Select" << qry.isSelect());
+
             while(qry.next())
             {
+
+                KCB_DEBUG_TRACE("qry.next");
+                
                 // Check how many we have.
                 // If only one then see if it requires a second code.
                 //   - If second code then signal that the second code is required.
@@ -100,19 +113,27 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
                 sCode1 = qry.value(fldCode1No).toString();
                 sCode1 = CEncryption::decryptString(sCode1);
 
+                KCB_DEBUG_TRACE("Code1" << sCode1 << "Code" << code);
 
                 if( sCode1 == code ) 
                 {
+
+                    KCB_DEBUG_TRACE("codes match");
+
+                    LockNums = qry.value(fldLockNo).toString();
+
+                    KCB_DEBUG_TRACE("Locks" << LockNums);
+                    
                     /* Check for expiration */
                     access_type = qry.value(fldAccessType).toInt();
                     access_count = qry.value(fldAccessCount).toInt();
                     max_access = qry.value(fldMaxAccess).toInt();
                     if (isExpired(access_type, access_count, max_access))
                     {
-                        return LockNums;
+                        KCB_DEBUG_TRACE(LockNums << "expired");
+                        KCB_DEBUG_EXIT;
+                        return KCB_FAILED;
                     }                    
-
-                    LockNums = qry.value(fldLockNo).toString();
 
                     if(qry.value(fldCode2No).isNull()) 
                     {
@@ -149,7 +170,10 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
 
                     bFingerprintRequired = qry.value(fldFingerprint1No).toInt() == 1 ? true : false;
 
-                    return LockNums;
+                    KCB_DEBUG_TRACE("returning(1)" << LockNums);
+
+                    KCB_DEBUG_EXIT;
+                    return KCB_SUCCESS;
                 }
             }
 
@@ -161,16 +185,16 @@ QString CTblCodes::checkCodeOne(QString code, bool &bSecondCodeRequired, bool &b
             {
                 bSecondCodeRequired = false;
             }
-
-            return LockNums;
         }
         else
         {
-            qDebug() << "query.exec() failed." << qry.lastError();
+            KCB_DEBUG_TRACE("failed" << qry.lastError());
         }
     }
 
-    return LockNums;
+    KCB_DEBUG_TRACE("failed - no match found");
+    KCB_DEBUG_EXIT;
+    return KCB_FAILED;
 }
 
 bool CTblCodes::isWhiteSpace(const QString &str)
@@ -178,11 +202,11 @@ bool CTblCodes::isWhiteSpace(const QString &str)
     return QRegExp("\\s*").exactMatch(str);
 }
 
-QString CTblCodes::checkCodeTwo(QString code, 
+int CTblCodes::checkCodeTwo(QString code, 
                             bool &bFingerprintRequired, 
                             bool &bQuestionsRequired, 
                             QString &codeOne, 
-                            QString &LockNums, 
+                            QString &lockNums, 
                             bool &bAskQuestions, 
                             QString &question1, 
                             QString &question2, 
@@ -191,14 +215,14 @@ QString CTblCodes::checkCodeTwo(QString code,
     // Make sure both the first code and the second code match
     // use _sCodeOne
 
-    qDebug() << "CTblCodes::checkCodeTwo()";
+    KCB_DEBUG_ENTRY;
     qDebug() << " code2:" << code;
     // get the time.
     QDateTime time = QDateTime::currentDateTime();
     // hold on to the code
     code = CEncryption::decryptString(code);
     _sCodeTwo = code;
-    LockNums = "";
+    lockNums = "";
 
     if( _pDB && _pDB->isOpen() ) 
     {
@@ -215,7 +239,8 @@ QString CTblCodes::checkCodeTwo(QString code,
 
         qDebug() << "SQL:" << sql;
 
-        if( !qry.prepare(sql) ) {
+        if( !qry.prepare(sql) ) 
+        {
             qDebug() << "qry.prepare fails!" << qry.lastError();
         }
 
@@ -224,7 +249,7 @@ QString CTblCodes::checkCodeTwo(QString code,
         qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));
         qry.bindValue(":timeend", time.toString("yyyy-MM-dd HH:mm:ss"));
 
-        LockNums = "";
+        lockNums = "";
         QString sCode1;
         QString sCode2;
         int nCount = 0; //
@@ -289,6 +314,8 @@ QString CTblCodes::checkCodeTwo(QString code,
                         _lastIDS = qry.value(fldIDS).toInt();
                         //qDebug() << "_lastIDS: " << QString::number(_lastIDS) << " Code2:" << sCode2 << " == code:" << code;
 
+                        lockNums = qry.value(fldLockNo).toInt();
+
 
                         int access_type = qry.value(fldAccessType).toInt();
                         int access_count = qry.value(fldAccessCount).toInt();
@@ -296,10 +323,9 @@ QString CTblCodes::checkCodeTwo(QString code,
                         /* Check for expiration */
                         if (isExpired(access_type, access_count, max_access))
                         {
-                            return LockNums;
+                            KCB_DEBUG_TRACE("expired" << lockNums);
+                            return KCB_FAILED;
                         }                    
-
-                        LockNums = qry.value(fldLockNo).toInt();
 
                         bFingerprintRequired = qry.value(fldFingerprint2).toInt() == 1 ? true : false;
                         if( bFingerprintRequired )
@@ -350,18 +376,21 @@ QString CTblCodes::checkCodeTwo(QString code,
                             updateLockboxState(_lastIDS, false);
                         }
 
-                        return LockNums;
+                        return KCB_SUCCESS;
                     }
                 } while(qry.next());
-            } else {
+            } 
+            else 
+            {
                 qDebug() << "Error:" << qry.lastError();
             }
         }
-        else {
+        else 
+        {
             qDebug() << "query.exec() failed." << qry.lastError();
         }
     }
-    return LockNums;
+    return KCB_FAILED;
 }
 
 void CTblCodes::selectCodeSet(QString &LockNums, QDateTime start, QDateTime end, CLockSet **pLockSet)
@@ -402,8 +431,10 @@ void CTblCodes::selectCodeSet(QString &LockNums, QDateTime start, QDateTime end,
         }
 
         sql += " ( (access_type = 0 or access_type = 2) or"
-               " ((starttime between :stime and :etime) or"
-               " (endtime between :stime and :etime)))";
+               " ((starttime >= :stime and starttime <= :etime) or"
+               " (endtime >= :stime and endtime <= :etime)))";
+            //    " ((starttime between :stime and :etime) or"
+            //    " (endtime between :stime and :etime)))";
 
         // Select codes where the start/end access doesn't matter (always and limited user) OR
         // codes where there is an overlap between start/end range and the code start/end
@@ -557,7 +588,8 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
     CLockState  *pLock;
     *pLockSet = 0;
 
-    if( _pDB && _pDB->isOpen() ) {
+    if( _pDB && _pDB->isOpen() ) 
+    {
         QSqlQuery qry(*_pDB);
         QString sql = "SELECT ids, sequence, sequence_order, locknums, description, "
                       "code1, code2, fingerprint1, fingerprint2, ask_questions, question1, question2, question3, "
@@ -567,7 +599,8 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
 
         qDebug() << "SQL:" << sql;
 
-        if( !qry.prepare(sql) ) {
+        if( !qry.prepare(sql) ) 
+        {
             qDebug() << "qry.prepare fails!" << qry.lastError();
         }
 

@@ -5,6 +5,9 @@
 #include <QDateTime>
 
 
+#define KCB_FAILED (-1)
+#define KCB_SUCCESS (0)
+
 // Debug Macros
 #define KCB_DEBUG_ENTRY qDebug() << Q_FUNC_INFO << "ENTRY"
 #define KCB_DEBUG_EXIT qDebug() << Q_FUNC_INFO << "EXIT"

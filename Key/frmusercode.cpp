@@ -7,6 +7,8 @@
 #include <libfprint/fprint.h>
 #include "dlgfingerprint.h"
 #include "version.h"
+#include "kcbcommon.h"
+
 
 CFrmUserCode::CFrmUserCode(QWidget *parent) :
     QDialog(parent),
@@ -40,7 +42,10 @@ void CFrmUserCode::OnDateTimeTimerTimeout()
  * @brief CFrmUserCode::onButtonClick
  * @param key
  */
-void CFrmUserCode::onButtonClick(char key) {
+void CFrmUserCode::onButtonClick(char key)
+{
+    KCB_DEBUG_ENTRY;
+
     QString qkey(key);
     QString sCurrKey;
     // Central button handling.
@@ -78,7 +83,8 @@ void CFrmUserCode::onButtonClick(char key) {
 
 void CFrmUserCode::onCodeEntered()
 {
-    
+    KCB_DEBUG_ENTRY;
+
     QString sCode = ui->edCode->text();
     qDebug() << "CFrmUserCode::onCodeEntered" << sCode;
     QApplication::processEvents();
@@ -88,6 +94,7 @@ void CFrmUserCode::onCodeEntered()
         this->enableKeypad(false);     // disable the keypad (momentarily)
         emit __CodeEntered(sCode);     // Signal that the code was entered.
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::onBackSpace()
