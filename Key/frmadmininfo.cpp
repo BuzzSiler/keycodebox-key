@@ -451,10 +451,6 @@ void CFrmAdminInfo::populateBoxListSelection(QComboBox *cbox)
 
     cbox->clear();
     cbox->addItem(QString(tr("All Locks")));
-    //for(int i=1;i<65;i++)
-    //{
-    //    cbox->addItem(QString(tr("Lock") + " #" + QVariant(i).toString()));
-    //}
 }
 
 void CFrmAdminInfo::populateCodeLockSelection()
@@ -1616,6 +1612,10 @@ void CFrmAdminInfo::on_btnReadCodes_clicked()
 
     KCB_DEBUG_TRACE(locks);
 
+    if (locks == tr("All Locks"))
+    {
+        locks = "*";
+    }
     emit __OnReadLockSet(locks, dtStart, dtEnd);
 }
 
@@ -1624,6 +1624,11 @@ void CFrmAdminInfo::on_btnRead_clicked()
     QDateTime dtStart = ui->dtStartCodeHistoryList->dateTime();
     QDateTime dtEnd = ui->dtEndCodeHistoryList->dateTime();
     QString locks = ui->cbLockNumHistory->currentText();
+    
+    if (locks == tr("All Locks"))
+    {
+        locks = "*";
+    }
     
     emit __OnReadLockHistorySet(locks, dtStart, dtEnd);
 }

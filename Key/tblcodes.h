@@ -5,12 +5,12 @@
 #include <cstdlib>
 #include <QtSql>
 #include <QDebug>
-//#include <QString>
 #include "lockstate.h"
 #include "lockset.h"
 
 
 class QString;
+class CLockSet;
 
 class CTblCodes
 {
@@ -54,16 +54,7 @@ public:
 
     // Methods
 
-    CTblCodes(QSqlDatabase *db) {
-        std::cout << "CTblCodes constructor\n";
-        setDatabase(db);
-        // make sure the table is created if it does not exist.
-        initialize();
-    }
-
-    void setDatabase(QSqlDatabase *db) {
-        _pDB = db;
-    }
+    CTblCodes(QSqlDatabase *db);
 
     void setLastCodeOne(QString code);
 
@@ -129,6 +120,14 @@ private:
     bool isWhiteSpace(const QString &str);
     bool isExpired(int access_type, int access_count, int max_access);
     bool incrementAccessCount(int ids);
+    bool updateQuestion(int fids, QString which_question, QString value);
+
+    QSqlQuery createQuery(QStringList column_list,
+                          QString table,
+                          QString condition);
+
+    void execSelectCodeSetQuery(QSqlQuery& qry, CLockSet **pLockSet);
+
 };
 
 #endif // CTBLCODES_H

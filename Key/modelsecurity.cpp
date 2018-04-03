@@ -276,7 +276,7 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                                                   bSecondCodeRequired,
                                                   bFingerprintRequired,
                                                   lockNums);
-            KCB_DEBUG_TRACE(lockNums);
+            KCB_DEBUG_TRACE("Locks" << lockNums);
             if( result == KCB_SUCCESS && lockNums != "" )
             {
                 // need to check if fingerprint security is enabled
@@ -429,6 +429,8 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     {
         QString lockNums;
 
+        KCB_DEBUG_TRACE("code1" << codeOne << "code2" << code);
+
         int result = _ptblCodes->checkCodeTwo(code,
                                              bFingerprintRequired,
                                              bQuestionsRequired,
@@ -438,8 +440,11 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                                              question1,
                                              question2,
                                              question3);
+        KCB_DEBUG_TRACE("Locks" << lockNums);
 		if (result == KCB_SUCCESS && lockNums != "")
         {
+            KCB_DEBUG_TRACE(lockNums);
+
             //we need to check if a fingerprint directory already exists,
             // if they do, do not attempt enrollmesnt
             if( bFingerprintRequired == true)
@@ -452,11 +457,13 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
 
                 if ( !QDir( QString("%1%2.%3").arg("/home/pi/run/prints/").arg(codeOne).arg(code) ).exists() )
                 {
+                    KCB_DEBUG_TRACE("fp check success" << codeOne << "." << code);
                     emit __EnrollFingerprintDialog(codeOne + "." + code);
                     emit __EnrollFingerprint(codeOne + "." + code);
                 }
                 else
                 {
+                    KCB_DEBUG_TRACE("fp check failed");
                     emit __OnSecurityCheckedFailed();
                 }
 
@@ -474,15 +481,18 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
             }
             else
             {
+                KCB_DEBUG_TRACE("check success" << lockNums);
                 emit __OnSecurityCheckSuccess(lockNums);
             }
         }
         else
         {
+            KCB_DEBUG_TRACE("check failed");
             emit __OnSecurityCheckedFailed();
         }
     }
-    // Might have timed out and cleared the _type
+
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)

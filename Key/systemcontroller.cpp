@@ -524,7 +524,7 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
 
              foreach (auto s, sl)
              {
-                 OnOpenLockRequest(s, true);
+                OnOpenLockRequest(s, true);
              }
 
              _systemState = EThankYou;

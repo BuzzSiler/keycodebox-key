@@ -295,7 +295,7 @@ void FrmCodeEditMulti::on_edCode2_clicked()
         kkd.setValue(ui->edCode2->text());
         if (kkd.exec())
         {
-            ui->edUsername->setText(kkd.getValue());
+            ui->edCode2->setText(kkd.getValue());
         }
     }
 

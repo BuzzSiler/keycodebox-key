@@ -50,7 +50,7 @@ void CFrmSelectLocks::update()
         reject();
     }
 
-    // If time remaining is less than 11 change color to red
+    // Set color to red for last 10 seconds
     if (time_remaining == 11)
     {
         QPalette palette;
