@@ -555,62 +555,6 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
          }
      }
 }
-#ifdef MULTILOCK
-void CSystemController::OnSecurityCheckSuccess(QVector<int> locks)
-{
-    /* At this point, we have authorization to open the specified lock; however,
-       that was probably the first code in the table.  Also, at this point,
-       if two codes were required, then both were authorized.
-
-       Instead of a single lock, we would like to get a list of all the locks
-
-       Create an instance of SelectLocksWidget and display
-
-       Wait for open click
-
-       Send signal to start opening locks like below.
-
-       Let's not block this thread.
-       Let's instantiate SelectLocksWidget, set the locks, connect signal/slot, show it and return
-       
-    */    
-    locks.append(1);
-    locks.append(3);
-
-
-    qDebug() << "CSystemController::OnSecurityCheckSuccess" << locks.count();
-    if (locks.count() == 1)
-    {
-        OnOpenSelectedLock(locks[0]);
-        OnOpenLocksCompleted();
-    }
-    else
-    {
-        SelectLocksDialog dlg;
-
-        dlg.setLocks(locks);
-        if (dlg.exec())
-        {
-            OnOpenLocksCompleted();
-        }
-    }
-}
-
-void CSystemController::OnOpenSelectedLock(int lockNum)
-{
-    qDebug() << "Opening Lock:" << lockNum;
-    _LockController.openLock(lockNum);
-    _locks.append(lockNum);
-    qDebug() << "Lock Open";
-}
-
-void CSystemController::OnOpenLocksCompleted()
-{
-    _systemState = EThankYou;
-    emit __OnCodeMessage(tr("Lock Open"));
-    reportActivity();
-}
-#endif
 
 void CSystemController::OnSecurityCheckedFailed()
 {

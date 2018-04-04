@@ -5,6 +5,7 @@
 #include <QSignalMapper>
 #include <QMessageBox>
 #include "kcbutils.h"
+#include "kcbcommon.h"
 
 KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
     QWidget(parent),
@@ -69,18 +70,57 @@ KcbKeyboardWidget::~KcbKeyboardWidget()
     delete ui;
 }
 
-void KcbKeyboardWidget::setValue(const QString value, const QStringList codes_in_use)
+void KcbKeyboardWidget::clear()
 {
-    qDebug() << Q_FUNC_INFO << value << codes_in_use;
+    m_codes_in_use.clear();
+    m_value = "";
+    this->disconnect();
+}
 
-    m_codes_in_use = codes_in_use;
+void KcbKeyboardWidget::OnCodeEntry(QString code1, QString code2)
+{
+    // Note: Code2 is not presently being used.  It is an artifact of the existing architecture
+    // In previous code edit implementation code2 was stripped out.  In the present code edit
+    // implementation (multi-lock) the signal goes direction to the keyboard widget.  So
+    // we can ignore it here :-)
+    Q_UNUSED(code2);
+
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("Code1" << code1 << "Code2" << code2);
+
+    //ui->edText->setText("");
+    //ui->edText->setText(code1);
+    //updateUi();
+}
+
+void KcbKeyboardWidget::setValue(const QString value,
+                                 const QStringList codes_in_use,
+                                 const QObject* sender,
+                                 const char* signal)
+{
+    KCB_DEBUG_ENTRY;
+
+    if (sender != nullptr && signal != nullptr)
+    {
+        KCB_DEBUG_TRACE("Connecting to signal");
+        this->disconnect();
+        connect(sender, signal, this, SLOT(OnCodeEntry(QString, QString)));
+    }
+
+    m_codes_in_use.clear();
+    if (codes_in_use.count())
+    {
+        m_codes_in_use = codes_in_use;
+    }
     m_value = value;
     ui->edText->setText(value);
-    updateUi();
+    updateUi();    
 }
 
 QString KcbKeyboardWidget::getValue()
 {
+    this->disconnect();
     return ui->edText->text();
 }
 
@@ -102,22 +142,16 @@ void KcbKeyboardWidget::updateValue(QString value)
 
 void KcbKeyboardWidget::digitClicked(QString value)
 {
-//    qDebug() << Q_FUNC_INFO << value;
-
     updateValue(value);
 }
 
 void KcbKeyboardWidget::alphaClicked(QString value)
 {
-//    qDebug() << Q_FUNC_INFO << value;
-
     updateValue(value);
 }
 
 void KcbKeyboardWidget::controlClicked(QString value)
 {
-//    qDebug() << Q_FUNC_INFO << value;
-
     if (value == "Back")
     {
         QString value = ui->edText->text();

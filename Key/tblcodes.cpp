@@ -40,6 +40,10 @@ void CTblCodes::setLastCodeOne(QString code)
 
 QSqlQuery CTblCodes::createQuery(QStringList column_list,
                                  QString table, 
+                                 // Note: While table is a constant in this class, it is envisioned
+                                 // a common class/module will exist that can handle all SQL query
+                                 // creation and execution.  This is just a reminder of what's is
+                                 // planned.
                                  QString condition)
 {
     KCB_DEBUG_ENTRY;
@@ -62,7 +66,7 @@ QSqlQuery CTblCodes::createQuery(QStringList column_list,
         sql += QString(" %1").arg(where);
     }
 
-    qDebug() << "SQL:" << sql;
+    //qDebug() << "SQL:" << sql;
 
     if( !query.prepare(sql) )
     {
@@ -992,29 +996,6 @@ bool CTblCodes::updateQuestion1(int fids, QString question)
 
     KCB_DEBUG_EXIT;
     return result;
-
-    // QSqlQuery qry(*_pDB);
-    // QString sql = QString("UPDATE ") + TABLENAME +
-    //         " SET " + QString("question1=:question1"
-    //                           " WHERE ids=:fids");
-
-    // KCB_DEBUG_TRACE("query: " << sql);
-
-    // qry.prepare(sql);
-
-    // qry.bindValue(":fids", fids);
-    // qry.bindValue(":question1", question);
-
-    // if(qry.exec())
-    // {
-    //     KCB_DEBUG_TRACE("succeeded");
-    //     return true;
-    // } 
-    // else 
-    // {
-    //     KCB_DEBUG_TRACE("failed");
-    //     return false;
-    // }
 }
 
 bool CTblCodes::updateQuestion2(int fids, QString question)
@@ -1025,28 +1006,6 @@ bool CTblCodes::updateQuestion2(int fids, QString question)
 
     KCB_DEBUG_EXIT;
     return result;
-    
-    // qDebug() << "CTblCodes::updateQuestio2()";
-
-    // QSqlQuery qry(*_pDB);
-    // QString sql = QString("UPDATE ") + TABLENAME +
-    //         " SET " + QString("question2=:question2"
-    //                           " WHERE ids=:fids");
-
-    // qDebug() << "CTblCodes::updateQuestion2(), query: " << sql;
-
-    // qry.prepare(sql);
-
-    // qry.bindValue(":fids", fids);
-    // qry.bindValue(":question2", question);
-
-    // if(qry.exec()) {
-    //     qDebug() << "CTblCodes::updateQuestion2() succeeded";
-    //     return true;
-    // } else {
-    //     qDebug() << "CTblCodes::updateQuestion2() failed";
-    //     return false;
-    // }
 }
 
 bool CTblCodes::updateQuestion3(int fids, QString question)
@@ -1057,28 +1016,6 @@ bool CTblCodes::updateQuestion3(int fids, QString question)
 
     KCB_DEBUG_EXIT;
     return result;
-    
-    // qDebug() << "CTblCodes::updateQuestion3()";
-
-    // QSqlQuery qry(*_pDB);
-    // QString sql = QString("UPDATE ") + TABLENAME +
-    //         " SET " + QString("question3=:question3"
-    //                           " WHERE ids=:fids");
-
-    // qDebug() << "CTblCodes::updateQuestion3(), query: " << sql;
-
-    // qry.prepare(sql);
-
-    // qry.bindValue(":fids", fids);
-    // qry.bindValue(":question3", question);
-
-    // if(qry.exec()) {
-    //     qDebug() << "CTblCodes::updateQuestion3() succeeded";
-    //     return true;
-    // } else {
-    //     qDebug() << "CTblCodes::updateQuestion3() failed";
-    //     return false;
-    // }
 }
 
 bool CTblCodes::updateRecord(CLockState &rec)

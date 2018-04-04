@@ -43,7 +43,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tabAdministrator">
     <attribute name="title">
@@ -922,7 +922,7 @@
       <string>Reboot System</string>
      </property>
     </widget>
-    <widget class="Line" name="line_4">
+    <widget class="Line" name="sepLine">
      <property name="geometry">
       <rect>
        <x>10</x>

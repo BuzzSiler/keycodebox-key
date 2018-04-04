@@ -124,7 +124,7 @@ void CDlgQuestions::on_buttonBoxQuestions_clicked(QAbstractButton *button)
 
 void CDlgQuestions::OnAdminInfoCodes(QString code1, QString code2)
 {
-    code2 = code2;
+    Q_UNUSED(code2);
     emit __OnCodes(code1);
 }
 

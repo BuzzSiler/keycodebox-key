@@ -20,7 +20,7 @@ KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent) :
     connect(&m_keyboard, &KcbKeyboardWidget::NotifyEnter, this, &KcbKeyboardDialog::accept);
 
     m_empty_list.clear();
-    m_keyboard.setValue("", m_empty_list);
+    m_keyboard.clear();
 }
 
 KcbKeyboardDialog::~KcbKeyboardDialog()
@@ -29,22 +29,24 @@ KcbKeyboardDialog::~KcbKeyboardDialog()
     delete ui;
 }
 
-void KcbKeyboardDialog::setValue(const QString value, const QStringList codes_in_use)
+void KcbKeyboardDialog::setValue(const QString value,
+                                 const QStringList codes_in_use,
+                                 const QObject* sender,
+                                 const char* signal)
 {
-//    qDebug() << Q_FUNC_INFO << value;
-    m_keyboard.setValue(value, codes_in_use);
+    m_keyboard.setValue(value, codes_in_use, sender, signal);
 }
 
-void KcbKeyboardDialog::setValue(const QString value)
+void KcbKeyboardDialog::setValue(const QString value,
+                                 const QObject* sender,
+                                 const char* signal)
 {
-    m_keyboard.setValue(value, m_empty_list);
+    m_keyboard.setValue(value, m_empty_list, sender, signal);
 }
 
 QString KcbKeyboardDialog::getValue()
 {
-    QString value = m_keyboard.getValue();
-//    qDebug() << Q_FUNC_INFO << value;
-    return value;
+    return m_keyboard.getValue();
 }
 
 void KcbKeyboardDialog::numbersOnly(bool state)

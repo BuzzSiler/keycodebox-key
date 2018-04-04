@@ -297,7 +297,19 @@ private:
     void purgeCodes();
 
     void HandleCodeUpdate();
-
+    void setPStateValues(QString lockNums,
+                         QString sAccessCode,
+                         QString sSecondCode,
+                         QString sUsername,
+                         QDateTime dtStart,
+                         QDateTime dtEnd,
+                         bool fingerprint1,
+                         bool fingerprint2,
+                         bool askQuestions,
+                         QString question1,
+                         QString question2,
+                         QString question3,
+                         int access_type);
 
 protected:
     void touchEvent(QTouchEvent *ev);

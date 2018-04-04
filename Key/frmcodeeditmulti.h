@@ -24,7 +24,10 @@ class FrmCodeEditMulti : public QDialog
         ~FrmCodeEditMulti();
 
         void setValues(CLockState * const state, const QStringList codes_in_use);
-        void getValues(CLockState * const state);        
+        void getValues(CLockState * const state);
+
+    signals:
+        void __OnAdminInfoCodes(QString,QString);
                        
     private slots:
         void on_pbClearCode1_clicked();
@@ -37,20 +40,13 @@ class FrmCodeEditMulti : public QDialog
         void on_edCode2_clicked();
         void on_edUsername_clicked();
         void on_cbEnableCode2_stateChanged(int arg1);
+        void on_bbSaveCancel_accepted();
+        void on_bbSaveCancel_rejected();
+        void on_cbEnableQuestions_stateChanged(int arg1);
+        void on_pbEditQuestions_clicked();
+        void on_cbFingerprint_clicked();
 
         void OnNotifyLockSelected(QString lock, bool is_selected);
-
-        void on_bbSaveCancel_accepted();
-
-        void on_bbSaveCancel_rejected();
-
-        void on_cbEnableQuestions_stateChanged(int arg1);
-
-        void on_pbEditQuestions_clicked();
-
-//        void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *currEdit);
-
-        void on_cbFingerprint_clicked();
 
     private:
         typedef struct _tag_code_state
@@ -68,7 +64,6 @@ class FrmCodeEditMulti : public QDialog
             bool fp_enabled;
             quint8 access_type;
             QString locks;
-
         } CODE_STATE;
 
         QVector<QString> m_questions;

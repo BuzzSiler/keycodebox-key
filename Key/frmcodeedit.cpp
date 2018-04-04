@@ -381,7 +381,6 @@ void CFrmCodeEdit::on_chkFingerPrint2_clicked(bool checked)
 
 void CFrmCodeEdit::OnAdminInfoCodes(QString code1, QString code2)
 {
-    Q_UNUSED(code1);
     Q_UNUSED(code2);
     emit __OnCodes(code1);
 }

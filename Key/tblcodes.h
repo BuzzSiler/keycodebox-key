@@ -125,8 +125,8 @@ class CTblCodes
         bool updateQuestion(int fids, QString which_question, QString value);
 
         QSqlQuery createQuery(QStringList column_list,
-                            QString table,
-                            QString condition);
+                              QString table,
+                              QString condition);
 
         void execSelectCodeSetQuery(QSqlQuery& qry, CLockSet **pLockSet);
 

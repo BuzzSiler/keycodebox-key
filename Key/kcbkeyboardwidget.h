@@ -19,13 +19,20 @@ class KcbKeyboardWidget : public QWidget
         explicit KcbKeyboardWidget(QWidget *parent = 0);
         ~KcbKeyboardWidget();
 
-        void setValue(const QString value, const QStringList codes_in_use);
+        void setValue(const QString value,
+                      const QStringList codes_in_use,
+                      const QObject* sender = nullptr,
+                      const char* signal = nullptr);
         QString getValue();
+        void clear();
         void numbersOnly(bool state);
 
     signals:
         void NotifyClose();
         void NotifyEnter();
+
+    public slots:
+        void OnCodeEntry(QString code1, QString code2);
 
     private slots:
         void digitClicked(QString value);
