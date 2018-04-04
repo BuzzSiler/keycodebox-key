@@ -32,8 +32,8 @@ class KcbKeyboardWidget : public QWidget
         void NotifyEnter();
 
     public slots:
-        void OnCodeEntry(QString code1, QString code2);
-
+        void OnTextChanged(QString text);
+        
     private slots:
         void digitClicked(QString value);
         void alphaClicked(QString value);

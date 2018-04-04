@@ -60,8 +60,8 @@ KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
     connect(&m_ctrl_mapper, SIGNAL(mapped(QString)), this, SLOT(controlClicked(QString)));
 
     connect(ui->pbCtrlClose, SIGNAL(clicked()), this, SIGNAL(NotifyClose()));
-    //connect(ui->pbCtrlReturn, SIGNAL(clicked()), this, SIGNAL(NotifyEnter()));
     connect(ui->pbCtrlReturn, SIGNAL(clicked()), this, SLOT(OnReturnClicked()));
+    connect(ui->edText, SIGNAL(textChanged(QString)), this, SLOT(OnTextChanged(QString)));
 }
 
 KcbKeyboardWidget::~KcbKeyboardWidget()
@@ -74,24 +74,12 @@ void KcbKeyboardWidget::clear()
 {
     m_codes_in_use.clear();
     m_value = "";
-    this->disconnect();
 }
 
-void KcbKeyboardWidget::OnCodeEntry(QString code1, QString code2)
+void KcbKeyboardWidget::OnTextChanged(QString text)
 {
-    // Note: Code2 is not presently being used.  It is an artifact of the existing architecture
-    // In previous code edit implementation code2 was stripped out.  In the present code edit
-    // implementation (multi-lock) the signal goes direction to the keyboard widget.  So
-    // we can ignore it here :-)
-    Q_UNUSED(code2);
-
-    KCB_DEBUG_ENTRY;
-
-    KCB_DEBUG_TRACE("Code1" << code1 << "Code2" << code2);
-
-    //ui->edText->setText("");
-    //ui->edText->setText(code1);
-    //updateUi();
+    KCB_DEBUG_TRACE("Text" << text);
+    updateUi();
 }
 
 void KcbKeyboardWidget::setValue(const QString value,
@@ -101,12 +89,12 @@ void KcbKeyboardWidget::setValue(const QString value,
 {
     KCB_DEBUG_ENTRY;
 
-    if (sender != nullptr && signal != nullptr)
-    {
-        KCB_DEBUG_TRACE("Connecting to signal");
-        this->disconnect();
-        connect(sender, signal, this, SLOT(OnCodeEntry(QString, QString)));
-    }
+//    if (sender != nullptr && signal != nullptr)
+//    {
+//        KCB_DEBUG_TRACE("Connecting to signal");
+//        //this->disconnect();
+//        //connect(sender, signal, this, SLOT(OnCodeEntry(QString, QString)));
+//    }
 
     m_codes_in_use.clear();
     if (codes_in_use.count())
@@ -120,7 +108,6 @@ void KcbKeyboardWidget::setValue(const QString value,
 
 QString KcbKeyboardWidget::getValue()
 {
-    this->disconnect();
     return ui->edText->text();
 }
 
@@ -198,6 +185,7 @@ void KcbKeyboardWidget::updateUi()
 
 void KcbKeyboardWidget::OnReturnClicked()
 {
+    KCB_DEBUG_ENTRY;
     // Disallow duplicate codes
     if (m_codes_in_use.contains(ui->edText->text()))
     {
@@ -210,6 +198,7 @@ void KcbKeyboardWidget::OnReturnClicked()
     }
     else
     {
+        KCB_DEBUG_TRACE("Emitting NotifyEnter");
         emit NotifyEnter();
     }
 }

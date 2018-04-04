@@ -135,8 +135,7 @@ int CMagTekCardReader::codeToInteger(int x)
 
 bool CMagTekCardReader::isStartCode(int x)
 {
-  // Semicolon
-  return ( x == 39 ) ? true : false
+    return ( x == 39 ) ? true : false;
 }
 
 /**

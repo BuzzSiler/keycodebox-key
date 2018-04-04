@@ -5,6 +5,7 @@
 
 #include "kcbkeyboardwidget.h"
 #include "kcbutils.h"
+#include "kcbcommon.h"
 
 KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent) :
     QDialog(parent),
@@ -16,8 +17,10 @@ KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent) :
 
     setWindowState(Qt::WindowFullScreen);
 
-    connect(&m_keyboard, &KcbKeyboardWidget::NotifyClose, this, &KcbKeyboardDialog::reject);
-    connect(&m_keyboard, &KcbKeyboardWidget::NotifyEnter, this, &KcbKeyboardDialog::accept);
+    // connect(&m_keyboard, &KcbKeyboardWidget::NotifyClose, this, &KcbKeyboardDialog::reject);
+    // connect(&m_keyboard, &KcbKeyboardWidget::NotifyEnter, this, &KcbKeyboardDialog::OnNotifyEnter);
+    connect(&m_keyboard, SIGNAL(NotifyClose()), this, SLOT(reject()));
+    connect(&m_keyboard, SIGNAL(NotifyEnter()), this, SLOT(accept()));
 
     m_empty_list.clear();
     m_keyboard.clear();
