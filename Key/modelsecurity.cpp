@@ -470,6 +470,9 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                 return;
             }
 
+            KCB_DEBUG_TRACE("Questions Required" << bQuestionsRequired);
+            KCB_DEBUG_TRACE("Ask Questions" << bAskQuestions);
+
             if( bQuestionsRequired == true)
             {
                 qDebug() << "ASK_QUESTIONS: " << QString::number(bAskQuestions);

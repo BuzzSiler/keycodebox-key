@@ -38,10 +38,6 @@ void CFrmUserCode::OnDateTimeTimerTimeout()
     ui->lblDateTime->setText(dt.toString("MM/dd/yyyy HH:mm:ss"));
 }
 
-/**
- * @brief CFrmUserCode::onButtonClick
- * @param key
- */
 void CFrmUserCode::onButtonClick(char key)
 {
     KCB_DEBUG_ENTRY;

@@ -232,7 +232,8 @@ void CSystemController::initializeReaders()
 }
 
 // On a card swipe. If the first code is empty, then use the 2nd code.
-QString CSystemController::getCodeToUse(QString code1, QString code2) {
+QString CSystemController::getCodeToUse(QString code1, QString code2) 
+{
     code1 = code1.trimmed();
 
     if(code1.length() == 0) 

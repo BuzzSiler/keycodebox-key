@@ -1371,7 +1371,12 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
             code1 += tr(" (FP)");
         }
         table->setItem(nRow, nCol++, new QTableWidgetItem(code1));
-        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2()));
+        QString code2 = pState->getCode2();
+        if (pState->getAskQuestions())
+        {
+            code2 += tr(" (Q)");
+        }
+        table->setItem(nRow, nCol++, new QTableWidgetItem(code2));
 
         if (pState->getAccessType() == ACCESS_TYPE_ALWAYS)
         {

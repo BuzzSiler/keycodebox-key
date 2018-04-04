@@ -17,6 +17,7 @@
 #include "hidreader.h"
 #include "magtekcardreader.h"
 #include "systemcontroller.h"
+#include "kcbcommon.h"
 
 MainWindow      *gpmainWindow;
 
@@ -158,22 +159,28 @@ void MainWindow::OnImageClicked()
 void MainWindow::OnDisplayTimeoutScreen()
 {
     // hide any open screens to show the touch screen to start
-    if(_pfUsercode) {
+    if(_pfUsercode) 
+    {
         _pfUsercode->hide();
     }
-    if(_pfAdminPW) {
+    if(_pfAdminPW) 
+    {
         _pfAdminPW->hide();
     }
-    if(_pfAdminInfo) {
+    if(_pfAdminInfo) 
+    {
         _pfAdminInfo->hide();
     }
-    if(_pdFingerprint) {
+    if(_pdFingerprint) 
+    {
         _pdFingerprint->hide();
     }
-    if(_pdFingerprintVerify) {
+    if(_pdFingerprintVerify) 
+    {
         _pdFingerprintVerify->hide();
     }
-    if(_pQuestions) {
+    if(_pQuestions) 
+    {
         _pQuestions->hide();
     }
 }
@@ -399,9 +406,10 @@ void MainWindow::OnEnrollFingerprintDialog(QString sCode)
 
 void MainWindow::OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3)
 {
-    qDebug() << "MainWindow::OnQuestionUserDialog()";
+    KCB_DEBUG_ENTRY;
     _pQuestions->setValues(lockNum, question1, question2, question3);
     _pQuestions->show();
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnQuestionUserDialogClose()
@@ -411,8 +419,8 @@ void MainWindow::OnQuestionUserDialogClose()
 
 void MainWindow::OnVerifyFingerprintDialog()
 {
-    qDebug() << "MainWindow::OnVerifyFingerprintDialog()";
-
+    KCB_DEBUG_ENTRY;
     _pdFingerprintVerify->show();
     _pdFingerprintVerify->setMessage("");
+    KCB_DEBUG_EXIT;
 }

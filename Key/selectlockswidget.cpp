@@ -76,7 +76,7 @@ void SelectLocksWidget::addLockToList(QString lock)
 {
     QString item_str;
 
-    qDebug() << "Cab Index:" << m_lock_cab.getSelectedCabinet() << "Lock Index:" << lock;
+    //qDebug() << "Cab Index:" << m_lock_cab.getSelectedCabinet() << "Lock Index:" << lock;
 
     createLockListStr(m_lock_cab.getSelectedCabinet(), lock, item_str);
 
@@ -107,7 +107,7 @@ void SelectLocksWidget::removeLockFromList(QString lock)
     QList<QListWidgetItem *> items;
     int row;
 
-    qDebug() << "Cab Index:" << m_lock_cab.getSelectedCabinet() << "Lock Index:" << lock;
+    //qDebug() << "Cab Index:" << m_lock_cab.getSelectedCabinet() << "Lock Index:" << lock;
 
     createLockListStr(m_lock_cab.getSelectedCabinet(), lock, item_str);
 
