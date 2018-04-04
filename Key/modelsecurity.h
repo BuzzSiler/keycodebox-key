@@ -14,108 +14,110 @@ class CModelSecurity : public QObject
 {
     Q_OBJECT
 
-private:
-    QSqlDatabase        _DB;
-    CTblCodes           *_ptblCodes;
-    CTblCodeHistory     *_ptblCodeHistory;
-    CTblAdmin           *_ptblAdmin;
+    public:
+        explicit CModelSecurity(QObject *parent = 0);    
+        ~CModelSecurity();
+        void getAllCodes1(QStringList& codes1);
 
-    QTimer          _timer;
-    QString         _type;
-    QTime           _time;
 
-    bool            _wasLastSecurityCheckPredictive;
+    signals:
+        void __QuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3);
+        
+        // Parallels signal flow to model security
+        void __EnrollFingerprint(QString sCode);
+        void __EnrollFingerprintDialog(QString sCode);
 
-    void setupTables();
-    void setupTimer();
-    void initialize();
-    void openDatabase();
+        void __onVerifyFingerprint(QString sCode);
+        void __onVerifyFingerprintDialog(QString sCode);
+        
+        void __OnRequireAdminPassword();
+        void __OnRequireCodeTwo();
+        void __OnAdminSecurityCheckOk(QString type);
+        void __OnAdminSecurityCheckFailed();
+        void __OnSecurityCheckSuccess(QString locks);
+        void __OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
+        void __OnSecurityCheckedFailed();
 
-    void removeCreatedObjects();
-    bool CheckPredictiveAccessCode(QString code, int &nLockNum);
-    //std::string encryptDecrypt(int nVal, std::string toEncrypt, std::string key);
-    QDateTime &roundDateTime(int res, QDateTime &datetime);
+        void __OnSecurityCheckTimedOut();
 
-    bool _updateCodeLockboxState = false;
-    int _updateCodeLockboxStateIds = -1;
-public:
-    explicit CModelSecurity(QObject *parent = 0);    
-    ~CModelSecurity();
+        void __OnRequestedCurrentAdmin(CAdminRec *adminInfo);
+        void __OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code);
+    signals:
+        void __OnUpdatedCurrentAdmin(bool bSuccess);
+        void __OnUpdatedCodeState(bool bSuccess);
 
-signals:
-    void __QuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3);
-    
-    // Parallels signal flow to model security
-    void __EnrollFingerprint(QString sCode);
-    void __EnrollFingerprintDialog(QString sCode);
+    signals:
+        void __OnReadLockSet(QString LockNums);
+        void __OnLockSet(CLockSet *pLockSet);
+    public slots:
+        void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
 
-    void __onVerifyFingerprint(QString sCode);
-    void __onVerifyFingerprintDialog(QString sCode);
-    
-    void __OnRequireAdminPassword();
-    void __OnRequireCodeTwo();
-    void __OnAdminSecurityCheckOk(QString type);
-    void __OnAdminSecurityCheckFailed();
-    void __OnSecurityCheckSuccess(QString locks);
-    void __OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
-    void __OnSecurityCheckedFailed();
+    signals:
+        void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
+        void __OnLockHistorySet(CLockHistorySet *pLockSet);
+    signals:
+        void __OnLastSuccessfulLogin(CLockHistoryRec *);
+    public slots:
+        void RequestLastSuccessfulLogin();
 
-    void __OnSecurityCheckTimedOut();
+    signals:
+        void __OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet);
+    public slots:
+        void OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd);
 
-    void __OnRequestedCurrentAdmin(CAdminRec *adminInfo);
-    void __OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code);
-signals:
-    void __OnUpdatedCurrentAdmin(bool bSuccess);
-    void __OnUpdatedCodeState(bool bSuccess);
+    public slots:
+        void OnReadLockHistorySet(QString nLockNum, QDateTime start, QDateTime end);
 
-signals:
-    void __OnReadLockSet(QString LockNums);
-    void __OnLockSet(CLockSet *pLockSet);
-public slots:
-    void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
+    public slots:
+        void OnUpdateCurrentAdmin(CAdminRec *adminInfo);
+        void OnUpdatedCurrentAdmin(bool bSuccess) { emit __OnUpdatedCurrentAdmin(bSuccess); }
 
-signals:
-    void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
-    void __OnLockHistorySet(CLockHistorySet *pLockSet);
-signals:
-    void __OnLastSuccessfulLogin(CLockHistoryRec *);
-public slots:
-    void RequestLastSuccessfulLogin();
+        void OnUpdateCodeState(CLockState *rec);
 
-signals:
-    void __OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet);
-public slots:
-    void OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd);
+    private slots:
+        void OnTimeout();
 
-public slots:
-    void OnReadLockHistorySet(QString nLockNum, QDateTime start, QDateTime end);
+        void OnCreateHistoryRecordFromLastSuccessfulLogin();
+        void OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString answer1, QString answer2, QString answer3);
+        void OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code);
 
-public slots:
-    void OnUpdateCurrentAdmin(CAdminRec *adminInfo);
-    void OnUpdatedCurrentAdmin(bool bSuccess) { emit __OnUpdatedCurrentAdmin(bSuccess); }
+    public slots:
+        void OnVerifyCodeOne(QString code);
+        void OnVerifyCodeTwo(QString code);
 
-    void OnUpdateCodeState(CLockState *rec);
+        void OnVerifyFingerprintCodeOne(QString code);
+        void OnVerifyFingerprintCodeTwo(QString code);
 
-private slots:
-    void OnTimeout();
+        void OnSuccessfulQuestionUsersAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
+        void OnQuestionUserCancelled();
+        
+        void OnVerifyAdminPassword(QString code);
 
-    void OnCreateHistoryRecordFromLastSuccessfulLogin();
-    void OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString answer1, QString answer2, QString answer3);
-    void OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code);
+        void OnRequestCurrentAdmin();
 
-public slots:
-    void OnVerifyCodeOne(QString code);
-    void OnVerifyCodeTwo(QString code);
+    private:
+        QSqlDatabase        _DB;
+        CTblCodes           *_ptblCodes;
+        CTblCodeHistory     *_ptblCodeHistory;
+        CTblAdmin           *_ptblAdmin;
 
-    void OnVerifyFingerprintCodeOne(QString code);
-    void OnVerifyFingerprintCodeTwo(QString code);
+        QTimer          _timer;
+        QString         _type;
+        QTime           _time;
 
-    void OnSuccessfulQuestionUsersAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
-    void OnQuestionUserCancelled();
-    
-    void OnVerifyAdminPassword(QString code);
+        bool            _wasLastSecurityCheckPredictive;
 
-    void OnRequestCurrentAdmin();
+        void setupTables();
+        void setupTimer();
+        void initialize();
+        void openDatabase();
+
+        void removeCreatedObjects();
+        bool CheckPredictiveAccessCode(QString code, int &nLockNum);
+        QDateTime &roundDateTime(int res, QDateTime &datetime);
+
+        bool _updateCodeLockboxState = false;
+        int _updateCodeLockboxStateIds = -1;
 };
 
 #endif // CMODELSECURITY_H

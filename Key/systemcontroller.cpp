@@ -122,6 +122,23 @@ void CSystemController::OnVerifyFingerprintDialogCancel()
     startTimeoutTimer(1000);
 }
 
+void CSystemController::OnFingerprintVerifyComplete(bool result, QString message) 
+{ 
+    emit __onUpdateVerifyFingerprintDialog(result, message); 
+}
+
+void CSystemController::OnReadLockSet(QString LockNums, QDateTime start, QDateTime end) 
+{ 
+    qDebug() << "SLOT: System Controller -> OnReadLockSet";
+    emit __OnReadLockSet(LockNums, start, end); 
+}
+
+void CSystemController::OnLockSet(CLockSet *pSet) 
+{ 
+    qDebug() << "SLOT: System Controller -> OnLockSet";
+    emit __OnLockSet(pSet); 
+}
+
 void CSystemController::TrigQuestionUser(QString lockNums, QString question1, QString question2, QString question3)
 {
     Q_UNUSED(lockNums);
@@ -724,7 +741,6 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
         {
             if( strcmp(mountedDevices[i],foundDevices[j]) == 0 )
             {
-                //qDebug() << "CSystemController::watchUSBStorageDevices(), found old device";
                 oldDeviceFound[i] = true;
                 existingDeviceCount++;
             }
@@ -747,8 +763,6 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
 
     for(i=0; i<foundDeviceCount; i++)
     {
-        //qDebug() << "CSystemController::watchUSBStorageDevices(), found device " << QString::number(i) << " ";
-
         if( (strcmp(mountedDevices[0],foundDevices[i]) != 0) &&
                 (strcmp(mountedDevices[1],foundDevices[i]) != 0) )
         {
@@ -825,8 +839,6 @@ void CSystemController::looprun()
 
             stopTimeoutTimer();
 
-            qDebug() << "CSystemController::EnrollFingerprintCancel()";
-
             if(_fingerprintReader)
             {
                 _fingerprintReader->cancelEnrollment();
@@ -891,7 +903,7 @@ void CSystemController::looprun()
             else
             {
                 QStringList locks_list = _locks.split(',');
-                locks_str = QString("%1 #%2").arg(tr("Locks")).arg(locks_list.join(", #"));
+                locks_str = QString("%1 #'s %2").arg(tr("Lock")).arg(locks_list.join(","));
             }
             _locks.clear();
 
@@ -1097,4 +1109,9 @@ void CSystemController::OnSendTestEmail(int test_type)
 
     emit __OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, NULL );
     
+}
+
+void CSystemController::getAllCodes1(QStringList& codes1)
+{
+    _securityController.getAllCodes1(codes1);
 }

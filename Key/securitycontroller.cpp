@@ -302,3 +302,8 @@ void CSecurityController::OnRequestedCurrentAdmin(CAdminRec *admin)
     qDebug() << "CSecurityController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(admin);
 }
+
+void CSecurityController::getAllCodes1(QStringList& codes1)
+{
+    _modelSecurity.getAllCodes1(codes1);
+}

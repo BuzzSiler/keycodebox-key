@@ -25,7 +25,8 @@ public:
     void initializeSignals();
 
     static QDateTime &roundDateTime(uint32_t res, QDateTime &datetime);
-//    std::string encryptDecrypt(uint32_t nVal, std::string toEncrypt, std::string key);
+
+    void getAllCodes1(QStringList& codes1);
 private:
     CSecurityUser       *_pSecurityUser;      // Default no access
     CModelSecurity      _modelSecurity;

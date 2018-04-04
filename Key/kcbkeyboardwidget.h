@@ -19,7 +19,7 @@ class KcbKeyboardWidget : public QWidget
         explicit KcbKeyboardWidget(QWidget *parent = 0);
         ~KcbKeyboardWidget();
 
-        void setValue(const QString value);
+        void setValue(const QString value, const QStringList codes_in_use);
         QString getValue();
         void numbersOnly(bool state);
 
@@ -31,6 +31,7 @@ class KcbKeyboardWidget : public QWidget
         void digitClicked(QString value);
         void alphaClicked(QString value);
         void controlClicked(QString value);
+        void OnReturnClicked();
 
     private:
         typedef void (*SLOT_PTR_TYPE)(QWidget *);
@@ -44,6 +45,7 @@ class KcbKeyboardWidget : public QWidget
         QSignalMapper& m_ctrl_mapper;
 
         QString m_value;
+        QStringList m_codes_in_use;
 
         Ui::KcbKeyboardWidget *ui;
 

@@ -724,3 +724,8 @@ void CModelSecurity::OnRequestCurrentAdmin()
 
     emit __OnRequestedCurrentAdmin(&_ptblAdmin->getCurrentAdmin());
 }
+
+void CModelSecurity::getAllCodes1(QStringList& codes1)
+{
+    _ptblCodes->getAllCodes1(codes1);
+}

@@ -48,14 +48,19 @@ QSqlQuery CTblCodes::createQuery(QStringList column_list,
     Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
 
     QSqlQuery query(*_pDB);
+    QString sql;
     
     query.setForwardOnly(true);
 
     auto select = QString("SELECT %1").arg(column_list.join(","));
+    sql += QString("%1").arg(select);
     auto from = QString("FROM %1").arg(table);
-    auto where = QString("WHERE %1").arg(condition);
-
-    auto sql = QString("%1 %2 %3").arg(select).arg(from).arg(where);
+    sql += QString(" %1").arg(from);
+    if (!condition.isEmpty())
+    {
+        auto where = QString("WHERE %1").arg(condition);
+        sql += QString(" %1").arg(where);
+    }
 
     qDebug() << "SQL:" << sql;
 
@@ -1247,4 +1252,39 @@ bool CTblCodes::incrementAccessCount(int fids)
         return false;
     }
     
+}
+
+void CTblCodes::getAllCodes1(QStringList& codes1)
+{
+    KCB_DEBUG_ENTRY;
+
+    // Create a query to return all code1 entries
+    QStringList column_list;
+    column_list << "code1";
+    QString condition = "";
+    auto qry = createQuery(column_list, TABLENAME, condition);
+
+    if (!qry.exec())
+    {
+        KCB_WARNING_TRACE(qry.lastError().text() << qry.lastQuery());
+    }
+
+    KCB_DEBUG_TRACE("Active" << qry.isActive() << "Select" << qry.isSelect());
+
+    if (!qry.first())
+    {
+        KCB_WARNING_TRACE(qry.lastError().text() << qry.lastQuery());
+    }
+
+    KCB_DEBUG_TRACE("Retrieving at least first record that was found!");
+
+    do
+    {
+        auto code1_enc = QUERY_VALUE(qry, "code1").toString();
+        codes1.append(CEncryption::decryptString(code1_enc));
+    } while (qry.next());
+
+    KCB_DEBUG_TRACE(codes1);
+
+    KCB_DEBUG_EXIT;
 }

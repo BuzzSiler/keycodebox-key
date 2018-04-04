@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QSignalMapper>
+#include <QMessageBox>
 #include "kcbutils.h"
 
 KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
@@ -58,7 +59,8 @@ KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
     connect(&m_ctrl_mapper, SIGNAL(mapped(QString)), this, SLOT(controlClicked(QString)));
 
     connect(ui->pbCtrlClose, SIGNAL(clicked()), this, SIGNAL(NotifyClose()));
-    connect(ui->pbCtrlReturn, SIGNAL(clicked()), this, SIGNAL(NotifyEnter()));
+    //connect(ui->pbCtrlReturn, SIGNAL(clicked()), this, SIGNAL(NotifyEnter()));
+    connect(ui->pbCtrlReturn, SIGNAL(clicked()), this, SLOT(OnReturnClicked()));
 }
 
 KcbKeyboardWidget::~KcbKeyboardWidget()
@@ -67,13 +69,13 @@ KcbKeyboardWidget::~KcbKeyboardWidget()
     delete ui;
 }
 
-void KcbKeyboardWidget::setValue(const QString value)
+void KcbKeyboardWidget::setValue(const QString value, const QStringList codes_in_use)
 {
-//    qDebug() << Q_FUNC_INFO << value;
+    qDebug() << Q_FUNC_INFO << value << codes_in_use;
 
+    m_codes_in_use = codes_in_use;
     m_value = value;
     ui->edText->setText(value);
-
     updateUi();
 }
 
@@ -158,4 +160,22 @@ void KcbKeyboardWidget::controlClicked(QString value)
 void KcbKeyboardWidget::updateUi()
 {
     ui->pbCtrlReturn->setDisabled(ui->edText->text() == m_value);
+}
+
+void KcbKeyboardWidget::OnReturnClicked()
+{
+    // Disallow duplicate codes
+    if (m_codes_in_use.contains(ui->edText->text()))
+    {
+        (void) QMessageBox::warning(this,
+                                    tr( "Duplicate Code Detected" ),
+                                    tr( "You have entered a code that is already in use.\n"
+                                        "Duplicate codes for 'Code 1' are not allowed.\n"
+                                        "Please enter a different code."),
+                                    QMessageBox::Ok);
+    }
+    else
+    {
+        emit NotifyEnter();
+    }
 }

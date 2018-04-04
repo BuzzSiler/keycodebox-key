@@ -60,7 +60,7 @@ QString SelectLocksWidget::getLocks()
     {
         str = ui->lstSelectedLocks->item(ii)->text();
         getCabinetLockFromStr(str, cab, lock);
-        locks.append(lock);
+        locks.append(QString::number(lock.toInt()));
     }
 
     return locks.join(",");
@@ -143,7 +143,7 @@ void SelectLocksWidget::getCabinetLockFromStr(QString& str, QString& cab, QStrin
     cab = cab_lock_vtr[1];
     lock = cab_lock_vtr[4];
 
-    qDebug() << "Item String:" << str << "Cabinet:" << cab << "Lock:" << lock;
+    //qDebug() << "Item String:" << str << "Cabinet:" << cab << "Lock:" << lock;
 }
 
 void SelectLocksWidget::openDoorTimer()

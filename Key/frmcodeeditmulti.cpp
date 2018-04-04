@@ -75,12 +75,14 @@ void FrmCodeEditMulti::displayWarning(QWidget* p_widget, bool is_valid)
     p_widget->setPalette(palette);
 }
 
-void FrmCodeEditMulti::setValues(CLockState * const state)
+void FrmCodeEditMulti::setValues(CLockState * const state, const QStringList codes_in_use)
 {
-    qDebug() << "FrmCodeEditMulti::setValues";
+    KCB_DEBUG_ENTRY;
+    
     state->show();
 
     resetQuestions();
+    m_codes_in_use = codes_in_use;
 
     // Set the code state to the current values Lock State for tracking changes
     m_code_state.code1 = state->getCode1();
@@ -276,7 +278,7 @@ void FrmCodeEditMulti::on_edCode1_clicked()
     KcbKeyboardDialog kkd;
 
     kkd.numbersOnly(true);
-    kkd.setValue(ui->edCode1->text());
+    kkd.setValue(ui->edCode1->text(), m_codes_in_use);
     if (kkd.exec())
     {
         ui->edCode1->setText(kkd.getValue());

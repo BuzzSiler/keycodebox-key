@@ -23,8 +23,8 @@ class FrmCodeEditMulti : public QDialog
         explicit FrmCodeEditMulti(QWidget *parent = 0);
         ~FrmCodeEditMulti();
 
-        void setValues(CLockState * const state);
-        void getValues(CLockState * const state);
+        void setValues(CLockState * const state, const QStringList codes_in_use);
+        void getValues(CLockState * const state);        
                        
     private slots:
         void on_pbClearCode1_clicked();
@@ -75,6 +75,7 @@ class FrmCodeEditMulti : public QDialog
         LockCabinetWidget& m_lock_cab;
         CClickableLineEdit *m_p_line_edit;
         CODE_STATE m_code_state;
+        QStringList m_codes_in_use;
         Ui::FrmCodeEditMulti *ui;
 
         void updateAccessType(int index);

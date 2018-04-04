@@ -7,7 +7,9 @@ namespace Ui {
     class KcbKeyboardDialog;
 }
 
+
 class KcbKeyboardWidget;
+class QStringList;
 
 class KcbKeyboardDialog : public QDialog
 {
@@ -18,11 +20,13 @@ class KcbKeyboardDialog : public QDialog
         ~KcbKeyboardDialog();
 
         void setValue(const QString value);
+        void setValue(const QString value, const QStringList codes_in_use);
         QString getValue();
         void numbersOnly(bool state);
 
     private:
         KcbKeyboardWidget& m_keyboard;
+        QStringList m_empty_list;
         Ui::KcbKeyboardDialog *ui;
 
 

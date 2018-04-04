@@ -714,7 +714,8 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
         return;
     }
 
-    if(!_pworkingSet) {
+    if(!_pworkingSet)
+    {
         _pworkingSet = new CLockSet();
     }
 
@@ -1271,20 +1272,15 @@ void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
 {
     qDebug() << "CFrmAdminInfo::OnLockStatusUpdate()";
     _pLocksStatus = locksStatus;
-
-    // Populate the Available doors combobox
-    //populateAvailableDoors();
 }
 
 void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
 {
-    // Display
     KCB_DEBUG_TRACE("Count" << pSet->getLockMap()->size());
-    //qDebug() << "CFrmAdminInfo::OnLockSet(). Count:" << pSet->getLockMap()->size();
 
     displayInTable(pSet);
 
-    pSet = NULL;
+    pSet = nullptr;
 }
 
 void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
@@ -1292,7 +1288,7 @@ void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
     qDebug() << "OnLockHistorySet()";
     Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
     displayInHistoryTable(pSet);
-    pSet = NULL;
+    pSet = nullptr;
 }
 
 void CFrmAdminInfo::codeTableCellSelected(int nRow, int nCol)
@@ -1318,8 +1314,6 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     table->setRowCount(pSet->getLockMap()->size());
     table->setColumnCount(7);
 
-    QStringList headers;
-    QStringList vheader;
 
     table->setColumnWidth(0, 40);
     table->setColumnWidth(1, 80);
@@ -1330,32 +1324,27 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     table->setColumnWidth(6, 160);
 
     table->verticalHeader()->hide();
-    headers<<"Line"<<"Lock #"<<"Username"<<"Code#1"<<"Code#2"<<"Start Time"<<"End Time";
+    QStringList headers;
+    headers << "Line" << "Locks" << "Username" << "Code#1" << "Code#2" << "Start Time" << "End Time";
     table->setHorizontalHeaderLabels(headers);
     table->verticalHeader()->setFixedWidth(60);
     table->horizontalHeader()->setFixedHeight(50);
-
-    CLockSet::Iterator itor;
-    CLockState  *pState;
-
-    _pworkingSet = pSet;    // Hold onto the set for additional work.
-
-    connect( table, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT( codeTableCellSelected( int, int ) ) );
 
     table->setStyleSheet("QTableView {selection-background-color: gray;}");
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    int nRow = 0;
-    int nCol = 0;
+    connect( table, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT( codeTableCellSelected( int, int ) ) );
 
     ui->cbLockNum->clear();
     ui->cbLockNum->addItem(QString(tr("All Locks")));
 
+    CLockSet::Iterator itor;
+    CLockState  *pState;
+    _pworkingSet = pSet;
+    int nRow = 0;
+    int nCol = 0;
     QSet<QString> lock_items;
-
-    QDateTime alwaysActiveStart = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
-    QDateTime alwaysActiveEnd = QDateTime(QDate(1990, 1, 1), QTime(0, 0, 0));
 
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
@@ -1406,6 +1395,9 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     QStringList sl(lock_items.toList());
     sl.sort();
     ui->cbLockNum->addItems(sl);
+
+    _codesInUse.clear();
+    _psysController->getAllCodes1(_codesInUse);
 
     // KCB_DEBUG_EXIT();
 }
@@ -1555,8 +1547,7 @@ void CFrmAdminInfo::codeEnableAll()
 
         if(_pState)
         {
-            // Only reset codes that are access type 'limited use' (value 2)
-            if (_pState->getAccessType() == 2 && _pState->getAccessCount() > 0)
+            if (_pState->getAccessType() == ACCESS_TYPE_LIMITED_USE && _pState->getAccessCount() > 0)
             {
                 _pState->setMarkForReset();
                 emit __OnUpdateCodeState(_pState);
@@ -1584,7 +1575,8 @@ void CFrmAdminInfo::codeCellSelected( int row, int col)
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
-        if(nRow == row) {
+        if(nRow == row)
+        {
             // itor is our man!
             pState = itor.value();
             Q_UNUSED(pState);
@@ -2013,7 +2005,7 @@ void CFrmAdminInfo::addCodeByRow()
         _pworkingSet = new CLockSet();
     }
 
-    _pFrmCodeEditMulti->setValues(_pState);                             
+    _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
     _pFrmCodeEditMulti->show();
     KCB_DEBUG_EXIT;
 }
@@ -2050,7 +2042,7 @@ void CFrmAdminInfo::editCodeByRow(int row)
 
     if(_pState)
     {
-        _pFrmCodeEditMulti->setValues(_pState);                                     
+        _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
         _pFrmCodeEditMulti->show();
     }
     else
@@ -2058,7 +2050,7 @@ void CFrmAdminInfo::editCodeByRow(int row)
         _pState = createNewLockState();
         _pworkingSet->addToSet(_pState);
 
-        _pFrmCodeEditMulti->setValues(_pState);                                     
+        _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
         _pFrmCodeEditMulti->show();
     }
 }

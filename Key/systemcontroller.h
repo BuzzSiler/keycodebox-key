@@ -44,6 +44,8 @@ public:
 
     void reportActivity();
 
+    void getAllCodes1(QStringList& codes1);
+
 private:
     QThread                 *_pInitThread;
     QThread                 _threadReport;
@@ -159,16 +161,9 @@ public slots:
 
     void OnVerifyFingerprint();
     void OnVerifyFingerprintDialogCancel();
-    void OnFingerprintVerifyComplete(bool result, QString message) { emit __onUpdateVerifyFingerprintDialog(result, message); };
-
-    void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end) { 
-        qDebug() << "SLOT: System Controller -> OnReadLockSet";
-        emit __OnReadLockSet(LockNums, start, end); 
-    }
-    void OnLockSet(CLockSet *pSet) { 
-        qDebug() << "SLOT: System Controller -> OnLockSet";
-        emit __OnLockSet(pSet); 
-    }
+    void OnFingerprintVerifyComplete(bool result, QString message);
+    void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
+    void OnLockSet(CLockSet *pSet);
     void OnIdentifiedFingerprint(QString sCode, QString sCode2);
 
 signals:

@@ -263,7 +263,8 @@ private:
 
     bool                _testEmail;
 
-    SelectLocksWidget& m_select_locks;
+    SelectLocksWidget&  m_select_locks;
+    QStringList         _codesInUse;
 
     void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
     std::string rtrim(std::string &s);
