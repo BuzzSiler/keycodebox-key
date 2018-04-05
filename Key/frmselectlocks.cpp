@@ -5,7 +5,9 @@
 #include <QTimer>
 #include "selectlockswidget.h"
 #include "kcbutils.h"
+#include "kcbcommon.h"
 
+#define COUNT_DOWN_TIMEOUT (1000)
 
 CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
     QDialog(parent),
@@ -22,6 +24,7 @@ CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
     connect(&m_select_locks, &SelectLocksWidget::NotifyOpen, this, &CFrmSelectLocks::accept);
 
     connect(&m_timer, &QTimer::timeout, this, &CFrmSelectLocks::update);
+    m_timer.setSingleShot(true);
 }
 
 CFrmSelectLocks::~CFrmSelectLocks()
@@ -32,8 +35,13 @@ CFrmSelectLocks::~CFrmSelectLocks()
 
 void CFrmSelectLocks::setLocks(QString locks)
 {
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE(locks);
+    ui->lblTimeRemaining->setText("30");
     m_select_locks.setLocks(locks);
-    m_timer.start(1000);
+    m_timer.start(COUNT_DOWN_TIMEOUT);
+    KCB_DEBUG_EXIT;
 }
 
 QString CFrmSelectLocks::getLocks()
@@ -47,20 +55,17 @@ void CFrmSelectLocks::update()
 
     if (time_remaining == 1)
     {
+        ui->lblTimeRemaining->setStyleSheet("color: black");
+        ui->lblTimeRemaining->setText(QString::number(30));
         reject();
     }
 
     // Set color to red for last 10 seconds
     if (time_remaining == 11)
     {
-        QPalette palette;
-        palette.setColor(QPalette::Window, Qt::red);
-        palette.setColor(QPalette::WindowText, Qt::red);
-        setAutoFillBackground(true);
-        ui->lblTimeRemaining->setPalette(palette);
+        ui->lblTimeRemaining->setStyleSheet("color: red");
     }
 
     ui->lblTimeRemaining->setText(QString::number(time_remaining - 1));
-    m_timer.start(1000);
-
+    m_timer.start(COUNT_DOWN_TIMEOUT);
 }

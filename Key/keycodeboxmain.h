@@ -14,7 +14,6 @@
 #include "frmadmininfo.h"
 #include "frmadminpassword.h"
 #include "dlgfingerprint.h"
-#include "dlgfingerprintverify.h"
 #include "dlgquestions.h"
 
 class CClickableGraphicsItem;
@@ -39,7 +38,6 @@ private:
     CFrmAdminInfo       *_pfAdminInfo;
 
     CDlgFingerprint *_pdFingerprint;
-    CDlgFingerprintVerify *_pdFingerprintVerify;
 
     CDlgQuestions *_pQuestions;
     
@@ -87,7 +85,6 @@ private slots:
     void OnUserFingerprintCodeTwo(QString sCode2);
 
     void OnEnrollFingerprintDialog(QString sCode);
-    void OnVerifyFingerprintDialog();
 
     void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3);
     void OnQuestionUserDialogClose();

@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QSignalMapper>
 #include "kcbutils.h"
+#include "kcbcommon.h"
 
 LockCabinetWidget::LockCabinetWidget(QWidget *parent, quint8 num_cabs, quint8 locks_per_cab) :
     QWidget(parent),
@@ -74,7 +75,7 @@ void LockCabinetWidget::StringToVector(QString str, QVector<int>& vtr)
     }
     else
     {
-        if (str.length() == 1)
+        if (str.length() >= 1)
         {
             vtr.append(str.toInt());
         }
@@ -99,7 +100,6 @@ void LockCabinetWidget::VectorToString(QVector<int> vtr, QString& str)
         str = QString::number(vtr[0]);
     }
 }
-
 
 void LockCabinetWidget::selectClearAllLocks(bool select_clear)
 {
@@ -181,10 +181,12 @@ void LockCabinetWidget::setSelectedLocks(QString locks)
         Q_ASSERT_X(cab_index >= 0 && cab_index < m_num_cabs,
                    "LockCabinetWidget::setSelectedLocks",
                    "cab_index out of range");
+        KCB_DEBUG_TRACE("Lock" << lock << "checked");                   
         m_cabs[cab_index].states[lock_index] = true;
         m_selected_locks.append(lock);
     }
 
+    KCB_DEBUG_TRACE(m_selected_locks);
     updateUi();
 }
 

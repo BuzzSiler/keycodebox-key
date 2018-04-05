@@ -44,7 +44,10 @@ void SelectLocksWidget::setLocks(QString locks)
     m_lock_cab.disableAllLocks();
     m_lock_cab.setEnabledLocks(locks);
     m_lock_cab.setSelectedLocks(locks);
+
+    ui->lstSelectedLocks->clear();
     addLocksToList(locks);
+
     ui->btnOpenSelected->setEnabled(locks.length() > 0 ? true : false);
 }
 
@@ -69,7 +72,7 @@ QString SelectLocksWidget::getLocks()
 void SelectLocksWidget::createLockListStr(QString cab, QString lock, QString& str)
 {
     str = QString(tr("Cabinet %1 - Lock %2")).arg(cab, 3, '0').arg(lock, 3, '0');
-    qDebug() << "Cabinet:" << cab << "Lock:" << lock << "Lock List Str:" << str;
+    //qDebug() << "Cabinet:" << cab << "Lock:" << lock << "Lock List Str:" << str;
 }
 
 void SelectLocksWidget::addLockToList(QString lock)
@@ -143,7 +146,7 @@ void SelectLocksWidget::getCabinetLockFromStr(QString& str, QString& cab, QStrin
     cab = cab_lock_vtr[1];
     lock = cab_lock_vtr[4];
 
-    //qDebug() << "Item String:" << str << "Cabinet:" << cab << "Lock:" << lock;
+    qDebug() << "Item String:" << str << "Cabinet:" << cab << "Lock:" << lock;
 }
 
 void SelectLocksWidget::openDoorTimer()

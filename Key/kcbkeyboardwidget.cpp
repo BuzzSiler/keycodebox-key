@@ -89,13 +89,6 @@ void KcbKeyboardWidget::setValue(const QString value,
 {
     KCB_DEBUG_ENTRY;
 
-//    if (sender != nullptr && signal != nullptr)
-//    {
-//        KCB_DEBUG_TRACE("Connecting to signal");
-//        //this->disconnect();
-//        //connect(sender, signal, this, SLOT(OnCodeEntry(QString, QString)));
-//    }
-
     m_codes_in_use.clear();
     if (codes_in_use.count())
     {

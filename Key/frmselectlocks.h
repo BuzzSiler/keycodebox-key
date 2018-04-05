@@ -25,6 +25,7 @@ class CFrmSelectLocks : public QDialog
         SelectLocksWidget& m_select_locks;
         QStringList m_selected_locks;
         QTimer& m_timer;
+
         Ui::CFrmSelectLocks *ui;
 
         void update();

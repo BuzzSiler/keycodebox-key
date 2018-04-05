@@ -246,7 +246,9 @@ bool CFingerprintReader::cancelEnrollment()
 
     result = fp_async_enroll_stop(fpdev, enrollCancelCb, NULL);
     if( result < 0 )
+    {
         return false;
+    }
     return true;
 }
 
@@ -270,7 +272,9 @@ bool CFingerprintReader::cancelVerify()
 
     result = fp_async_identify_stop(fpdev, verifyCancelCb, NULL);
     if( result < 0 )
+    {
         return false;
+    }
     return true;
 }
 
@@ -403,7 +407,9 @@ bool CFingerprintReader::initVerify()
 
 
     for(count=0; count < 5000; count++)
+    {
         print_gallery[count] = NULL;
+    }
 
     count = 0;
     while (it.hasNext())

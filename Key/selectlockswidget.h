@@ -26,7 +26,6 @@ class SelectLocksWidget : public QWidget
         void setLocks(QString locks);
         QString getLocks();
 
-
     signals:
         void NotifyRequestLockOpen(QString lockNum, bool is_user);
 

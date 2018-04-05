@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QString>
 #include <QByteArray>
+#include "kcbcommon.h"
 
 SerialPort::SerialPort(const QString& portName, int baudRate, int writeTimeout, int readTimeout) :
     QObject(nullptr),
@@ -47,11 +48,9 @@ int SerialPort::ReadData(QByteArray& response)
     if (m_port.waitForReadyRead(m_readTimeout)) 
     {
         response = m_port.readAll();
-        qDebug() << "ReadData size: " << response.size();
         while (m_port.waitForReadyRead(m_readTimeout))
         {
             response += m_port.readAll();
-            qDebug() << "ReadData size: " << response.size();
         }
 
         qDebug() << "ReadData:" << response.toHex();
@@ -61,6 +60,6 @@ int SerialPort::ReadData(QByteArray& response)
         qCritical() << "Timeout occurred while reading from serial port";
     }
     
-    qDebug() << "ReadData size: " << response.size();
+    KCB_DEBUG_TRACE("ReadData size: " << response.size());
     return response.size();
 }

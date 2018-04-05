@@ -21,11 +21,17 @@
 #include "kcbcommon.h"
 
 CSystemController::CSystemController(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    _fingerprintReader(0),
+    _systemState(ETimeoutScreen),
+    _systemStateDisplay(ENone),
+    _pfUsercode(0),
+    _pdFingerprintVerify(0),
+    _ptimer(0)
 {
     Q_UNUSED(parent);
 
-    qRegisterMetaType<QVector<int> >("QVector<int>");
+    //qRegisterMetaType<QVector<int> >("QVector<int>");
 }
 
 CSystemController::~CSystemController()
@@ -47,20 +53,12 @@ CSystemController::~CSystemController()
 void CSystemController::initialize(QThread *pthread)
 {
     _pInitThread = pthread;
-    _ptimer = 0;
-
-    _systemState = ETimeoutScreen;
-    _systemStateDisplay = ENone;
-    _pfUsercode = 0;
-
-    _fingerprintReader = 0;
 
     if( _LCDGraphicsController.isLCDAttached() ) 
     {
         qDebug() << "CSystemController::initialize moveToThread.";
         _LCDGraphicsController.setBrightness(75);
     }
-
 
     qDebug() << "Starting up KeyCodeBox Alpha " << VERSION;
 
@@ -79,6 +77,7 @@ void CSystemController::TrigEnrollFingerprint(QString sCode)
     {
         _fingerprintReader->initEnrollment(sCode);
     }
+    KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(15000);
 }
 
@@ -89,6 +88,7 @@ void CSystemController::EnrollFingerprintDialogCancel()
     {
         _fingerprintReader->cancelEnrollment();
     }
+    KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(1000);
 }
 
@@ -103,28 +103,42 @@ void CSystemController::EnrollFingerprintResetStageCount()
 
 void CSystemController::OnVerifyFingerprint()
 {
-    qDebug() << "CSystemController::OnVerifyFingerprint()";
+    KCB_DEBUG_ENTRY;
 
+    KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(10000);
     if(_fingerprintReader)
     {
         _fingerprintReader->initVerify();
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnVerifyFingerprintDialogCancel()
 {
-    qDebug() << "CSystemController::OnFingerprintFingerprintCancel()";
+    KCB_DEBUG_ENTRY;
     if(_fingerprintReader)
     {
         _fingerprintReader->cancelVerify();
     }
-    startTimeoutTimer(1000);
+    if (_pdFingerprintVerify)
+    {
+        _pdFingerprintVerify->hide();
+    }    
+    
+    KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnFingerprintVerifyComplete(bool result, QString message) 
 { 
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("Result" << result << "Message" << message);
+
     emit __onUpdateVerifyFingerprintDialog(result, message); 
+
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnReadLockSet(QString LockNums, QDateTime start, QDateTime end) 
@@ -160,6 +174,7 @@ void CSystemController::AnswerUserSave(QString lockNums, QString question1, QStr
 void CSystemController::QuestionUserCancel()
 {
     qDebug() << "CSystemController::QuestionUserCancel()";
+    KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(1000);
     emit __onQuestionUserCancel();
 }
@@ -224,11 +239,36 @@ void CSystemController::initializeReaders()
         _fingerprintReader = 0;
     }
 
+    if( !_pdFingerprintVerify )
+    {
+        _pdFingerprintVerify = new CDlgFingerprintVerify();
+        connect(_pdFingerprintVerify, SIGNAL(__onVerifyFingerprintDialogCancel()), this, SLOT(OnVerifyFingerprintDialogCancel()));
+        connect(this, SIGNAL(__onUpdateVerifyFingerprintDialog(bool, QString)), _pdFingerprintVerify, SLOT(OnUpdateVerifyFingerprintDialog(bool, QString)));
+        _pdFingerprintVerify->hide();
+    }
+    
+
     connect(&_securityController, SIGNAL(__TrigQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
     connect(&_securityController, SIGNAL(__TrigQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUser(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserAnswers(QString,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserCancel()), &_securityController, SLOT(OnQuestionUserCancel()));
+}
+
+void CSystemController::OnVerifyFingerprintDialog()
+{
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("FPVerify" << _pdFingerprintVerify);
+    Q_ASSERT_X(_pdFingerprintVerify != nullptr, Q_FUNC_INFO, "FPVerify is null");
+    
+    if (_pdFingerprintVerify)
+    {
+        KCB_DEBUG_TRACE("Showing FingerprintVerifier dialog");
+        _pdFingerprintVerify->show();
+        _pdFingerprintVerify->setMessage("");
+    }
+    KCB_DEBUG_EXIT;
 }
 
 // On a card swipe. If the first code is empty, then use the 2nd code.
@@ -270,10 +310,13 @@ void CSystemController::OnFingerSwipe(QString sCode1, QString sCode2)
     QString sCodeToUse = getCodeToUse(sCode1, sCode2);
 
     qDebug() << "CSystemController::OnFingerSwipe(" << sCodeToUse << ")";
-    if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) {
+    if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
+    {
         qDebug() << "...ETimeoutScreen || EUserCodeOne:" << sCodeToUse;
         emit __onUserFingerprintCodeOne(sCodeToUse);
-    } else if( _systemState == EUserCodeTwo) {
+    } 
+    else if( _systemState == EUserCodeTwo) 
+    {
         qDebug() << "... EUserCodeTwo: " << sCode2;
         emit __onUserFingerprintCodeTwo(sCode2);
     }
@@ -359,9 +402,11 @@ void CSystemController::initializeLockController()
 
 void CSystemController::OnIdentifiedFingerprint(QString sCode, QString sCode2)
 {
-    qDebug() << "SystemController::OnIdentifiedFingerprint()";
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE("Time: " << QTime::currentTime().toString());
     qDebug() << "OnCardSwipe() -> " << sCode << "," << sCode2;
     this->OnFingerSwipe(sCode, sCode2);
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnCodeEntered(QString sCode)
@@ -519,41 +564,44 @@ void CSystemController::OnReadLockStatus()
 void CSystemController::OnSecurityCheckSuccess(QString locks)
 {    
     KCB_DEBUG_TRACE(locks);
-    _locks = locks;
 
-     if (!locks.contains(','))
-     {
-         OnOpenLockRequest(locks, true);
-         _systemState = EThankYou;
-     }
-     else
-     {
-         CFrmSelectLocks dlg;
+    if (_pdFingerprintVerify)
+    {
+        _pdFingerprintVerify->hide();
+    }
 
-         dlg.setLocks(locks);
-         if (dlg.exec())
-         {
-             // We get here, when open finished and calls done(Accepted)
-             // What is our system state here?
-             _locks = dlg.getLocks();
-             qDebug() << "Selected locks - " << _locks;
+    if (locks.contains(','))
+    {
+        KCB_DEBUG_TRACE("Multi Lock");
 
-             QStringList sl = _locks.split(",");
+        CFrmSelectLocks sl;
 
-             foreach (auto s, sl)
-             {
+        sl.setLocks(locks);
+        if (sl.exec())
+        {
+            _locks = sl.getLocks();
+
+            QStringList sl = _locks.split(",");
+
+            foreach (auto s, sl)
+            {
                 OnOpenLockRequest(s, true);
-             }
+            }
+            _systemState = EThankYou;
+        }
+        else
+        {
+            OnUserCodeCancel();
+        }
+    }
+    else
+    {
+        KCB_DEBUG_TRACE("Single Lock");
+        _locks = locks;
+        OnOpenLockRequest(locks, true);
+        _systemState = EThankYou;
+    }
 
-             _systemState = EThankYou;
-         }
-         else
-         {
-             // We get here, if close is clicked
-             // What is our system state here?
-             _systemState = ETimeoutScreen;
-         }
-     }
 }
 
 void CSystemController::OnSecurityCheckedFailed()
@@ -598,6 +646,10 @@ void CSystemController::resetToTimeoutScreen()
     if(_fingerprintReader)
     {
         _fingerprintReader->cancelVerify();
+    }
+    if (_pdFingerprintVerify)
+    {
+        _pdFingerprintVerify->hide();
     }
 }
 
@@ -792,12 +844,17 @@ void CSystemController::looprun()
             {
                 _fingerprintReader->cancelVerify();
             }
+            if (_pdFingerprintVerify)
+            {
+                _pdFingerprintVerify->hide();
+            }            
 
             emit __OnCodeMessage(QString("<%1 #1>").arg(tr("Please Enter Code")));
             emit __OnDisplayCodeDialog(this);
             emit __OnNewMessage(QString("%1 #1").arg(tr("Enter Code")));
             emit __OnEnableKeypad(true);
 
+            KCB_DEBUG_TRACE("EUserCodeOne Timeout Active");
             startTimeoutTimer(30000);
         }
     }
@@ -815,6 +872,7 @@ void CSystemController::looprun()
             emit __OnCodeMessage(QString("<%1>").arg(tr("Please Enter Second Code")));
             emit __OnNewMessage(tr("Enter Second Code"));
 
+            KCB_DEBUG_TRACE("EUserCodeTwo Timeout Active");
             startTimeoutTimer(20000);
         }
     }
@@ -829,6 +887,7 @@ void CSystemController::looprun()
             emit __OnClearEntry();
             emit __OnDisplayAdminPasswordDialog(this);
 
+            KCB_DEBUG_TRACE("EAdminPassword Timeout Active");
             startTimeoutTimer(30000);
         }
     }
@@ -857,6 +916,7 @@ void CSystemController::looprun()
             emit __OnCodeMessage(str);
             emit __OnNewMessage("");
 
+            KCB_DEBUG_TRACE("EThankYou Timeout Active");
             startTimeoutTimer(5000);
         }
     }
@@ -884,6 +944,7 @@ void CSystemController::looprun()
 
 void CSystemController::stopTimeoutTimer()
 {
+    KCB_DEBUG_ENTRY;
     if(_ptimer) 
     {
         if(_ptimer->isActive())
@@ -893,18 +954,21 @@ void CSystemController::stopTimeoutTimer()
         delete _ptimer;
         _ptimer = 0;
     }
+    KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::startTimeoutTimer(int duration)
 {
-    // TODO:Set timer to return to Code #1 entry screen
-    //
     qDebug() << "SingleShot timer " << QVariant(duration).toString();
+    KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
+    
     if(!_ptimer) 
     {
         _ptimer = new QTimer();
         connect(_ptimer, SIGNAL(timeout()), this, SLOT(resetToTimeoutScreen()));
     }
+    _ptimer->stop();
     _ptimer->start(duration);
 }
 

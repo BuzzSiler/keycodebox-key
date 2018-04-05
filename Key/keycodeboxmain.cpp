@@ -126,7 +126,6 @@ void MainWindow::initialize() {
     _pfAdminPW = 0;
     _pfAdminInfo = 0;
     _pdFingerprint = 0;
-    _pdFingerprintVerify = 0;
     _pQuestions = 0;
 
     QCursor::setPos(848, 480);
@@ -158,6 +157,8 @@ void MainWindow::OnImageClicked()
 
 void MainWindow::OnDisplayTimeoutScreen()
 {
+    KCB_DEBUG_ENTRY;
+
     // hide any open screens to show the touch screen to start
     if(_pfUsercode) 
     {
@@ -175,14 +176,12 @@ void MainWindow::OnDisplayTimeoutScreen()
     {
         _pdFingerprint->hide();
     }
-    if(_pdFingerprintVerify) 
-    {
-        _pdFingerprintVerify->hide();
-    }
     if(_pQuestions) 
     {
         _pQuestions->hide();
     }
+
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayCodeDialog(QObject *psysController)
@@ -205,7 +204,7 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(psysController, SIGNAL(__onQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(QString,QString,QString,QString)));
 
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprint()), psysController, SLOT(OnVerifyFingerprint()));
-        connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
+        connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), psysController, SLOT(OnVerifyFingerprintDialog()));
         connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
 
 
@@ -217,13 +216,6 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
             _pdFingerprint->hide();
         }
 
-        if( !_pdFingerprintVerify )
-        {
-            _pdFingerprintVerify = new CDlgFingerprintVerify();
-            connect(_pdFingerprintVerify, SIGNAL(__onVerifyFingerprintDialogCancel()), psysController, SLOT(OnVerifyFingerprintDialogCancel()));
-            connect(psysController, SIGNAL(__onUpdateVerifyFingerprintDialog(bool, QString)), _pdFingerprintVerify, SLOT(OnUpdateVerifyFingerprintDialog(bool, QString)));
-            _pdFingerprintVerify->hide();
-        }
 
         if( !_pQuestions )
         {
@@ -415,12 +407,4 @@ void MainWindow::OnQuestionUserDialog(QString lockNum, QString question1, QStrin
 void MainWindow::OnQuestionUserDialogClose()
 {
     _pQuestions->hide();
-}
-
-void MainWindow::OnVerifyFingerprintDialog()
-{
-    KCB_DEBUG_ENTRY;
-    _pdFingerprintVerify->show();
-    _pdFingerprintVerify->setMessage("");
-    KCB_DEBUG_EXIT;
 }

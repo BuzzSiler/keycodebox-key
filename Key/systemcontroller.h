@@ -13,6 +13,9 @@
 #include "magtekcardreader.h"
 #include "hidreader.h"
 #include "fingerprintreader.h"
+#include "dlgfingerprintverify.h"
+#include "frmselectlocks.h"
+
 
 class CSystemController : public QObject
 {
@@ -46,6 +49,7 @@ public:
 
     void getAllCodes1(QStringList& codes1);
 
+
 private:
     QThread                 *_pInitThread;
     QThread                 _threadReport;
@@ -69,6 +73,8 @@ private:
     CAdminRec       *_padminInfo;
 
     CFrmUserCode *_pfUsercode;
+    CDlgFingerprintVerify *_pdFingerprintVerify;    
+
 
     QTimer      *_ptimer;
     uint64_t    _un64Locks;
@@ -82,6 +88,7 @@ private:
     void stopTimeoutTimer();
     void initializeReaders();
     QString getCodeToUse(QString code1, QString code2);
+
 signals:
     void __verifyUserAccess(QString sCode1);
     void __verifyUserAccessTwo(QString sCode1, QString sCode2);
@@ -165,6 +172,9 @@ public slots:
     void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
     void OnLockSet(CLockSet *pSet);
     void OnIdentifiedFingerprint(QString sCode, QString sCode2);
+
+    void OnVerifyFingerprintDialog();
+
 
 signals:
     void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);

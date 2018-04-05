@@ -352,14 +352,14 @@ bool FrmCodeEditMulti::isModified()
                              m_code_state.question2 != m_questions[1] ||
                              m_code_state.question3 != m_questions[2];
 
-//    qDebug() << "Code1 Changed" << code1_changed;
-//    qDebug() << "FP Changed" << fp_changed;
-//    qDebug() << "Code2 Changed" << code2_changed;
-//    qDebug() << "Username Changed" << username_changed;
-//    qDebug() << "Locks Changed" << locks_changed;
-//    qDebug() << "Access Type Changed" << accesstype_changed;
-//    qDebug() << "DateTime Changed" << datetime_changed;
-//    qDebug() << "Questions Changed" << questions_changed;
+   KCB_DEBUG_TRACE("Code1 Changed" << code1_changed);
+   KCB_DEBUG_TRACE("FP Changed" << fp_changed);
+   KCB_DEBUG_TRACE("Code2 Changed" << code2_changed);
+   KCB_DEBUG_TRACE("Username Changed" << username_changed);
+   KCB_DEBUG_TRACE("Locks Changed" << locks_changed);
+   KCB_DEBUG_TRACE("Access Type Changed" << accesstype_changed);
+   KCB_DEBUG_TRACE("DateTime Changed" << datetime_changed);
+   KCB_DEBUG_TRACE("Questions Changed" << questions_changed);
 
     return code1_changed || fp_changed || code2_changed || username_changed ||
            accesstype_changed || locks_changed || questions_changed ||
@@ -420,15 +420,16 @@ void FrmCodeEditMulti::updateUi()
         m_lock_cab.setWarning();
     }
 
-    qDebug() << "Exit Condition:";
-    qDebug() << "\tModified:" << isModified();
-    qDebug() << "\tCode1 Text:" << code1_valid_text;
-    qDebug() << "\tCode2 Text:" << code2_valid_text;
-    qDebug() << "\tCode2 Valid:" << code2_valid;
-    qDebug() << "\tFP Valid:" << fp_valid;
-    qDebug() << "\tSelected Locks:" << locks_valid;
-    qDebug() << "\tStart/End:" << start_end_valid;
-    qDebug() << "\tQuestions:" << questions_valid;
+    KCB_DEBUG_TRACE("Exit Condition:");
+    KCB_DEBUG_TRACE("\tModified:" << isModified());
+    KCB_DEBUG_TRACE("\tLocks:" << locks_valid << m_lock_cab.getSelectedLocks());
+    KCB_DEBUG_TRACE("\tCode1 Text:" << code1_valid_text);
+    KCB_DEBUG_TRACE("\tCode2 Text:" << code2_valid_text);
+    KCB_DEBUG_TRACE("\tCode2 Valid:" << code2_valid);
+    KCB_DEBUG_TRACE("\tFP Valid:" << fp_valid);
+    KCB_DEBUG_TRACE("\tSelected Locks:" << locks_valid);
+    KCB_DEBUG_TRACE("\tStart/End:" << start_end_valid);
+    KCB_DEBUG_TRACE("\tQuestions:" << questions_valid);
 
     bool valid_exit = isModified() &&
                       code1_valid_text &&
