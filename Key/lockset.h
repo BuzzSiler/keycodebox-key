@@ -10,33 +10,30 @@ class CLockSet : public QObject
 {
     Q_OBJECT
 
-public:
-    const char *flockset = "lock set";
+    public:
+        const char *flockset = "lock set";
+        typedef QMultiMap<QString, CLockState*>::Iterator   Iterator;
 
-    explicit CLockSet(QObject *parent = 0);
-    ~CLockSet();
-    void clearSet();
+        explicit CLockSet(QObject *parent = 0);
+        ~CLockSet();
+        void clearSet();
 
-    QJsonArray &jsonArraySet(QJsonObject &json);
-    QString jsonArrayAsStringObject();  // Object containing the array of CLockState objects { "lock_set":[],[],.. }
+        QJsonArray &jsonArraySet(QJsonObject &json);
+        QString jsonArrayAsStringObject();
 
-    bool setFromJsonObject(QJsonObject &jsonObj);    // Object containing array
-    bool setFromJsonString(QString strJson); // Stringified object containing array of CLockState objects "{ }"
+        bool setFromJsonObject(QJsonObject &jsonObj);
+        bool setFromJsonString(QString strJson);
 
-    const QMultiMap<int, CLockState*>*  getLockMap() { return &_mmapLocks; }
+        const QMultiMap<QString, CLockState*>*  getLockMap() { return &_mmapLocks; }
 
-    typedef QMultiMap<int, CLockState*>::Iterator   Iterator;
 
-    Iterator    begin() { return _mmapLocks.begin(); }
-    Iterator    end() { return _mmapLocks.end(); }
+        Iterator    begin() { return _mmapLocks.begin(); }
+        Iterator    end() { return _mmapLocks.end(); }
 
-    void addToSet(CLockState *plockState);
-private:
-    QMultiMap<int, CLockState*>       _mmapLocks;     // Container keyed off lock number
+        void addToSet(CLockState *plockState);
+    private:
+        QMultiMap<QString, CLockState*> _mmapLocks;
 
-signals:
-
-public slots:
 };
 
 #endif // CLOCKSET_H

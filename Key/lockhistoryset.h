@@ -30,7 +30,7 @@ class CLockHistorySet : public QObject
         const QVector<CLockHistoryRec*>*getLockHistoryMap() { return &_storage; }
 
         
-        Iterator getIterator() { return VIterator(_storage); }
+        Iterator getIterator() { return Iterator(_storage); }
 
         void addToSet(CLockHistoryRec &lockHistoryRec);
     private:

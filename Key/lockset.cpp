@@ -26,7 +26,7 @@ void CLockSet::clearSet()
 
 void CLockSet::addToSet(CLockState *plockState)
 {
-    _mmapLocks.insertMulti(plockState->getLockNum(), plockState);
+    _mmapLocks.insertMulti(plockState->getLockNums(), plockState);
 }
 
 CLockSet::~CLockSet()

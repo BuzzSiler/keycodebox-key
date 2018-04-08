@@ -76,7 +76,7 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
         QDateTime dtAccess;
         QString sDesc;
         QString body;
-        int nLockNum;
+        QString LockNums;
 	    QString question1, question2, question3;
         QTextStream stream( *ppFile );
         stream << "KeyCodeBox Access History." << endl;
@@ -91,9 +91,9 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
 
             dtAccess = plockHistoryRec->getAccessTime();
             sDesc = plockHistoryRec->getDescription();
-            nLockNum = plockHistoryRec->getLockNum();
+            LockNums = plockHistoryRec->getLockNums();
 	    
-            body = QString("%1 #%2").arg(tr("Lock"), QVariant(nLockNum).toString());
+            body = QString("%1 #%2").arg(tr("Lock"), QVariant(LockNums).toString());
 
             if( sDesc.size() > 0 )
             {

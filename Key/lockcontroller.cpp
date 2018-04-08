@@ -106,6 +106,7 @@ void CLockController::openLock(uint16_t nLockNum)
 
         QByteArray response;
         int num_bytes = _pport->ReadData(response);
+        Q_UNUSED(num_bytes);
     }
 }
 
@@ -210,6 +211,7 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
 
         QByteArray response;
         int num_bytes = _pport->ReadData(response);        
+        Q_UNUSED(num_bytes);
     }
 }
 
