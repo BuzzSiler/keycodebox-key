@@ -127,10 +127,10 @@ public slots:
     void OnLockHistorySet(CLockHistorySet *pSet) { emit __OnLockHistorySet(pSet); }
 
 signals:
-    void __RequestLastSuccessfulLogin();
+    void __RequestLastSuccessfulLogin(QString locknums);
     void __OnLastSuccessfulLogin(CLockHistoryRec *);
 public slots:
-    void RequestLastSuccessfulLogin();
+    void RequestLastSuccessfulLogin(QString locknums);
     void OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory);
 
 signals:

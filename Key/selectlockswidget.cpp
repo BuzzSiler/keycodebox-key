@@ -146,7 +146,7 @@ void SelectLocksWidget::getCabinetLockFromStr(QString& str, QString& cab, QStrin
     cab = cab_lock_vtr[1];
     lock = cab_lock_vtr[4];
 
-    qDebug() << "Item String:" << str << "Cabinet:" << cab << "Lock:" << lock;
+    //qDebug() << "Item String:" << str << "Cabinet:" << cab << "Lock:" << lock;
 }
 
 void SelectLocksWidget::openDoorTimer()
@@ -155,7 +155,7 @@ void SelectLocksWidget::openDoorTimer()
     QString lock;
     QString str;
 
-    qDebug() << "Opening" << ui->lstSelectedLocks->item(0)->text();
+    //qDebug() << "Opening" << ui->lstSelectedLocks->item(0)->text();
 
     str = ui->lstSelectedLocks->item(0)->text();
     delete ui->lstSelectedLocks->item(0);

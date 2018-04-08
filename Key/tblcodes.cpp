@@ -6,9 +6,6 @@
 #include "encryption.h"
 #include "kcbcommon.h"
 
-#define FIELD_INDEX(query, fld_name) (query.record().indexOf(fld_name))
-#define QUERY_VALUE(q, fld_name)  q.value(FIELD_INDEX(q, fld_name))
-
 CTblCodes::CTblCodes(QSqlDatabase *db)
 {
     KCB_DEBUG_ENTRY;
@@ -296,6 +293,8 @@ int CTblCodes::checkCodeTwo(QString code,
 
     return KCB_FAILED;
 }
+
+
 
 void CTblCodes::execSelectCodeSetQuery(QSqlQuery& qry, CLockSet **pLockSet)
 {

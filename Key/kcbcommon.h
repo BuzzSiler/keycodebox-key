@@ -19,4 +19,11 @@ const QString _DATENONE_STR = _DATENONE.toString("yyyy-MM-dd HH:mm:ss");
 
 typedef enum {ACCESS_TYPE_ALWAYS=0, ACCESS_TYPE_TIMED=1, ACCESS_TYPE_LIMITED_USE=2} ACCESS_TYPE;
 
+#define FIELD_INDEX(query, fld_name) (query.record().indexOf(fld_name))
+#define QUERY_VALUE(q, fld_name)  q.value(FIELD_INDEX(q, fld_name))
+
+#define DATETIME_FORMAT QStringLiteral("yyyy-MM-dd HH:mm:ss")
+
+
+
 #endif

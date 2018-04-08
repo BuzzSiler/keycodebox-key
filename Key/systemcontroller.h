@@ -45,7 +45,7 @@ public:
 
     const CLockController &getLockController() { return _LockController; }
 
-    void reportActivity();
+    void reportActivity(QString locknums);
 
     void getAllCodes1(QStringList& codes1);
 
@@ -187,11 +187,11 @@ public slots:
     void OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd);
 
 signals:
-    void __RequestLastSuccessfulLogin();
+    void __RequestLastSuccessfulLogin(QString locknums);
     void __OnSendTestEmail(int test_type);
     
 public slots:
-    void RequestLastSuccessfulLogin();
+    void RequestLastSuccessfulLogin(QString locknums);
     void OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory);
 
 public slots:

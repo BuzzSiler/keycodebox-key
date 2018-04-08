@@ -22,8 +22,9 @@ private:
 
     QDateTime   _access_time;
     bool        _adminNotificationSent;
-    QString _userNotificationEmail;
+    QString     _userNotificationEmail;
     bool        _userNotificationSent;
+    QString     _lockNums;
 
 public:
     QDateTime getAccessTime() { return _access_time; }
@@ -49,6 +50,8 @@ public:
     virtual bool setFromJsonString(QString strJson);
 
     void setFromLockState(CLockState &lockState);
+    void setLockNums(QString locknums) { _lockNums = locknums; };
+    QString getLockNums() { return _lockNums; };
 
 
 signals:

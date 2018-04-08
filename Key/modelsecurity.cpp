@@ -52,12 +52,24 @@ void CModelSecurity::OnReadLockSet(QString LockNums, QDateTime start, QDateTime 
 void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end)
 {
     CLockHistorySet *pLockHistorySet;
-    // Build the lock history set for this locknum and date range
-    _ptblCodeHistory->selectLockCodeHistorySet(LockNums, start, end, &pLockHistorySet);
+    CLockHistoryRec  *pState;
 
-    Q_ASSERT_X(pLockHistorySet != nullptr, "CModelSecurity::OnReadLockHistorySet", "pLockHistorySet is null");
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("Locks" << LockNums);
+    _ptblCodeHistory->selectLockCodeHistorySet(LockNums, start, end, &pLockHistorySet);
+    Q_ASSERT_X(pLockHistorySet != nullptr, Q_FUNC_INFO, "pLockHistorySet is null");
+
+    auto itor = pLockHistorySet->getIterator();
+
+    while (itor.hasNext())
+    {
+        pState = itor.next();
+        KCB_DEBUG_TRACE(pState->getLockNums());
+    }
 
     emit __OnLockHistorySet(pLockHistorySet);
+    KCB_DEBUG_EXIT;
 }
 
 /**
@@ -568,14 +580,17 @@ void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNu
     lockState.setLockNums(LockNums);
     lockState.setCode1(code);
     lockHistoryRec.setFromLockState(lockState);
-    _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
+    //_ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
     KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
 {
     KCB_DEBUG_ENTRY;
+
     int ids = _ptblCodes->getLastSuccessfulIDS();
+
+    KCB_DEBUG_TRACE("Ids" << ids);
     if(ids != -1)
     {
         int         nVal;
@@ -591,7 +606,7 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
             nVal++;
             pState = itor.value();
             lockHistoryRec.setFromLockState(*pState);
-            _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
+            //_ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
         }
         if(nVal > 1) 
         {
@@ -604,7 +619,10 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
 void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString answer1, QString answer2, QString answer3)
 {
     KCB_DEBUG_ENTRY;
+
     int ids = _ptblCodes->getLastSuccessfulIDS();
+    KCB_DEBUG_TRACE("Ids" << ids);
+
     if(ids != -1)
     {
         int         nVal;
@@ -620,9 +638,10 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QSt
             nVal++;
             pState = itor.value();
             lockHistoryRec.setFromLockState(*pState);
-            _ptblCodeHistory->addLockCodeHistoryWithAnswers(lockHistoryRec, answer1, answer2, answer3);
+            //_ptblCodeHistory->addLockCodeHistoryWithAnswers(lockHistoryRec, answer1, answer2, answer3);
         }
-        if(nVal > 1) {
+        if(nVal > 1) 
+        {
             KCB_DEBUG_TRACE("Error has more than 1 record");
         }
     }
@@ -630,15 +649,18 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QSt
     
 }
 
-void CModelSecurity::RequestLastSuccessfulLogin()
+void CModelSecurity::RequestLastSuccessfulLogin(QString locknums)
 {
     KCB_DEBUG_ENTRY;
+    
+    KCB_DEBUG_TRACE(locknums);
     if( !_ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
     {
         int ids = _ptblCodes->getLastSuccessfulIDS();
+        KCB_DEBUG_TRACE("Ids" << ids);
         if(ids != -1)
         {
-            qDebug() << "--------lastSuccessfulIDS ids != -1";
+            qDebug() << "lastSuccessfulIDS ids" << ids << "locks" << locknums;
             int         nVal;
             CLockSet    *pLockSet;
             // Build the lock set for this lock num
@@ -650,10 +672,22 @@ void CModelSecurity::RequestLastSuccessfulLogin()
             for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) 
             {
                 nVal++;
+                qDebug() << "count" << nVal;
                 pState = itor.value();
                 plockHistoryRec = new CLockHistoryRec();
                 plockHistoryRec->setFromLockState(*pState);
-                //
+                // Note: What we get back from the database is the code entry.  We want to 
+                // enter into the history the locks that were actually opened not the locks
+                // assigned to the code.  So, we initialize the history record with the default
+                // for the code and then override the locks value.
+                plockHistoryRec->setLockNums(locknums);
+                // Despite the fact that we are in a loop, there is only ever one response from
+                // the code table query, i.e., ids is single value associated with a single code
+                // So, since we're here, we will add an entry to the lock history for this lock
+                // More desirable to know exactly what locks were opened as opposed to the 
+                // 'possible' locks that can be opened which is what selectCodeSet gives us.
+                _ptblCodeHistory->addLockCodeHistory(*plockHistoryRec);
+
                 emit __OnLastSuccessfulLogin(plockHistoryRec);
             }
             if(nVal > 1) 
@@ -676,20 +710,20 @@ void CModelSecurity::RequestLastSuccessfulLogin()
         now = now.currentDateTime();
         QString LockNums;
 
-        qDebug() << ">>SENDING >>> Start:" << time.toString("yyyy-MM-dd HH:mm:ss") << "  End:" << now.toString("yyyy-MM-dd HH:mm:ss");
+        qDebug() << ">>SENDING >>> Start:" << time.toString(DATETIME_FORMAT) << "  End:" << now.toString(DATETIME_FORMAT);
 
         _ptblCodeHistory->selectLastLockCodeHistorySet(LockNums, time, now, &_pHistorySet);
 
         // Predictive - so history rec
         CLockHistoryRec *plockHistoryRec;
 
-        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++) 
-        {
-            plockHistoryRec = itor.value();
-            //
-            qDebug() << "  Found last successful login";
-            emit __OnLastSuccessfulLogin(plockHistoryRec);
-        }
+//        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++)
+//        {
+//            plockHistoryRec = itor.value();
+//            //
+//            qDebug() << "  Found last successful login";
+//            emit __OnLastSuccessfulLogin(plockHistoryRec);
+//        }
     }
 
     KCB_DEBUG_EXIT;

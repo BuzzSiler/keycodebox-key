@@ -1272,9 +1272,12 @@ void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
 
 void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
 {
-    qDebug() << "OnLockHistorySet()";
+    KCB_DEBUG_ENTRY;
     Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
+
+
     displayInHistoryTable(pSet);
+    
     pSet = nullptr;
 }
 
@@ -1301,21 +1304,22 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     table->setRowCount(pSet->getLockMap()->size());
     table->setColumnCount(7);
 
-
     table->setColumnWidth(0, 40);
     table->setColumnWidth(1, 80);
-    table->setColumnWidth(2, 130);
+    table->setColumnWidth(2, 150);
     table->setColumnWidth(3, 110);
     table->setColumnWidth(4, 110);
-    table->setColumnWidth(5, 160);
-    table->setColumnWidth(6, 160);
+    table->setColumnWidth(5, 155);
+    table->setColumnWidth(6, 155);
 
     table->verticalHeader()->hide();
+    
     QStringList headers;
     headers << "Line" << "Locks" << "Username" << "Code#1" << "Code#2" << "Start Time" << "End Time";
     table->setHorizontalHeaderLabels(headers);
     table->verticalHeader()->setFixedWidth(60);
     table->horizontalHeader()->setFixedHeight(50);
+    table->horizontalHeader()->setStretchLastSection(true);
 
     table->setStyleSheet("QTableView {selection-background-color: gray;}");
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -1424,30 +1428,11 @@ void CFrmAdminInfo::setupCodeTableContextMenu()
 
 void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
 {
-    qDebug() << "CFrmAdminInfo::displayInHistoryTable" << pSet;
+    KCB_DEBUG_TRACE(pSet);
 
-    Q_ASSERT(pSet != nullptr);
+    Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
 
-    QTableWidget    *table = ui->tblHistory;
-    table->setRowCount(pSet->getLockHistoryMap()->size());
-    qDebug() << "First deref of pSet";
-    table->setColumnCount(5);
-
-    QStringList headers;
-    table->setColumnWidth(0, 80);
-    table->setColumnWidth(1, 120);
-    table->setColumnWidth(2, 100);
-    table->setColumnWidth(3, 100);
-    table->setColumnWidth(4, 350);
-    headers<<tr("Lock #")<<tr("Username")<<tr("Code#1")<<tr("Code#2")<<tr("Accessed");
-    table->setHorizontalHeaderLabels(headers);
-
-    CLockHistorySet::Iterator itor;
-    CLockHistoryRec  *pState;
-    QString unencCode1;
-    QString unencCode2;
-
-    if(_phistoryWorkingSet) 
+    if (_phistoryWorkingSet) 
     {
         _phistoryWorkingSet->clearSet();
         delete _phistoryWorkingSet;
@@ -1455,30 +1440,71 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
 
     _phistoryWorkingSet = pSet;    // Hold onto the set for additional work.
 
-    connect( table, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT( codeHistoryTableCellSelected( int, int ) ) );
+    // Setup the table display
+
+    QTableWidget    *table = ui->tblHistory;
+    table->setRowCount(pSet->getLockHistoryMap()->size());
+    table->setColumnCount(5);
+
+    table->setColumnWidth(0, 80);
+    table->setColumnWidth(1, 120);
+    table->setColumnWidth(2, 100);
+    table->setColumnWidth(3, 100);
+    table->setColumnWidth(4, 350);
+    
+    table->verticalHeader()->hide();
+    
+    QStringList headers;
+    headers<<tr("Lock #")<<tr("Username")<<tr("Code#1")<<tr("Code#2")<<tr("Accessed");
+    table->setHorizontalHeaderLabels(headers);
+    table->verticalHeader()->setFixedWidth(60);
+    table->horizontalHeader()->setFixedHeight(50);    
+    table->horizontalHeader()->setStretchLastSection(true);
 
     table->setStyleSheet("QTableView {selection-background-color: lightblue;}");
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    connect( table, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT( codeHistoryTableCellSelected( int, int ) ) );
+
+    ui->cbLockNumHistory->clear();
+    ui->cbLockNumHistory->addItem(QString(tr("All Locks")));
+
     int nRow = 0;
     int nCol = 0;
-    for(itor = pSet->begin(); itor != pSet->end(); itor++)
+    CLockHistoryRec  *pState;
+    QSet<QString> lock_items;
+    
+    auto itor = _phistoryWorkingSet->getIterator();
+
+    while (itor.hasNext())
     {
-        pState = itor.value();
+        pState = itor.next();
         qDebug() << "Adding row of History Lock State - Codes. Lock Num:" << pState->getLockNums();
+        
+        // Locks can be single or comma-separated.  We will add the comma-separated value as well as
+        // the individual locks for filtering purposes
+        QString locks = pState->getLockNums();
+        KCB_DEBUG_TRACE("Locks" << locks);
+        lock_items.insert(locks);
+        QStringList sl = locks.split(',');
+        foreach (auto s, sl)
+        {
+            lock_items.insert(s);
+        }
+        
         nCol = 0;
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getLockNums()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getDescription()));
-        unencCode1 = pState->getCode1();
-        unencCode2 = pState->getCode2();
-
-        qDebug() << "  >>>History>> Code1:" << unencCode1 << "  code2:" << unencCode2;
-
-        table->setItem(nRow, nCol++, new QTableWidgetItem(unencCode1));
-        table->setItem(nRow, nCol++, new QTableWidgetItem(unencCode2));
+        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode1()));
+        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getAccessTime().toString("yyyy-MM-dd HH:mm:ss AP")));
         nRow++;
     }
+
+    QStringList sl(lock_items.toList());
+    sl.sort();
+    ui->cbLockNumHistory->addItems(sl);
+    
 }
 
 void CFrmAdminInfo::codeDeleteSelection()
@@ -1952,13 +1978,6 @@ bool CFrmAdminInfo::eventFilter(QObject *target, QEvent *event)
 
 void CFrmAdminInfo::OnCodes(QString code1, QString code2)
 {
-    // QString str = code1;
-    // if( code2.size() > 0 )
-    // {
-    //     str += " : " + code2;
-    // }
-    // ui->edInfo->setText(str);
-
     KCB_DEBUG_TRACE(code1 << code2);
     emit __OnAdminInfoCodes(code1, code2);
 }

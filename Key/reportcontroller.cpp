@@ -81,9 +81,11 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
         QTextStream stream( *ppFile );
         stream << "KeyCodeBox Access History." << endl;
 
-        for (CLockHistorySet::Iterator itor = pLockHistorySet->begin(); itor != pLockHistorySet->end(); itor++) 
+        auto itor = pLockHistorySet->getIterator();
+
+        while (itor.hasNext())
         {
-            plockHistoryRec = itor.value();
+            plockHistoryRec = itor.next();
             
             body = "";
 

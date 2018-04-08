@@ -346,7 +346,7 @@ void CSystemController::initializeReportController()
     _ReportController.moveToThread(&_threadReport);
     _threadReport.start();
 
-    connect(this, SIGNAL(__RequestLastSuccessfulLogin()), &_securityController, SLOT(RequestLastSuccessfulLogin()));
+    connect(this, SIGNAL(__RequestLastSuccessfulLogin(QString)), &_securityController, SLOT(RequestLastSuccessfulLogin(QString)));
     connect(&_securityController, SIGNAL(__OnLastSuccessfulLogin(CLockHistoryRec*)), this, SLOT(OnLastSuccessfulLoginRequest(CLockHistoryRec*)));
 }
 
@@ -537,16 +537,16 @@ void CSystemController::OnOpenLockRequest(QString LockNums, bool is_user)
     if (is_user)
     {
         qDebug() << "SystemController: reportActivity";
-        reportActivity();
+        reportActivity(LockNums);
     }
 }
 
-void CSystemController::reportActivity()
+void CSystemController::reportActivity(QString locknums)
 {
     // Check the frequency & send and email if it's each event
     _bCurrentAdminRetrieved = false;
     emit __OnRequestCurrentAdmin();
-    emit __RequestLastSuccessfulLogin();
+    emit __RequestLastSuccessfulLogin(locknums);
 }
 
 void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd)
@@ -972,13 +972,16 @@ void CSystemController::startTimeoutTimer(int duration)
     _ptimer->start(duration);
 }
 
-void CSystemController::RequestLastSuccessfulLogin()
+void CSystemController::RequestLastSuccessfulLogin(QString locknums)
 {
-    emit __RequestLastSuccessfulLogin();
+    emit __RequestLastSuccessfulLogin(locknums);
 }
 
 void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE(pLockHistory->getLockNums());
+    
     int nCount = 0;
     while(!_bCurrentAdminRetrieved && nCount < 25) 
     {
@@ -1029,6 +1032,8 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
                 QString sDesc = pLockHistory->getDescription();
                 QString LockNums = pLockHistory->getLockNums();
 
+                KCB_DEBUG_TRACE("Locks" << LockNums);
+
                 QString body = QString("%1 #%2").arg(tr("Lock")).arg(LockNums);
 
                 if( sDesc.size() > 0 )
@@ -1043,15 +1048,18 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
             }
         }
         delete pLockHistory;
-    } else 
+    } 
+    else 
     {
         qDebug() << "OnLastSuccessfulLoginRequest() No admin record yet!";
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnBrightnessChanged(int nValue)
 {
-    if( _LCDGraphicsController.isLCDAttached() ) {
+    if( _LCDGraphicsController.isLCDAttached() ) 
+    {
         _LCDGraphicsController.setBrightness(nValue);
     }
 }

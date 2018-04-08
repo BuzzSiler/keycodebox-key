@@ -62,7 +62,7 @@ void CSecurityController::initializeSignals()
     
     connect(&_modelSecurity, SIGNAL(__OnCreateHistoryRecordFromLastPredictiveLogin(QString, QString)), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastPredictiveLogin(QString, QString)));
     connect(&_modelSecurity, SIGNAL(__OnLastSuccessfulLogin(CLockHistoryRec*)), this, SLOT(OnLastSuccessfulLoginRequest(CLockHistoryRec*)));
-    connect(this, SIGNAL( __RequestLastSuccessfulLogin()), &_modelSecurity, SLOT(RequestLastSuccessfulLogin()));
+    connect(this, SIGNAL( __RequestLastSuccessfulLogin(QString)), &_modelSecurity, SLOT(RequestLastSuccessfulLogin(QString)));
 
     connect(&_modelSecurity, SIGNAL(__OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)),
             this, SLOT(OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)));
@@ -75,26 +75,20 @@ void CSecurityController::initializeSignals()
     connect(this, SIGNAL(__OnQuestionUserCancelled()), &_modelSecurity, SLOT(OnQuestionUserCancelled()));
 }
 
-
-//std::string CSecurityController::encryptDecrypt(uint32_t nVal, std::string toEncrypt, std::string key)
-//{
-//    std::string skey = key;
-//    std::string output = toEncrypt;
-
-//    for (uint i = 0; i < toEncrypt.length(); i++)
-//        output[i] = toEncrypt[i] ^ skey[i + nVal % (skey.length())];
-
-//    return output;
-//}
-
-void CSecurityController::RequestLastSuccessfulLogin()
+void CSecurityController::RequestLastSuccessfulLogin(QString locknums)
 {
-    emit __RequestLastSuccessfulLogin();
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE(locknums);
+    emit __RequestLastSuccessfulLogin(locknums);
+    KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE(pLockHistory->getLockNums());
     emit __OnLastSuccessfulLogin(pLockHistory);
+    KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd)
@@ -111,7 +105,7 @@ void CSecurityController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime
 
 void CSecurityController::OnUpdateCodeState(CLockState *rec)
 {
-    qDebug() << "CSecurityController::OnUpdateCodeState emitting __OnUpdateCodeState";
+    KCB_DEBUG_TRACE("emitting __OnUpdateCodeState");
 
     emit __OnUpdateCodeState(rec);
 }
