@@ -62,6 +62,7 @@ class FrmCodeEditMulti : public QDialog
             QString question2;
             QString question3;
             bool fp_enabled;
+            bool fp_deleted;
             quint8 access_type;
             QString locks;
         } CODE_STATE;

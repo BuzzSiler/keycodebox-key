@@ -23,6 +23,7 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     ui->setupUi(this);
 
     ui->bbSaveCancel->button(QDialogButtonBox::Save)->setDisabled(true);
+    ui->bbSaveCancel->button(QDialogButtonBox::Cancel)->setEnabled(true);
 
     FrmCodeEditMulti::showFullScreen();
 
@@ -46,7 +47,7 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     ui->cbEnableCode2->setChecked(false);
     ui->edUsername->setText("");
 
-    ui->cbEnableQuestions->setEnabled(true);
+    ui->cbEnableQuestions->setDisabled(true);
     ui->cbEnableQuestions->setChecked(false);
     ui->pbEditQuestions->setDisabled(true);
     resetQuestions();
@@ -96,6 +97,7 @@ void FrmCodeEditMulti::setValues(CLockState * const state, const QStringList cod
     m_code_state.question2 = "";
     m_code_state.question3 = "";
     m_code_state.fp_enabled = state->getFingerprint1();
+    m_code_state.fp_deleted = false;
     m_code_state.access_type = state->getAccessType();
     m_code_state.locks = state->getLockNums();
     m_code_state.question1 = state->getQuestion1();
@@ -120,6 +122,7 @@ void FrmCodeEditMulti::setValues(CLockState * const state, const QStringList cod
     ui->dtEndAccess->setDateTime(m_code_state.end_datetime);
 
     ui->cbFingerprint->setChecked(m_code_state.fp_enabled);
+    ui->cbEnableQuestions->setEnabled(m_code_state.code2_enabled);
     ui->cbEnableQuestions->setChecked(m_code_state.questions_enabled);
     ui->pbEditQuestions->setEnabled(m_code_state.questions_enabled);
     m_questions[0] = m_code_state.question1;
@@ -152,7 +155,10 @@ void FrmCodeEditMulti::getValues(CLockState * const state)
     state->setMaxAccess(ui->cbAccessType->currentIndex() == ACCESS_TYPE_LIMITED_USE ? 2 : -1);
     state->setAccessType(ui->cbAccessType->currentIndex());
     state->setLockNums(m_lock_cab.getSelectedLocks());
-    state->show();
+    //state->show();
+
+    ui->bbSaveCancel->button(QDialogButtonBox::Save)->setDisabled(true);
+    ui->bbSaveCancel->button(QDialogButtonBox::Cancel)->setEnabled(true);
 }
 
 void FrmCodeEditMulti::updateAccessType(int index)
@@ -340,7 +346,7 @@ void FrmCodeEditMulti::on_cbEnableCode2_stateChanged(int arg1)
 bool FrmCodeEditMulti::isModified()
 {
     bool code1_changed = m_code_state.code1 != ui->edCode1->text();
-    bool fp_changed = m_code_state.fp_enabled != ui->cbFingerprint->isChecked();
+    bool fp_changed = m_code_state.fp_enabled != ui->cbFingerprint->isChecked() || m_code_state.fp_deleted;
     bool code2_changed = m_code_state.code2_enabled != ui->cbEnableCode2->isChecked() || m_code_state.code2 != ui->edCode2->text();
     bool username_changed = m_code_state.username != ui->edUsername->text();
     bool locks_changed = m_code_state.locks != m_lock_cab.getSelectedLocks();
@@ -376,6 +382,8 @@ void FrmCodeEditMulti::updateUi()
     ui->pbClearCode2->setDisabled(ui->edCode2->text() == "");
     ui->pbClearUsername->setDisabled(ui->edUsername->text() == "");
 
+    ui->cbEnableQuestions->setEnabled(ui->cbEnableCode2->isChecked() && ui->edCode1->text() != "");
+
     // Note:
     // If fingerprint is enabled, code 2 is not allowed and will be cleared
     if (ui->cbFingerprint->isChecked())
@@ -410,7 +418,7 @@ void FrmCodeEditMulti::updateUi()
     displayWarning(qobject_cast<QWidget *>(ui->dtStartAccess), start_end_valid);
     displayWarning(qobject_cast<QWidget *>(ui->dtEndAccess), start_end_valid);
     displayWarning(qobject_cast<QWidget *>(ui->cbEnableQuestions), questions_valid);
-    displayWarning(qobject_cast<QWidget *>(ui->pbEditQuestions), questions_valid);
+    displayWarning(qobject_cast<QWidget *>(ui->pbEditQuestions), code2_valid && questions_valid);
     if (locks_valid)
     {
         m_lock_cab.clrWarning();
@@ -454,6 +462,7 @@ void FrmCodeEditMulti::clrCodeState()
     m_code_state.question2 = "";
     m_code_state.question3 = "";
     m_code_state.questions_enabled = false;
+    m_code_state.fp_deleted = false;
 }
 
 void FrmCodeEditMulti::on_bbSaveCancel_accepted()
@@ -495,6 +504,8 @@ void FrmCodeEditMulti::on_cbFingerprint_clicked()
             if (nRC == QMessageBox::Yes)
             {
                 std::system( ("sudo rm -rf " + printDirectory.toStdString()).c_str());
+                m_code_state.fp_deleted = true;
+                ui->bbSaveCancel->button(QDialogButtonBox::Cancel)->setDisabled(true);
             }
             else
             {
