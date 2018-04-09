@@ -127,10 +127,11 @@ public slots:
     void OnLockHistorySet(CLockHistorySet *pSet) { emit __OnLockHistorySet(pSet); }
 
 signals:
-    void __RequestLastSuccessfulLogin(QString locknums);
+    void __RequestLastSuccessfulLogin(QString locknums, QString answer1, QString answer2, QString answer3);
     void __OnLastSuccessfulLogin(CLockHistoryRec *);
 public slots:
     void RequestLastSuccessfulLogin(QString locknums);
+    void RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3);
     void OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory);
 
 signals:

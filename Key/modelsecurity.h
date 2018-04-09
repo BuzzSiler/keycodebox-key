@@ -58,7 +58,7 @@ class CModelSecurity : public QObject
     signals:
         void __OnLastSuccessfulLogin(CLockHistoryRec *);
     public slots:
-        void RequestLastSuccessfulLogin(QString locknums);
+        void RequestLastSuccessfulLogin(QString locknums, QString answer1, QString answer2, QString answer3);
 
     signals:
         void __OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet);

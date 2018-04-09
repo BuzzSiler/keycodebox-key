@@ -180,7 +180,6 @@ bool CTblCodes::isWhiteSpace(const QString &str)
 
 int CTblCodes::checkCodeTwo(QString code, 
                             bool &bFingerprintRequired, 
-                            bool &bQuestionsRequired, 
                             QString &codeOne, 
                             QString &lockNums, 
                             bool &bAskQuestions, 
@@ -264,26 +263,10 @@ int CTblCodes::checkCodeTwo(QString code,
 
             if( lockboxState == 0)
             {
-                bQuestionsRequired = false;
                 updateLockboxState(_lastIDS, true);
             }
             else
             {
-                if( !question1.isEmpty() )
-                {
-                    bQuestionsRequired = true;
-                }
-
-                if( !question2.isEmpty() )
-                {
-                    bQuestionsRequired = true;
-                }
-
-                if( !question3.isEmpty() )
-                {
-                    bQuestionsRequired = true;
-                }
-
                 updateLockboxState(_lastIDS, false);
             }
 
@@ -761,8 +744,8 @@ bool CTblCodes::createTestDefault()
 
     qry.bindValue(":codeOne", encCode1);
     qry.bindValue(":codeTwo", encCode2);
-    qry.bindValue(":start", _DATENONE_STR);
-    qry.bindValue(":end", _DATENONE_STR);
+    qry.bindValue(":start", DEFAULT_DATETIME_STR);
+    qry.bindValue(":end", DEFAULT_DATETIME_STR);
     qry.bindValue(":fingerprint1", false);
     qry.bindValue(":fingerprint2", false);
 

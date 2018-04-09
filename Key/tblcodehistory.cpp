@@ -449,6 +449,7 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString co
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
     KCB_DEBUG_TRACE("Adding Locks w/ Answers to History" << locknums);
+    KCB_DEBUG_TRACE("Answer1" << answer1 << "Answer2" << answer2 << "Answer3" << answer3);
 
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + TABLENAME +

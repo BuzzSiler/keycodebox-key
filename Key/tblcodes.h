@@ -60,7 +60,8 @@ class CTblCodes
 
         int getLastSuccessfulIDS() { return _lastIDS; }
         int checkCodeOne(QString code, bool &bSecondCodeRequired, bool &bFingerprintRequired, QString &lockNums );
-        int checkCodeTwo(QString code, bool &bFingerprintRequired, bool &bQuestionsRequired, QString &codeOne, QString &lockNums, bool &bAskQuestions, QString &question1, QString &question2, QString &question3);
+        int checkCodeTwo(QString code, bool &bFingerprintRequired, QString &codeOne, QString &lockNums, 
+                         bool &bAskQuestions, QString &question1, QString &question2, QString &question3);
 
         int addLockCodeClear(QString locknums, QString code1, QString code2="",
                             QDateTime starttime=QDateTime(QDate(1990,01,01), QTime(0,0,0)),

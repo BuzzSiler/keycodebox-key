@@ -62,7 +62,7 @@ void CSecurityController::initializeSignals()
     
     connect(&_modelSecurity, SIGNAL(__OnCreateHistoryRecordFromLastPredictiveLogin(QString, QString)), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastPredictiveLogin(QString, QString)));
     connect(&_modelSecurity, SIGNAL(__OnLastSuccessfulLogin(CLockHistoryRec*)), this, SLOT(OnLastSuccessfulLoginRequest(CLockHistoryRec*)));
-    connect(this, SIGNAL( __RequestLastSuccessfulLogin(QString)), &_modelSecurity, SLOT(RequestLastSuccessfulLogin(QString)));
+    connect(this, SIGNAL( __RequestLastSuccessfulLogin(QString, QString, QString, QString)), &_modelSecurity, SLOT(RequestLastSuccessfulLogin(QString, QString, QString, QString)));
 
     connect(&_modelSecurity, SIGNAL(__OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)),
             this, SLOT(OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)));
@@ -79,7 +79,15 @@ void CSecurityController::RequestLastSuccessfulLogin(QString locknums)
 {
     KCB_DEBUG_ENTRY;
     KCB_DEBUG_TRACE(locknums);
-    emit __RequestLastSuccessfulLogin(locknums);
+    emit __RequestLastSuccessfulLogin(locknums, "", "", "");
+    KCB_DEBUG_EXIT;
+}
+
+void CSecurityController::RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3)
+{
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE("Answer1" << answer1 << "Answer2" << answer2 << "Answer3" << answer3);    
+    emit __RequestLastSuccessfulLogin(locknums, answer1, answer2, answer3);
     KCB_DEBUG_EXIT;
 }
 
@@ -260,14 +268,14 @@ void CSecurityController::OnSecurityCheckSuccess(QString locks)
 {
     KCB_DEBUG_TRACE("locks:" << locks);
     emit __OnSecurityCheckSuccess(locks);
-    emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
+    //emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
 }
 
 void CSecurityController::OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
-    KCB_DEBUG_TRACE(answer1 << ", " << answer2 << ", " << answer3);
+    KCB_DEBUG_TRACE(lockNums << "; " << answer1 << "; " << answer2 << "; " << answer3);
     emit __OnSecurityCheckSuccess(lockNums);
-    emit __OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(answer1, answer2, answer3);
+    //emit __OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(answer1, answer2, answer3);
 }
 
 void CSecurityController::OnSecurityCheckedFailed()

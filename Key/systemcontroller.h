@@ -79,6 +79,12 @@ private:
     QTimer      *_ptimer;
     uint64_t    _un64Locks;
 
+    QString _answer1;
+    QString _answer2;
+    QString _answer3;
+    bool _answers_provided;
+    
+
     void initializeSecurityConnections();
     void initializeLockController();
 
@@ -188,6 +194,7 @@ public slots:
 
 signals:
     void __RequestLastSuccessfulLogin(QString locknums);
+    void __RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3);
     void __OnSendTestEmail(int test_type);
     
 public slots:
@@ -217,7 +224,7 @@ private slots:
 
     void OnUserCodeCancel();
 
-    void OnOpenLockRequest(QString LockNums, bool is_user);
+    void OnOpenLockRequest(QString lockNum);
     void OnReadLockStatus();
 
     void OnTouchScreenTouched();

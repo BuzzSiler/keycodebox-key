@@ -159,21 +159,23 @@ void CSystemController::TrigQuestionUser(QString lockNums, QString question1, QS
     Q_UNUSED(question1);
     Q_UNUSED(question2);
     Q_UNUSED(question3);
-    qDebug() << "CSystemController::TrigQuestionUser()";
+    KCB_DEBUG_ENTRY;
     stopTimeoutTimer();
 }
 
 void CSystemController::AnswerUserSave(QString lockNums, QString question1, QString question2, QString question3)
 {
-    qDebug() << "CSystemController::QuestionUserSave()";
-    //emit signal to security model/controller here
-    qDebug() << "CSystemController::AnswerUserSave(), emitting AnswerUserSave(): " << lockNums << ", " << question1 << ", " << question2 << ", " << question3;
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE("emitting " << lockNums << ", " << question1 << ", " << question2 << ", " << question3);
+    _answer1 = question1;
+    _answer2 = question2;
+    _answer3 = question3;
+    _answers_provided = true;
     emit __onQuestionUserAnswers(lockNums, question1, question2, question3);
 }
 
 void CSystemController::QuestionUserCancel()
 {
-    qDebug() << "CSystemController::QuestionUserCancel()";
     KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(1000);
     emit __onQuestionUserCancel();
@@ -346,9 +348,14 @@ void CSystemController::initializeReportController()
     _ReportController.moveToThread(&_threadReport);
     _threadReport.start();
 
-    connect(this, SIGNAL(__RequestLastSuccessfulLogin(QString)), &_securityController, SLOT(RequestLastSuccessfulLogin(QString)));
-    connect(&_securityController, SIGNAL(__OnLastSuccessfulLogin(CLockHistoryRec*)), this, SLOT(OnLastSuccessfulLoginRequest(CLockHistoryRec*)));
+    connect(this, SIGNAL(__RequestLastSuccessfulLogin(QString)), 
+            &_securityController, SLOT(RequestLastSuccessfulLogin(QString)));
+    connect(this, SIGNAL(__RequestLastSuccessfulLoginWithAnswers(QString, QString, QString, QString)), 
+            &_securityController, SLOT(RequestLastSuccessfulLoginWithAnswers(QString, QString, QString, QString)));
+    connect(&_securityController, SIGNAL(__OnLastSuccessfulLogin(CLockHistoryRec*)), 
+            this, SLOT(OnLastSuccessfulLoginRequest(CLockHistoryRec*)));
 }
+
 
 void CSystemController::initializeSecurityConnections()
 {
@@ -527,26 +534,35 @@ void CSystemController::OnUserCodeCancel()
     emit __OnClearEntry();
 }
 
-void CSystemController::OnOpenLockRequest(QString LockNums, bool is_user)
+void CSystemController::OnOpenLockRequest(QString lockNum)
 {
-    KCB_DEBUG_TRACE(LockNums << is_user);
+    KCB_DEBUG_TRACE(lockNum);
     // Open the lock
     qDebug() << "Lock Open";
     emit __OnCodeMessage(tr("Lock Open"));
-    _LockController.openLocks(LockNums);
-    if (is_user)
-    {
-        qDebug() << "SystemController: reportActivity";
-        reportActivity(LockNums);
-    }
+    _LockController.openLocks(lockNum);
 }
 
 void CSystemController::reportActivity(QString locknums)
 {
-    // Check the frequency & send and email if it's each event
+    // Check the frequency & send an email if it's each event
     _bCurrentAdminRetrieved = false;
     emit __OnRequestCurrentAdmin();
-    emit __RequestLastSuccessfulLogin(locknums);
+
+    if (_answers_provided)
+    {
+        KCB_DEBUG_TRACE("Answer1" << _answer1 << "Answer2" << _answer2 << "Answer3" << _answer3);
+        emit __RequestLastSuccessfulLoginWithAnswers(locknums, _answer1, _answer2, _answer3);
+        _answers_provided = false;
+        _answer1 = "";
+        _answer2 = "";
+        _answer3 = "";
+    }
+    else
+    {
+        emit __RequestLastSuccessfulLogin(locknums);
+    }
+
 }
 
 void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd)
@@ -585,23 +601,26 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
 
             foreach (auto s, sl)
             {
-                OnOpenLockRequest(s, true);
+                OnOpenLockRequest(s);
             }
-            _systemState = EThankYou;
+
         }
         else
         {
             OnUserCodeCancel();
+            return;
         }
     }
     else
     {
         KCB_DEBUG_TRACE("Single Lock");
         _locks = locks;
-        OnOpenLockRequest(locks, true);
-        _systemState = EThankYou;
+        OnOpenLockRequest(locks);
     }
 
+    reportActivity(_locks);
+    _systemState = EThankYou;
+            
 }
 
 void CSystemController::OnSecurityCheckedFailed()

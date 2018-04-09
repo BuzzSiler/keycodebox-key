@@ -72,11 +72,6 @@ void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDa
     KCB_DEBUG_EXIT;
 }
 
-/**
- * @brief CModelSecurity::OnUpdateCurrentAdmin
- * @param adminInfo
- * Password and AccessCode are required to be clear text here.
- */
 void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 {
     bool bSuccess = _ptblAdmin->updateAdminClear(adminInfo->getAdminName(), adminInfo->getAdminEmail(), adminInfo->getAdminPhone(),
@@ -114,13 +109,16 @@ void CModelSecurity::initialize()
 
 void CModelSecurity::removeCreatedObjects()
 {
-    if(_ptblCodes) {
+    if(_ptblCodes) 
+    {
         delete _ptblCodes;
     }
-    if( _ptblCodeHistory) {
+    if( _ptblCodeHistory) 
+    {
         delete _ptblCodeHistory;
     }
-    if( _ptblAdmin) {
+    if( _ptblAdmin) 
+    {
         delete _ptblAdmin;
     }
 }
@@ -128,10 +126,13 @@ void CModelSecurity::removeCreatedObjects()
 void CModelSecurity::OnTimeout()
 {
     // Timeout waiting on security code?
-    if( _type == "Admin" ) {
+    if( _type == "Admin" ) 
+    {
         _type = "";
         emit __OnAdminSecurityCheckFailed();
-    } else {
+    } 
+    else 
+    {
         _type = "";
         emit __OnSecurityCheckedFailed();
     }
@@ -270,11 +271,6 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                     emit __OnSecurityCheckedFailed();
                 }
             }
-        }
-        else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
-        {
-            // Store AnyAccessCode = code
-            // Enter Secondary code - Verify against DB (second access code?)            
         }
         else
         {
@@ -418,7 +414,6 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     KCB_DEBUG_TRACE(code);
 
     bool bFingerprintRequired = false;
-    bool bQuestionsRequired = false;
     QString codeOne;
     bool bAskQuestions = false;
     QString question1 = "";
@@ -445,7 +440,6 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
 
         int result = _ptblCodes->checkCodeTwo(code,
                                              bFingerprintRequired,
-                                             bQuestionsRequired,
                                              codeOne,
                                              lockNums,
                                              bAskQuestions,
@@ -482,12 +476,10 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                 return;
             }
 
-            KCB_DEBUG_TRACE("Questions Required" << bQuestionsRequired);
             KCB_DEBUG_TRACE("Ask Questions" << bAskQuestions);
 
-            if( bQuestionsRequired == true)
+            if( bAskQuestions )
             {
-                qDebug() << "ASK_QUESTIONS: " << QString::number(bAskQuestions);
                 qDebug() << "QUESTION1: " << question1;
                 qDebug() << "QUESTION2: " << question2;
                 qDebug() << "QUESTION3: " << question3;
@@ -512,14 +504,13 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
 
 void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
-    qDebug() << "CModelSecurity::OnSuccessfulQuestionUsersAnswers()";
+    KCB_DEBUG_ENTRY;
     emit __OnSecurityCheckSuccessWithAnswers(lockNums, answer1, answer2, answer3);
 }
 
 void CModelSecurity::OnQuestionUserCancelled()
 {
-    qDebug() << "CModelSecurity::OnQuestionUserCancelled()";
-    //emit __OnSecurityCheckedFailed();
+    KCB_DEBUG_ENTRY;
     _ptblCodes->updateLockboxState(_ptblCodes->_lastIDS, true);
 }
 
@@ -527,7 +518,6 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
 {
     //    _timer.stop();
     bool bFingerprintRequired = false;
-    bool bQuestionsRequired = false;
     QString codeOne;
     bool bAskQuestions = false;
     QString question1 = "";
@@ -550,7 +540,6 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
         QString lockNums;
         int result = _ptblCodes->checkCodeTwo(code,
                                               bFingerprintRequired,
-                                              bQuestionsRequired,
                                               codeOne,
                                               lockNums,
                                               bAskQuestions,
@@ -580,7 +569,7 @@ void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNu
     lockState.setLockNums(LockNums);
     lockState.setCode1(code);
     lockHistoryRec.setFromLockState(lockState);
-    //_ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
+    _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
     KCB_DEBUG_EXIT;
 }
 
@@ -606,7 +595,8 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
             nVal++;
             pState = itor.value();
             lockHistoryRec.setFromLockState(*pState);
-            //_ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
+            lockHistoryRec.setLockNums(pState->getLockNums());
+            _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
         }
         if(nVal > 1) 
         {
@@ -638,7 +628,8 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QSt
             nVal++;
             pState = itor.value();
             lockHistoryRec.setFromLockState(*pState);
-            //_ptblCodeHistory->addLockCodeHistoryWithAnswers(lockHistoryRec, answer1, answer2, answer3);
+            lockHistoryRec.setLockNums(pState->getLockNums());
+            _ptblCodeHistory->addLockCodeHistoryWithAnswers(lockHistoryRec, answer1, answer2, answer3);
         }
         if(nVal > 1) 
         {
@@ -649,13 +640,39 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QSt
     
 }
 
-void CModelSecurity::RequestLastSuccessfulLogin(QString locknums)
+void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer1, QString answer2, QString answer3)
 {
     KCB_DEBUG_ENTRY;
     
     KCB_DEBUG_TRACE(locknums);
-    if( !_ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
+    if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
     {
+        qDebug() << "RequestLastSuccessfulLogin( Predictive )";
+        CLockHistorySet *_pHistorySet = NULL;
+
+        QDateTime   time, now;
+        time = time.currentDateTime().addSecs(-5);  // 5 Seconds ago
+        now = now.currentDateTime();
+        QString LockNums;
+
+        qDebug() << ">>SENDING >>> Start:" << time.toString(DATETIME_FORMAT) << "  End:" << now.toString(DATETIME_FORMAT);
+
+        _ptblCodeHistory->selectLastLockCodeHistorySet(LockNums, time, now, &_pHistorySet);
+
+        // Predictive - so history rec
+        CLockHistoryRec *plockHistoryRec;
+
+//        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++)
+//        {
+//            plockHistoryRec = itor.value();
+//            //
+//            qDebug() << "  Found last successful login";
+//            emit __OnLastSuccessfulLogin(plockHistoryRec);
+//        }
+    }
+    else
+    {
+        
         int ids = _ptblCodes->getLastSuccessfulIDS();
         KCB_DEBUG_TRACE("Ids" << ids);
         if(ids != -1)
@@ -681,12 +698,23 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums)
                 // assigned to the code.  So, we initialize the history record with the default
                 // for the code and then override the locks value.
                 plockHistoryRec->setLockNums(locknums);
+
                 // Despite the fact that we are in a loop, there is only ever one response from
                 // the code table query, i.e., ids is single value associated with a single code
                 // So, since we're here, we will add an entry to the lock history for this lock
                 // More desirable to know exactly what locks were opened as opposed to the 
                 // 'possible' locks that can be opened which is what selectCodeSet gives us.
-                _ptblCodeHistory->addLockCodeHistory(*plockHistoryRec);
+
+
+                // Set the answers if they exist, i.e., not empty
+                if (!answer1.isEmpty() || !answer2.isEmpty() || !answer3.isEmpty())
+                {
+                    _ptblCodeHistory->addLockCodeHistoryWithAnswers(*plockHistoryRec, answer1, answer2, answer3);
+                }
+                else
+                {
+                    _ptblCodeHistory->addLockCodeHistory(*plockHistoryRec);
+                }
 
                 emit __OnLastSuccessfulLogin(plockHistoryRec);
             }
@@ -699,31 +727,6 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums)
         {
             qDebug() << "ids == -1)";
         }
-    }
-    else 
-    {
-        qDebug() << "RequestLastSuccessfulLogin( Predictive )";
-        CLockHistorySet *_pHistorySet = NULL;
-
-        QDateTime   time, now;
-        time = time.currentDateTime().addSecs(-5);  // 5 Seconds ago
-        now = now.currentDateTime();
-        QString LockNums;
-
-        qDebug() << ">>SENDING >>> Start:" << time.toString(DATETIME_FORMAT) << "  End:" << now.toString(DATETIME_FORMAT);
-
-        _ptblCodeHistory->selectLastLockCodeHistorySet(LockNums, time, now, &_pHistorySet);
-
-        // Predictive - so history rec
-        CLockHistoryRec *plockHistoryRec;
-
-//        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++)
-//        {
-//            plockHistoryRec = itor.value();
-//            //
-//            qDebug() << "  Found last successful login";
-//            emit __OnLastSuccessfulLogin(plockHistoryRec);
-//        }
     }
 
     KCB_DEBUG_EXIT;
