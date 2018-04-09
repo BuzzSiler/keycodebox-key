@@ -49,8 +49,8 @@ SOURCES += main.cpp\
     clickablelabel.cpp \
     lockhistoryset.cpp \
     lockhistoryrec.cpp \
-    dlgfullkeyboard.cpp \
-    currentedit.cpp \
+#    dlgfullkeyboard.cpp \
+#    currentedit.cpp \
     reportcontroller.cpp \
     smtp/emailaddress.cpp \
     smtp/mimeattachment.cpp \
@@ -80,7 +80,6 @@ SOURCES += main.cpp\
     frmselectlocks.cpp \
     frmcodeeditmulti.cpp \
     lockcabinetwidget.cpp \
-    dlgnumberpad.cpp \
     kcbkeyboardwidget.cpp \
     kcbkeyboarddialog.cpp \
     kcbutils.cpp
@@ -115,8 +114,6 @@ HEADERS  += keycodeboxmain.h \
     clickablelabel.h \
     lockhistoryset.h \
     lockhistoryrec.h \
-    dlgfullkeyboard.h \
-    currentedit.h \
     reportcontroller.h \
     smtp/emailaddress.h \
     smtp/mimeattachment.h \
@@ -148,7 +145,6 @@ HEADERS  += keycodeboxmain.h \
     frmselectlocks.h \
     frmcodeeditmulti.h \
     lockcabinetwidget.h \
-    dlgnumberpad.h \
     kcbcommon.h \
     kcbkeyboardwidget.h \
     kcbkeyboarddialog.h \
@@ -172,7 +168,6 @@ FORMS    += mainwindow.ui \
     frmselectlocks.ui \
     frmcodeeditmulti.ui \
     lockcabinetwidget.ui \
-    dlgnumberpad.ui \
     kcbkeyboardwidget.ui \
     kcbkeyboarddialog.ui
     

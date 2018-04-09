@@ -17,8 +17,6 @@ KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent) :
 
     setWindowState(Qt::WindowFullScreen);
 
-    // connect(&m_keyboard, &KcbKeyboardWidget::NotifyClose, this, &KcbKeyboardDialog::reject);
-    // connect(&m_keyboard, &KcbKeyboardWidget::NotifyEnter, this, &KcbKeyboardDialog::OnNotifyEnter);
     connect(&m_keyboard, SIGNAL(NotifyClose()), this, SLOT(reject()));
     connect(&m_keyboard, SIGNAL(NotifyEnter()), this, SLOT(accept()));
 
@@ -33,18 +31,14 @@ KcbKeyboardDialog::~KcbKeyboardDialog()
 }
 
 void KcbKeyboardDialog::setValue(const QString value,
-                                 const QStringList codes_in_use,
-                                 const QObject* sender,
-                                 const char* signal)
+                                 const QStringList codes_in_use)
 {
-    m_keyboard.setValue(value, codes_in_use, sender, signal);
+    m_keyboard.setValue(value, codes_in_use);
 }
 
-void KcbKeyboardDialog::setValue(const QString value,
-                                 const QObject* sender,
-                                 const char* signal)
+void KcbKeyboardDialog::setValue(const QString value)
 {
-    m_keyboard.setValue(value, m_empty_list, sender, signal);
+    m_keyboard.setValue(value, m_empty_list);
 }
 
 QString KcbKeyboardDialog::getValue()

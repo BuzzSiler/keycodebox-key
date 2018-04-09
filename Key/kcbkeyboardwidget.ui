@@ -197,7 +197,7 @@
     <widget class="QPushButton" name="pbLetterP">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>120</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -218,7 +218,7 @@
     <widget class="QPushButton" name="pbLetterN">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>0</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -239,8 +239,8 @@
     <widget class="QPushButton" name="pbLetterM">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>60</y>
+       <x>720</x>
+       <y>0</y>
        <width>55</width>
        <height>55</height>
       </rect>
@@ -260,7 +260,7 @@
     <widget class="QPushButton" name="pbLetterW">
      <property name="geometry">
       <rect>
-       <x>600</x>
+       <x>540</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -470,7 +470,7 @@
     <widget class="QPushButton" name="pbLetterV">
      <property name="geometry">
       <rect>
-       <x>540</x>
+       <x>480</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -533,7 +533,7 @@
     <widget class="QPushButton" name="pbLetterT">
      <property name="geometry">
       <rect>
-       <x>420</x>
+       <x>360</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -554,8 +554,8 @@
     <widget class="QPushButton" name="pbLetterY">
      <property name="geometry">
       <rect>
-       <x>720</x>
-       <y>0</y>
+       <x>660</x>
+       <y>60</y>
        <width>55</width>
        <height>55</height>
       </rect>
@@ -596,7 +596,7 @@
     <widget class="QPushButton" name="pbLetterU">
      <property name="geometry">
       <rect>
-       <x>480</x>
+       <x>420</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -680,7 +680,7 @@
     <widget class="QPushButton" name="pbLetterO">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>60</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -785,7 +785,7 @@
     <widget class="QPushButton" name="pbLetterQ">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>180</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -848,7 +848,7 @@
     <widget class="QPushButton" name="pbLetterX">
      <property name="geometry">
       <rect>
-       <x>660</x>
+       <x>600</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -953,7 +953,7 @@
     <widget class="QPushButton" name="pbLetterS">
      <property name="geometry">
       <rect>
-       <x>360</x>
+       <x>300</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>
@@ -1100,7 +1100,7 @@
     <widget class="QPushButton" name="pbLetterR">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>240</x>
        <y>60</y>
        <width>55</width>
        <height>55</height>

@@ -17,8 +17,6 @@
 #include <QPointF>
 #include "systemcontroller.h"
 #include "clickablelabel.h"
-#include "dlgfullkeyboard.h"
-#include "currentedit.h"
 #include "dlgsmtp.h"
 #include "dlgvnc.h"
 #include "frmcodeeditmulti.h"
@@ -45,9 +43,8 @@ public:
     explicit CFrmAdminInfo(QWidget *parent = 0);
     ~CFrmAdminInfo();
 
-    void setSystemController(CSystemController *psysController); // { _psysController = psysController; }
+    void setSystemController(CSystemController *psysController);
     void getSysControllerLockSettings();
-    void checkAndCreateCurrentLabelEdit();
 
     CLockState* createNewLockState();
 
@@ -58,12 +55,6 @@ public:
 
 
 signals:
-    // void __OnDoneSave(int nRow, int nId, int nLockNum, 
-    //                   QString sAccessCode, QString sSecondCode, QString sDescription, 
-    //                   QDateTime dtStart, QDateTime dtEnd, 
-    //                   bool fingerprint1, bool fingerprint2, 
-    //                   bool askQuestions, QString question1, QString question2, QString question3,
-    //                   int access_type);
     void __OnCloseFrmAdmin();
     void __TextEntered(QString sText);
     void __KeyPressed(char key);
@@ -90,7 +81,6 @@ signals:
     
 public slots:
     void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
-    void OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *pcurrEdit);
     void OnReadLockSet(QString LockNums, QDateTime start, QDateTime end) { emit __OnReadLockSet(LockNums, start, end); }
     void OnLockSet(CLockSet *pSet);
     void OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(LockNums, start, end); }
@@ -103,29 +93,17 @@ public slots:
 
     void OnFoundNewStorageDevice(QString device0, QString device1);
 
-    void onStartEditLabel(QLabel* pLabel, QString sLabelText);
 
     void onStopEdit();
-    // void OnCodeEditDoneSave(int nRow, int nId, QString LockNums, 
-    //                         QString sAccessCode, QString sSecondCode, QString sDescription, 
-    //                         QDateTime dtStart, QDateTime dtEnd, 
-    //                         bool fingerprint1, bool fingerprint2, 
-    //                         bool askQuestions, QString question1, QString question2, QString question3,
-    //                         int access_type);
     void OnCodeEditClose();
     void OnTabSelected(int index);
     void OnDisplayFingerprintButton(bool);
     void OnDisplayShowHideButton(bool);
-//    void OnRequestLockOpen(QString lockNums);
     void OnOpenLockRequest(QString lock, bool is_user);
 
     
 private slots:
     void OnCodes(QString code1, QString code2);
-    //void LocalReadLockSet(QString Locks, QDateTime dtStart, QDateTime dtEnd);
-    //void LocalReadLockHistorySet(QString Locks, QDateTime dtStart, QDateTime dtEnd);
-
-    //void menuSelection(QAction *action);
     void OnLockStatusUpdated(CLocksStatus *pLocksStatus);
 
     void codeDeleteSelection();
@@ -253,9 +231,6 @@ private:
 
     QTimer              _timerMedia;
 
-    CDlgFullKeyboard    *_pKeyboard = 0;
-    CCurrentEdit        *_pcurrentLabelEdit = 0;
-
     FrmCodeEditMulti    *_pFrmCodeEditMulti = 0;
 
     QString             _reportDirectory;
@@ -275,13 +250,8 @@ private:
     void onBackSpace();
     void hideKeyboard(bool bHide);
     void onDelete();
-    //void populateAvailableDoors();
-    //void createLockMenus();
 
     void initializeConnections();
-    //int parseLockNumFromObjectName(QString objectName);
-    //int isLock(uint16_t nLockNum);
-    //void openAllDoors();
     void displayInTable(CLockSet *pSet);
     void setupCodeTableContextMenu();
     void displayInHistoryTable(CLockHistorySet *pSet);
@@ -310,6 +280,8 @@ private:
                          QString question2,
                          QString question3,
                          int access_type);
+    void RunKeyboard(QString& text, bool numbersOnly = false);
+                         
 
 protected:
     void touchEvent(QTouchEvent *ev);

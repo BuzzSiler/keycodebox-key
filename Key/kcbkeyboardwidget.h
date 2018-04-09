@@ -20,9 +20,7 @@ class KcbKeyboardWidget : public QWidget
         ~KcbKeyboardWidget();
 
         void setValue(const QString value,
-                      const QStringList codes_in_use,
-                      const QObject* sender = nullptr,
-                      const char* signal = nullptr);
+                      const QStringList codes_in_use);
         QString getValue();
         void clear();
         void numbersOnly(bool state);

@@ -83,9 +83,7 @@ void KcbKeyboardWidget::OnTextChanged(QString text)
 }
 
 void KcbKeyboardWidget::setValue(const QString value,
-                                 const QStringList codes_in_use,
-                                 const QObject* sender,
-                                 const char* signal)
+                                 const QStringList codes_in_use)
 {
     KCB_DEBUG_ENTRY;
 
@@ -127,7 +125,17 @@ void KcbKeyboardWidget::digitClicked(QString value)
 
 void KcbKeyboardWidget::alphaClicked(QString value)
 {
-    updateValue(value);
+    if ( (value >= "a" && value <= "z")  || (value >= "A" && value <= "Z") )
+    {
+        if (ui->pbCtrlUpperLower->isChecked())
+        {
+            updateValue(value.toUpper());
+        }
+        else
+        {
+            updateValue(value.toLower());
+        }
+    }
 }
 
 void KcbKeyboardWidget::controlClicked(QString value)
@@ -149,18 +157,10 @@ void KcbKeyboardWidget::controlClicked(QString value)
         if ( ui->pbCtrlUpperLower->isChecked() )
         {
             ui->pbCtrlUpperLower->setText("Upper");
-            for (int ii = 0; ii < m_letters.count(); ++ii)
-            {
-                m_letters[ii]->setText(m_letters[ii]->text().toUpper());
-            }
         }
         else
         {
             ui->pbCtrlUpperLower->setText("Lower");
-            for (int ii = 0; ii < m_letters.count(); ++ii)
-            {
-                m_letters[ii]->setText(m_letters[ii]->text().toLower());
-            }
         }
     }
     else if (value == "Space")

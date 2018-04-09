@@ -7,9 +7,6 @@
 #include <QDir>
 #include "lockcabinetwidget.h"
 #include "lockstate.h"
-#include "dlgnumberpad.h"
-#include "dlgfullkeyboard.h"
-#include "currentedit.h"
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
 #include "dlgeditquestions.h"
@@ -284,7 +281,7 @@ void FrmCodeEditMulti::on_edCode1_clicked()
     KcbKeyboardDialog kkd;
 
     kkd.numbersOnly(true);
-    kkd.setValue(ui->edCode1->text(), m_codes_in_use);//, this, SIGNAL(__OnAdminInfoCodes(QString,QString)));
+    kkd.setValue(ui->edCode1->text(), m_codes_in_use);
     if (kkd.exec())
     {
         ui->edCode1->setText(kkd.getValue());
@@ -300,7 +297,7 @@ void FrmCodeEditMulti::on_edCode2_clicked()
         KcbKeyboardDialog kkd;
 
         kkd.numbersOnly(true);
-        kkd.setValue(ui->edCode2->text());//, this, SIGNAL(__OnAdminInfoCodes(QString,QString)));
+        kkd.setValue(ui->edCode2->text());
         if (kkd.exec())
         {
             ui->edCode2->setText(kkd.getValue());

@@ -19,13 +19,9 @@ class KcbKeyboardDialog : public QDialog
         explicit KcbKeyboardDialog(QWidget *parent = 0);
         ~KcbKeyboardDialog();
 
+        void setValue(const QString value);
         void setValue(const QString value,
-                      const QObject *sender = nullptr,
-                      const char *signal = nullptr);
-        void setValue(const QString value,
-                      const QStringList codes_in_use,
-                      const QObject *sender = nullptr,
-                      const char *signal = nullptr);
+                      const QStringList codes_in_use);
         QString getValue();
         void numbersOnly(bool state);
 

@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include "selectlockswidget.h"
 #include "kcbcommon.h"
+#include "kcbkeyboarddialog.h"
 
 
 static const char CMD_REMOVE_ALL_FP_FILES[] = "sudo rm -rf /home/pi/run/prints/*";
@@ -65,7 +66,6 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
 
     CFrmAdminInfo::showFullScreen();
-    _pcurrentLabelEdit = 0;
 
     initialize();
 
@@ -75,10 +75,6 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
 CFrmAdminInfo::~CFrmAdminInfo()
 {
     delete ui;
-    if(_pcurrentLabelEdit) 
-    {
-        delete _pcurrentLabelEdit;
-    }
 
     if(_pmodel) 
     {
@@ -812,113 +808,78 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
     }
 }
 
-void CFrmAdminInfo::onStartEditLabel(QLabel* pLabel, QString sLabelText)
-{
-    if(!_pKeyboard)
-    {
-        _pKeyboard = new CDlgFullKeyboard();
-        connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*,CCurrentEdit*)),
-                this, SLOT(OnKeyboardTextEntered(CDlgFullKeyboard*, CCurrentEdit*)));
-    }
-    if(!_pcurrentLabelEdit)
-    {
-        _pcurrentLabelEdit = new CCurrentEdit();
-    }
-    if(_pKeyboard && _pcurrentLabelEdit)
-    {
-        _pKeyboard->setCurrentEdit(_pcurrentLabelEdit);
-        _pcurrentLabelEdit->setLabelToBeEdited(pLabel);
-        _pcurrentLabelEdit->setOriginalTextToEdit(pLabel->text());
-        _pcurrentLabelEdit->setLabelText(sLabelText);
-
-        _pKeyboard->setActive();
-    }
-}
-
-void CFrmAdminInfo::OnKeyboardTextEntered(CDlgFullKeyboard *keyboard, CCurrentEdit *currEdit)
-{
-    currEdit->getLabelBeingEdited()->setText(currEdit->getNewText());
-    keyboard->hide();
-}
-
 void CFrmAdminInfo::onStopEdit()
 {
     ui->tabWidget->show();
     ui->widgetEdit->hide();
 }
 
-void CFrmAdminInfo::checkAndCreateCurrentLabelEdit()
+void CFrmAdminInfo::RunKeyboard(QString& text, bool numbersOnly)
 {
-    if(!_pcurrentLabelEdit)
+    KcbKeyboardDialog kkd;
+
+    kkd.numbersOnly(numbersOnly);
+    kkd.setValue(text);
+    if (kkd.exec())
     {
-        _pcurrentLabelEdit = new CCurrentEdit();
+        text = kkd.getValue();
     }
 }
 
 void CFrmAdminInfo::on_lblName_clicked()
 {
-    checkAndCreateCurrentLabelEdit();
-
-    _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblName, tr("Administrator"));
-
-    qDebug() << "on_lblName_clicked()";
+    QString text = ui->lblName->text();
+    RunKeyboard(text);
+    ui->lblName->setText(text);
 }
 
 void CFrmAdminInfo::on_lblEmail_clicked()
 {
-    checkAndCreateCurrentLabelEdit();
-    qDebug() << "on_lblEmail_clicked()";
-    _pcurrentLabelEdit->setEmailFilter();
-    onStartEditLabel(ui->lblEmail, tr("Administrator Email Address"));
+    QString text = ui->lblEmail->text();
+    RunKeyboard(text);
+    ui->lblEmail->setText(text);
 }
 
 void CFrmAdminInfo::on_lblPhone_clicked()
 {
-    checkAndCreateCurrentLabelEdit();
-    qDebug() << "on_lblPhone_clicked()";
-    _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblPhone, tr("Administrator Phone"));
+    QString text = ui->lblPhone->text();
+    RunKeyboard(text);
+    ui->lblPhone->setText(text);
 }
 
 void CFrmAdminInfo::on_lblAccessCode_clicked()
 {
-    checkAndCreateCurrentLabelEdit();
-    qDebug() << "on_lblAccessCode_clicked()";
-    _pcurrentLabelEdit->setNumbersOnly();
-    onStartEditLabel(ui->lblAccessCode, tr("Administrator Code #1"));
+    QString text = ui->lblAccessCode->text();
+    RunKeyboard(text);
+    ui->lblAccessCode->setText(text);
 }
 
 void CFrmAdminInfo::on_lblPassword_clicked()
 {
-    checkAndCreateCurrentLabelEdit();
-    qDebug() << "on_lblPassword_clicked()";
-    _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblPassword, tr("Administrator Password"));
+    QString text = ui->lblPassword->text();
+    RunKeyboard(text);
+    ui->lblPassword->setText(text);
 }
 
 void CFrmAdminInfo::on_lblAssistCode_clicked()
 {
-    checkAndCreateCurrentLabelEdit();
-    qDebug() << "on_lblAssistCode_clicked()";
-    _pcurrentLabelEdit->setNumbersOnly();
-    onStartEditLabel(ui->lblAssistCode, tr("Assistant Code"));
+    QString text = ui->lblAssistCode->text();
+    RunKeyboard(text);
+    ui->lblAssistCode->setText(text);
 }
 
 void CFrmAdminInfo::on_lblAssistPassword_clicked()
 {
-    checkAndCreateCurrentLabelEdit();
-    qDebug() << "on_lblAssistPassword_clicked()";
-    _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblAssistPassword, tr("Assistant Password"));
+    QString text = ui->lblAssistPassword->text();
+    RunKeyboard(text);
+    ui->lblAssistPassword->setText(text);
 }
 
 void CFrmAdminInfo::on_lblKey_clicked()
 {
-    checkAndCreateCurrentLabelEdit();
-    qDebug() << "on_lblKey_clicked()";
-    _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblKey, tr("Predictive Key"));
+    QString text = ui->lblKey->text();
+    RunKeyboard(text);
+    ui->lblKey->setText(text);
 }
 
 void CFrmAdminInfo::on_btnSaveSettings_clicked()
@@ -2204,11 +2165,8 @@ void CFrmAdminInfo::purgeCodes()
 
 void CFrmAdminInfo::on_tblCodesList_cellClicked(int row, int column)
 {
-    // qDebug() << "CFrmAdminInfo::on_tblCodesList_cellClicked. Column:" << QVariant(column).toString()
-    //          << " Row:" << QVariant(row).toString();
-
-    // _nRowSelected = row;
-    // qDebug() << "Row Selected:" << QVariant(_nRowSelected).toString();
+    Q_UNUSED(row);
+    Q_UNUSED(column);
 }
 
 void CFrmAdminInfo::on_btnRebootSystem_clicked()
