@@ -16,8 +16,8 @@
 
 #define DATETIME_FORMAT QStringLiteral("yyyy-MM-dd HH:mm:ss")
 
-const QDateTime _DATENONE = QDateTime(QDate(1990,1,1), QTime(0,0,0));
-const QString _DATENONE_STR = _DATENONE.toString(DATETIME_FORMAT);
+const QDateTime DEFAULT_DATETIME = QDateTime(QDate(1990,1,1), QTime(0,0,0));
+const QString DEFAULT_DATETIME_STR = DEFAULT_DATETIME.toString(DATETIME_FORMAT);
 
 typedef enum {ACCESS_TYPE_ALWAYS=0, ACCESS_TYPE_TIMED=1, ACCESS_TYPE_LIMITED_USE=2} ACCESS_TYPE;
 
