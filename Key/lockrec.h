@@ -2,6 +2,7 @@
 #define CLOCKREC_H
 
 #include <QObject>
+#include <QString>
 
 class CLockRec : public QObject
 {
@@ -11,15 +12,15 @@ public:
 
 private:
     int             ids; // integer primary key unique,
-    std::string     sequence;    // text,\
+    QString     sequence;    // text,\
     int             sequence_order;  // integer,
     int             door;    // integer,
-    std::string     description;    // text,
-    std::string     code1;  // text,
-    std::string     code2;  // text,\
+    QString     description;    // text,
+    QString     code1;  // text,
+    QString     code2;  // text,\
     datetime        starttime;   // DATETIME,
     datetime        endtime; // DATETIME,
-    std::string     status;  // text,
+    QString     status;  // text,
     int             access_count;   // integer,\
     int             retry_count; // integer,
     int             max_access; // integer,
@@ -27,31 +28,31 @@ private:
     bool            fingerprint1;
     bool            fingerprint2;
     bool            ask_questions;
-    std::string     question1;
-    std::string     question2;
-    std::string     question3;
+    QString     question1;
+    QString     question2;
+    QString     question3;
 
 public:
     int getID() { return ids; }// integer primary key unique,
     void setID(int id) { ids = id; }
-    int getSequence() { return sequence; }    // text,\
-    void setSequence(std::string seq) { sequence = seq; }
+    int getSequence() { return sequence; }    // text,
+    void setSequence(QString seq) { sequence = seq; }
     int getSequenceOrder() { return sequence_order; } // integer,
     void setSequenceOrder(int seqOrder) { sequence_order = seqOrder; }
     int getDoorNum() { return door; }    // integer,
     void setDoorNum(int nNewDoor) { door = nNewDoor; }
-    std::string getDescription() { return description; }   // text,
-    void setDescription(std::string desc) { description = desc; }
-    std::string getCode1() { return code1; }  // text,
-    void setCode1(std::string code) { code1 = code; }
-    std::string getCode2() { return code2; }  // text,\
-    void setCode2(std::string code) { code2 = code; }
+    QString getDescription() { return description; }   // text,
+    void setDescription(QString desc) { description = desc; }
+    QString getCode1() { return code1; }  // text,
+    void setCode1(QString code) { code1 = code; }
+    QString getCode2() { return code2; }  // text,
+    void setCode2(QString code) { code2 = code; }
     QDateTime getStartTime() { return starttime; }   // DATETIME,
     void setStartTime(QDateTime dt) { starttime = dt; }
     QDateTime getEndTime() { return endtime; } // DATETIME,
     void setEndTime(QDateTime dt) { endtime = date; }
-    std::string getStatus() { return status; } // text,
-    void setStatus(std::string stat) { status = stat; }
+    QString getStatus() { return status; } // text,
+    void setStatus(QString stat) { status = stat; }
     int getAccessCount() { return access_count; }   // integer,
     void setAccessCount(int accessCount) { access_count = accessCount; }
     int getRetryCount() { return retry_count; } // integer,
@@ -68,11 +69,11 @@ public:
     void setAskQuestions(bool askQuestions) { ask_questions = askQuestions; }
     bool getAskQuestions() { return ask_questions; }
 
-    void setQuestion1(std::string question) { question1 = question; }
+    void setQuestion1(QString question) { question1 = question; }
     void getQuestion1() { return question1; }
-    void setQuestion2(std::string question) { question2 = question; }
+    void setQuestion2(QString question) { question2 = question; }
     void getQuestion2() { return question2; }
-    void setQuestion3(std::string question) { question3 = question; }
+    void setQuestion3(QString question) { question3 = question; }
     void getQuestion3() { return question3; }
     
 signals:

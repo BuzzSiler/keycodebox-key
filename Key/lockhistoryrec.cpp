@@ -15,7 +15,7 @@ QJsonObject &CLockHistoryRec::jsonRecord(QJsonObject &json)
     CLockState::jsonRecord(json);
     json.insert(faccess_time, QJsonValue(_access_time.toString("yyyy-MM-dd HH:mm:ss")));    // Datetime as text
     json.insert(fadmin_notification_sent, QJsonValue(_adminNotificationSent));
-    json.insert(fuser_notification_email, QJsonValue(_userNotificationEmail.c_str()));
+    json.insert(fuser_notification_email, QJsonValue(_userNotificationEmail));
     json.insert(fuser_notification_sent, QJsonValue(_userNotificationSent));
 
     return json;
@@ -36,7 +36,7 @@ void CLockHistoryRec::setFromLockState(CLockState &newLockState)
     _ids = newLockState.getID();            // Record id // integer primary key unique, (if -1 then this is a new record)
     _sequence = newLockState.getSequence();    // Sequence // text,
     _sequence_order = newLockState.getSequenceOrder();
-    _lock_num = newLockState.getLockNum();
+    _lock_nums = newLockState.getLockNums();
     _description = newLockState.getDescription();
     _code1 = newLockState.getCode1();
     _code2 = newLockState.getCode2();
@@ -65,14 +65,21 @@ bool CLockHistoryRec::setFromJsonObject(QJsonObject jsonObj)
     //
     try {
         if(!jsonObj.value(faccess_time).isUndefined())
+        {            
             _access_time.fromString(jsonObj.value(faccess_time).toString(), "yyyy-MM-dd HH:mm:ss");
+        }        
         if(!jsonObj.value(fadmin_notification_sent).isUndefined())
+        {            
             _adminNotificationSent = jsonObj.value(fadmin_notification_sent).toBool();
+        }        
         if(!jsonObj.value(fuser_notification_email).isUndefined())
-            _userNotificationEmail = jsonObj.value(fuser_notification_email).toString().toStdString();
+        {            
+            _userNotificationEmail = jsonObj.value(fuser_notification_email).toString();
+        }        
         if(!jsonObj.value(fuser_notification_sent).isUndefined())
+        {            
             _userNotificationSent = jsonObj.value(fuser_notification_sent).toBool();
-
+        }
         return CLockState::setFromJsonObject(jsonObj);
     } catch(std::exception &e) {
         qDebug() << "CLockHistoryRec::setFromJsonObject():" << e.what();
@@ -82,10 +89,9 @@ bool CLockHistoryRec::setFromJsonObject(QJsonObject jsonObj)
     return true;
 }
 
-bool CLockHistoryRec::setFromJsonString(std::string strJson)
+bool CLockHistoryRec::setFromJsonString(QString strJson)
 {
-    QString     strIn = strJson.c_str();
-    QJsonDocument doc = QJsonDocument::fromJson(strIn.toUtf8());
+    QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
     // check validity of the document
     if(!doc.isNull())
     {
@@ -101,7 +107,7 @@ bool CLockHistoryRec::setFromJsonString(std::string strJson)
     }
     else
     {
-        qDebug() << "Invalid JSON...\n" << strIn << endl;
+        qDebug() << "Invalid JSON...\n" << strJson << endl;
         return false;
     }
     return true;

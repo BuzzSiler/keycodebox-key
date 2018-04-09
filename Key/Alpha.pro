@@ -49,9 +49,8 @@ SOURCES += main.cpp\
     clickablelabel.cpp \
     lockhistoryset.cpp \
     lockhistoryrec.cpp \
-    frmcodeedit.cpp \
-    dlgfullkeyboard.cpp \
-    currentedit.cpp \
+#    dlgfullkeyboard.cpp \
+#    currentedit.cpp \
     reportcontroller.cpp \
     smtp/emailaddress.cpp \
     smtp/mimeattachment.cpp \
@@ -76,7 +75,14 @@ SOURCES += main.cpp\
     hidreader.cpp \
     simplecrypt.cpp \
     usbprovider.cpp \
-    serialport.cpp
+    serialport.cpp \
+    selectlockswidget.cpp \
+    frmselectlocks.cpp \
+    frmcodeeditmulti.cpp \
+    lockcabinetwidget.cpp \
+    kcbkeyboardwidget.cpp \
+    kcbkeyboarddialog.cpp \
+    kcbutils.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -108,9 +114,6 @@ HEADERS  += keycodeboxmain.h \
     clickablelabel.h \
     lockhistoryset.h \
     lockhistoryrec.h \
-    frmcodeedit.h \
-    dlgfullkeyboard.h \
-    currentedit.h \
     reportcontroller.h \
     smtp/emailaddress.h \
     smtp/mimeattachment.h \
@@ -137,24 +140,36 @@ HEADERS  += keycodeboxmain.h \
     hidreader.h \
     simplecrypt.h \
     usbprovider.h \
-    serialport.h
+    serialport.h \
+    selectlockswidget.h \
+    frmselectlocks.h \
+    frmcodeeditmulti.h \
+    lockcabinetwidget.h \
+    kcbcommon.h \
+    kcbkeyboardwidget.h \
+    kcbkeyboarddialog.h \
+    kcbutils.h
 
 FORMS    += mainwindow.ui \
-    frmcodeentry.ui \
     qwerty_keypad.ui \
     alpha_keypad.ui \
     number_keypad.ui \
     frmusercode.ui \
     frmadmininfo.ui \
     frmadminpassword.ui \
-    frmcodeedit.ui \
     dlgfullkeyboard.ui \
     dlgsmtp.ui \
     dlgvnc.ui \
     dlgfingerprint.ui\
     dlgfingerprintverify.ui \
     dlgeditquestions.ui \
-    dlgquestions.ui
+    dlgquestions.ui \
+    selectlockswidget.ui \
+    frmselectlocks.ui \
+    frmcodeeditmulti.ui \
+    lockcabinetwidget.ui \
+    kcbkeyboardwidget.ui \
+    kcbkeyboarddialog.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/debug/ -lqsqlite

@@ -2,39 +2,40 @@
 #define CLOCKHISTORYSET_H
 
 #include <QObject>
-#include <QMap>
+//#include <QMap>
+#include <QVector>
+#include <QVectorIterator>
 #include "lockhistoryrec.h"
 
 
 class CLockHistorySet : public QObject
 {
     Q_OBJECT
-public:
-    const char *flockhistoryset = "lock history set";
+    
+    public:
+        const char *flockhistoryset = "lock history set";
 
-    explicit CLockHistorySet(QObject *parent = 0);
-    void clearSet();
+        explicit CLockHistorySet(QObject *parent = 0);
 
-    QJsonArray &jsonArraySet(QJsonObject &json);
-    QString jsonArrayAsStringObject();  // Object containing the array of CLockHistoryRec objects { "lock_set":[],[],.. }
+        typedef QVectorIterator<CLockHistoryRec*> Iterator;
 
-    bool setFromJsonObject(QJsonObject &jsonObj);    // Object containing array
-    bool setFromJsonString(std::string strJson); // Stringified object containing array of CLockHistoryRec objects "{ }"
+        void clearSet();
 
-    const QMultiMap<int, CLockHistoryRec*>        *getLockHistoryMap() { return &_mmapLocks; }
+        QJsonArray &jsonArraySet(QJsonObject &json);
+        QString jsonArrayAsStringObject();  // Object containing the array of CLockHistoryRec objects { "lock_set":[],[],.. }
 
-    typedef QMultiMap<int, CLockHistoryRec*>::Iterator   Iterator;
+        bool setFromJsonObject(QJsonObject &jsonObj);    // Object containing array
+        bool setFromJsonString(QString strJson); // Stringified object containing array of CLockHistoryRec objects "{ }"
 
-    Iterator    begin() { return _mmapLocks.begin(); }
-    Iterator    end() { return _mmapLocks.end(); }
+        const QVector<CLockHistoryRec*>*getLockHistoryMap() { return &_storage; }
 
-    void addToSet(CLockHistoryRec &lockHistoryRec);
-private:
-    QMultiMap<int, CLockHistoryRec*>       _mmapLocks;     // Container keyed off lock number
+        
+        Iterator getIterator() { return Iterator(_storage); }
 
-signals:
+        void addToSet(CLockHistoryRec &lockHistoryRec);
+    private:
+        QVector<CLockHistoryRec*>  _storage;
 
-public slots:
 };
 
 

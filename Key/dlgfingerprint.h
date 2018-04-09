@@ -2,8 +2,6 @@
 #define DLGFINGERPRINT_H
 
 #include <QDialog>
-#include "clickablelabel.h"
-#include "dlgfullkeyboard.h"
 
 namespace Ui {
   class CDlgFingerprint;
@@ -24,7 +22,6 @@ public:
     void setOkDisabled(bool disabled);
 
  signals:
-    //void __onFingerprintDialogComplete(CDlgFingerprint*);
     void __onEnrollFingerprintDialogCancel();
     void __onUpdateEnrollFingerprintDialog(int current, int total);
     

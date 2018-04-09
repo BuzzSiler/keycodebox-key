@@ -11,19 +11,16 @@ CLockHistorySet::CLockHistorySet(QObject *parent) : QObject(parent)
 
 void CLockHistorySet::clearSet()
 {
-    CLockHistoryRec  *pLockHistoryRec;
-    Iterator itor;
-    for(itor=begin();itor!=end();itor++)
+    foreach (auto s, _storage)
     {
-        pLockHistoryRec = itor.value();
-        delete pLockHistoryRec;
+        delete s;        
     }
-    _mmapLocks.clear();
+    _storage.clear();
 }
 
 void CLockHistorySet::addToSet(CLockHistoryRec &lockHistoryRec)
 {
-    _mmapLocks.insert(lockHistoryRec.getLockNum(), &lockHistoryRec);
+    _storage.append(&lockHistoryRec);
 }
 
 bool CLockHistorySet::setFromJsonObject(QJsonObject &jsonObj)
@@ -36,29 +33,39 @@ bool CLockHistorySet::setFromJsonObject(QJsonObject &jsonObj)
     // Clear
     clearSet();
     //
-    try {
+    try 
+    {
         if((jsonObj[flockhistoryset].isUndefined()) || (!jsonObj[flockhistoryset].isArray()))
+        {
             return false;
+        }
         val = jsonObj[flockhistoryset]; // array of
-        if(val.isArray()) {
+        if(val.isArray()) 
+        {
             ary = val.toArray();
             for(itor = ary.begin(); itor != ary.end(); itor++)
             {
                 val = *itor;
-                if(val.isObject()) {
+                if(val.isObject()) 
+                {
                     obj = val.toObject();
                     CLockHistoryRec  *plockHistoryRec = new CLockHistoryRec();
                     plockHistoryRec->setFromJsonObject(obj);
                     addToSet(*plockHistoryRec);
-                } else
+                } 
+                else
                 {
                     qDebug() << "CLockHistorySet::setFromJsonObject(): bad form";
                 }
             }
-        } else {
+        } 
+        else 
+        {
             qDebug() << "CLockHistorySet::setFromJsonObject(): Not a JSON Array";
         }
-    } catch(std::exception &e) {
+    } 
+    catch(std::exception &e) 
+    {
         qDebug() << "ClockHistorySet::setFromJsonObject():" << e.what();
         return false;
     }
@@ -67,11 +74,11 @@ bool CLockHistorySet::setFromJsonObject(QJsonObject &jsonObj)
 }
 
 
-bool CLockHistorySet::setFromJsonString(std::string strJson)
+bool CLockHistorySet::setFromJsonString(QString strJson)
 {
-    QString     strIn = strJson.c_str();
-    QJsonDocument doc = QJsonDocument::fromJson(strIn.toUtf8());
+    QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
     QJsonObject     obj;
+    
     // check validity of the document
     if(!doc.isNull())
     {
@@ -88,7 +95,7 @@ bool CLockHistorySet::setFromJsonString(std::string strJson)
     }
     else
     {
-        qDebug() << "Invalid JSON...\n" << strIn << endl;
+        qDebug() << "Invalid JSON...\n" << strJson << endl;
         return false;
     }
     return true;
