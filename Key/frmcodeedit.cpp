@@ -54,14 +54,14 @@ void CFrmCodeEdit::getValues(int *pId, int *pLockNum, QString *psAccessCode, QSt
     *psSecondCode = ui->edtSecondCode->text().trimmed();
     *psDesc = ui->edtDescription->text();
 
-    /* Other parts of the software depend on _DATENONE as a way of controlling
+    /* Other parts of the software depend on DEFAULT_DATETIME as a way of controlling
        display.  So, we must translate 'minimum' datetime, what we get when
-       we assign _DATENONE to a CDateTimeEdit control, to _DATENONE before
+       we assign DEFAULT_DATETIME to a CDateTimeEdit control, to DEFAULT_DATETIME before
        we exit.
     */
     if (ui->dtStartAccess->dateTime() == ui->dtStartAccess->minimumDateTime())
     {
-        *pdtStart = _DATENONE;
+        *pdtStart = DEFAULT_DATETIME;
     }
     else
     {
@@ -69,7 +69,7 @@ void CFrmCodeEdit::getValues(int *pId, int *pLockNum, QString *psAccessCode, QSt
     }
     if (ui->dtEndAccess->dateTime() == ui->dtEndAccess->minimumDateTime())
     {
-        *pdtEnd = _DATENONE;        
+        *pdtEnd = DEFAULT_DATETIME;        
     }
     else
     {
@@ -121,9 +121,9 @@ void CFrmCodeEdit::setValues(int id, int nLockNum, QString sAccessCode, QString 
     {
         qDebug() << "ACCESS TYPE is ACCESS TIMED";
 
-        /* Note: For a new code, dtStart and dtEnd will be set to _DATENONE
+        /* Note: For a new code, dtStart and dtEnd will be set to DEFAULT_DATETIME
            However, dtStartAccess and dtEndAccess are QDateTimeEdit controls
-           which have their minimum set much lated than _DATENONE which means
+           which have their minimum set much lated than DEFAULT_DATETIME which means
            that upon assignment, they will default to their minimum.
 
            In the case of an edit, where the datetime should be within the min
@@ -150,9 +150,9 @@ void CFrmCodeEdit::on_buttonBox_accepted()
 
     /* For the cases where start/end access is not valid, i.e., access always and access limited use,
        the datetime will be the minimum datetime of the QDateTimeEdit control.  In thoses case,
-       return _DATENONE.  Other parts of the software rely on _DATENONE.
+       return DEFAULT_DATETIME.  Other parts of the software rely on DEFAULT_DATETIME.
 
-       Note: It may not be the best decision to query based on a default datetime like _DATENONE.
+       Note: It may not be the best decision to query based on a default datetime like DEFAULT_DATETIME.
        Now that there are different types of access maybe the query should be modified to 
        accommodate these types.
     */
@@ -160,11 +160,11 @@ void CFrmCodeEdit::on_buttonBox_accepted()
     QDateTime dtEnd = ui->dtEndAccess->dateTime();
     if (ui->dtStartAccess->dateTime() == ui->dtStartAccess->minimumDateTime())
     {
-        dtStart = _DATENONE;
+        dtStart = DEFAULT_DATETIME;
     }
     if (ui->dtEndAccess->dateTime() == ui->dtEndAccess->minimumDateTime())
     {
-        dtEnd = _DATENONE;
+        dtEnd = DEFAULT_DATETIME;
     }
 
     // if we have a 'set all locks' checkbox set,
@@ -443,7 +443,7 @@ void CFrmCodeEdit::on_radioCodeAccessTimed_clicked()
 {
     ui->radioCodeAccessTimed->setChecked(true);
 
-    /* Note: If the 'default' datetime (_DATENONE) was passed, which happens for a new
+    /* Note: If the 'default' datetime (DEFAULT_DATETIME) was passed, which happens for a new
        code, then we want to set the Start/EndAccess datetime to be the current datetime
 
        If we are editing an existing code, then the datetime value will be more resent

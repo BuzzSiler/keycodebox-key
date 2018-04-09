@@ -754,14 +754,14 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
                    - Always
                    - Timed
                    - Limited Use
-               Start/end dates are only valid for 'Timed' codes.  All other codes should be _DATENONE
+               Start/end dates are only valid for 'Timed' codes.  All other codes should be DEFAULT_DATETIME
                While they are initialized above, it is possible that a customer will put a start/end
                datetime in the XML file.               
             */
             if (access_type == ACCESS_TYPE_ALWAYS || access_type == ACCESS_TYPE_LIMITED_USE)
             {
-                dtStart = _DATENONE;
-                dtEnd = _DATENONE;
+                dtStart = DEFAULT_DATETIME;
+                dtEnd = DEFAULT_DATETIME;
             }
 
             _pState = createNewLockState();

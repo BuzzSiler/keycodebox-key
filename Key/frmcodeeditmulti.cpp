@@ -190,16 +190,16 @@ void FrmCodeEditMulti::updateAccessType(int index)
         case ACCESS_TYPE_LIMITED_USE:
             ui->lblStartAccessTextOverlay->setText(tr("LIMITED USE (Take/Return only)"));
             ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
-            ui->dtStartAccess->setDateTime(_DATENONE);
-            ui->dtEndAccess->setDateTime(_DATENONE);
+            ui->dtStartAccess->setDateTime(DEFAULT_DATETIME);
+            ui->dtEndAccess->setDateTime(DEFAULT_DATETIME);
             break;
 
         case ACCESS_TYPE_ALWAYS:
         default:
             ui->lblStartAccessTextOverlay->setText(tr("ALWAYS"));
             ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
-            ui->dtStartAccess->setDateTime(_DATENONE);
-            ui->dtEndAccess->setDateTime(_DATENONE);
+            ui->dtStartAccess->setDateTime(DEFAULT_DATETIME);
+            ui->dtEndAccess->setDateTime(DEFAULT_DATETIME);
             break;
     }
 

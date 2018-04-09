@@ -43,7 +43,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tabAdministrator">
     <attribute name="title">
@@ -372,7 +372,7 @@
           <widget class="QPushButton" name="btnTestUserEmail">
            <property name="maximumSize">
             <size>
-             <width>82</width>
+             <width>100</width>
              <height>27</height>
             </size>
            </property>
@@ -471,13 +471,13 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
         <width>251</width>
-        <height>241</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -485,6 +485,12 @@
         <widget class="QCheckBox" name="chkUsePredictive">
          <property name="enabled">
           <bool>true</bool>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
          </property>
          <property name="font">
           <font>
@@ -503,6 +509,12 @@
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QLabel" name="lPredictiveCodeGenResolution">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>30</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <pointsize>12</pointsize>
@@ -515,6 +527,12 @@
          </item>
          <item>
           <widget class="QSpinBox" name="spinCodeGenResolution">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>30</height>
+            </size>
+           </property>
            <property name="suffix">
             <string> mins</string>
            </property>
@@ -522,7 +540,7 @@
             <number>5</number>
            </property>
            <property name="maximum">
-            <number>360</number>
+            <number>356</number>
            </property>
            <property name="singleStep">
             <number>5</number>
@@ -535,6 +553,12 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QLabel" name="lKey">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>30</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <pointsize>12</pointsize>
@@ -547,6 +571,18 @@
          </item>
          <item>
           <widget class="CClickableLabel" name="lblKey">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>30</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <pointsize>12</pointsize>
@@ -1205,7 +1241,7 @@
       <rect>
        <x>140</x>
        <y>170</y>
-       <width>151</width>
+       <width>161</width>
        <height>26</height>
       </rect>
      </property>
@@ -1414,7 +1450,7 @@
       <rect>
        <x>10</x>
        <y>210</y>
-       <width>421</width>
+       <width>441</width>
        <height>201</height>
       </rect>
      </property>
@@ -1422,7 +1458,7 @@
     <widget class="QCheckBox" name="cbReportViaEmail">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>310</x>
        <y>170</y>
        <width>151</width>
        <height>26</height>
@@ -1477,7 +1513,7 @@
     <widget class="Line" name="line_4">
      <property name="geometry">
       <rect>
-       <x>450</x>
+       <x>460</x>
        <y>160</y>
        <width>21</width>
        <height>241</height>
@@ -1804,7 +1840,7 @@
       </font>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>0</x>
