@@ -36,18 +36,11 @@ class CLockController : public QObject
         }
 
         void openLock(uint16_t nLockNum);
+        void openLocks(QString lockNums);
         void openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, uint16_t nPulseOnTimeMS, uint16_t nPulseOffTimeMS);
         uint64_t inquireLockStatus(uint8_t unBanks);  // Single bit per Lock up to 64.
 
-        int isLock(uint16_t nLockNum);
-
-        CLocksStatus* getLockStatus() 
-        {
-            if( _plockStatus )
-                return _plockStatus;
-            else
-                return 0;
-        }
+        CLocksStatus* getLockStatus() { return _plockStatus ? _plockStatus : 0;}
 
     signals:
         void __OnLocksStatus(QObject &locksStatus);
@@ -107,20 +100,10 @@ public:
     void setLockController(CLockController *pLockController) { _pLockController = pLockController; }
 
     void setLockState(uint64_t locks) { _un64LockLocks = locks; }
-    bool isLock(uint16_t unLock) {
-        if(_pLockController != 0) {
-            return _pLockController->isLock(unLock);
-        } else {
-            return false;
-        }
-    }
 
-    bool openLock(uint16_t unLock) {
-        if(_pLockController != 0 && isLock(unLock)) {
-            _pLockController->openLock(unLock);
-        } else {
-            return false;
-        }
+    void openLocks(QString Locks) 
+    {
+        _pLockController->openLocks(Locks);
     }
 };
 

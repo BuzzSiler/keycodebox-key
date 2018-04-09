@@ -44,9 +44,13 @@ static void dev_open_cb(struct fp_dev *dev, int status, void *user_data)
     qDebug() << "CFingerprintReader::openDeviceHandle(), Driver: '" << fp_driver_get_full_name(drv) << "'";
 
     if (fp_dev_supports_imaging(fpdev))
+    {
         qDebug() << "CFingerprintReader::openDeviceHandle(), IS an imaging device!";
+    }
     else
+    {
         qDebug() << "CFingerprintReader::openDeviceHandle(), IS NOT an imaging device!";
+    }
 
     enroll_stages = fp_dev_get_nr_enroll_stages(fpdev);
     qDebug() << "CFingerprintReader::openDeviceHandle(), Required enroll stages: " << QString::number(enroll_stages);
@@ -85,7 +89,9 @@ bool CFingerprintReader::openDeviceHandle()
     qDebug() << "CFingerprintReader::openDeviceHandle(), Opening Device..";
 
     if( count )
+    {
         r = fp_async_dev_open(ddev, dev_open_cb, NULL);
+    }
 
     if( r )
     {
@@ -100,7 +106,8 @@ bool CFingerprintReader::openDeviceHandle()
 void CFingerprintReader::start()
 {
     qDebug() << "CFingerprintReader::start()";
-    while(1) {
+    while(1) 
+    {
         //readCardReaderLoop();
         QCoreApplication::processEvents();
     }
@@ -141,41 +148,47 @@ void CFingerprintReader::enrollStageCb(struct fp_dev *dev, int result,
         return;
     }
 
-    if (img) {
+    if (img) 
+    {
         last_fp_img = img;
-    } else {
+    } 
+    else 
+    {
         last_fp_img = NULL;
     }
 
     if (print)
+    {
         enroll_data = print;
+    }
 
-    switch (result) {
-    case FP_ENROLL_COMPLETE:
-        tmp = tr("<b>Enrollment completed!</b>");
-        break;
-    case FP_ENROLL_PASS:
-        tmp = "";
-        current_enroll_stage++;
-        qDebug() << "CFingerprintReader::enrollStageCB(), Step " << QString::number(current_enroll_stage) << " of " << QString::number(enroll_stages);
-        break;
-    case FP_ENROLL_FAIL:
-        tmp = tr("<b>Enrollment failed!</b>");
-        break;
-    case FP_ENROLL_RETRY:
-        tmp = tr("<b>Bad scan. Please try again.</b>");
-        break;
-    case FP_ENROLL_RETRY_TOO_SHORT:
-        tmp = tr("<b>Bad scan: swipe was too short. Please try again.</b>");
-        break;
-    case FP_ENROLL_RETRY_CENTER_FINGER:
-        tmp = tr("<b>Bad scan: finger was not centered on scanner. Please try again.</b>");
-        break;
-    case FP_ENROLL_RETRY_REMOVE_FINGER:
-        tmp = tr("<b>Bad scan: please remove finger before retrying.</b>");
-        break;
-    default:
-        tmp = tr("Unknown state!");
+    switch (result) 
+    {
+        case FP_ENROLL_COMPLETE:
+            tmp = tr("<b>Enrollment completed!</b>");
+            break;
+        case FP_ENROLL_PASS:
+            tmp = "";
+            current_enroll_stage++;
+            qDebug() << "CFingerprintReader::enrollStageCB(), Step " << QString::number(current_enroll_stage) << " of " << QString::number(enroll_stages);
+            break;
+        case FP_ENROLL_FAIL:
+            tmp = tr("<b>Enrollment failed!</b>");
+            break;
+        case FP_ENROLL_RETRY:
+            tmp = tr("<b>Bad scan. Please try again.</b>");
+            break;
+        case FP_ENROLL_RETRY_TOO_SHORT:
+            tmp = tr("<b>Bad scan: swipe was too short. Please try again.</b>");
+            break;
+        case FP_ENROLL_RETRY_CENTER_FINGER:
+            tmp = tr("<b>Bad scan: finger was not centered on scanner. Please try again.</b>");
+            break;
+        case FP_ENROLL_RETRY_REMOVE_FINGER:
+            tmp = tr("<b>Bad scan: please remove finger before retrying.</b>");
+            break;
+        default:
+            tmp = tr("Unknown state!");
     }
 
     if (result == FP_ENROLL_COMPLETE || result == FP_ENROLL_FAIL)
@@ -246,7 +259,9 @@ bool CFingerprintReader::cancelEnrollment()
 
     result = fp_async_enroll_stop(fpdev, enrollCancelCb, NULL);
     if( result < 0 )
+    {
         return false;
+    }
     return true;
 }
 
@@ -270,7 +285,9 @@ bool CFingerprintReader::cancelVerify()
 
     result = fp_async_identify_stop(fpdev, verifyCancelCb, NULL);
     if( result < 0 )
+    {
         return false;
+    }
     return true;
 }
 
@@ -285,30 +302,31 @@ void CFingerprintReader::identifyCb(struct fp_dev *dev, int result, size_t match
     bool retResult = false;
     bool retryScan = true;
 
-    switch(result) {
-    case FP_VERIFY_NO_MATCH:
-        tmp = tr("<b>Finger does not match.</b>");
-        break;
-    case FP_VERIFY_MATCH:
-        tmp = tr("<b>Finger matches!</b>");
-        retResult = true;
-        retryScan = false;
-        break;
-    case FP_VERIFY_RETRY:
-        tmp = tr("<b>Bad scan.</b>");
-        break;
-    case FP_VERIFY_RETRY_TOO_SHORT:
-        tmp = tr("<b>Swipe was too short.</b>");
-        break;
-    case FP_VERIFY_RETRY_CENTER_FINGER:
-        tmp = tr("<b>Finger was not centered on sensor.</b>");
-        break;
-    case FP_VERIFY_RETRY_REMOVE_FINGER:
-        tmp = tr("<b>Bad scan, remove finger.</b>");
-        break;
-    default:
-        tmp = tr("<b>Unknown state! Click 'Cancel' and try again!</b>");
-        break;
+    switch(result) 
+    {
+        case FP_VERIFY_NO_MATCH:
+            tmp = tr("<b>Finger does not match.</b>");
+            break;
+        case FP_VERIFY_MATCH:
+            tmp = tr("<b>Finger matches!</b>");
+            retResult = true;
+            retryScan = false;
+            break;
+        case FP_VERIFY_RETRY:
+            tmp = tr("<b>Bad scan.</b>");
+            break;
+        case FP_VERIFY_RETRY_TOO_SHORT:
+            tmp = tr("<b>Swipe was too short.</b>");
+            break;
+        case FP_VERIFY_RETRY_CENTER_FINGER:
+            tmp = tr("<b>Finger was not centered on sensor.</b>");
+            break;
+        case FP_VERIFY_RETRY_REMOVE_FINGER:
+            tmp = tr("<b>Bad scan, remove finger.</b>");
+            break;
+        default:
+            tmp = tr("<b>Unknown state! Click 'Close' and try again!</b>");
+            break;
     }
 
     fp_async_identify_stop(fpdev, verifyCancelCb, NULL);
@@ -403,7 +421,9 @@ bool CFingerprintReader::initVerify()
 
 
     for(count=0; count < 5000; count++)
+    {
         print_gallery[count] = NULL;
+    }
 
     count = 0;
     while (it.hasNext())

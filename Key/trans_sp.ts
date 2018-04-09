@@ -9,388 +9,29 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgeditquestions.ui" line="82"/>
-        <source>A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="100"/>
-        <source>B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="118"/>
-        <source>C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="136"/>
-        <source>D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="154"/>
-        <source>G</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="172"/>
-        <source>E</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="190"/>
-        <source>F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="208"/>
-        <source>H</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="226"/>
-        <source>J</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="244"/>
-        <source>I</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="262"/>
-        <source>M</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="280"/>
-        <source>K</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="298"/>
-        <source>L</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="316"/>
-        <source>P</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="334"/>
-        <source>R</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="352"/>
-        <source>N</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="370"/>
-        <source>S</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="388"/>
-        <source>O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="406"/>
-        <source>T</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="424"/>
-        <source>Q</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="442"/>
-        <source>W</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="460"/>
-        <source>@</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="478"/>
-        <source>X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="496"/>
-        <source>U</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="514"/>
-        <source>Y</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="532"/>
-        <source>-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="550"/>
-        <source>.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="568"/>
-        <source>Z</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="586"/>
-        <source>V</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="604"/>
-        <source>_</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="622"/>
-        <source>;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="640"/>
-        <source>&amp;&amp;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="658"/>
-        <source>$</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="676"/>
-        <source>+</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="694"/>
-        <source>:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="712"/>
-        <source>&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="730"/>
-        <source>&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="748"/>
-        <source>?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="766"/>
-        <source>/</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="784"/>
-        <source>*</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="802"/>
-        <source>(</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="820"/>
-        <source>!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="838"/>
-        <source>#</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="856"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="874"/>
-        <source>)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="892"/>
-        <source>^</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="910"/>
-        <source>0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="928"/>
-        <source>7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="946"/>
-        <source>Space</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="964"/>
-        <source>9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="982"/>
-        <source>5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1000"/>
-        <source>1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1018"/>
-        <source>3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1036"/>
-        <source>6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1054"/>
-        <source>Enter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1072"/>
-        <source>8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1090"/>
-        <source>2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1108"/>
-        <source>4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1126"/>
-        <source>Back</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1144"/>
-        <source>Del</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1162"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1180"/>
-        <location filename="dlgeditquestions.ui" line="1559"/>
-        <location filename="dlgeditquestions.ui" line="1592"/>
-        <location filename="dlgeditquestions.ui" line="1634"/>
+        <location filename="dlgeditquestions.ui" line="157"/>
+        <location filename="dlgeditquestions.ui" line="196"/>
+        <location filename="dlgeditquestions.ui" line="238"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgeditquestions.ui" line="1198"/>
-        <source>[</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1216"/>
-        <source>{</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1234"/>
-        <source>]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1252"/>
-        <source>\</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1270"/>
-        <source>&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1288"/>
-        <source>~</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1306"/>
-        <source>&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1324"/>
-        <source>}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1342"/>
-        <source>`</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1360"/>
-        <source>Lower</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgeditquestions.ui" line="1466"/>
-        <location filename="dlgeditquestions.cpp" line="64"/>
+        <location filename="dlgeditquestions.ui" line="64"/>
         <source>Question #1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgeditquestions.ui" line="1484"/>
-        <location filename="dlgeditquestions.cpp" line="70"/>
+        <location filename="dlgeditquestions.ui" line="82"/>
         <source>Question #2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgeditquestions.ui" line="1502"/>
-        <location filename="dlgeditquestions.cpp" line="76"/>
+        <location filename="dlgeditquestions.ui" line="100"/>
         <source>Question #3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgeditquestions.ui" line="1520"/>
+        <location filename="dlgeditquestions.ui" line="118"/>
         <source>Questions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -452,21 +93,16 @@
     </message>
     <message>
         <location filename="dlgfingerprintverify.ui" line="93"/>
-        <source>Ok</source>
+        <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfingerprintverify.ui" line="106"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgfingerprintverify.ui" line="125"/>
+        <location filename="dlgfingerprintverify.ui" line="112"/>
         <source>Please press your finger firmly against the scanner&apos;s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfingerprintverify.ui" line="143"/>
+        <location filename="dlgfingerprintverify.ui" line="130"/>
         <source>glass and then remove it</source>
         <translation type="unfinished"></translation>
     </message>
@@ -479,362 +115,357 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="93"/>
+        <location filename="dlgfullkeyboard.ui" line="598"/>
         <source>A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="114"/>
+        <location filename="dlgfullkeyboard.ui" line="1081"/>
         <source>B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="135"/>
+        <location filename="dlgfullkeyboard.ui" line="73"/>
         <source>C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="156"/>
+        <location filename="dlgfullkeyboard.ui" line="787"/>
         <source>D</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="177"/>
+        <location filename="dlgfullkeyboard.ui" line="388"/>
         <source>G</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="198"/>
+        <location filename="dlgfullkeyboard.ui" line="514"/>
         <source>E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="219"/>
+        <location filename="dlgfullkeyboard.ui" line="766"/>
         <source>F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="240"/>
+        <location filename="dlgfullkeyboard.ui" line="955"/>
         <source>H</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="261"/>
+        <location filename="dlgfullkeyboard.ui" line="325"/>
         <source>J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="282"/>
+        <location filename="dlgfullkeyboard.ui" line="892"/>
         <source>I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="303"/>
+        <location filename="dlgfullkeyboard.ui" line="262"/>
         <source>M</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="324"/>
+        <location filename="dlgfullkeyboard.ui" line="136"/>
         <source>K</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="345"/>
+        <location filename="dlgfullkeyboard.ui" line="94"/>
         <source>L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="366"/>
+        <location filename="dlgfullkeyboard.ui" line="220"/>
         <source>P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="387"/>
+        <location filename="dlgfullkeyboard.ui" line="1123"/>
         <source>R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="408"/>
+        <location filename="dlgfullkeyboard.ui" line="241"/>
         <source>N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="429"/>
+        <location filename="dlgfullkeyboard.ui" line="976"/>
         <source>S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="450"/>
+        <location filename="dlgfullkeyboard.ui" line="703"/>
         <source>O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="471"/>
+        <location filename="dlgfullkeyboard.ui" line="556"/>
         <source>T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="492"/>
+        <location filename="dlgfullkeyboard.ui" line="808"/>
         <source>Q</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="513"/>
+        <location filename="dlgfullkeyboard.ui" line="283"/>
         <source>W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="534"/>
+        <location filename="dlgfullkeyboard.ui" line="934"/>
         <source>@</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="555"/>
+        <location filename="dlgfullkeyboard.ui" line="871"/>
         <source>X</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="576"/>
+        <location filename="dlgfullkeyboard.ui" line="619"/>
         <source>U</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="597"/>
+        <location filename="dlgfullkeyboard.ui" line="577"/>
         <source>Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="618"/>
+        <location filename="dlgfullkeyboard.ui" line="913"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="639"/>
+        <location filename="dlgfullkeyboard.ui" line="682"/>
         <source>.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="660"/>
+        <location filename="dlgfullkeyboard.ui" line="451"/>
         <source>Z</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="681"/>
+        <location filename="dlgfullkeyboard.ui" line="493"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="702"/>
+        <location filename="dlgfullkeyboard.ui" line="850"/>
         <source>_</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="723"/>
+        <location filename="dlgfullkeyboard.ui" line="640"/>
         <source>;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="744"/>
+        <location filename="dlgfullkeyboard.ui" line="304"/>
         <source>&amp;&amp;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="765"/>
+        <location filename="dlgfullkeyboard.ui" line="115"/>
         <source>$</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="786"/>
+        <location filename="dlgfullkeyboard.ui" line="1039"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="807"/>
+        <location filename="dlgfullkeyboard.ui" line="367"/>
         <source>:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="828"/>
+        <location filename="dlgfullkeyboard.ui" line="1144"/>
         <source>&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="849"/>
+        <location filename="dlgfullkeyboard.ui" line="535"/>
         <source>&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="870"/>
+        <location filename="dlgfullkeyboard.ui" line="430"/>
         <source>?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="891"/>
+        <location filename="dlgfullkeyboard.ui" line="157"/>
         <source>/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="912"/>
+        <location filename="dlgfullkeyboard.ui" line="472"/>
         <source>*</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="933"/>
+        <location filename="dlgfullkeyboard.ui" line="346"/>
         <source>(</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="954"/>
+        <location filename="dlgfullkeyboard.ui" line="1186"/>
         <source>!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="975"/>
+        <location filename="dlgfullkeyboard.ui" line="1207"/>
         <source>#</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="996"/>
+        <location filename="dlgfullkeyboard.ui" line="1165"/>
         <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1017"/>
+        <location filename="dlgfullkeyboard.ui" line="178"/>
         <source>)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1038"/>
+        <location filename="dlgfullkeyboard.ui" line="997"/>
         <source>^</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1059"/>
+        <location filename="dlgfullkeyboard.ui" line="1457"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1080"/>
+        <location filename="dlgfullkeyboard.ui" line="1391"/>
         <source>7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1101"/>
+        <location filename="dlgfullkeyboard.ui" line="1689"/>
         <source>Space</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1122"/>
+        <location filename="dlgfullkeyboard.ui" line="1292"/>
         <source>9</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1143"/>
+        <location filename="dlgfullkeyboard.ui" line="1589"/>
         <source>5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1164"/>
+        <location filename="dlgfullkeyboard.ui" line="1358"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1185"/>
+        <location filename="dlgfullkeyboard.ui" line="1325"/>
         <source>3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1206"/>
+        <location filename="dlgfullkeyboard.ui" line="1523"/>
         <source>6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1227"/>
+        <location filename="dlgfullkeyboard.ui" line="1776"/>
         <source>Enter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1248"/>
+        <location filename="dlgfullkeyboard.ui" line="1424"/>
         <source>8</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1269"/>
+        <location filename="dlgfullkeyboard.ui" line="1490"/>
         <source>2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1290"/>
+        <location filename="dlgfullkeyboard.ui" line="1556"/>
         <source>4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1311"/>
+        <location filename="dlgfullkeyboard.ui" line="1662"/>
         <source>Back</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1332"/>
-        <source>Del</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgfullkeyboard.ui" line="1353"/>
+        <location filename="dlgfullkeyboard.ui" line="1749"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1374"/>
+        <location filename="dlgfullkeyboard.ui" line="1635"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1395"/>
+        <location filename="dlgfullkeyboard.ui" line="1018"/>
         <source>[</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1416"/>
+        <location filename="dlgfullkeyboard.ui" line="829"/>
         <source>{</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1437"/>
+        <location filename="dlgfullkeyboard.ui" line="1102"/>
         <source>]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1458"/>
+        <location filename="dlgfullkeyboard.ui" line="724"/>
         <source>\</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1479"/>
+        <location filename="dlgfullkeyboard.ui" line="1060"/>
         <source>&lt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1500"/>
+        <location filename="dlgfullkeyboard.ui" line="661"/>
         <source>~</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1521"/>
+        <location filename="dlgfullkeyboard.ui" line="199"/>
         <source>&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1542"/>
+        <location filename="dlgfullkeyboard.ui" line="745"/>
         <source>}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1563"/>
+        <location filename="dlgfullkeyboard.ui" line="409"/>
         <source>`</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dlgfullkeyboard.ui" line="1584"/>
+        <location filename="dlgfullkeyboard.ui" line="1716"/>
         <source>Lower</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1214,21 +845,6 @@
         <source>Please answer the following questions:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="dlgquestions.cpp" line="70"/>
-        <source>Answer #1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgquestions.cpp" line="76"/>
-        <source>Answer #2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgquestions.cpp" line="82"/>
-        <source>Answer #3</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>CDlgSMTP</name>
@@ -1254,7 +870,6 @@
     </message>
     <message>
         <location filename="dlgsmtp.ui" line="123"/>
-        <location filename="dlgsmtp.cpp" line="184"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1278,21 +893,6 @@
         <source>TLS</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="dlgsmtp.cpp" line="160"/>
-        <source>SMTP Server Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgsmtp.cpp" line="168"/>
-        <source>SMTP Server Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgsmtp.cpp" line="176"/>
-        <source>User Name</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>CDlgVNC</name>
@@ -1313,86 +913,80 @@
     </message>
     <message>
         <location filename="dlgvnc.ui" line="122"/>
-        <location filename="dlgvnc.cpp" line="144"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="dlgvnc.cpp" line="136"/>
-        <source>VNC Server Port</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CFingerprintReader</name>
     <message>
-        <location filename="fingerprintreader.cpp" line="155"/>
+        <location filename="fingerprintreader.cpp" line="168"/>
         <source>&lt;b&gt;Enrollment completed!&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="163"/>
+        <location filename="fingerprintreader.cpp" line="176"/>
         <source>&lt;b&gt;Enrollment failed!&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="166"/>
+        <location filename="fingerprintreader.cpp" line="179"/>
         <source>&lt;b&gt;Bad scan. Please try again.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="169"/>
+        <location filename="fingerprintreader.cpp" line="182"/>
         <source>&lt;b&gt;Bad scan: swipe was too short. Please try again.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="172"/>
+        <location filename="fingerprintreader.cpp" line="185"/>
         <source>&lt;b&gt;Bad scan: finger was not centered on scanner. Please try again.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="175"/>
+        <location filename="fingerprintreader.cpp" line="188"/>
         <source>&lt;b&gt;Bad scan: please remove finger before retrying.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="178"/>
+        <location filename="fingerprintreader.cpp" line="191"/>
         <source>Unknown state!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="290"/>
+        <location filename="fingerprintreader.cpp" line="308"/>
         <source>&lt;b&gt;Finger does not match.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="293"/>
+        <location filename="fingerprintreader.cpp" line="311"/>
         <source>&lt;b&gt;Finger matches!&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="298"/>
+        <location filename="fingerprintreader.cpp" line="316"/>
         <source>&lt;b&gt;Bad scan.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="301"/>
+        <location filename="fingerprintreader.cpp" line="319"/>
         <source>&lt;b&gt;Swipe was too short.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="304"/>
+        <location filename="fingerprintreader.cpp" line="322"/>
         <source>&lt;b&gt;Finger was not centered on sensor.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="307"/>
+        <location filename="fingerprintreader.cpp" line="325"/>
         <source>&lt;b&gt;Bad scan, remove finger.&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="fingerprintreader.cpp" line="310"/>
-        <source>&lt;b&gt;Unknown state! Click &apos;Cancel&apos; and try again!&lt;/b&gt;</source>
+        <location filename="fingerprintreader.cpp" line="328"/>
+        <source>&lt;b&gt;Unknown state! Click &apos;Close&apos; and try again!&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1405,8 +999,7 @@
     </message>
     <message>
         <location filename="frmadmininfo.ui" line="50"/>
-        <location filename="frmadmininfo.ui" line="328"/>
-        <location filename="frmadmininfo.cpp" line="986"/>
+        <location filename="frmadmininfo.ui" line="227"/>
         <source>Administrator</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1416,1201 +1009,867 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="85"/>
-        <location filename="frmadmininfo.cpp" line="1044"/>
+        <location filename="frmadmininfo.ui" line="568"/>
         <source>Predictive Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="106"/>
+        <location filename="frmadmininfo.ui" line="501"/>
         <source>Use Predictive Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="146"/>
+        <location filename="frmadmininfo.ui" line="524"/>
         <source>Time Resolution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="159"/>
+        <location filename="frmadmininfo.ui" line="537"/>
         <source> mins</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="228"/>
+        <location filename="frmadmininfo.ui" line="127"/>
         <source>MMM dd yyyy hh:mm:ss AP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="252"/>
+        <location filename="frmadmininfo.ui" line="151"/>
         <source>Internet Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="270"/>
+        <location filename="frmadmininfo.ui" line="169"/>
         <source>Set Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="289"/>
+        <location filename="frmadmininfo.ui" line="188"/>
         <source>Timezone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="340"/>
+        <location filename="frmadmininfo.ui" line="239"/>
         <source>Email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="352"/>
+        <location filename="frmadmininfo.ui" line="251"/>
         <source>Phone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="364"/>
+        <location filename="frmadmininfo.ui" line="263"/>
         <source>Admin Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="376"/>
+        <location filename="frmadmininfo.ui" line="275"/>
         <source>Admin Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="388"/>
+        <location filename="frmadmininfo.ui" line="287"/>
         <source>Assist Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="400"/>
+        <location filename="frmadmininfo.ui" line="299"/>
         <source>Assist Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="552"/>
-        <location filename="frmadmininfo.ui" line="1028"/>
+        <location filename="frmadmininfo.ui" line="385"/>
+        <location filename="frmadmininfo.ui" line="1076"/>
         <source>Test Email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="574"/>
+        <location filename="frmadmininfo.ui" line="616"/>
         <source>Utilities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="644"/>
+        <location filename="frmadmininfo.ui" line="689"/>
         <source>Email Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="663"/>
+        <location filename="frmadmininfo.ui" line="708"/>
         <source>Remote Desktop Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="681"/>
+        <location filename="frmadmininfo.ui" line="729"/>
         <source>Brightness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="700"/>
+        <location filename="frmadmininfo.ui" line="748"/>
         <source>IP Address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="737"/>
-        <location filename="frmadmininfo.ui" line="1443"/>
-        <location filename="frmadmininfo.cpp" line="212"/>
-        <location filename="frmadmininfo.cpp" line="565"/>
-        <location filename="frmadmininfo.cpp" line="1271"/>
-        <location filename="frmadmininfo.cpp" line="1273"/>
-        <location filename="frmadmininfo.cpp" line="2300"/>
+        <location filename="frmadmininfo.ui" line="785"/>
+        <location filename="frmadmininfo.ui" line="1491"/>
+        <location filename="frmadmininfo.cpp" line="230"/>
+        <location filename="frmadmininfo.cpp" line="584"/>
+        <location filename="frmadmininfo.cpp" line="1141"/>
+        <location filename="frmadmininfo.cpp" line="1143"/>
+        <location filename="frmadmininfo.cpp" line="1713"/>
         <source>Source #1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="780"/>
+        <location filename="frmadmininfo.ui" line="828"/>
         <source>Install</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="807"/>
-        <location filename="frmadmininfo.ui" line="853"/>
+        <location filename="frmadmininfo.ui" line="855"/>
+        <location filename="frmadmininfo.ui" line="901"/>
         <source>Load</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="832"/>
+        <location filename="frmadmininfo.ui" line="880"/>
         <source>Branding image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="880"/>
+        <location filename="frmadmininfo.ui" line="928"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="904"/>
+        <location filename="frmadmininfo.ui" line="952"/>
         <source>Remove All Codes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="922"/>
+        <location filename="frmadmininfo.ui" line="970"/>
         <source>Reboot System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="954"/>
+        <location filename="frmadmininfo.ui" line="1002"/>
         <source>Install new KeyCodeBox App</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="973"/>
+        <location filename="frmadmininfo.ui" line="1021"/>
         <source>Load bulk codes list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="992"/>
+        <location filename="frmadmininfo.ui" line="1040"/>
         <source>Display Fingerprint Button?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1010"/>
+        <location filename="frmadmininfo.ui" line="1058"/>
         <source>Display Show/Hide Button?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1034"/>
+        <location filename="frmadmininfo.ui" line="1082"/>
         <source>Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1051"/>
+        <location filename="frmadmininfo.ui" line="1099"/>
         <source>Reporting Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1069"/>
+        <location filename="frmadmininfo.ui" line="1117"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1088"/>
+        <location filename="frmadmininfo.ui" line="1136"/>
         <source>Reporting Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1107"/>
+        <location filename="frmadmininfo.ui" line="1155"/>
+        <location filename="frmadmininfo.h" line="192"/>
         <source>Never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1112"/>
+        <location filename="frmadmininfo.ui" line="1160"/>
+        <location filename="frmadmininfo.h" line="193"/>
         <source>Each Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1117"/>
+        <location filename="frmadmininfo.ui" line="1165"/>
+        <location filename="frmadmininfo.h" line="194"/>
         <source>Hourly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1122"/>
+        <location filename="frmadmininfo.ui" line="1170"/>
+        <location filename="frmadmininfo.h" line="195"/>
         <source>Every 12 Hours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1127"/>
+        <location filename="frmadmininfo.ui" line="1175"/>
+        <location filename="frmadmininfo.h" line="196"/>
         <source>Daily</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1132"/>
+        <location filename="frmadmininfo.ui" line="1180"/>
+        <location filename="frmadmininfo.h" line="197"/>
         <source>Weekly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1137"/>
+        <location filename="frmadmininfo.ui" line="1185"/>
+        <location filename="frmadmininfo.h" line="198"/>
         <source>Monthly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1185"/>
-        <location filename="frmadmininfo.ui" line="1268"/>
-        <location filename="frmadmininfo.ui" line="1372"/>
-        <location filename="frmadmininfo.ui" line="3158"/>
-        <location filename="frmadmininfo.ui" line="3267"/>
-        <location filename="frmadmininfo.ui" line="3401"/>
-        <location filename="frmadmininfo.ui" line="3491"/>
+        <location filename="frmadmininfo.ui" line="1233"/>
+        <location filename="frmadmininfo.ui" line="1316"/>
+        <location filename="frmadmininfo.ui" line="1420"/>
+        <location filename="frmadmininfo.ui" line="1702"/>
+        <location filename="frmadmininfo.ui" line="1795"/>
+        <location filename="frmadmininfo.ui" line="1964"/>
+        <location filename="frmadmininfo.ui" line="2050"/>
         <source>MMM dd yyyy hh:mm AP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1206"/>
+        <location filename="frmadmininfo.ui" line="1254"/>
         <source>Save to directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1289"/>
+        <location filename="frmadmininfo.ui" line="1337"/>
         <source>Print an immediate report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1307"/>
+        <location filename="frmadmininfo.ui" line="1355"/>
         <source>Starting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1325"/>
+        <location filename="frmadmininfo.ui" line="1373"/>
         <source>Ending</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1396"/>
+        <location filename="frmadmininfo.ui" line="1444"/>
         <source>Print Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1425"/>
+        <location filename="frmadmininfo.ui" line="1473"/>
         <source>Report via Email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1465"/>
+        <location filename="frmadmininfo.ui" line="1541"/>
         <source>Doors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1482"/>
-        <source>Open All Doors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1509"/>
-        <source> 7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1534"/>
-        <source> 8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1557"/>
-        <source>63</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1581"/>
-        <source>64</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1605"/>
-        <location filename="frmadmininfo.ui" line="4696"/>
+        <location filename="frmadmininfo.ui" line="3262"/>
         <source>6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1628"/>
-        <location filename="frmadmininfo.ui" line="4633"/>
+        <location filename="frmadmininfo.ui" line="3199"/>
         <source>5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1651"/>
-        <location filename="frmadmininfo.ui" line="4654"/>
+        <location filename="frmadmininfo.ui" line="3220"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1674"/>
-        <location filename="frmadmininfo.ui" line="4759"/>
+        <location filename="frmadmininfo.ui" line="3325"/>
         <source>2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1697"/>
-        <location filename="frmadmininfo.ui" line="4675"/>
+        <location filename="frmadmininfo.ui" line="3241"/>
         <source>3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1719"/>
-        <location filename="frmadmininfo.ui" line="4780"/>
+        <location filename="frmadmininfo.ui" line="3346"/>
         <source>4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1742"/>
-        <location filename="frmadmininfo.ui" line="4612"/>
+        <location filename="frmadmininfo.ui" line="3178"/>
         <source>9</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="1766"/>
-        <source>17</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1790"/>
-        <source>25</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1814"/>
-        <source>33</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1838"/>
-        <source>41</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1862"/>
-        <source>49</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1886"/>
-        <source>57</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1910"/>
-        <source>10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1934"/>
-        <source>11</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1958"/>
-        <source>12</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="1982"/>
-        <source>13</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2006"/>
-        <source>14</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2030"/>
-        <source>15</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2054"/>
-        <source>16</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2078"/>
-        <source>18</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2102"/>
-        <source>23</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2126"/>
-        <source>19</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2150"/>
-        <source>20</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2174"/>
-        <source>21</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2198"/>
-        <source>22</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2222"/>
-        <source>24</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2246"/>
-        <source>26</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2270"/>
-        <source>27</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2294"/>
-        <source>28</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2318"/>
-        <source>29</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2342"/>
-        <source>30</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2366"/>
-        <source>31</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2390"/>
-        <source>32</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2414"/>
-        <source>34</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2438"/>
-        <source>35</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2462"/>
-        <source>36</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2486"/>
-        <source>37</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2510"/>
-        <source>39</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2534"/>
-        <source>38</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2558"/>
-        <source>40</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2582"/>
-        <source>42</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2606"/>
-        <source>43</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2630"/>
-        <source>44</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2654"/>
-        <source>45</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2678"/>
-        <source>46</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2702"/>
-        <source>47</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2726"/>
-        <source>48</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2750"/>
-        <source>50</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2774"/>
-        <source>51</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2798"/>
-        <source>52</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2822"/>
-        <source>53</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2846"/>
-        <source>54</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2870"/>
-        <source>56</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2894"/>
-        <source>55</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2918"/>
-        <source>58</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2942"/>
-        <source>59</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2966"/>
-        <source>60</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="2990"/>
-        <source>61</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="3014"/>
-        <source>62</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="3071"/>
-        <source>Max Lock #</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.ui" line="3077"/>
-        <location filename="frmadmininfo.cpp" line="858"/>
-        <location filename="frmadmininfo.cpp" line="859"/>
-        <location filename="frmadmininfo.cpp" line="928"/>
+        <location filename="frmadmininfo.ui" line="1557"/>
         <source>Codes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3174"/>
-        <location filename="frmadmininfo.ui" line="3334"/>
+        <location filename="frmadmininfo.ui" line="1625"/>
+        <location filename="frmadmininfo.ui" line="1894"/>
         <source>From</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3187"/>
-        <location filename="frmadmininfo.ui" line="3321"/>
+        <location filename="frmadmininfo.ui" line="1718"/>
+        <location filename="frmadmininfo.ui" line="1980"/>
         <source>To</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3200"/>
-        <location filename="frmadmininfo.ui" line="3308"/>
+        <location filename="frmadmininfo.ui" line="1817"/>
+        <location filename="frmadmininfo.ui" line="2072"/>
         <source>Read</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3289"/>
-        <location filename="frmadmininfo.ui" line="3423"/>
-        <location filename="frmadmininfo.cpp" line="417"/>
+        <location filename="frmadmininfo.ui" line="1611"/>
+        <location filename="frmadmininfo.ui" line="1880"/>
+        <location filename="frmadmininfo.cpp" line="440"/>
+        <location filename="frmadmininfo.cpp" line="1292"/>
+        <location filename="frmadmininfo.cpp" line="1431"/>
+        <location filename="frmadmininfo.cpp" line="1586"/>
+        <location filename="frmadmininfo.cpp" line="1599"/>
         <source>All Locks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3296"/>
-        <location filename="frmadmininfo.cpp" line="860"/>
-        <location filename="frmadmininfo.cpp" line="861"/>
-        <location filename="frmadmininfo.cpp" line="934"/>
+        <location filename="frmadmininfo.ui" line="1826"/>
         <source>History</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3583"/>
+        <location filename="frmadmininfo.ui" line="2149"/>
         <source>A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3604"/>
+        <location filename="frmadmininfo.ui" line="2170"/>
         <source>B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3625"/>
+        <location filename="frmadmininfo.ui" line="2191"/>
         <source>C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3646"/>
+        <location filename="frmadmininfo.ui" line="2212"/>
         <source>D</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3667"/>
+        <location filename="frmadmininfo.ui" line="2233"/>
         <source>G</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3688"/>
+        <location filename="frmadmininfo.ui" line="2254"/>
         <source>E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3709"/>
+        <location filename="frmadmininfo.ui" line="2275"/>
         <source>F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3730"/>
+        <location filename="frmadmininfo.ui" line="2296"/>
         <source>H</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3751"/>
+        <location filename="frmadmininfo.ui" line="2317"/>
         <source>J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3772"/>
+        <location filename="frmadmininfo.ui" line="2338"/>
         <source>I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3793"/>
+        <location filename="frmadmininfo.ui" line="2359"/>
         <source>M</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3814"/>
+        <location filename="frmadmininfo.ui" line="2380"/>
         <source>K</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3835"/>
+        <location filename="frmadmininfo.ui" line="2401"/>
         <source>L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3856"/>
+        <location filename="frmadmininfo.ui" line="2422"/>
         <source>P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3877"/>
+        <location filename="frmadmininfo.ui" line="2443"/>
         <source>R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3898"/>
+        <location filename="frmadmininfo.ui" line="2464"/>
         <source>N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3919"/>
+        <location filename="frmadmininfo.ui" line="2485"/>
         <source>S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3940"/>
+        <location filename="frmadmininfo.ui" line="2506"/>
         <source>O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3961"/>
+        <location filename="frmadmininfo.ui" line="2527"/>
         <source>T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="3982"/>
+        <location filename="frmadmininfo.ui" line="2548"/>
         <source>Q</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4003"/>
+        <location filename="frmadmininfo.ui" line="2569"/>
         <source>W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4024"/>
+        <location filename="frmadmininfo.ui" line="2590"/>
         <source>@</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4045"/>
+        <location filename="frmadmininfo.ui" line="2611"/>
         <source>X</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4066"/>
+        <location filename="frmadmininfo.ui" line="2632"/>
         <source>U</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4087"/>
+        <location filename="frmadmininfo.ui" line="2653"/>
         <source>Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4108"/>
+        <location filename="frmadmininfo.ui" line="2674"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4129"/>
+        <location filename="frmadmininfo.ui" line="2695"/>
         <source>.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4150"/>
+        <location filename="frmadmininfo.ui" line="2716"/>
         <source>Z</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4171"/>
+        <location filename="frmadmininfo.ui" line="2737"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4192"/>
+        <location filename="frmadmininfo.ui" line="2758"/>
         <source>_</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4213"/>
+        <location filename="frmadmininfo.ui" line="2779"/>
         <source>;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4234"/>
+        <location filename="frmadmininfo.ui" line="2800"/>
         <source>&amp;&amp;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4255"/>
+        <location filename="frmadmininfo.ui" line="2821"/>
         <source>$</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4276"/>
+        <location filename="frmadmininfo.ui" line="2842"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4297"/>
+        <location filename="frmadmininfo.ui" line="2863"/>
         <source>:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4318"/>
+        <location filename="frmadmininfo.ui" line="2884"/>
         <source>&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4339"/>
+        <location filename="frmadmininfo.ui" line="2905"/>
         <source>&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4360"/>
+        <location filename="frmadmininfo.ui" line="2926"/>
         <source>?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4381"/>
+        <location filename="frmadmininfo.ui" line="2947"/>
         <source>/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4402"/>
+        <location filename="frmadmininfo.ui" line="2968"/>
         <source>*</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4423"/>
+        <location filename="frmadmininfo.ui" line="2989"/>
         <source>(</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4444"/>
+        <location filename="frmadmininfo.ui" line="3010"/>
         <source>!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4465"/>
+        <location filename="frmadmininfo.ui" line="3031"/>
         <source>#</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4486"/>
+        <location filename="frmadmininfo.ui" line="3052"/>
         <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4507"/>
+        <location filename="frmadmininfo.ui" line="3073"/>
         <source>)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4528"/>
+        <location filename="frmadmininfo.ui" line="3094"/>
         <source>^</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4549"/>
+        <location filename="frmadmininfo.ui" line="3115"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4570"/>
+        <location filename="frmadmininfo.ui" line="3136"/>
         <source>7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4591"/>
+        <location filename="frmadmininfo.ui" line="3157"/>
         <source>Space</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4717"/>
+        <location filename="frmadmininfo.ui" line="3283"/>
         <source>Enter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4738"/>
+        <location filename="frmadmininfo.ui" line="3304"/>
         <source>8</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4801"/>
+        <location filename="frmadmininfo.ui" line="3367"/>
         <source>Back</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4822"/>
+        <location filename="frmadmininfo.ui" line="3388"/>
         <source>Del</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4843"/>
+        <location filename="frmadmininfo.ui" line="3409"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4864"/>
+        <location filename="frmadmininfo.ui" line="3430"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4885"/>
+        <location filename="frmadmininfo.ui" line="3451"/>
         <source>[</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4906"/>
+        <location filename="frmadmininfo.ui" line="3472"/>
         <source>{</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4927"/>
+        <location filename="frmadmininfo.ui" line="3493"/>
         <source>]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4948"/>
+        <location filename="frmadmininfo.ui" line="3514"/>
         <source>\</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4969"/>
+        <location filename="frmadmininfo.ui" line="3535"/>
         <source>&lt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="4990"/>
+        <location filename="frmadmininfo.ui" line="3556"/>
         <source>~</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="5011"/>
+        <location filename="frmadmininfo.ui" line="3577"/>
         <source>&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="5032"/>
+        <location filename="frmadmininfo.ui" line="3598"/>
         <source>}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="5053"/>
+        <location filename="frmadmininfo.ui" line="3619"/>
         <source>`</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="5074"/>
+        <location filename="frmadmininfo.ui" line="3640"/>
         <source>Lower</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.ui" line="5100"/>
+        <location filename="frmadmininfo.ui" line="3666"/>
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="420"/>
-        <source>Lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.cpp" line="494"/>
+        <location filename="frmadmininfo.cpp" line="513"/>
         <source>Save Directory Set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="559"/>
-        <location filename="frmadmininfo.cpp" line="1278"/>
-        <location filename="frmadmininfo.cpp" line="2297"/>
+        <location filename="frmadmininfo.cpp" line="578"/>
+        <location filename="frmadmininfo.cpp" line="1148"/>
+        <location filename="frmadmininfo.cpp" line="1708"/>
         <source>Source #2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="604"/>
+        <location filename="frmadmininfo.cpp" line="623"/>
         <source>File Copied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="604"/>
+        <location filename="frmadmininfo.cpp" line="623"/>
         <source>New KeyCodeBox application copied.
 System requires reboot to run.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="678"/>
+        <location filename="frmadmininfo.cpp" line="697"/>
         <source>XML Parsing Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="679"/>
+        <location filename="frmadmininfo.cpp" line="698"/>
         <source>Can&apos;t parse given XML file
 Please check syntax and integrity of your file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="759"/>
+        <location filename="frmadmininfo.cpp" line="777"/>
         <source>Bulk Code Upload Complete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="760"/>
+        <location filename="frmadmininfo.cpp" line="778"/>
         <source>Please check the &apos;Codes&apos; tab to see that your codes were added successfully.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="769"/>
+        <location filename="frmadmininfo.cpp" line="787"/>
         <source>Set New Branding Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="770"/>
+        <location filename="frmadmininfo.cpp" line="788"/>
         <source>The new branding image will be set to the selected file and scaled to 760x390.
 Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="783"/>
+        <location filename="frmadmininfo.cpp" line="801"/>
         <source>Verify Branding Image Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="784"/>
+        <location filename="frmadmininfo.cpp" line="802"/>
         <source>The branding image will be reset to the default.
 Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="853"/>
-        <location filename="frmadmininfo.cpp" line="854"/>
-        <location filename="frmadmininfo.cpp" line="875"/>
-        <location filename="frmadmininfo.cpp" line="881"/>
-        <location filename="frmadmininfo.cpp" line="882"/>
-        <location filename="frmadmininfo.cpp" line="890"/>
-        <location filename="frmadmininfo.cpp" line="923"/>
-        <source>Open</source>
+        <location filename="frmadmininfo.cpp" line="1323"/>
+        <source> (FP)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="996"/>
-        <source>Administrator Email Address</source>
+        <location filename="frmadmininfo.cpp" line="1329"/>
+        <source> (Q)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1004"/>
-        <source>Administrator Phone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.cpp" line="1012"/>
-        <source>Administrator Code #1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.cpp" line="1020"/>
-        <source>Administrator Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.cpp" line="1028"/>
-        <source>Assistant Code</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.cpp" line="1036"/>
-        <source>Assistant Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmadmininfo.cpp" line="1909"/>
+        <location filename="frmadmininfo.cpp" line="1335"/>
         <source>ALWAYS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1910"/>
-        <location filename="frmadmininfo.cpp" line="1920"/>
+        <location filename="frmadmininfo.cpp" line="1336"/>
+        <location filename="frmadmininfo.cpp" line="1346"/>
         <source>ACTIVE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1919"/>
+        <location filename="frmadmininfo.cpp" line="1345"/>
         <source>LIMITED USE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1919"/>
+        <location filename="frmadmininfo.cpp" line="1345"/>
         <source>uses remaining</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1920"/>
+        <location filename="frmadmininfo.cpp" line="1346"/>
         <source>DISABLED</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1933"/>
+        <location filename="frmadmininfo.cpp" line="1380"/>
         <source>Edit Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1934"/>
-        <location filename="frmadmininfo.cpp" line="2570"/>
+        <location filename="frmadmininfo.cpp" line="1381"/>
+        <location filename="frmadmininfo.cpp" line="1992"/>
         <source>Add Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1935"/>
+        <location filename="frmadmininfo.cpp" line="1382"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1955"/>
+        <location filename="frmadmininfo.cpp" line="1419"/>
         <source>Lock #</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1955"/>
+        <location filename="frmadmininfo.cpp" line="1419"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1955"/>
+        <location filename="frmadmininfo.cpp" line="1419"/>
         <source>Code#1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1955"/>
+        <location filename="frmadmininfo.cpp" line="1419"/>
         <source>Code#2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1955"/>
+        <location filename="frmadmininfo.cpp" line="1419"/>
         <source>Accessed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="1999"/>
+        <location filename="frmadmininfo.cpp" line="1475"/>
         <source>Verify Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="2000"/>
+        <location filename="frmadmininfo.cpp" line="1476"/>
         <source>Do you want to delete the selected code?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="2573"/>
+        <location filename="frmadmininfo.cpp" line="1995"/>
         <source>Enable All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="2752"/>
+        <location filename="frmadmininfo.cpp" line="2174"/>
         <source>Verify System Reboot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="2753"/>
-        <source>System is about to be restarted.
+        <location filename="frmadmininfo.cpp" line="2175"/>
+        <source>System will be restarted.
 Do you want to restart?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="2767"/>
+        <location filename="frmadmininfo.cpp" line="2190"/>
         <source>Verify Remove All Codes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="2768"/>
+        <location filename="frmadmininfo.cpp" line="2191"/>
         <source>All access codes will be removed from the system
 Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="2777"/>
+        <location filename="frmadmininfo.cpp" line="2201"/>
         <source>Code Removal Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmadmininfo.cpp" line="2778"/>
+        <location filename="frmadmininfo.cpp" line="2202"/>
         <source>Code Removal is successful!!
 Please give the codes list a moment to update.</source>
         <translation type="unfinished"></translation>
@@ -3002,613 +2261,118 @@ Please give the codes list a moment to update.</source>
     </message>
 </context>
 <context>
-    <name>CFrmCodeEdit</name>
+    <name>CFrmSelectLocks</name>
     <message>
-        <location filename="frmcodeedit.ui" line="14"/>
-        <source>Edit Code</source>
+        <location filename="frmselectlocks.ui" line="20"/>
+        <source>User Code Entry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmcodeedit.ui" line="82"/>
-        <source>A</source>
+        <location filename="frmselectlocks.ui" line="50"/>
+        <source>30</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmcodeedit.ui" line="100"/>
-        <source>B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="118"/>
-        <source>C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="136"/>
-        <source>D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="154"/>
-        <source>G</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="172"/>
-        <source>E</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="190"/>
-        <source>F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="208"/>
-        <source>H</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="226"/>
-        <source>J</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="244"/>
-        <source>I</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="262"/>
-        <source>M</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="280"/>
-        <source>K</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="298"/>
-        <source>L</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="316"/>
-        <source>P</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="334"/>
-        <source>R</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="352"/>
-        <source>N</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="370"/>
-        <source>S</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="388"/>
-        <source>O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="406"/>
-        <source>T</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="424"/>
-        <source>Q</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="442"/>
-        <source>W</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="460"/>
-        <source>@</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="478"/>
-        <source>X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="496"/>
-        <source>U</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="514"/>
-        <source>Y</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="532"/>
-        <source>-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="550"/>
-        <source>.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="568"/>
-        <source>Z</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="586"/>
-        <source>V</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="604"/>
-        <source>_</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="622"/>
-        <source>;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="640"/>
-        <source>&amp;&amp;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="658"/>
-        <source>$</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="676"/>
-        <source>+</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="694"/>
-        <source>:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="712"/>
-        <source>&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="730"/>
-        <source>&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="748"/>
-        <source>?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="766"/>
-        <source>/</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="784"/>
-        <source>*</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="802"/>
-        <source>(</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="820"/>
-        <source>!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="838"/>
-        <source>#</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="856"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="874"/>
-        <source>)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="892"/>
-        <source>^</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="910"/>
-        <source>0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="928"/>
-        <source>7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="946"/>
-        <source>Space</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="964"/>
-        <source>9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="982"/>
-        <source>5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1000"/>
-        <source>1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1018"/>
-        <source>3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1036"/>
-        <source>6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1054"/>
-        <source>Enter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1072"/>
-        <source>8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1090"/>
-        <source>2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1108"/>
-        <source>4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1126"/>
-        <source>Back</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1144"/>
-        <source>Del</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1162"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1180"/>
-        <location filename="frmcodeedit.ui" line="1658"/>
-        <location filename="frmcodeedit.ui" line="1676"/>
-        <location filename="frmcodeedit.ui" line="1694"/>
-        <location filename="frmcodeedit.ui" line="1736"/>
-        <source>Clear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1198"/>
-        <source>[</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1216"/>
-        <source>{</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1234"/>
-        <source>]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1252"/>
-        <source>\</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1270"/>
-        <source>&lt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1288"/>
-        <source>~</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1306"/>
-        <source>&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1324"/>
-        <source>}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1342"/>
-        <source>`</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1360"/>
-        <source>Lower</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1386"/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1427"/>
-        <source>Lock #</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1487"/>
-        <location filename="frmcodeedit.cpp" line="208"/>
-        <source>Code #1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1505"/>
-        <location filename="frmcodeedit.cpp" line="216"/>
-        <source>Code #2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1523"/>
-        <location filename="frmcodeedit.cpp" line="224"/>
-        <source>Username</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1562"/>
-        <source># of codes to create</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1601"/>
-        <source>Start Access:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1619"/>
-        <source>End Access:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1757"/>
-        <location filename="frmcodeedit.ui" line="1781"/>
-        <source>Fingerprint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1799"/>
-        <source>Questions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1843"/>
-        <location filename="frmcodeedit.ui" line="1922"/>
-        <source>MMM dd yyyy hh:mm AP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1943"/>
-        <source>ACTIVE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1974"/>
-        <source>Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="1995"/>
-        <source>Timed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.ui" line="2013"/>
-        <source>Limited Use</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="274"/>
-        <source>No Code #1 Entered</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="275"/>
-        <source>You are enabling fingerprint authentication for this code, but you must have already entered a Code #1. Enter a unique Code #1 and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="285"/>
-        <source>Warning! Adding Fingerprint Authentication</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="286"/>
-        <source>You are enabling fingerprint authentication for this code, Code #2 is disallowed with fingerprint authentication. Are you sure this is what you want to do?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="309"/>
-        <location filename="frmcodeedit.cpp" line="360"/>
-        <source>Verify Fingerprint Scan Removal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="310"/>
-        <source>Saved fingerprint scan exists for this code.
-Do you really want to remove it?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="361"/>
-        <source> Saved fingerprint scan exists for this code.
-Do you really want to remove it?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="426"/>
-        <source>ALWAYS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeedit.cpp" line="466"/>
-        <source>LIMITED USE (Take and Return only)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CFrmCodeEntry</name>
-    <message>
-        <location filename="frmcodeentry.ui" line="14"/>
-        <source>Code Entry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="frmcodeentry.ui" line="26"/>
-        <source>Enter Code</source>
+        <location filename="frmselectlocks.ui" line="71"/>
+        <source>Seconds Remaining</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CFrmUserCode</name>
     <message>
-        <location filename="frmusercode.ui" line="17"/>
+        <location filename="frmusercode.ui" line="20"/>
         <source>User Code Entry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="34"/>
+        <location filename="frmusercode.ui" line="37"/>
         <source>noversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="70"/>
+        <location filename="frmusercode.ui" line="73"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="97"/>
+        <location filename="frmusercode.ui" line="100"/>
         <source>7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="124"/>
+        <location filename="frmusercode.ui" line="127"/>
         <source>9</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="151"/>
+        <location filename="frmusercode.ui" line="154"/>
         <source>5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="178"/>
+        <location filename="frmusercode.ui" line="181"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="205"/>
+        <location filename="frmusercode.ui" line="208"/>
         <source>3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="232"/>
+        <location filename="frmusercode.ui" line="235"/>
         <source>6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="259"/>
+        <location filename="frmusercode.ui" line="262"/>
         <source>Enter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="280"/>
+        <location filename="frmusercode.ui" line="283"/>
         <source>8</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="307"/>
+        <location filename="frmusercode.ui" line="310"/>
         <source>2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="334"/>
+        <location filename="frmusercode.ui" line="337"/>
         <source>Del</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="355"/>
+        <location filename="frmusercode.ui" line="358"/>
         <source>4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="382"/>
+        <location filename="frmusercode.ui" line="385"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="403"/>
+        <location filename="frmusercode.ui" line="406"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="468"/>
+        <location filename="frmusercode.ui" line="471"/>
         <source>&lt;Please Enter Code #1&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="490"/>
+        <location filename="frmusercode.ui" line="493"/>
         <location filename="frmusercode.cpp" line="229"/>
         <source>Show</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="frmusercode.ui" line="520"/>
+        <location filename="frmusercode.ui" line="523"/>
         <source>Fingerprint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3621,40 +2385,40 @@ Do you really want to remove it?</source>
 <context>
     <name>CReportController</name>
     <message>
-        <location filename="reportcontroller.cpp" line="94"/>
+        <location filename="reportcontroller.cpp" line="96"/>
         <source>Lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="reportcontroller.cpp" line="98"/>
+        <location filename="reportcontroller.cpp" line="100"/>
         <source>user</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="reportcontroller.cpp" line="100"/>
+        <location filename="reportcontroller.cpp" line="102"/>
         <source>accessed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="reportcontroller.cpp" line="108"/>
-        <location filename="reportcontroller.cpp" line="109"/>
-        <source>code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="reportcontroller.cpp" line="110"/>
         <location filename="reportcontroller.cpp" line="111"/>
+        <source>code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="reportcontroller.cpp" line="112"/>
+        <location filename="reportcontroller.cpp" line="113"/>
+        <location filename="reportcontroller.cpp" line="114"/>
         <source>question</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="reportcontroller.cpp" line="335"/>
+        <location filename="reportcontroller.cpp" line="342"/>
         <source>Lock Box History Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="reportcontroller.cpp" line="337"/>
+        <location filename="reportcontroller.cpp" line="344"/>
         <source>report</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3662,92 +2426,92 @@ Do you really want to remove it?</source>
 <context>
     <name>CSystemController</name>
     <message>
-        <location filename="systemcontroller.cpp" line="452"/>
-        <location filename="systemcontroller.cpp" line="489"/>
+        <location filename="systemcontroller.cpp" line="542"/>
         <source>Lock Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="498"/>
+        <location filename="systemcontroller.cpp" line="629"/>
         <source>Incorrect Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="509"/>
-        <location filename="systemcontroller.cpp" line="733"/>
+        <location filename="systemcontroller.cpp" line="640"/>
+        <location filename="systemcontroller.cpp" line="871"/>
         <source>Please Enter Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="513"/>
-        <location filename="systemcontroller.cpp" line="752"/>
+        <location filename="systemcontroller.cpp" line="644"/>
+        <location filename="systemcontroller.cpp" line="891"/>
         <source>Please Enter Second Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="520"/>
+        <location filename="systemcontroller.cpp" line="651"/>
         <source>Password Timeout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="735"/>
+        <location filename="systemcontroller.cpp" line="873"/>
         <source>Enter Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="753"/>
+        <location filename="systemcontroller.cpp" line="892"/>
         <source>Enter Second Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="764"/>
-        <location filename="systemcontroller.cpp" line="765"/>
+        <location filename="systemcontroller.cpp" line="904"/>
+        <location filename="systemcontroller.cpp" line="905"/>
         <source>Enter Admin Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="780"/>
+        <location filename="systemcontroller.cpp" line="933"/>
         <source>Thank you!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="780"/>
-        <location filename="systemcontroller.cpp" line="893"/>
+        <location filename="systemcontroller.cpp" line="924"/>
+        <location filename="systemcontroller.cpp" line="929"/>
+        <location filename="systemcontroller.cpp" line="1056"/>
         <source>Lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="780"/>
+        <location filename="systemcontroller.cpp" line="933"/>
         <source>open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="886"/>
+        <location filename="systemcontroller.cpp" line="1047"/>
         <source>Lock Box Event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="900"/>
+        <location filename="systemcontroller.cpp" line="1063"/>
         <source>was accessed at</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="951"/>
+        <location filename="systemcontroller.cpp" line="1117"/>
         <source>Testing Email Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="953"/>
+        <location filename="systemcontroller.cpp" line="1119"/>
         <source>You have successfully configured the email settings!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="970"/>
+        <location filename="systemcontroller.cpp" line="1136"/>
         <source>Testing Administrator Email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systemcontroller.cpp" line="972"/>
+        <location filename="systemcontroller.cpp" line="1138"/>
         <source>You have successfully configured the Administrator email!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4047,13 +2811,13 @@ Do you really want to remove it?</source>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="706"/>
-        <location filename="number_keypad.ui" line="41"/>
+        <location filename="number_keypad.ui" line="175"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="719"/>
-        <location filename="number_keypad.ui" line="54"/>
+        <location filename="number_keypad.ui" line="67"/>
         <source>7</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4065,56 +2829,56 @@ Do you really want to remove it?</source>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="745"/>
-        <location filename="number_keypad.ui" line="67"/>
+        <location filename="number_keypad.ui" line="49"/>
         <source>9</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="758"/>
-        <location filename="number_keypad.ui" line="80"/>
+        <location filename="number_keypad.ui" line="211"/>
         <source>5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="771"/>
-        <location filename="number_keypad.ui" line="93"/>
+        <location filename="number_keypad.ui" line="31"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="784"/>
-        <location filename="number_keypad.ui" line="106"/>
+        <location filename="number_keypad.ui" line="121"/>
         <source>3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="797"/>
-        <location filename="number_keypad.ui" line="119"/>
+        <location filename="number_keypad.ui" line="139"/>
         <source>6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="810"/>
-        <location filename="number_keypad.ui" line="132"/>
+        <location filename="number_keypad.ui" line="193"/>
         <location filename="qwerty_keypad.ui" line="615"/>
         <source>Enter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="823"/>
-        <location filename="number_keypad.ui" line="145"/>
+        <location filename="number_keypad.ui" line="103"/>
         <source>8</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="836"/>
-        <location filename="number_keypad.ui" line="158"/>
+        <location filename="number_keypad.ui" line="157"/>
         <source>2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="alpha_keypad.ui" line="849"/>
-        <location filename="number_keypad.ui" line="171"/>
+        <location filename="number_keypad.ui" line="85"/>
         <source>4</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4133,17 +2897,774 @@ Do you really want to remove it?</source>
         <source>Number Pad</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="number_keypad.ui" line="229"/>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FrmCodeEditMulti</name>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="14"/>
+        <source>Code Edit Multilock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="65"/>
+        <source>Edit Questions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="94"/>
+        <location filename="frmcodeeditmulti.ui" line="391"/>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="112"/>
+        <source>Start Access</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="148"/>
+        <source>Fingerprint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="166"/>
+        <source>End Access</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="202"/>
+        <source>Code #1  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="214"/>
+        <location filename="frmcodeeditmulti.ui" line="262"/>
+        <location filename="frmcodeeditmulti.ui" line="310"/>
+        <source>123456789012345678901234567890</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="226"/>
+        <location filename="frmcodeeditmulti.ui" line="274"/>
+        <location filename="frmcodeeditmulti.ui" line="322"/>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="250"/>
+        <source>Code #2  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="298"/>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="346"/>
+        <source>Access Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="359"/>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="364"/>
+        <source>Timed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="369"/>
+        <source>Limited Use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="412"/>
+        <source>Start Access Text Overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.ui" line="436"/>
+        <source>End Access Text Overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.cpp" line="37"/>
+        <location filename="frmcodeeditmulti.cpp" line="202"/>
+        <source>ALWAYS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.cpp" line="39"/>
+        <location filename="frmcodeeditmulti.cpp" line="195"/>
+        <location filename="frmcodeeditmulti.cpp" line="203"/>
+        <source>ACTIVE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.cpp" line="194"/>
+        <source>LIMITED USE (Take/Return only)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.cpp" line="479"/>
+        <source>Warning! Adding Fingerprint Authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.cpp" line="480"/>
+        <source>You are enabling fingerprint authentication.
+Fingerprint authentication is allowed only for Code #1.
+If Code #2 is set, it will be cleared and disabled.
+Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.cpp" line="497"/>
+        <source>Verify Fingerprint Scan Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="frmcodeeditmulti.cpp" line="498"/>
+        <source>Saved fingerprint scan exists for this code.
+Do you want to remove it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>KcbKeyboardDialog</name>
+    <message>
+        <location filename="kcbkeyboarddialog.ui" line="14"/>
+        <source>KCB Keyboard Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>KcbKeyboardWidget</name>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="68"/>
+        <source>C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="89"/>
+        <source>L</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="110"/>
+        <source>$</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="131"/>
+        <source>K</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="152"/>
+        <source>/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="173"/>
+        <source>)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="194"/>
+        <source>&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="215"/>
+        <source>P</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="236"/>
+        <source>N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="257"/>
+        <source>M</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="278"/>
+        <source>W</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="299"/>
+        <source>&amp;&amp;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="320"/>
+        <source>J</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="341"/>
+        <source>(</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="362"/>
+        <source>:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="383"/>
+        <source>G</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="404"/>
+        <source>`</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="425"/>
+        <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="446"/>
+        <source>Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="467"/>
+        <source>*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="488"/>
+        <source>V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="509"/>
+        <source>E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="530"/>
+        <source>&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="551"/>
+        <source>T</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="572"/>
+        <source>Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="593"/>
+        <source>A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="614"/>
+        <source>U</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="635"/>
+        <source>;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="656"/>
+        <source>~</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="677"/>
+        <source>.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="698"/>
+        <source>O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="719"/>
+        <source>\</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="740"/>
+        <source>}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="761"/>
+        <source>F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="782"/>
+        <source>D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="803"/>
+        <source>Q</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="824"/>
+        <source>{</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="845"/>
+        <source>_</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="866"/>
+        <source>X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="887"/>
+        <source>I</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="908"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="929"/>
+        <source>@</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="950"/>
+        <source>H</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="971"/>
+        <source>S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="992"/>
+        <source>^</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1013"/>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1034"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1055"/>
+        <source>&lt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1076"/>
+        <source>B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1097"/>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1118"/>
+        <source>R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1139"/>
+        <source>&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1160"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1181"/>
+        <source>!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1202"/>
+        <source>#</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1235"/>
+        <location filename="kcbkeyboardwidget.cpp" line="166"/>
+        <source>Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1268"/>
+        <location filename="kcbkeyboardwidget.cpp" line="155"/>
+        <location filename="kcbkeyboardwidget.cpp" line="159"/>
+        <source>Upper</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1341"/>
+        <source>9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1374"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1407"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1440"/>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1473"/>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1506"/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1539"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1572"/>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1605"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1638"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1684"/>
+        <location filename="kcbkeyboardwidget.cpp" line="151"/>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1711"/>
+        <location filename="kcbkeyboardwidget.cpp" line="143"/>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1738"/>
+        <location filename="kcbkeyboardwidget.cpp" line="51"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.ui" line="1765"/>
+        <location filename="kcbkeyboardwidget.cpp" line="51"/>
+        <source>Enter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.cpp" line="155"/>
+        <location filename="kcbkeyboardwidget.cpp" line="163"/>
+        <source>Lower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.cpp" line="186"/>
+        <source>Duplicate Code Detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="kcbkeyboardwidget.cpp" line="187"/>
+        <source>You have entered a code that is already in use.
+Duplicate codes for &apos;Code 1&apos; are not allowed.
+Please enter a different code.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LockCabinetWidget</name>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="41"/>
+        <source>Cabinets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="70"/>
+        <source>Locks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="97"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="112"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="127"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="142"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="164"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="179"/>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="194"/>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="209"/>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="231"/>
+        <source>9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="246"/>
+        <source>10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="261"/>
+        <source>11</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="276"/>
+        <source>12</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="298"/>
+        <source>13</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="313"/>
+        <source>14</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="328"/>
+        <source>15</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="343"/>
+        <source>16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="365"/>
+        <source>17</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="380"/>
+        <source>18</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="395"/>
+        <source>19</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="410"/>
+        <source>20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="432"/>
+        <source>21</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="447"/>
+        <source>22</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="462"/>
+        <source>23</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="477"/>
+        <source>24</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="499"/>
+        <source>25</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="514"/>
+        <source>26</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="529"/>
+        <source>27</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="544"/>
+        <source>28</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="566"/>
+        <source>29</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="581"/>
+        <source>30</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="596"/>
+        <source>31</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="611"/>
+        <source>32</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="635"/>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.ui" line="647"/>
+        <source>Clear All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="lockcabinetwidget.cpp" line="47"/>
+        <source>Cabinet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="keycodeboxmain.cpp" line="325"/>
+        <location filename="keycodeboxmain.cpp" line="324"/>
         <source>Incorrect Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="29"/>
         <source>KeyCodeBox</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SelectLocksWidget</name>
+    <message>
+        <location filename="selectlockswidget.ui" line="17"/>
+        <source>Select Locks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="selectlockswidget.ui" line="34"/>
+        <source>Selected Locks:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="selectlockswidget.ui" line="70"/>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="selectlockswidget.ui" line="94"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="selectlockswidget.cpp" line="74"/>
+        <source>Cabinet %1 - Lock %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

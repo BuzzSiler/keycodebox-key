@@ -7,6 +7,8 @@
 #include <libfprint/fprint.h>
 #include "dlgfingerprint.h"
 #include "version.h"
+#include "kcbcommon.h"
+
 
 CFrmUserCode::CFrmUserCode(QWidget *parent) :
     QDialog(parent),
@@ -36,11 +38,10 @@ void CFrmUserCode::OnDateTimeTimerTimeout()
     ui->lblDateTime->setText(dt.toString("MM/dd/yyyy HH:mm:ss"));
 }
 
-/**
- * @brief CFrmUserCode::onButtonClick
- * @param key
- */
-void CFrmUserCode::onButtonClick(char key) {
+void CFrmUserCode::onButtonClick(char key)
+{
+    //KCB_DEBUG_ENTRY;
+
     QString qkey(key);
     QString sCurrKey;
     // Central button handling.
@@ -78,15 +79,18 @@ void CFrmUserCode::onButtonClick(char key) {
 
 void CFrmUserCode::onCodeEntered()
 {
-    
+    //KCB_DEBUG_ENTRY;
+
     QString sCode = ui->edCode->text();
     qDebug() << "CFrmUserCode::onCodeEntered" << sCode;
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
-    if(sCode.length() > 0 ) {
+    if(sCode.length() > 0 )
+    {
         this->enableKeypad(false);     // disable the keypad (momentarily)
         emit __CodeEntered(sCode);     // Signal that the code was entered.
     }
+    //KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::onBackSpace()
@@ -125,18 +129,14 @@ void CFrmUserCode::OnClearCodeDisplay()
     qDebug() << "Post CFrmUserCode::OnClearCodeDisplay()";
 }
 
-/**
- * @brief CFrmUserCode::OnSwipeCode
- * @param sCode
- * This will circumvent the numbers-only entry requirement.
- */
 void CFrmUserCode::OnSwipeCode(QString sCode)
 {
     qDebug() << "CFrmUserCode::OnSwipeCode" << sCode;
     ui->edCode->setText(sCode);
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
-    if(sCode.size() > 0 ) {
+    if(sCode.size() > 0 ) 
+    {
         emit __CodeEntered(sCode);     // Signal that the code was entered.
     }
 }

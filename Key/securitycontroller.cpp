@@ -2,6 +2,7 @@
 #include "securitycontroller.h"
 #include "modelsecurity.h"
 #include "encryption.h"
+#include "kcbcommon.h"
 
 
 CSecurityController::CSecurityController(QObject *parent) : QObject(parent),
@@ -21,9 +22,9 @@ void CSecurityController::initializeSignals()
     connect(&_modelSecurity, SIGNAL(__OnRequireCodeTwo()), this, SLOT(OnRequireCodeTwo()));
     connect(&_modelSecurity, SIGNAL(__OnAdminSecurityCheckOk(QString)), this, SLOT(OnAdminSecurityCheckOk(QString)));
     connect(&_modelSecurity, SIGNAL(__OnAdminSecurityCheckFailed()), this, SLOT(OnAdminSecurityCheckFailed()));
-    connect(&_modelSecurity, SIGNAL(__OnSecurityCheckSuccess(int)), this, SLOT(OnSecurityCheckSuccess(int)));
+    connect(&_modelSecurity, SIGNAL(__OnSecurityCheckSuccess(QString)), this, SLOT(OnSecurityCheckSuccess(QString)));
 
-    connect(&_modelSecurity, SIGNAL(__OnSecurityCheckSuccessWithAnswers(int,QString,QString,QString)), this, SLOT(OnSecurityCheckSuccessWithAnswers(int,QString,QString,QString)));
+    connect(&_modelSecurity, SIGNAL(__OnSecurityCheckSuccessWithAnswers(QString,QString,QString,QString)), this, SLOT(OnSecurityCheckSuccessWithAnswers(QString,QString,QString,QString)));
 
     connect(&_modelSecurity, SIGNAL(__OnSecurityCheckedFailed()), this, SLOT(OnSecurityCheckedFailed()));
 
@@ -33,7 +34,7 @@ void CSecurityController::initializeSignals()
     connect(&_modelSecurity, SIGNAL(__EnrollFingerprint(QString)), this, SLOT(OnEnrollFingerprint(QString)));
     connect(&_modelSecurity, SIGNAL(__EnrollFingerprintDialog(QString)), this, SLOT(OnEnrollFingerprintDialog(QString)));
 
-    connect(&_modelSecurity, SIGNAL(__QuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
+    connect(&_modelSecurity, SIGNAL(__QuestionUserDialog(QString,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(QString,QString,QString,QString)));
     
     connect(this, SIGNAL(__VerifyCodeTwo(QString)), &_modelSecurity, SLOT(OnVerifyCodeTwo(QString)));
 
@@ -50,18 +51,18 @@ void CSecurityController::initializeSignals()
     connect(this, SIGNAL(__UpdateCurrentAdmin(CAdminRec*)), &_modelSecurity, SLOT(OnUpdateCurrentAdmin(CAdminRec*)));
     connect(&_modelSecurity, SIGNAL(__OnUpdatedCurrentAdmin(bool)), this, SLOT(OnUpdatedCurrentAdmin(bool)));
 
-    connect(this, SIGNAL(__OnReadLockSet(int,QDateTime,QDateTime)), &_modelSecurity, SLOT(OnReadLockSet(int,QDateTime,QDateTime)));
+    connect(this, SIGNAL(__OnReadLockSet(QString,QDateTime,QDateTime)), &_modelSecurity, SLOT(OnReadLockSet(QString,QDateTime,QDateTime)));
     connect(&_modelSecurity, SIGNAL(__OnLockSet(CLockSet*)), this, SLOT(OnLockSet(CLockSet*)));
 
-    connect(this, SIGNAL(__OnReadLockHistorySet(int,QDateTime,QDateTime)), &_modelSecurity, SLOT(OnReadLockHistorySet(int,QDateTime,QDateTime)));
+    connect(this, SIGNAL(__OnReadLockHistorySet(QString,QDateTime,QDateTime)), &_modelSecurity, SLOT(OnReadLockHistorySet(QString,QDateTime,QDateTime)));
     connect(&_modelSecurity, SIGNAL(__OnLockHistorySet(CLockHistorySet*)), this, SLOT(OnLockHistorySet(CLockHistorySet*)));
 
     connect(this, SIGNAL(__OnCreateHistoryRecordFromLastSuccessfulLogin()), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastSuccessfulLogin()));
     connect(this, SIGNAL(__OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString,QString,QString)), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString,QString,QString)));
     
-    connect(&_modelSecurity, SIGNAL(__OnCreateHistoryRecordFromLastPredictiveLogin(int, QString)), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastPredictiveLogin(int, QString)));
+    connect(&_modelSecurity, SIGNAL(__OnCreateHistoryRecordFromLastPredictiveLogin(QString, QString)), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastPredictiveLogin(QString, QString)));
     connect(&_modelSecurity, SIGNAL(__OnLastSuccessfulLogin(CLockHistoryRec*)), this, SLOT(OnLastSuccessfulLoginRequest(CLockHistoryRec*)));
-    connect(this, SIGNAL( __RequestLastSuccessfulLogin()), &_modelSecurity, SLOT(RequestLastSuccessfulLogin()));
+    connect(this, SIGNAL( __RequestLastSuccessfulLogin(QString, QString, QString, QString)), &_modelSecurity, SLOT(RequestLastSuccessfulLogin(QString, QString, QString, QString)));
 
     connect(&_modelSecurity, SIGNAL(__OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)),
             this, SLOT(OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)));
@@ -70,30 +71,32 @@ void CSecurityController::initializeSignals()
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), &_modelSecurity, SLOT(OnUpdateCodeState(CLockState*)));
     connect(&_modelSecurity, SIGNAL(__OnUpdatedCodeState(bool)), this, SLOT(OnUpdatedCodeState(bool)));
 
-    connect(this, SIGNAL(__OnSuccessfulQuestionUsersAnswers(int,QString,QString,QString)), &_modelSecurity, SLOT(OnSuccessfulQuestionUsersAnswers(int,QString,QString,QString)));
+    connect(this, SIGNAL(__OnSuccessfulQuestionUsersAnswers(QString,QString,QString,QString)), &_modelSecurity, SLOT(OnSuccessfulQuestionUsersAnswers(QString,QString,QString,QString)));
     connect(this, SIGNAL(__OnQuestionUserCancelled()), &_modelSecurity, SLOT(OnQuestionUserCancelled()));
 }
 
-
-//std::string CSecurityController::encryptDecrypt(uint32_t nVal, std::string toEncrypt, std::string key)
-//{
-//    std::string skey = key;
-//    std::string output = toEncrypt;
-
-//    for (uint i = 0; i < toEncrypt.length(); i++)
-//        output[i] = toEncrypt[i] ^ skey[i + nVal % (skey.length())];
-
-//    return output;
-//}
-
-void CSecurityController::RequestLastSuccessfulLogin()
+void CSecurityController::RequestLastSuccessfulLogin(QString locknums)
 {
-    emit __RequestLastSuccessfulLogin();
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE(locknums);
+    emit __RequestLastSuccessfulLogin(locknums, "", "", "");
+    KCB_DEBUG_EXIT;
+}
+
+void CSecurityController::RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3)
+{
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE("Answer1" << answer1 << "Answer2" << answer2 << "Answer3" << answer3);    
+    emit __RequestLastSuccessfulLogin(locknums, answer1, answer2, answer3);
+    KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE(pLockHistory->getLockNums());
     emit __OnLastSuccessfulLogin(pLockHistory);
+    KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd)
@@ -110,7 +113,7 @@ void CSecurityController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime
 
 void CSecurityController::OnUpdateCodeState(CLockState *rec)
 {
-    qDebug() << "CSecurityController::OnUpdateCodeState emitting __OnUpdateCodeState";
+    KCB_DEBUG_TRACE("emitting __OnUpdateCodeState");
 
     emit __OnUpdateCodeState(rec);
 }
@@ -118,18 +121,19 @@ void CSecurityController::OnUpdateCodeState(CLockState *rec)
 std::string CSecurityController::GetPredictiveAccessCode(QString code, int nLockNum)
 {
     QDateTime datetime = QDateTime::currentDateTime();
-    std::string skey;
+    QString skey;
     std::string outEncrypt = "";
     QString  sTmp;
 
     Q_UNUSED(code);
 
-    if(_pAdminRec) {
+    if(_pAdminRec) 
+    {
         // Round the current date up to the resolution specified
         datetime = CEncryption::roundDateTime(_pAdminRec->getPredictiveResolution(), datetime);
         skey = _pAdminRec->getPredictiveKey();
 
-        CEncryption::calculatePredictiveCodeOld(nLockNum, skey, datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
+        CEncryption::calculatePredictiveCodeOld(nLockNum, skey.toStdString().c_str(), datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
 
         sTmp += QString(" trunc outEncrypt:") + outEncrypt.c_str();
         qDebug() << sTmp;
@@ -144,7 +148,7 @@ void CSecurityController::CheckPredictiveAccessCode(QString code)
 {
     uint32_t nLockNum;
     QDateTime datetime = QDateTime::currentDateTime();
-    std::string skey;
+    QString skey;
     std::string outEncrypt = "";
     QString sTmp;
 
@@ -154,16 +158,18 @@ void CSecurityController::CheckPredictiveAccessCode(QString code)
 
         skey = _pAdminRec->getPredictiveKey();
 
-        for(nLockNum=1; nLockNum<256; nLockNum++) {
+        for(nLockNum=1; nLockNum<256; nLockNum++) 
+        {
             // Round the current date up to the resolution specified
 
-            CEncryption::calculatePredictiveCodeOld(nLockNum, skey, datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
+            CEncryption::calculatePredictiveCodeOld(nLockNum, skey.toStdString().c_str(), datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
 
             sTmp += QString(" trunc outEncrypt:") + outEncrypt.c_str();
             qDebug() << sTmp;
 
-            if( outEncrypt == code.toStdString()) {
-                OnSecurityCheckSuccess(nLockNum);
+            if( outEncrypt == code.toStdString()) 
+            {
+                OnSecurityCheckSuccess(QString::number(nLockNum));
                 return;
             }
         }
@@ -177,20 +183,21 @@ void CSecurityController::CheckPredictiveAccessCode(QString code)
  */
 void CSecurityController::CheckAccessCodeOne(QString code1)
 {
+    KCB_DEBUG_TRACE(code1);
+
     // Use the CModelSecurity class
     _sCode1 = code1;
     _sCode2 = "";       // clear code2
-    qDebug() << "CSecurityController::CheckAccessCodeOne:" << code1;
 
     emit(__VerifyCodeOne(code1));       // This should cross thread to the _modelSecurity object
 }
 
 void CSecurityController::CheckAccessCodeTwo(QString code2)
 {
-    // Use the CModelSecurity class
+    KCB_DEBUG_TRACE(code2);
+
     _sCode2 = code2;
 
-    qDebug() << "CSecurityController::CheckAccessCodeTwo\n";
     QString sCodeEnc(CEncryption::encryptString(code2));
 
     emit(__VerifyCodeTwo(sCodeEnc));       // This should cross thread to the _modelSecurity object
@@ -257,18 +264,18 @@ void CSecurityController::OnAdminSecurityCheckFailed()
     emit __OnAdminSecurityCheckFailed();
 }
 
-void CSecurityController::OnSecurityCheckSuccess(int doorNum)
+void CSecurityController::OnSecurityCheckSuccess(QString locks)
 {
-    qDebug() << "CSecurityController::OnSecurityCheckSuccess(int nDoorNum)";
-    emit __OnSecurityCheckSuccess(doorNum);
-    emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
+    KCB_DEBUG_TRACE("locks:" << locks);
+    emit __OnSecurityCheckSuccess(locks);
+    //emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
 }
 
-void CSecurityController::OnSecurityCheckSuccessWithAnswers(int doorNum, QString answer1, QString answer2, QString answer3)
+void CSecurityController::OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
-  qDebug() << "CSecurityController::OnSecurityCheckSuccessWithAnswers, " << answer1 << ", " << answer2 << ", " << answer3;
-    emit __OnSecurityCheckSuccess(doorNum);
-    emit __OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(answer1, answer2, answer3);
+    KCB_DEBUG_TRACE(lockNums << "; " << answer1 << "; " << answer2 << "; " << answer3);
+    emit __OnSecurityCheckSuccess(lockNums);
+    //emit __OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(answer1, answer2, answer3);
 }
 
 void CSecurityController::OnSecurityCheckedFailed()
@@ -296,4 +303,9 @@ void CSecurityController::OnRequestedCurrentAdmin(CAdminRec *admin)
 
     qDebug() << "CSecurityController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(admin);
+}
+
+void CSecurityController::getAllCodes1(QStringList& codes1)
+{
+    _modelSecurity.getAllCodes1(codes1);
 }

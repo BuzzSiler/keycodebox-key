@@ -80,30 +80,17 @@
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout"/>
-   <widget class="QPushButton" name="buttonBoxOk">
+   <widget class="QPushButton" name="bbClose">
     <property name="geometry">
      <rect>
-      <x>178</x>
+      <x>240</x>
       <y>250</y>
       <width>100</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>Ok</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="buttonBoxCancel">
-    <property name="geometry">
-     <rect>
-      <x>292</x>
-      <y>250</y>
-      <width>100</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Cancel</string>
+     <string>Close</string>
     </property>
    </widget>
   </widget>
@@ -146,9 +133,9 @@
   <widget class="QLabel" name="lblFPrintMessage2">
    <property name="geometry">
     <rect>
-     <x>183</x>
+     <x>52</x>
      <y>150</y>
-     <width>300</width>
+     <width>501</width>
      <height>40</height>
     </rect>
    </property>
@@ -159,6 +146,9 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>
