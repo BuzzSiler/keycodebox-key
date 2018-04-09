@@ -2,7 +2,6 @@
 #define DLGFINGERPRINTVERIFY_H
 
 #include <QDialog>
-#include "dlgfullkeyboard.h"
 
 namespace Ui {
   class CDlgFingerprintVerify;
@@ -23,7 +22,6 @@ class CDlgFingerprintVerify : public QDialog
         void __onUpdateVerifyFingerprintDialog(bool result, QString message);
 
     private slots:
-//        void on_buttonBoxCancel_clicked();
         void on_bbClose_clicked();
 
     public slots:
@@ -31,7 +29,6 @@ class CDlgFingerprintVerify : public QDialog
 
     private:
         Ui::CDlgFingerprintVerify *ui;
-        void shutdown();
 
 };
 

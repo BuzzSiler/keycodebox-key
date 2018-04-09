@@ -2,8 +2,6 @@
 #define DLGSMTP_H
 
 #include <QDialog>
-#include "clickablelabel.h"
-#include "dlgfullkeyboard.h"
 
 namespace Ui {
 class CDlgSMTP;

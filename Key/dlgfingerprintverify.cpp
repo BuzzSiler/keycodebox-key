@@ -3,7 +3,6 @@
 
 #include <QDebug>
 
-#include "dlgfullkeyboard.h"
 #include "kcbcommon.h"
 
 CDlgFingerprintVerify::CDlgFingerprintVerify(QWidget *parent) :
@@ -11,24 +10,12 @@ CDlgFingerprintVerify::CDlgFingerprintVerify(QWidget *parent) :
     ui(new Ui::CDlgFingerprintVerify)
 {
     ui->setupUi(this);
-    //  CDlgFingerprintVerify::showFullScreen();
     setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
 CDlgFingerprintVerify::~CDlgFingerprintVerify()
 {
 }
-
-void CDlgFingerprintVerify::shutdown()
-{
-}
-
-//void CDlgFingerprintVerify::on_buttonBoxCancel_clicked()
-//{
-//    KCB_DEBUG_ENTRY;
-//    emit __onVerifyFingerprintDialogCancel();
-//    KCB_DEBUG_EXIT;
-//}
 
 void CDlgFingerprintVerify::on_bbClose_clicked()
 {
