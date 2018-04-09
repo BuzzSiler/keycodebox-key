@@ -30,7 +30,6 @@ SOURCES += main.cpp\
     securityadmin.cpp \
     securitycontroller.cpp \
     securityuser.cpp \
-    #frmcodeentry.cpp \
     frmusercode.cpp \
     lcdgraphicscontroller.cpp \
     systemcontroller.cpp \
@@ -94,7 +93,6 @@ HEADERS  += keycodeboxmain.h \
     securityadmin.h \
     securitycontroller.h \
     securityuser.h \
-    #frmcodeentry.h \
     frmusercode.h \
     lcdgraphicscontroller.h \
     systemcontroller.h \
