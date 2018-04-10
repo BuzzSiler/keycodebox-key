@@ -25,7 +25,8 @@ public:
     void initializeSignals();
 
     static QDateTime &roundDateTime(uint32_t res, QDateTime &datetime);
-//    std::string encryptDecrypt(uint32_t nVal, std::string toEncrypt, std::string key);
+
+    void getAllCodes1(QStringList& codes1);
 private:
     CSecurityUser       *_pSecurityUser;      // Default no access
     CModelSecurity      _modelSecurity;
@@ -47,9 +48,9 @@ signals:
     void    __OnRequireCodeTwo();
     void    __OnAdminSecurityCheckOk(QString type);
     void    __OnAdminSecurityCheckFailed();
-    void    __OnSecurityCheckSuccess(int doorNum);
+    void __OnSecurityCheckSuccess(QString);
 
-    void    __OnSecurityCheckSuccessWithAnswers(int doorNum, QString answer1, QString answer2, QString answer3);
+    void    __OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
     
     void    __OnSecurityCheckedFailed();
     void    __OnSecurityCheckTimedOut();
@@ -77,31 +78,31 @@ signals:
     void    __OnUpdatedCodeState(bool bSuccess);
     
 signals:
-    void __OnReadLockSet(int nLockNum, QDateTime start, QDateTime end);
+    void __OnReadLockSet(QString nLockNum, QDateTime start, QDateTime end);
     void __OnLockSet(CLockSet *pLockSet);
     
     void __TrigEnrollFingerprint(QString sCode);
     void __TrigEnrollFingerprintDialog(QString);
     
-    void __TrigQuestionUserDialog(int,QString,QString,QString);
-    void __TrigQuestionUser(int,QString,QString,QString);
+    void __TrigQuestionUserDialog(QString,QString,QString,QString);
+    void __TrigQuestionUser(QString,QString,QString,QString);
 
-    void __OnSuccessfulQuestionUsersAnswers(int doorNum, QString answer1, QString answer2, QString answer3);
+    void __OnSuccessfulQuestionUsersAnswers(QString lockNum, QString answer1, QString answer2, QString answer3);
     void __OnQuestionUserCancelled();
     public slots:
   
   void OnEnrollFingerprint(QString sCode) { emit __TrigEnrollFingerprint(sCode); }
   void OnEnrollFingerprintDialog(QString sCode) { emit __TrigEnrollFingerprintDialog(sCode); }
   
-  void OnQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3)
+  void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3)
   {
-    emit __TrigQuestionUser(doorNum,question1,question2,question3);
-    emit __TrigQuestionUserDialog(doorNum,question1,question2,question3);
+    emit __TrigQuestionUser(lockNum,question1,question2,question3);
+    emit __TrigQuestionUserDialog(lockNum,question1,question2,question3);
   }
 
-  void OnQuestionUserAnswers(int doorNum, QString answer1, QString answer2, QString answer3)
+  void OnQuestionUserAnswers(QString lockNum, QString answer1, QString answer2, QString answer3)
   {
-    emit __OnSuccessfulQuestionUsersAnswers(doorNum,answer1,answer2,answer3);
+    emit __OnSuccessfulQuestionUsersAnswers(lockNum,answer1,answer2,answer3);
   }
 
   void OnQuestionUserCancel()
@@ -109,21 +110,28 @@ signals:
     emit __OnQuestionUserCancelled();
   }
   
-  void OnReadLockSet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockSet(nLockNum, start, end); }
-  void OnLockSet(CLockSet *pSet) { emit __OnLockSet(pSet); }
+  void OnReadLockSet(QString nLockNum, QDateTime start, QDateTime end) { 
+      qDebug() << "SLOT: SecurityController -> OnReadLockSet";
+      emit __OnReadLockSet(nLockNum, start, end); 
+  }
+  void OnLockSet(CLockSet *pSet) { 
+      qDebug() << "SLOT: SecurityController -> OnLockSet";
+      emit __OnLockSet(pSet); 
+  }
 
 signals:
-    void __OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end);
+    void __OnReadLockHistorySet(QString nLockNum, QDateTime start, QDateTime end);
     void __OnLockHistorySet(CLockHistorySet *pLockSet);
 public slots:
-    void OnReadLockHistorySet(int nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(nLockNum, start, end); }
+    void OnReadLockHistorySet(QString nLockNum, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(nLockNum, start, end); }
     void OnLockHistorySet(CLockHistorySet *pSet) { emit __OnLockHistorySet(pSet); }
 
 signals:
-    void __RequestLastSuccessfulLogin();
+    void __RequestLastSuccessfulLogin(QString locknums, QString answer1, QString answer2, QString answer3);
     void __OnLastSuccessfulLogin(CLockHistoryRec *);
 public slots:
-    void RequestLastSuccessfulLogin();
+    void RequestLastSuccessfulLogin(QString locknums);
+    void RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3);
     void OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory);
 
 signals:
@@ -152,8 +160,8 @@ public slots:
     void OnRequireCodeTwo();
     void OnAdminSecurityCheckOk(QString type);
     void OnAdminSecurityCheckFailed();
-    void OnSecurityCheckSuccess(int doorNum);
-    void OnSecurityCheckSuccessWithAnswers(int doorNum, QString answer1, QString answer2, QString answer3);
+    void OnSecurityCheckSuccess(QString lockNums);
+    void OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3);
     void OnSecurityCheckedFailed();
     void OnSecurityCheckTimedOut();
 

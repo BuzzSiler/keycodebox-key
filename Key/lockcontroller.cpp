@@ -106,8 +106,34 @@ void CLockController::openLock(uint16_t nLockNum)
 
         QByteArray response;
         int num_bytes = _pport->ReadData(response);
+        Q_UNUSED(num_bytes);
     }
 }
+
+void CLockController::openLocks(QString lockNums)
+{
+    // lockNums is a string representation of a list of locks to be opened
+    //    e.g. 1,2,5,16,22,23,30
+    //    - If a single lock is specified, there will be no commas
+    //         e.g. 5
+    //    - If more than one lock is specified, then
+    //         e.g. 1,4,6
+    // Note: No spaces will present
+
+    if (lockNums.contains(','))
+    {
+        QStringList list_str = lockNums.split(',');
+        foreach (QString lock_str, list_str)
+        {
+            openLock(lock_str.toInt());
+        }
+    }
+    else
+    {
+        openLock(lockNums.toInt());
+    }
+}
+
 
 /**
  * @brief CLockController::openLockWithPulse
@@ -185,6 +211,7 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
 
         QByteArray response;
         int num_bytes = _pport->ReadData(response);        
+        Q_UNUSED(num_bytes);
     }
 }
 
@@ -335,31 +362,4 @@ uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
 void CLockController::OnLocksStatusRequest()
 {
     emit __OnLocksStatus(*_plockStatus);
-}
-
-/**
- * @brief CLockController::isLockLock
- * @param nLockNum value from 1 to 64
- * @return 1 = Lock state has been read and the Lock lock solenoid is connect, 0 = Lock state read and not solenoid not connected,
- *   -1 = Lock state is not read
- */
-int CLockController::isLock(uint16_t nLockNum)
-{
-    Q_UNUSED(nLockNum);
-    return 1;
-//    if( _bLockStateRead )
-//    {
-//        // Test
-//        uint64_t    un64Mask = 0x0000000000000001;
-//        uint64_t    un64LockNum = (unsigned long long)nLockNum - 1LL;  // Set Lock num to zero based number
-//        if ((_un64LockLocks & (un64Mask << un64LockNum)) != 0 )
-//        {
-//            return 1;
-//        } else {
-//            return 0;
-//        }
-//    } else {
-//        return -1;
-//    }
-
 }

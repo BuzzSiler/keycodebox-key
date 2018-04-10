@@ -127,17 +127,17 @@ std::string CUSBController::getDevicePortString(QString deviceType, QString filt
     //sPort = sOutput.substr(devicePos+deviceLength, devicePos+deviceLength);
     //std::cout << "\tport:" << sPort;
     if(devicePos > -1)
-      {
-	sPort = sOutput[devicePos+deviceLength];
-	std::cout << "\tport:" << sPort;
-	foundPort = true;
-      }
+    {
+        sPort = sOutput[devicePos+deviceLength];
+        std::cout << "\tport:" << sPort;
+        foundPort = true;
+    }
     
     if(!foundPort)
-      {
-	std::cout << "\tnot found! returning/n";
-	return "";
-      }
+    {
+        std::cout << "\tnot found! returning/n";
+        return "";
+    }
     
     sPort += "\0x00";
 

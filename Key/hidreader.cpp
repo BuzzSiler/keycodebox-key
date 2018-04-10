@@ -15,7 +15,8 @@ CHWKeyboardReader::CHWKeyboardReader(QObject *parent) :
 
 CHWKeyboardReader::~CHWKeyboardReader()
 {
-    if(_handle) {
+    if(_handle) 
+    {
         hid_close(_handle);
     }
 }
@@ -34,57 +35,60 @@ void CHWKeyboardReader::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 
 bool CHWKeyboardReader::floatXInputDevice()
 {
-  FILE *pF;
-  
-  std::string filterString = "'HID OMNIKEY 5427 CK'";
-  std::string systemCmd = "xinput list | grep " + filterString;
-  std::string sOutput = "";
-  std::string parseToken = "id=";
-  std::string xInputId = "";
-  std::string floatCmd = "xinput float ";
-  
-  pF = popen(systemCmd.c_str(), "r");
-  if(!pF)
+    FILE *pF;
+
+    std::string filterString = "'HID OMNIKEY 5427 CK'";
+    std::string systemCmd = "xinput list | grep " + filterString;
+    std::string sOutput = "";
+    std::string parseToken = "id=";
+    std::string xInputId = "";
+    std::string floatCmd = "xinput float ";
+
+    pF = popen(systemCmd.c_str(), "r");
+    if(!pF)
     {
-      qDebug() << "CHWKeyboardReader::floatXInputDevice(), failed poppen()";
-      return false;
+        qDebug() << "CHWKeyboardReader::floatXInputDevice(), failed poppen()";
+        return false;
     }
 
-  ExtractCommandOutput(pF, sOutput);
-  fclose(pF);
-  
-  qDebug() << "CHWKeyboardReader::floatXInputDevice(), sOuput = " << QString::fromStdString(sOutput);
+    ExtractCommandOutput(pF, sOutput);
+    fclose(pF);
 
-  size_t idPos = sOutput.find(parseToken);
-  
-  if( idPos != std::string::npos )
-  {
-      xInputId = sOutput.substr(idPos + parseToken.length(), 1);
+    qDebug() << "CHWKeyboardReader::floatXInputDevice(), sOuput = " << QString::fromStdString(sOutput);
 
-      qDebug() << "CHWKeyboardReader::floatXInputDevice(), float xinput id: " << QString::fromStdString(xInputId);
+    size_t idPos = sOutput.find(parseToken);
 
-      floatCmd += xInputId;
-      std::system(floatCmd.c_str());
-      return true;
-  }
+    if( idPos != std::string::npos )
+    {
+        xInputId = sOutput.substr(idPos + parseToken.length(), 1);
 
-  return false;
+        qDebug() << "CHWKeyboardReader::floatXInputDevice(), float xinput id: " << QString::fromStdString(xInputId);
+
+        floatCmd += xInputId;
+        std::system(floatCmd.c_str());
+        return true;
+    }
+
+    return false;
 }
 
 bool CHWKeyboardReader::openDeviceHandle()
 {
 
-  //legacy code!
-  // Open the device using the VID, PID,
+    //legacy code!
+    // Open the device using the VID, PID,
     // and optionally the Serial number.
     _handle = hid_open(_unVID, _unPID, NULL);
 
-    if(_handle) {
+    if(_handle) 
+    {
         qDebug() << "hid_opened!\n";
         hid_set_nonblocking(_handle, 1);
 	floatXInputDevice();
         return true;
-    } else {
+    } 
+    else 
+    {
         qDebug() << "failed to open hid\n";
         return false;
     }
@@ -93,7 +97,8 @@ bool CHWKeyboardReader::openDeviceHandle()
 
 bool CHWKeyboardReader::closeDeviceHandle()
 {
-    if(_handle) {
+    if(_handle) 
+    {
         hid_close(_handle);
         _handle = 0;
     }
@@ -111,9 +116,12 @@ unsigned char CHWKeyboardReader::convertHIDKeyboardChar(unsigned char byIn)
       '1','2','3','4','5','6','7','8','9','0',
     0x0d };
 
-    if(sizeof(aConvertTable) >= (int)byIn) {
+    if(sizeof(aConvertTable) >= (int)byIn) 
+    {
         return aConvertTable[(int)byIn];
-    } else {
+    } 
+    else 
+    {
         return 0x00;
     }
 }
@@ -151,7 +159,8 @@ QString CHWKeyboardReader::readHIDReader()
     while(bEndFound == false)
     {
         res = 0;
-        while (res == 0) {
+        while (res == 0) 
+        {
             res = hid_read(_handle, buf, sizeof(buf));
             if (res < 0)
             {
@@ -160,11 +169,13 @@ QString CHWKeyboardReader::readHIDReader()
             usleep(50*1000);  // 50 ms
         }
         //QByteArray array((char*)buf, res);
-        if(buf[2] == 0x28) {
+        if(buf[2] == 0x28) 
+        {
             // Enter key found
             bEndFound = true;
         }
-        else if(buf[2] != 0x00) {
+        else if(buf[2] != 0x00) 
+        {
             qDebug() << "Byte:" << QVariant(buf[2]).toString();
             strHID += convertHIDKeyboardChar(buf[2]);
             qDebug() << "HID:" << strHID.c_str();
@@ -176,23 +187,19 @@ QString CHWKeyboardReader::readHIDReader()
 	    strResult += strHID[i];
 	    digitCount++;
     }
-
-    qDebug() << "HID RESULT:" << strResult.c_str();
-    qDebug() << "HID RESULT LENGTH: " << strResult.length();
-    qDebug() << "\n\tATTENTION: Observed new HID code: " << QString::number(strResult[0]) << QString::number(strResult[1]) << QString::number(strResult[2]) << QString::number(strResult[3]) << QString::number(strResult[4]);
-
-    // note that these keys are printed out in reverse for correct ordering
     
     std::string xdotool = "xdotool key ";
     for(i = digitCount - 1; i > -1; i--)
-      {
-	std::string tempCmd = xdotool + strResult[i];
-	qDebug() << "tempCmd: " << QString::fromStdString(tempCmd);
-	std::system(tempCmd.c_str());
-	usleep(50);
-      }
+    {
+        std::string tempCmd = xdotool + strResult[i];
+        qDebug() << "tempCmd: " << QString::fromStdString(tempCmd);
+        std::system(tempCmd.c_str());
+        usleep(50);
+    }
     
-    return strResult.c_str();
+    // Note: It is necessary to reverse the string when creating the xdotool command,
+    // but we must return the code in the order in was received.
+    return strHID.c_str();
 }
 
 
@@ -205,9 +212,12 @@ QString CHWKeyboardReader::convertHexStringToNumString(QString inHex)
     }
 
     unsigned int unValue = inHex.toUInt(&bOk, 16);
-    if(bOk) {
+    if(bOk) 
+    {
         return QVariant( (unsigned int)unValue).toString();
-    } else {
+    } 
+    else 
+    {
         return "";
     }
 }
@@ -232,24 +242,26 @@ void CHWKeyboardReader::readHIDReaderLoop()
             if(sCardData.size() > 0 )
             {
                 qDebug() << "Code before conversion:" << sCardData;
+// It doesn't make any sense to convert these values.  The HID code
+// is not a numbers, it's characters and so it should be treated as
+// such.  Converting it to a number causes it to not match what's in
+// the database, i.e., there is no conversion done when assigning the
+// code because xdotool inserts the text directly into the LineEdit;
+// nor, should there be.  Use the code as presented.
+#ifdef CODE_WITH_NO_PURPOSE
                 sCardData = convertHexStringToNumString(sCardData);
                 qDebug() << "Code after conversion:" << sCardData;
+#endif                
                 emit __onHIDSwipeCodes(sCardData, "");
             }
-        } catch (const std::runtime_error &e)
+        } 
+        catch (const std::runtime_error &e)
         {
             qDebug() << "readHIDReaderLoop() runtime error:\t" << e.what();
         }
     }
 }
 
-/**
- * @brief CHIDReader::parseCardReaderCodes
- * @param sCardData
- * @param pcode1
- * @param pcode2
- * @return
- */
 int CHWKeyboardReader::parseHIDReaderCodes(QString sCardData, QString *pcode1, QString *pcode2)
 {
     // Parse the card data for codes

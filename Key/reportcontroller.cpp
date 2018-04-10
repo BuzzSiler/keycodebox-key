@@ -43,7 +43,7 @@ void CReportController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 QString CReportController::createNewFileName()
 {
     QDateTime   now = QDateTime::currentDateTime();
-    QString strFileName = "SafePak_" + now.toString("yyyy-MM-dd-HH_mm_ss") + ".txt";
+    QString strFileName = "KeyCodeBox_" + now.toString("yyyy-MM-dd-HH_mm_ss") + ".txt";
     return strFileName;
 }
 
@@ -54,7 +54,7 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
     // Predictive - so history rec
     CLockHistoryRec *plockHistoryRec;
     QString strFileName = createNewFileName();
-    QDir    dir(adminInfo->getReportDirectory().c_str());
+    QDir    dir(adminInfo->getReportDirectory());
     *ppFile = new QFile(dir.absoluteFilePath(strFileName));
 
     if(!(*ppFile)) {
@@ -62,55 +62,63 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
 
         return;
     }
-    // Check for directory "SafePakReports"
+    // Check for directory "KeyCodeBoxReports"
     // Create if it doesn't exist
     if(!dir.exists())
     {
         qDebug() << " Path doesn't exist. Creating entire path";
-        dir.mkpath(adminInfo->getReportDirectory().c_str());
+        dir.mkpath(adminInfo->getReportDirectory());
     }
     if((*ppFile)->open(QIODevice::ReadWrite))
     {
         qDebug() << "CReportController::buildReportFile() ... file open!:" << dir.absoluteFilePath(strFileName);
 
         QDateTime dtAccess;
-        QString sDesc, body;
-        int nLockNum;
-	QString question1, question2, question3;
+        QString sDesc;
+        QString body;
+        QString LockNums;
+	    QString question1, question2, question3;
         QTextStream stream( *ppFile );
-        stream << "SafePak Access History." << endl;
+        stream << "KeyCodeBox Access History." << endl;
 
-        for(CLockHistorySet::Iterator itor = pLockHistorySet->begin(); itor != pLockHistorySet->end(); itor++) {
-            plockHistoryRec = itor.value();
-            //
+        auto itor = pLockHistorySet->getIterator();
+
+        while (itor.hasNext())
+        {
+            plockHistoryRec = itor.next();
+            
             body = "";
 
             dtAccess = plockHistoryRec->getAccessTime();
-            sDesc = plockHistoryRec->getDescription().c_str();
-            nLockNum = plockHistoryRec->getLockNum();
+            sDesc = plockHistoryRec->getDescription();
+            LockNums = plockHistoryRec->getLockNums();
 	    
-            body = QString("Lock #") + QVariant(nLockNum).toString();
+            body = QString("%1 #%2").arg(tr("Lock"), QVariant(LockNums).toString());
 
             if( sDesc.size() > 0 )
             {
-                body += " user: [" + sDesc + "]";
+                body += QString(" %1: [%2]").arg(tr("user"), sDesc);
             }
-            body += " accessed:" + dtAccess.toString("MM/dd/yyyy HH:mm:ss");
-            std::string code_one = plockHistoryRec->getCode1();
-            std::string code_two = plockHistoryRec->getCode2();
-	    std::string question1 = plockHistoryRec->getQuestion1();
-	    std::string question2 = plockHistoryRec->getQuestion2();
-	    std::string question3 = plockHistoryRec->getQuestion3();
-            body += " code #1:" + QString(code_one.c_str());
-            body += " code #2:" + QString(code_two.c_str());
-	    body += " question #1:" + QString(question1.c_str());
-	    body += " question #2:" + QString(question2.c_str());
-	    body += " question #3:" + QString(question3.c_str());
+            body += QString(" %1: %2").arg(tr("accessed"), dtAccess.toString("MM/dd/yyyy HH:mm:ss"));
+
+            QString code_one = plockHistoryRec->getCode1();
+            QString code_two = plockHistoryRec->getCode2();
+            QString question1 = plockHistoryRec->getQuestion1();
+            QString question2 = plockHistoryRec->getQuestion2();
+            QString question3 = plockHistoryRec->getQuestion3();
+
+            body += QString(" %1 #1:%2").arg(tr("code")).arg(code_one);
+            body += QString(" %1 #2:%2").arg(tr("code")).arg(code_two);
+            body += QString(" %1 #1:%2").arg(tr("question")).arg(question1);
+            body += QString(" %1 #2:%2").arg(tr("question")).arg(question2);
+            body += QString(" %1 #3:%2").arg(tr("question")).arg(question3);
             stream << body << endl;
         }
         stream.flush();
         (*ppFile)->close();
-    } else {
+    } 
+    else 
+    {
         qDebug() << "can't open file: " << (*ppFile)->errorString();
         qDebug() << "CReportController::buildReportFile() ... can't open file!:" << dir.absoluteFilePath(strFileName);
         delete *ppFile;
@@ -118,7 +126,7 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
     }
 }
 
-void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd, int nLockNum)
+void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd)
 {
     requestCurrentAdminRecord();
 
@@ -134,18 +142,20 @@ void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTim
     {
         QFile       *pFile = NULL;
         CLockHistorySet *pHistorySet = NULL;
-        processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, nLockNum);
+        processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         if(pHistorySet) delete pHistorySet;
         if(pFile) delete pFile;
     }
 }
 
-void CReportController::processLockCodeHistoryReport(CLockHistorySet *_pHistorySet, QFile *pFile, QDateTime &dtReportStart, QDateTime &dtReportEnd, int nLockNum)
+void CReportController::processLockCodeHistoryReport(CLockHistorySet *_pHistorySet, 
+                                                     QFile *pFile, 
+                                                     QDateTime &dtReportStart, 
+                                                     QDateTime &dtReportEnd)
 {
     qDebug() << "CReportController::processLockCodeHistoryReport()";
 
     Q_UNUSED(_pHistorySet);
-    Q_UNUSED(nLockNum);
 
     _pFile = pFile;
     _dtReportStart = dtReportStart;
@@ -226,9 +236,9 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
         {
             dtReportStart = date.addSecs(-3600);
             dtReportEnd = date.currentDateTime();
-            int         nLockNum = -1;
+            QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, nLockNum);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     } else if(dtFreq == QDateTime(QDate(1,1,1), QTime(12,0)))
     { // Every 12 hours
@@ -237,9 +247,9 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
         {
             dtReportStart = date.addSecs(-3600 * 12);
             dtReportEnd = date.currentDateTime();
-            int         nLockNum = -1;
+            QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, nLockNum);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     } else if(dtFreq == QDateTime(QDate(1,1,1), QTime(23,59)))
     {  // Daily
@@ -248,9 +258,9 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
         {
             dtReportStart = date.addDays(-1);
             dtReportEnd = date.currentDateTime();
-            int         nLockNum = -1;
+            QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, nLockNum);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     } else if(dtFreq == QDateTime(QDate(1,1,7), QTime(0,0)))
     {   // Weekly
@@ -259,9 +269,9 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
         {
             dtReportStart = date.addDays(-7);
             dtReportEnd = date.currentDateTime();
-            int         nLockNum = -1;
+            QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, nLockNum);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     } else if(dtFreq == QDateTime(QDate(1,12,1), QTime(0,0)))
     {   // Monthly
@@ -270,9 +280,9 @@ bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStar
         {
             dtReportStart = date.addMonths(-1);
             dtReportEnd = date.currentDateTime();
-            int         nLockNum = -1;
+            QString         LockNums;
             // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd, nLockNum);
+            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
         }
     }
     if(pHistorySet)
@@ -300,9 +310,12 @@ void CReportController::OnCheckIfReportingTimeEvent()
     // Check if we need to send a report.
     QDateTime   dtNow = QDateTime::currentDateTime();
     QDateTime dtReportStart, dtReportEnd;
-    if(!timetoSendReport(dtNow, dtReportStart, dtReportEnd)) {
+    if(!timetoSendReport(dtNow, dtReportStart, dtReportEnd)) 
+    {
         return;
-    } else {
+    } 
+    else 
+    {
         _dtLastReportDate = QDateTime::currentDateTime();
     }
 
@@ -317,18 +330,18 @@ void CReportController::PrepareToSendEmail(CAdminRec *admin, QFile *pFile)
 
     qDebug() << "Sending email";
 
-    QString SMTPSvr = admin->getSMTPServer().c_str();
+    QString SMTPSvr = admin->getSMTPServer();
     int SMTPPort = admin->getSMTPPort();
     int SMTPType = admin->getSMTPType();
 
-    QString SMTPUser = admin->getSMTPUsername().c_str();
-    QString SMTPPW = admin->getSMTPPassword().c_str();
+    QString SMTPUser = admin->getSMTPUsername();
+    QString SMTPPW = admin->getSMTPPassword();
 
-    QString from = admin->getAdminEmail().c_str();
-    QString to = admin->getAdminEmail().c_str();
-    QString subject = "Lock Box History Report";
+    QString from = admin->getAdminEmail();
+    QString to = admin->getAdminEmail();
+    QString subject = tr("Lock Box History Report");
 
-    QString body = "SafePak report :" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString body = QString("KeyCodeBox %1 :%2").arg(tr("report")).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
 
     OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, pFile );
 }
@@ -341,8 +354,8 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
                                     const QString &subject, const QString &body, const QFile *pfileAttach)
 {
     qDebug() << "Sending Email:" << SMTPServer;
-    qDebug() << "  Port:" << QVariant(SMTPPort).toString();
-    qDebug() << "  Type:" << QVariant(SMTPType).toString();
+    qDebug() << "  Port:" << QString::number(SMTPPort);
+    qDebug() << "  Type:" << QString::number(SMTPType);
     qDebug() << "  User:" << SMTPUsername;
     qDebug() << "  PW  :" << SMTPPassword;
     qDebug() << "  from:" << from;

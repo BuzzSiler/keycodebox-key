@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Edit Code</string>
   </property>
   <widget class="QWidget" name="widgetEdit" native="true">
    <property name="enabled">
@@ -1673,7 +1673,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Clear</string>
+     <string/>
     </property>
    </widget>
    <widget class="QPushButton" name="clrSecondCode">

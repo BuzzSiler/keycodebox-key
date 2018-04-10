@@ -1,5 +1,5 @@
-#ifndef SAFEPAKMAIN_H
-#define SAFEPAKMAIN_H
+#ifndef KEYCODEBOXMAIN_H
+#define KEYCODEBOXMAIN_H
 
 #include <QMainWindow>
 #include <QGraphicsScene>
@@ -14,7 +14,6 @@
 #include "frmadmininfo.h"
 #include "frmadminpassword.h"
 #include "dlgfingerprint.h"
-#include "dlgfingerprintverify.h"
 #include "dlgquestions.h"
 
 class CClickableGraphicsItem;
@@ -39,7 +38,6 @@ private:
     CFrmAdminInfo       *_pfAdminInfo;
 
     CDlgFingerprint *_pdFingerprint;
-    CDlgFingerprintVerify *_pdFingerprintVerify;
 
     CDlgQuestions *_pQuestions;
     
@@ -87,9 +85,8 @@ private slots:
     void OnUserFingerprintCodeTwo(QString sCode2);
 
     void OnEnrollFingerprintDialog(QString sCode);
-    void OnVerifyFingerprintDialog();
 
-    void OnQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3);
+    void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3);
     void OnQuestionUserDialogClose();
     
 private:
@@ -101,4 +98,4 @@ protected:
 
 };
 
-#endif // SAFEPAKMAIN_H
+#endif // KEYCODEBOXMAIN_H

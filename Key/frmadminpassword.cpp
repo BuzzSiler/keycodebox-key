@@ -132,7 +132,7 @@ void CFrmAdminPassword::OnNewMessage(QString sMsg, int nDurationMS)
 
 void CFrmAdminPassword::ResetPlaceholderText()
 {
-    ui->edPassword1->setPlaceholderText("<Enter Password>");
+    ui->edPassword1->setPlaceholderText(tr("<Enter Password>"));
     this->OnEnableKeyboard(true);
 }
 
@@ -572,10 +572,10 @@ void CFrmAdminPassword::on_btnShowPassword_clicked(bool checked)
 {
     if(checked) {
         ui->edPassword1->setEchoMode(QLineEdit::Normal);
-        ui->btnShowPassword->setText("Hide");
+        ui->btnShowPassword->setText(tr("Hide"));
     } else {
         ui->edPassword1->setEchoMode(QLineEdit::Password);
-        ui->btnShowPassword->setText("Show");
+        ui->btnShowPassword->setText(tr("Show"));
     }
 }
 

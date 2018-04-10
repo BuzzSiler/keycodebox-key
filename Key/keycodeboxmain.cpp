@@ -1,4 +1,4 @@
-#include "safepakmain.h"
+#include "keycodeboxmain.h"
 #include "ui_mainwindow.h"
 
 #include <QDateTime>
@@ -17,6 +17,7 @@
 #include "hidreader.h"
 #include "magtekcardreader.h"
 #include "systemcontroller.h"
+#include "kcbcommon.h"
 
 MainWindow      *gpmainWindow;
 
@@ -125,7 +126,6 @@ void MainWindow::initialize() {
     _pfAdminPW = 0;
     _pfAdminInfo = 0;
     _pdFingerprint = 0;
-    _pdFingerprintVerify = 0;
     _pQuestions = 0;
 
     QCursor::setPos(848, 480);
@@ -157,25 +157,31 @@ void MainWindow::OnImageClicked()
 
 void MainWindow::OnDisplayTimeoutScreen()
 {
+    KCB_DEBUG_ENTRY;
+
     // hide any open screens to show the touch screen to start
-    if(_pfUsercode) {
+    if(_pfUsercode) 
+    {
         _pfUsercode->hide();
     }
-    if(_pfAdminPW) {
+    if(_pfAdminPW) 
+    {
         _pfAdminPW->hide();
     }
-    if(_pfAdminInfo) {
+    if(_pfAdminInfo) 
+    {
         _pfAdminInfo->hide();
     }
-    if(_pdFingerprint) {
+    if(_pdFingerprint) 
+    {
         _pdFingerprint->hide();
     }
-    if(_pdFingerprintVerify) {
-        _pdFingerprintVerify->hide();
-    }
-    if(_pQuestions) {
+    if(_pQuestions) 
+    {
         _pQuestions->hide();
     }
+
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayCodeDialog(QObject *psysController)
@@ -195,10 +201,10 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
 
         connect(psysController, SIGNAL(__onEnrollFingerprintDialog(QString)), this, SLOT(OnEnrollFingerprintDialog(QString)));
-        connect(psysController, SIGNAL(__onQuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
+        connect(psysController, SIGNAL(__onQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(QString,QString,QString,QString)));
 
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprint()), psysController, SLOT(OnVerifyFingerprint()));
-        connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), this, SLOT(OnVerifyFingerprintDialog()));
+        connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), psysController, SLOT(OnVerifyFingerprintDialog()));
         connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
 
 
@@ -210,21 +216,14 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
             _pdFingerprint->hide();
         }
 
-        if( !_pdFingerprintVerify )
-        {
-            _pdFingerprintVerify = new CDlgFingerprintVerify();
-            connect(_pdFingerprintVerify, SIGNAL(__onVerifyFingerprintDialogCancel()), psysController, SLOT(OnVerifyFingerprintDialogCancel()));
-            connect(psysController, SIGNAL(__onUpdateVerifyFingerprintDialog(bool, QString)), _pdFingerprintVerify, SLOT(OnUpdateVerifyFingerprintDialog(bool, QString)));
-            _pdFingerprintVerify->hide();
-        }
 
         if( !_pQuestions )
         {
             _pQuestions = new CDlgQuestions();
             _pQuestions->hide();
-            connect(psysController, SIGNAL(__onQuestionUserDialog(int,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(int,QString,QString,QString)));
+            connect(psysController, SIGNAL(__onQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(QString,QString,QString,QString)));
             connect(_pQuestions, SIGNAL(__OnQuestionsCancel()), psysController, SLOT(QuestionUserCancel()));
-            connect(_pQuestions, SIGNAL(__OnQuestionsSave(int,QString,QString,QString)), psysController, SLOT(AnswerUserSave(int,QString,QString,QString)));
+            connect(_pQuestions, SIGNAL(__OnQuestionsSave(QString,QString,QString,QString)), psysController, SLOT(AnswerUserSave(QString,QString,QString,QString)));
             connect(_pQuestions, SIGNAL(__OnQuestionsClose()), this, SLOT(OnQuestionUserDialogClose()));
         }
 
@@ -322,7 +321,7 @@ void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
  */
 void MainWindow::OnAdminSecurityCheckFailed()
 {
-    _pfAdminPW->OnNewMessage("Incorrect Password", 5000);
+    _pfAdminPW->OnNewMessage(tr("Incorrect Password"), 5000);
 }
 
 void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
@@ -332,7 +331,7 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
         _pfAdminInfo = new CFrmAdminInfo();
         _pfAdminInfo->setSystemController((CSystemController*)psysController);
     }
-    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(int)), _psystemController, SLOT(OnOpenLockRequest(int)));
+    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(QString, bool)), _psystemController, SLOT(OnOpenLockRequest(QString, bool)));
     connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
     connect(_pfAdminInfo, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(_pfAdminInfo, SIGNAL(__OnDisplayShowHideButton(bool)), _pfUsercode, SIGNAL(__OnDisplayShowHideButton(bool)));
@@ -397,22 +396,15 @@ void MainWindow::OnEnrollFingerprintDialog(QString sCode)
     _pdFingerprint->setOkDisabled(true);
 }
 
-void MainWindow::OnQuestionUserDialog(int doorNum, QString question1, QString question2, QString question3)
+void MainWindow::OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3)
 {
-    qDebug() << "MainWindow::OnQuestionUserDialog()";
-    _pQuestions->setValues(doorNum, question1, question2, question3);
+    KCB_DEBUG_ENTRY;
+    _pQuestions->setValues(lockNum, question1, question2, question3);
     _pQuestions->show();
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnQuestionUserDialogClose()
 {
     _pQuestions->hide();
-}
-
-void MainWindow::OnVerifyFingerprintDialog()
-{
-    qDebug() << "MainWindow::OnVerifyFingerprintDialog()";
-
-    _pdFingerprintVerify->show();
-    _pdFingerprintVerify->setMessage("");
 }

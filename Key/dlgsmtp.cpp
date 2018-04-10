@@ -2,8 +2,7 @@
 #include "ui_dlgsmtp.h"
 
 #include <QDebug>
-#include "dlgfullkeyboard.h"
-#include "clickablelabel.h"
+#include "kcbkeyboarddialog.h"
 
 CDlgSMTP::CDlgSMTP(QWidget *parent) :
     QDialog(parent),
@@ -11,35 +10,12 @@ CDlgSMTP::CDlgSMTP(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    _pKeyboard = NULL;
-    _pcurrentLabelEdit = NULL;
 }
 
 CDlgSMTP::~CDlgSMTP()
 {
-    shutdown();
     delete ui;
 }
-
-void CDlgSMTP::initializeKeyboard()
-{
-    _pKeyboard = new CDlgFullKeyboard();
-
-    connect(_pKeyboard, SIGNAL(__TextEntered(CDlgFullKeyboard*, CCurrentEdit *)), this, SLOT(OnTextEntered(CDlgFullKeyboard*, CCurrentEdit *)));
-    connect(_pKeyboard, SIGNAL(__OnCancelKeyboard(CDlgFullKeyboard*,CCurrentEdit*)), this, SLOT(OnCancelKeyboard(CDlgFullKeyboard*, CCurrentEdit *)));
-    connect(_pKeyboard, SIGNAL(__OnCloseKeyboard(CDlgFullKeyboard*)), this, SLOT(OnCloseKeyboard(CDlgFullKeyboard*)));
-}
-
-void CDlgSMTP::shutdown()
-{
-    if(_pKeyboard) {
-        delete _pKeyboard;
-    }
-    if( _pcurrentLabelEdit ) {
-        delete _pcurrentLabelEdit;
-    }
-}
-
 
 void CDlgSMTP::setValues(QString sSMTPServer, int nSMTPPort, int nSMTPType, QString sUsername, QString sPassword)
 {
@@ -56,13 +32,16 @@ void CDlgSMTP::setValues(QString sSMTPServer, int nSMTPPort, int nSMTPType, QStr
     ui->rbtnNone->setChecked(false);
     ui->rbtnSSL->setChecked(false);
     ui->rbtnTLS->setChecked(false);
-    if(nSMTPType == 0) {
+    if(nSMTPType == 0)
+    {
         ui->rbtnNone->setChecked(true);
     }
-    else if(nSMTPType == 1) {
+    else if(nSMTPType == 1)
+    {
         ui->rbtnSSL->setChecked(true);
     }
-    else if(nSMTPType == 2) {
+    else if(nSMTPType == 2)
+    {
         ui->rbtnTLS->setChecked(true);
     }
 }
@@ -76,65 +55,22 @@ void CDlgSMTP::getValues(QString &sSMTPServer, int &nSMTPPort, int &nSMTPType, Q
     sPassword = ui->lblPassword->text();
 
     if(ui->rbtnNone->isChecked())
-        nSMTPType = 0;
-    else if(ui->rbtnSSL->isChecked())
-        nSMTPType = 1;
-    else if(ui->rbtnTLS->isChecked())
-        nSMTPType = 2;
-
-}
-
-
-void CDlgSMTP::onStartEditLabel(QLabel* pLabel, QString sLabelText)
-{
-    qDebug() << "onStartEditLabel()";
-    if(!_pKeyboard) {
-        qDebug() << "initializing keyboard()";
-        initializeKeyboard();
-    }
-    qDebug() << "keyboard and CurrentEdit?";
-    if(_pKeyboard && _pcurrentLabelEdit)
     {
-        qDebug() << "...yes!";
-        _pKeyboard->setCurrentEdit(_pcurrentLabelEdit);
-        _pcurrentLabelEdit->setLabelToBeEdited(pLabel);
-        _pcurrentLabelEdit->setOriginalTextToEdit(pLabel->text());
-        _pcurrentLabelEdit->setLabelText(sLabelText);
-
-        qDebug() << "onStartEditLabel(): Showing Keyboard";
-        _pKeyboard->show();
-    } else if(!_pKeyboard) {
-        qDebug() << "No keyboard";
-    } else if(!_pcurrentLabelEdit) {
-        qDebug() << "No CurrentEdit";
+        nSMTPType = 0;
     }
-}
+    else if(ui->rbtnSSL->isChecked())
+    {
+        nSMTPType = 1;
+    }
+    else if(ui->rbtnTLS->isChecked())
+    {
+        nSMTPType = 2;
+    }
 
-void CDlgSMTP::OnTextEntered(CDlgFullKeyboard *pkeyboard, CCurrentEdit *pCurrEdit)
-{
-    Q_UNUSED(pkeyboard);
-    qDebug() << "SMTP OnTextEntered";
-    pCurrEdit->getLabelBeingEdited()->setText(pCurrEdit->getNewText());
-    _pKeyboard->hide();
-
-}
-
-void CDlgSMTP::OnCancelKeyboard(CDlgFullKeyboard *pkeyboard, CCurrentEdit *pCurrEdit)
-{
-    // Do nothing
-    Q_UNUSED(pkeyboard);
-    Q_UNUSED(pCurrEdit);
-}
-
-void CDlgSMTP::OnCloseKeyboard(CDlgFullKeyboard *pkeyboard)
-{
-    // Do nothing
-    Q_UNUSED(pkeyboard);
 }
 
 void CDlgSMTP::on_buttonBox_accepted()
 {
-    //do something
     emit __onSMTPDialogComplete(this);
 }
 
@@ -143,43 +79,42 @@ void CDlgSMTP::on_buttonBox_rejected()
     // Rejected
 }
 
-void CDlgSMTP::checkAndCreateCurrentLabelEdit()
+void CDlgSMTP::RunKeyboard(QString& text, bool numbersOnly)
 {
-    if(!_pcurrentLabelEdit) {
-        qDebug() << "creating CurrentEdit";
-        _pcurrentLabelEdit = new CCurrentEdit();
+    KcbKeyboardDialog kkd;
+
+    kkd.numbersOnly(numbersOnly);
+    kkd.setValue(text);
+    if (kkd.exec())
+    {
+        text = kkd.getValue();
     }
 }
 
 void CDlgSMTP::on_lblSMTPServer_clicked()
 {
-    //
-    qDebug() << "lblSMTPServer clicked";
-    checkAndCreateCurrentLabelEdit();
-    _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblSMTPServer, "SMTP Server Address");
+    QString text = ui->lblSMTPServer->text();
+    RunKeyboard(text);
+    ui->lblSMTPServer->setText(text);
 }
 
 void CDlgSMTP::on_lblSMTPPort_clicked()
 {
-    //
-    checkAndCreateCurrentLabelEdit();
-    _pcurrentLabelEdit->setNumbersOnly();
-    onStartEditLabel(ui->lblSMTPPort, "SMTP Server Port");
+    QString text = ui->lblSMTPPort->text();
+    RunKeyboard(text, true);
+    ui->lblSMTPPort->setText(text);
 }
 
 void CDlgSMTP::on_lblUsername_clicked()
 {
-    //
-    checkAndCreateCurrentLabelEdit();
-    _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblUsername, "User Name");
+    QString text = ui->lblUsername->text();
+    RunKeyboard(text);
+    ui->lblUsername->setText(text);
 }
 
 void CDlgSMTP::on_lblPassword_clicked()
 {
-    //
-    checkAndCreateCurrentLabelEdit();
-    _pcurrentLabelEdit->clearInputMasks();
-    onStartEditLabel(ui->lblPassword, "Password");
+    QString text = ui->lblPassword->text();
+    RunKeyboard(text);
+    ui->lblPassword->setText(text);
 }

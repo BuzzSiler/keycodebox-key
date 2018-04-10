@@ -16,21 +16,21 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>VNC Settings</string>
   </property>
-     <widget class="QPushButton" name="btnResetVNC">
-       <property name="geometry">
-	 <rect>
-	   <x>155</x>
-	   <y>210</y>
-	   <width>130</width>
-	   <height>45</height>
-	 </rect>
-       </property>
-       <property name="text">
-	 <string>Save</string>
-       </property>
-     </widget>
+  <widget class="QPushButton" name="btnResetVNC">
+   <property name="geometry">
+    <rect>
+     <x>155</x>
+     <y>210</y>
+     <width>130</width>
+     <height>45</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
@@ -109,7 +109,7 @@
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+    <item>
      <widget class="QLabel" name="lPort">
       <property name="text">
        <string>Port</string>
@@ -147,7 +147,7 @@
       </property>
      </widget>
     </item>
-     <item>
+    <item>
      <widget class="CClickableLabel" name="lblPassword">
       <property name="font">
        <font>
@@ -161,7 +161,7 @@
        <set>Qt::LinksAccessibleByMouse</set>
       </property>
      </widget>
-     </item>
+    </item>
    </layout>
   </widget>
  </widget>
