@@ -189,13 +189,13 @@ private:
     int                 _nRowSelected = 0;
     bool                _bAddingCode = false;
 
-    const char *fNever = "Never";
-    const char *fEach = "Each Activity";
-    const char *fHourly = "Hourly";
-    const char *fEvery12Hours = "Every 12 Hours";
-    const char *fDaily = "Daily";
-    const char *fWeekly = "Weekly";
-    const char *fMonthly = "Monthly";
+    QString fNever = tr("Never");
+    QString fEach = tr("Each Activity");
+    QString fHourly = tr("Hourly");
+    QString fEvery12Hours = tr("Every 12 Hours");
+    QString fDaily = tr("Daily");
+    QString fWeekly = tr("Weekly");
+    QString fMonthly = tr("Monthly");
 
     const int fLockNum = 0;
     const int fDesc = 1;

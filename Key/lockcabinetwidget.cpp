@@ -44,7 +44,7 @@ LockCabinetWidget::LockCabinetWidget(QWidget *parent, quint8 num_cabs, quint8 lo
         // Populate the cabinets dropdown
         ui->cbSelectedCabinet->addItem(
             QString("%1 - %2 (%4 .. %5)").
-                    arg("Cabinet").
+                    arg(tr("Cabinet")).
                     arg(cab_num).
                     arg(start, 3).
                     arg(stop, 3));

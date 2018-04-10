@@ -16,9 +16,9 @@ Smtp::Smtp( const QString &from, const QString &to, const QString &subject, cons
     connect(socket, SIGNAL(disconnectedFromHost()), this,
         SLOT(disconnected()));;
 
-    message = "To: " + to + "\n";
-    message.append("From: " + from + "\n");
-    message.append("Subject: " + subject + "\n");
+    message = tr("To: ") + to + "\n";
+    message.append(tr("From: ") + from + "\n");
+    message.append(tr("Subject: ") + subject + "\n");
     message.append(body);
     message.replace( QString::fromLatin1( "\n" ), QString::fromLatin1( "\r\n" ) );
     message.replace( QString::fromLatin1( "\r\n.\r\n" ),

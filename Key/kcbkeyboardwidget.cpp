@@ -48,7 +48,7 @@ KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
     // Map the click signal from the control buttons to the slot via a mapper
     for (int ii = 0; ii < m_control.length(); ++ii)
     {
-        if (m_control[ii]->text() == "Enter" || m_control[ii]->text() == "Close")
+        if (m_control[ii]->text() == tr("Enter") || m_control[ii]->text() == tr("Close"))
         {
             continue;
         }
@@ -140,7 +140,7 @@ void KcbKeyboardWidget::alphaClicked(QString value)
 
 void KcbKeyboardWidget::controlClicked(QString value)
 {
-    if (value == "Back")
+    if (value == tr("Back"))
     {
         QString value = ui->edText->text();
         int curr_pos = ui->edText->cursorPosition();
@@ -148,22 +148,22 @@ void KcbKeyboardWidget::controlClicked(QString value)
         ui->edText->setText(value);
         ui->edText->setCursorPosition(curr_pos - 1);
     }
-    else if (value == "Clear")
+    else if (value == tr("Clear"))
     {
         ui->edText->setText("");
     }
-    else if (value == "Lower" || value == "Upper")
+    else if (value == tr("Lower") || value == tr("Upper"))
     {
         if ( ui->pbCtrlUpperLower->isChecked() )
         {
-            ui->pbCtrlUpperLower->setText("Upper");
+            ui->pbCtrlUpperLower->setText(tr("Upper"));
         }
         else
         {
-            ui->pbCtrlUpperLower->setText("Lower");
+            ui->pbCtrlUpperLower->setText(tr("Lower"));
         }
     }
-    else if (value == "Space")
+    else if (value == tr("Space"))
     {
         updateValue(" ");
     }
