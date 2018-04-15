@@ -7,6 +7,14 @@
 #include "kcbutils.h"
 #include "kcbcommon.h"
 
+static const QString css_unpushed = "QPushButton[checkable=true]:enabled {color:\"black\"; background-color: \"red\"; font-weight:bold;}"
+                                    "QPushButton[checkable=true]:disabled{color:\"gray\"; font-weight:normal;}"
+                                    "QPushButton[checkable=true]:checked {color:\"black\"; background-color: \"green\"; font-weight:bold; border:none;}";
+
+static const QString css_pushed = "QPushButton[checkable=true]:enabled {color:\"black\"; font-weight:bold;}"
+                                  "QPushButton[checkable=true]:disabled{color:\"gray\"; font-weight:normal;}"
+                                  "QPushButton[checkable=true]:checked {color:\"black\"; background-color:\"green\"; font-weight:bold; border:5px;}";
+
 LockCabinetWidget::LockCabinetWidget(QWidget *parent, quint8 num_cabs, quint8 locks_per_cab) :
     QWidget(parent),
     m_num_cabs(num_cabs),
@@ -51,9 +59,6 @@ LockCabinetWidget::LockCabinetWidget(QWidget *parent, quint8 num_cabs, quint8 lo
 
         start += m_locks_per_cab;
     };
-
-    m_default_palette = m_lock_buttons[0]->palette();
-
 }
 
 LockCabinetWidget::~LockCabinetWidget()
@@ -93,6 +98,7 @@ void LockCabinetWidget::VectorToString(QVector<int> vtr, QString& str)
         {
             list << QString::number(item);
         }
+        list.sort();
         str = list.join(',');
     }
     else if (vtr.count() == 1)
@@ -228,23 +234,12 @@ void LockCabinetWidget::clrSelectedLocks(const QString& lock)
 
 void LockCabinetWidget::setWarning()
 {
-    foreach (auto button, m_lock_buttons)
-    {
-        QPalette pal = button->palette();
-        pal.setColor(QPalette::Button, QColor(Qt::red));
-        button->setAutoFillBackground(true);
-        button->setPalette(pal);
-        button->update();
-    }
-
+    setStyleSheet(css_unpushed);
 }
 
 void LockCabinetWidget::clrWarning()
 {
-    foreach (auto button, m_lock_buttons)
-    {
-        button->setPalette(m_default_palette);
-    }
+    setStyleSheet(css_pushed);
 }
 
 /* Set enabled locks */
@@ -338,6 +333,7 @@ void LockCabinetWidget::updateUi()
         m_lock_buttons[ii]->setChecked(p_cab->states[ii]);
         m_lock_buttons[ii]->setEnabled(p_cab->enabled[ii]);
         m_lock_buttons[ii]->setText(QString::number(p_cab->start + ii));
+
     }
 }
 

@@ -331,7 +331,7 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
         _pfAdminInfo = new CFrmAdminInfo();
         _pfAdminInfo->setSystemController((CSystemController*)psysController);
     }
-    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(QString, bool)), _psystemController, SLOT(OnOpenLockRequest(QString, bool)));
+    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(QString)), _psystemController, SLOT(OnOpenLockRequest(QString)));
     connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
     connect(_pfAdminInfo, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(_pfAdminInfo, SIGNAL(__OnDisplayShowHideButton(bool)), _pfUsercode, SIGNAL(__OnDisplayShowHideButton(bool)));

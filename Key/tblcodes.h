@@ -129,7 +129,8 @@ class CTblCodes
                               QString table,
                               QString condition);
 
-        void execSelectCodeSetQuery(QSqlQuery& qry, CLockSet **pLockSet);
+        void execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry, CLockSet **pLockSet);
+        bool containsMatchingEntries(const QStringList& s1, const QStringList& s2);
 
 };
 

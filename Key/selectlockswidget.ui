@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>761</width>
-    <height>413</height>
+    <width>848</width>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
   <widget class="QLabel" name="lblSelectedLocks">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>11</y>
+     <x>390</x>
+     <y>9</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -37,10 +37,10 @@
   <widget class="QListWidget" name="lstSelectedLocks">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>41</y>
+     <x>390</x>
+     <y>30</y>
      <width>221</width>
-     <height>361</height>
+     <height>401</height>
     </rect>
    </property>
    <property name="font">
@@ -55,7 +55,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>620</x>
+     <x>670</x>
      <y>290</y>
      <width>131</width>
      <height>51</height>
@@ -79,8 +79,8 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>620</x>
-     <y>351</y>
+     <x>670</x>
+     <y>350</y>
      <width>131</width>
      <height>51</height>
     </rect>
@@ -103,7 +103,7 @@
      <x>10</x>
      <y>10</y>
      <width>351</width>
-     <height>391</height>
+     <height>421</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="vloLockCabinet"/>

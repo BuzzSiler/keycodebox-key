@@ -15,7 +15,7 @@ class CDlgQuestions : public QDialog
         explicit CDlgQuestions(QWidget *parent = 0);
         ~CDlgQuestions();
 
-        void getValues(QString *question1, QString *question2, QString *question3);
+        void getValues(QString& question1, QString& question2, QString& question3);
         void setValues(QString lockNum, QString question1, QString question2, QString question3);
 
     signals:
@@ -30,17 +30,22 @@ class CDlgQuestions : public QDialog
         void on_edtAnswer2_clicked();
         void on_edtAnswer3_clicked();
 
-        void on_buttonBoxQuestions_accepted();
-        void on_buttonBoxQuestions_rejected();
+//        void on_bbOkCancel_accepted();
+//        void on_bbOkCancel_rejected();
 
         void on_clrAnswer1_clicked();
         void on_clrAnswer2_clicked();
         void on_clrAnswer3_clicked();
 
+        void on_bbOkCancel_accepted();
+
+        void on_bbOkCancel_rejected();
+
     private:
         QString _lockNum;
         Ui::CDlgQuestions *ui;
         void RunKeyboard(QString& text);
+        void enableOk();
 
 
 };

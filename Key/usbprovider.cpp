@@ -3,6 +3,10 @@
 #include <QDebug>
 #include "serialport.h"
 
+#define SP_BAUD_RATE (19200)
+#define SP_WRITE_TIMEOUT (500)
+#define SP_READ_TIMEOUT (500)
+
 // Lock Controller Strings
 static QString     _sFilterString0 = "USB-Serial.*ttyUSB";
 static QString     _sFilterString1 = "USB2.0-Ser.*ttyUSB";
@@ -94,7 +98,7 @@ SerialPort* UsbProvider::GetLockControllerDevice()
 
         if(!sDevice.empty())
         {
-            m_serialport = new SerialPort(QString::fromStdString(sDevice), 19200, 10, 10);
+            m_serialport = new SerialPort(QString::fromStdString(sDevice), SP_BAUD_RATE, SP_WRITE_TIMEOUT, SP_READ_TIMEOUT);
         }
     }
 

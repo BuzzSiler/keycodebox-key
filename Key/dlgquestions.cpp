@@ -2,6 +2,7 @@
 #include "ui_dlgquestions.h"
 #include <QDebug>
 #include "kcbkeyboarddialog.h"
+#include "kcbutils.h"
 
 CDlgQuestions::CDlgQuestions(QWidget *parent) :
     QDialog(parent),
@@ -9,43 +10,50 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
     ui(new Ui::CDlgQuestions)
 {
     ui->setupUi(this);
+
+    CDlgQuestions::showFullScreen();
+
+    ui->bbOkCancel->button(QDialogButtonBox::Ok)->setDisabled(true);
+    ui->bbOkCancel->button(QDialogButtonBox::Cancel)->setEnabled(true);
 }
 
 CDlgQuestions::~CDlgQuestions()
 {
+    Kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 
-void CDlgQuestions::getValues(QString *question1, QString *question2, QString *question3)
+void CDlgQuestions::getValues(QString& question1, QString& question2, QString& question3)
 {
-  *question1 = ui->edtAnswer1->text();
-  *question2 = ui->edtAnswer2->text();
-  *question3 = ui->edtAnswer3->text();
+  question1 = ui->edtAnswer1->text();
+  question2 = ui->edtAnswer2->text();
+  question3 = ui->edtAnswer3->text();
 }
 
 void CDlgQuestions::setValues(QString lockNum, QString question1, QString question2, QString question3)
 {
-  qDebug() << "Editing Questions, " << " question1: " << question1 << " question2: " << question2 << " question3: " << question3;
-  _lockNum = lockNum;
-  ui->label_question1->setText(question1);
-  ui->label_question2->setText(question2);
-  ui->label_question3->setText(question3);
+    _lockNum = lockNum;
 
-  ui->edtAnswer1->setText("");
-  ui->edtAnswer2->setText("");
-  ui->edtAnswer3->setText("");
-}
+    if (!question1.isEmpty())
+    {
+      ui->label_question1->setText(question1);
+      ui->edtAnswer1->setEnabled(true);
+      ui->edtAnswer1->setText("");
+    }
+    if (!question2.isEmpty())
+    {
+      ui->label_question2->setText(question2);
+      ui->edtAnswer2->setEnabled(true);
+      ui->edtAnswer2->setText("");
+    }
+    if (!question3.isEmpty())
+    {
+      ui->label_question3->setText(question3);
+      ui->edtAnswer3->setEnabled(true);
+      ui->edtAnswer3->setText("");
+    }
 
-void CDlgQuestions::on_buttonBoxQuestions_accepted()
-{
-    emit __OnQuestionsSave(_lockNum, ui->edtAnswer1->text(), ui->edtAnswer2->text(), ui->edtAnswer3->text());
-    emit __OnQuestionsClose();
-}
-
-void CDlgQuestions::on_buttonBoxQuestions_rejected()
-{
-    emit __OnQuestionsClose();
-    emit __OnQuestionsCancel();
+    enableOk();
 }
 
 void CDlgQuestions::RunKeyboard(QString& text)
@@ -63,35 +71,85 @@ void CDlgQuestions::on_edtAnswer1_clicked()
 {
     QString text = ui->edtAnswer1->text();
     RunKeyboard(text);
+    ui->clrAnswer1->setEnabled(!text.isEmpty());
     ui->edtAnswer1->setText(text);
+    enableOk();
 }
 
 void CDlgQuestions::on_edtAnswer2_clicked()
 {
-    QString text = ui->edtAnswer2->text();
-    RunKeyboard(text);
-    ui->edtAnswer2->setText(text);
+    if (ui->edtAnswer1->isEnabled())
+    {
+        QString text = ui->edtAnswer2->text();
+        RunKeyboard(text);
+        ui->clrAnswer2->setEnabled(!text.isEmpty());
+        ui->edtAnswer2->setText(text);
+    }
+    enableOk();
 }
 
 void CDlgQuestions::on_edtAnswer3_clicked()
 {
-    QString text = ui->edtAnswer3->text();
-    RunKeyboard(text);
-    ui->edtAnswer3->setText(text);
+    if (ui->edtAnswer3->isEnabled())
+    {
+        QString text = ui->edtAnswer3->text();
+        RunKeyboard(text);
+        ui->clrAnswer3->setEnabled(!text.isEmpty());
+        ui->edtAnswer3->setText(text);
+    }
+    enableOk();
 }
 
 void CDlgQuestions::on_clrAnswer1_clicked()
 {
-  ui->edtAnswer1->setText("");
+    ui->clrAnswer1->setDisabled(true);
+    ui->edtAnswer1->setText("");
+    ui->edtAnswer1->setFocus();
+    enableOk();
 }
 
 void CDlgQuestions::on_clrAnswer2_clicked()
 {
-  ui->edtAnswer2->setText("");
+    ui->clrAnswer2->setDisabled(true);
+    ui->edtAnswer2->setText("");
+    ui->edtAnswer2->setFocus();
+    enableOk();
 }
 
 void CDlgQuestions::on_clrAnswer3_clicked()
 {
-  ui->edtAnswer3->setText("");
+    ui->clrAnswer3->setDisabled(true);
+    ui->edtAnswer3->setText("");
+    ui->edtAnswer3->setFocus();
+    enableOk();
 }
 
+void CDlgQuestions::on_bbOkCancel_accepted()
+{
+    emit __OnQuestionsSave(_lockNum, ui->edtAnswer1->text(), ui->edtAnswer2->text(), ui->edtAnswer3->text());
+    emit __OnQuestionsClose();
+}
+
+void CDlgQuestions::on_bbOkCancel_rejected()
+{
+    emit __OnQuestionsClose();
+    emit __OnQuestionsCancel();
+}
+
+void CDlgQuestions::enableOk()
+{
+    bool q1_required = !ui->label_question1->text().isEmpty();
+    bool q2_required = !ui->label_question2->text().isEmpty();
+    bool q3_required = !ui->label_question3->text().isEmpty();
+
+    bool q1_specified = !ui->edtAnswer1->text().isEmpty();
+    bool q2_specified = !ui->edtAnswer2->text().isEmpty();
+    bool q3_specified = !ui->edtAnswer3->text().isEmpty();
+
+    bool q1_valid = !q1_required || (q1_required && q1_specified);
+    bool q2_valid = !q2_required || (q2_required && q2_specified);
+    bool q3_valid = !q3_required || (q3_required && q3_specified);
+
+    ui->bbOkCancel->button(QDialogButtonBox::Ok)->setEnabled(q1_valid && q2_valid && q3_valid);
+
+}
