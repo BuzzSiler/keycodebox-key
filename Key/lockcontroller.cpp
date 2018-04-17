@@ -107,6 +107,7 @@ void CLockController::openLock(uint16_t nLockNum)
 
         QByteArray response;
         int num_bytes = _pport->ReadData(response);
+        Q_UNUSED(num_bytes);
     }
 }
 
@@ -178,8 +179,8 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
         commands[2] -= 0x30;
 
         commands[4] |= seqNum;
-//        commands[4] |= 0x50;    // Send msg on Reverse Loop?
-//        commands[4] |= 0x80;    // Send msg on Fwd loop?
+        commands[4] |= 0x50;    // Send msg on Reverse Loop?
+        commands[4] |= 0x80;    // Send msg on Fwd loop?
 
         commands[5] = sPulseCount[0];
         commands[6] = sPulseOn[0];
