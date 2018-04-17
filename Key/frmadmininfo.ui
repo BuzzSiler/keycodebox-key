@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>848</width>
-    <height>460</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="baseSize">
@@ -26,14 +26,14 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>5</y>
+     <y>0</y>
      <width>848</width>
-     <height>455</height>
+     <height>480</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>16</pointsize>
     </font>
    </property>
    <property name="tabPosition">
@@ -484,7 +484,7 @@
        <item>
         <widget class="QCheckBox" name="chkUsePredictive">
          <property name="enabled">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="maximumSize">
           <size>
@@ -509,6 +509,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QLabel" name="lPredictiveCodeGenResolution">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -527,6 +530,9 @@
          </item>
          <item>
           <widget class="QSpinBox" name="spinCodeGenResolution">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -553,6 +559,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QLabel" name="lKey">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -571,6 +580,9 @@
          </item>
          <item>
           <widget class="CClickableLabel" name="lblKey">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -797,7 +809,7 @@
        <x>10</x>
        <y>250</y>
        <width>480</width>
-       <height>161</height>
+       <height>181</height>
       </rect>
      </property>
      <attribute name="headerCascadingSectionResizes">
@@ -938,7 +950,7 @@
      <property name="geometry">
       <rect>
        <x>550</x>
-       <y>280</y>
+       <y>290</y>
        <width>251</width>
        <height>45</height>
       </rect>
@@ -956,7 +968,7 @@
      <property name="geometry">
       <rect>
        <x>550</x>
-       <y>340</y>
+       <y>350</y>
        <width>251</width>
        <height>45</height>
       </rect>
@@ -1240,7 +1252,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>170</y>
+       <y>180</y>
        <width>161</width>
        <height>26</height>
       </rect>
@@ -1261,7 +1273,7 @@
      <property name="geometry">
       <rect>
        <x>490</x>
-       <y>170</y>
+       <y>180</y>
        <width>341</width>
        <height>241</height>
       </rect>
@@ -1449,17 +1461,22 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>210</y>
+       <y>220</y>
        <width>441</width>
        <height>201</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
      </property>
     </widget>
     <widget class="QCheckBox" name="cbReportViaEmail">
      <property name="geometry">
       <rect>
        <x>310</x>
-       <y>170</y>
+       <y>180</y>
        <width>151</width>
        <height>26</height>
       </rect>
@@ -1477,7 +1494,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>160</y>
+       <y>170</y>
        <width>111</width>
        <height>41</height>
       </rect>
@@ -1516,7 +1533,7 @@
        <x>460</x>
        <y>160</y>
        <width>21</width>
-       <height>241</height>
+       <height>261</height>
       </rect>
      </property>
      <property name="orientation">
@@ -1543,10 +1560,10 @@
     <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>821</width>
-       <height>411</height>
+       <x>0</x>
+       <y>0</y>
+       <width>841</width>
+       <height>451</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="vloSelectLocks"/>
@@ -1562,7 +1579,7 @@
        <x>2</x>
        <y>56</y>
        <width>841</width>
-       <height>372</height>
+       <height>391</height>
       </rect>
      </property>
      <property name="font">
@@ -1620,6 +1637,11 @@
           <width>40</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>From</string>
@@ -1713,6 +1735,11 @@
           <width>40</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>To</string>
@@ -1813,6 +1840,11 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Read</string>
         </property>
@@ -1831,7 +1863,7 @@
        <x>2</x>
        <y>56</y>
        <width>841</width>
-       <height>372</height>
+       <height>391</height>
       </rect>
      </property>
      <property name="font">
@@ -1840,16 +1872,16 @@
       </font>
      </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
        <width>841</width>
-       <height>52</height>
+       <height>51</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="hloHistory">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
       <property name="leftMargin">
        <number>10</number>
       </property>
@@ -1889,6 +1921,11 @@
           <width>40</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>From</string>
@@ -1975,6 +2012,11 @@
           <width>40</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>To</string>
@@ -2067,6 +2109,11 @@
           <width>80</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>Read</string>

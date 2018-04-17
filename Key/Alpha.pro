@@ -48,8 +48,6 @@ SOURCES += main.cpp\
     clickablelabel.cpp \
     lockhistoryset.cpp \
     lockhistoryrec.cpp \
-#    dlgfullkeyboard.cpp \
-#    currentedit.cpp \
     reportcontroller.cpp \
     smtp/emailaddress.cpp \
     smtp/mimeattachment.cpp \

@@ -6,12 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
-    <height>390</height>
+    <width>329</width>
+    <height>401</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QPushButton[checkable=true]:enabled {
+   color: &quot;black&quot;;
+    font-weight: bold;
+}
+QPushButton[checkable=true]:disabled{
+    color: &quot;gray&quot;;
+    font-weight: normal;
+}
+QPushButton[checkable=true]:checked {
+    color: &quot;black&quot;;
+    background-color: &quot;green&quot;;
+    border: none;
+}
+</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -19,7 +41,7 @@
      <x>0</x>
      <y>0</y>
      <width>329</width>
-     <height>389</height>
+     <height>401</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="vloLockCabinet">
@@ -47,7 +69,7 @@
           <property name="minimumSize">
            <size>
             <width>201</width>
-            <height>41</height>
+            <height>30</height>
            </size>
           </property>
           <property name="font">
@@ -66,8 +88,11 @@
           <pointsize>12</pointsize>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <property name="text">
-         <string>Locks</string>
+         <string>Select One Or More Locks</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -88,9 +113,19 @@
         </property>
         <item>
          <widget class="QPushButton" name="pbLock01">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -103,9 +138,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock02">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -118,9 +160,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock03">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -133,9 +182,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock04">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -155,9 +211,16 @@
         </property>
         <item>
          <widget class="QPushButton" name="pbLock05">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -170,9 +233,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock06">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -185,9 +255,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock07">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -200,9 +277,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock08">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -222,9 +306,16 @@
         </property>
         <item>
          <widget class="QPushButton" name="pbLock09">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -237,9 +328,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock10">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -252,9 +350,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock11">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -267,9 +372,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock12">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -289,9 +401,16 @@
         </property>
         <item>
          <widget class="QPushButton" name="pbLock13">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -304,9 +423,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock14">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -319,9 +445,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock15">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -334,9 +467,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock16">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -356,9 +496,16 @@
         </property>
         <item>
          <widget class="QPushButton" name="pbLock17">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -371,9 +518,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock18">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -386,9 +540,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock19">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -401,9 +562,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock20">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -423,9 +591,16 @@
         </property>
         <item>
          <widget class="QPushButton" name="pbLock21">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -438,9 +613,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock22">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -453,9 +635,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock23">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -468,9 +657,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock24">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -490,9 +686,16 @@
         </property>
         <item>
          <widget class="QPushButton" name="pbLock25">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -505,9 +708,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock26">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -520,9 +730,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock27">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -535,9 +752,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock28">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -557,10 +781,20 @@
         </property>
         <item>
          <widget class="QPushButton" name="pbLock29">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>29</string>
@@ -572,9 +806,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock30">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -587,9 +828,16 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock31">
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -602,9 +850,19 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbLock32">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>35</width>
+            <height>35</height>
+           </size>
+          </property>
           <property name="font">
            <font>
-            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
            </font>
           </property>
           <property name="text">
@@ -626,6 +884,12 @@
       </property>
       <item>
        <widget class="QPushButton" name="pbSelectAll">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -638,6 +902,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="pbClearAll">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <pointsize>12</pointsize>

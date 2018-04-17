@@ -369,7 +369,8 @@ void CFrmAdminInfo::populateTimeZoneSelection(QComboBox *cbox)
     cbox->clear();
     // Fill in combo box.
     QList<QByteArray> ids = QTimeZone::availableTimeZoneIds();
-    foreach (QByteArray id, ids) {
+    foreach (QByteArray id, ids) 
+    {
         cbox->addItem(id);
     }
 
@@ -391,22 +392,20 @@ void CFrmAdminInfo::populateTimeZoneSelection(QComboBox *cbox)
         sTimeZone = "America/New_York";
     }
 
-    qDebug() << "sOutput: " << QString::fromStdString(sTimeZone);
-
     if( strcmp(sTimeZone.c_str(), "") )
     {
         char *tokString = strtok(const_cast<char*> (sTimeZone.c_str()), "\n");
         parsedString = tokString;
-        qDebug() << "parsedString: " << QString::fromStdString(CMD_READ_TIME_ZONE);
 
-        int index = cbox->findText(QString::fromStdString(CMD_READ_TIME_ZONE));
-        if (index != -1) 
+        int index = cbox->findText(QString::fromStdString(parsedString));
+        if (index != -1)
         {
             cbox->setCurrentIndex(index);
         }
     }
     ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
     _currentTime = QDateTime().currentDateTime();
+
 }
 
 void CFrmAdminInfo::setTimeZone()
@@ -1296,21 +1295,19 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     _pworkingSet = pSet;
     int nRow = 0;
     int nCol = 0;
-    QSet<QString> lock_items;
+    QSet<int> lock_items;
 
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
         // qDebug() << "Adding row of Lock State - Codes. Lock Nums:" << QVariant(pState->getLockNums());
 
-        // Locks can be single or comma-separated.  We will add the comma-separated value as well as
-        // the individual locks for filtering purposes
+        // Locks can be single or comma-separated.
         QString locks = pState->getLockNums();
-        lock_items.insert(locks);
         QStringList sl = locks.split(',');
         foreach (auto s, sl)
         {
-            lock_items.insert(s);
+            lock_items.insert(s.toInt());
         }
 
         nCol = 0;
@@ -1349,9 +1346,16 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         nRow++;
     }
 
-    QStringList sl(lock_items.toList());
-    sl.sort();
-    ui->cbLockNum->addItems(sl);
+    // Note: We want the entries in the combo box to be in numeric order
+    // We gather the locks using a set to remove duplicates.  Unfortunately
+    // sets cannot be sorted, so we convert to a list, so and add to the
+    // combo box.
+    QList<int> lock_items_list(lock_items.toList());
+    qSort(lock_items_list.begin(), lock_items_list.end());
+    foreach (auto i, lock_items_list)
+    {
+        ui->cbLockNum->addItem(QString::number(i));
+    }
 
     _codesInUse.clear();
     _psysController->getAllCodes1(_codesInUse);
@@ -1433,7 +1437,7 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     int nRow = 0;
     int nCol = 0;
     CLockHistoryRec  *pState;
-    QSet<QString> lock_items;
+    QSet<int> lock_items;
     
     auto itor = _phistoryWorkingSet->getIterator();
 
@@ -1442,15 +1446,12 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
         pState = itor.next();
         qDebug() << "Adding row of History Lock State - Codes. Lock Num:" << pState->getLockNums();
         
-        // Locks can be single or comma-separated.  We will add the comma-separated value as well as
-        // the individual locks for filtering purposes
         QString locks = pState->getLockNums();
         KCB_DEBUG_TRACE("Locks" << locks);
-        lock_items.insert(locks);
         QStringList sl = locks.split(',');
         foreach (auto s, sl)
         {
-            lock_items.insert(s);
+            lock_items.insert(s.toInt());
         }
         
         nCol = 0;
@@ -1462,9 +1463,16 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
         nRow++;
     }
 
-    QStringList sl(lock_items.toList());
-    sl.sort();
-    ui->cbLockNumHistory->addItems(sl);
+    // Note: We want the entries in the combo box to be in numeric order
+    // We gather the locks using a set to remove duplicates.  Unfortunately
+    // sets cannot be sorted, so we convert to a list, so and add to the
+    // combo box.
+    QList<int> lock_items_list(lock_items.toList());
+    qSort(lock_items_list.begin(), lock_items_list.end());
+    foreach (auto i, lock_items_list)
+    {
+        ui->cbLockNumHistory->addItem(QString::number(i));
+    }
     
 }
 
@@ -2243,5 +2251,9 @@ void CFrmAdminInfo::OnDisplayShowHideButton(bool state)
 
 void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
 {
-    emit __OnOpenLockRequest(lock, is_user);
+    Q_UNUSED(is_user);
+    // Only allow this path if we are admin, i.e., not user
+    // Note: It should never be the case that we are not admin
+    Q_ASSERT_X(is_user == false, Q_FUNC_INFO, "We are not admin");
+    emit __OnOpenLockRequest(lock);
 }

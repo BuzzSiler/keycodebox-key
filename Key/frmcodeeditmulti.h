@@ -39,10 +39,10 @@ class FrmCodeEditMulti : public QDialog
         void on_edCode1_clicked();
         void on_edCode2_clicked();
         void on_edUsername_clicked();
-        void on_cbEnableCode2_stateChanged(int arg1);
+        void on_cbEnableCode2_stateChanged(int state);
         void on_bbSaveCancel_accepted();
         void on_bbSaveCancel_rejected();
-        void on_cbEnableQuestions_stateChanged(int arg1);
+        void on_cbEnableQuestions_stateChanged(int state);
         void on_pbEditQuestions_clicked();
         void on_cbFingerprint_clicked();
 
@@ -72,6 +72,7 @@ class FrmCodeEditMulti : public QDialog
         CClickableLineEdit *m_p_line_edit;
         CODE_STATE m_code_state;
         QStringList m_codes_in_use;
+        bool m_initialized;
         Ui::FrmCodeEditMulti *ui;
 
         void updateAccessType(int index);
@@ -79,7 +80,9 @@ class FrmCodeEditMulti : public QDialog
         bool isModified();
         void clrCodeState();
         void resetQuestions();
-        void displayWarning(QWidget *p_widget, bool is_valid);
+        void disableCode2();
+        void disableQuestions();
+
 
 
 };

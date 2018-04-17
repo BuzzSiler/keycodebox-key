@@ -277,9 +277,32 @@ int CTblCodes::checkCodeTwo(QString code,
     return KCB_FAILED;
 }
 
+bool CTblCodes::containsMatchingEntries(const QStringList& s1, const QStringList& s2)
+{
+    /* Note: I intended to use regular expressions to do the matching, i.e., 1$|,1$|^1,|,1,
+     * Running QRegularExpression example application, this pattern worked perfectly, but
+     * it did not work in this application.  I don't know why.  It would match on 10 or 13 or 21 --
+     * anything that contained a '1'.  Ultimately, settled for a double loop.
+     */
+    if (s1.count() > 0)
+    {
+        foreach (auto s1_str, s1)
+        {
+            foreach (auto s2_str, s2)
+            {
+                if (s1_str == s2_str)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
+    return true;
+}
 
-void CTblCodes::execSelectCodeSetQuery(QSqlQuery& qry, CLockSet **pLockSet)
+void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry, CLockSet **pLockSet)
 {
     CLockState *pLock;
     
@@ -288,7 +311,12 @@ void CTblCodes::execSelectCodeSetQuery(QSqlQuery& qry, CLockSet **pLockSet)
         qDebug() << qry.lastError().text() << qry.lastQuery();
     }
 
-    KCB_DEBUG_TRACE("Active" << qry.isActive() << "Select" << qry.isSelect());
+    Q_ASSERT_X(qry.isActive(), Q_FUNC_INFO, "Query is not active");
+    Q_ASSERT_X(qry.isSelect(), Q_FUNC_INFO, "Query is not selected");
+    if (!qry.isActive() || !qry.isSelect())
+    {
+        KCB_DEBUG_TRACE("SQL Query Failure" << "Active" << qry.isActive() << "Select" << qry.isSelect());
+    }
 
     if (!qry.first())
     {
@@ -299,13 +327,17 @@ void CTblCodes::execSelectCodeSetQuery(QSqlQuery& qry, CLockSet **pLockSet)
 
     qDebug() << "Retrieving at least first record that was found!";
     do
-    {                    
-        pLock = new CLockState();
+    {
+
+        auto lock_nums = QUERY_VALUE(qry, "locknums").toString();
+        if (!containsMatchingEntries(lockNumsList, lock_nums.split(",")))
+        {
+            continue;
+        }
 
         auto ids = QUERY_VALUE(qry, "ids").toInt();
         auto seq = QUERY_VALUE(qry, "sequence").toString();
         auto seq_order = QUERY_VALUE(qry, "sequence_order").toInt();
-        auto lock_nums = QUERY_VALUE(qry, "locknums").toString();
         auto desc = QUERY_VALUE(qry, "description").toString();
         auto sCode1 = QUERY_VALUE(qry, "code1").toString();
         auto sCode2 = QUERY_VALUE(qry, "code2").toString();                    
@@ -328,7 +360,10 @@ void CTblCodes::execSelectCodeSetQuery(QSqlQuery& qry, CLockSet **pLockSet)
         auto question2 = QUERY_VALUE(qry, "question2").toString();
         auto question3 = QUERY_VALUE(qry, "question3").toString();
         auto access_type = QUERY_VALUE(qry, "access_type").toInt();
-        
+
+
+        pLock = new CLockState();
+
         pLock->setID(ids);
         pLock->setSequence(seq);
         pLock->setSequenceOrder(seq_order);
@@ -369,25 +404,65 @@ void CTblCodes::selectCodeSet(QString &lockNums, QDateTime start, QDateTime end,
     column_list << "starttime" << "endtime" << "status";
     column_list << "access_count" << "retry_count" << "max_access" << "max_retry" << "access_type";
     QString condition = "";
-    if(lockNums != "" && lockNums != "*")
+    bool locknums_but_not_all = lockNums != "" && lockNums != "*";
+    /* The goal is to query for those codes whose locknums field contains the specified lock.  For example,
+     *     lock = 2
+     * Existing Codes and associated locks:
+     *     code = xxx, locks = 1,2,3
+     *     code = yyy, locks = 3,20,21
+     *     code = zzz, locks = 2,7,10
+     * We should only selected codes xxx and zzz.
+     *
+     * The locknums field contains a string of one or more lock numbers.  If a single lock number is specified
+     * it will be one or more characters, e.g. 1 or 10 or 100.  If multiple lock numbers are specified, they
+     * will be one or more characters separated by commas, e.g., 1,10,100
+     *
+     * Note: No spaces are used and the locks are sorted (before they were added to the database)
+     *
+     * When we are searching the database for matching codes, we need to do the following:
+     *     1. if the lock number is a single value, then find all of the entries with that single value
+     *     2. if the lock number is multiple values, then split on the comma and do a search to match
+     *        each individual value
+     *
+     * Note: SQLite does support REGEXP, but not natively and there are apparently issues connecting C++ (Qt)
+     *       to C-based SQLite.  So, regular expression as part of the database query is out.
+     *
+     * Without regular expression support in SQLite, we will need to pull all possible matches from the database,
+     * e.g., 1,2,3 would match 8,9,10 (because of the 1).  When we loop over the records we will perform
+     * pattern matching and select the relevant codes.
+     */
+
+    QStringList sl = lockNums.split(',');
+    if (sl[0] == "*")
     {
-        /* Lock nums is a string with either a single value or comma-separated values.
+        sl.clear();
+    }
+
+    if(locknums_but_not_all)
+    {
+        /* locknums is a string with either a single value or comma-separated values.
             * Entries in the database may be single values or comma-separated values.
             * Find all entries with all matching values.
             */
 
         condition += " ( ";
-        if (lockNums.contains(','))
+        if (sl.count() > 1)
         {
-            QStringList sl = lockNums.split(',');
+            int count = sl.count();
             foreach (auto s, sl)
             {
-                condition += QString("instr(locknums, %1) > 0 and ").arg(s);
+                condition += QString("instr(locknums, %1) > 0").arg(s);
+                if (count > 1)
+                {
+                    condition += " or ";
+                }
+                count--;
             }
         }
-        // Note: This handles the case of a single number.  It is redundant for
-        // comma-separated values, but eliminates an 'else'
-        condition += "instr(locknums, :lockNums) > 0";
+        else
+        {
+            condition += "instr(locknums, :lockNums) > 0";
+        }
         condition += " ) and ";
     }
     condition += " ( (access_type = 0 or access_type = 2) or"
@@ -408,14 +483,14 @@ void CTblCodes::selectCodeSet(QString &lockNums, QDateTime start, QDateTime end,
 
     auto qry = createQuery(column_list, TABLENAME, condition);
 
-    if (lockNums != "" && lockNums != "*")
+    if (locknums_but_not_all)
     {
-        qry.bindValue(":lockNums", lockNums);
+        qry.bindValue(":lockNums", sl[0]);
     }
     qry.bindValue(":stime", start);
     qry.bindValue(":etime", end);
 
-    execSelectCodeSetQuery(qry, pLockSet);
+    execSelectCodeSetQuery(sl, qry, pLockSet);
 }
 
 void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
@@ -436,7 +511,7 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
 
     qry.bindValue(":id", ids);
 
-    execSelectCodeSetQuery(qry, pLockSet);
+    execSelectCodeSetQuery(QStringList(), qry, pLockSet);
 }
 
 bool CTblCodes::tableExists()

@@ -317,19 +317,9 @@ CTblAdmin::CTblAdmin(QSqlDatabase *db)
 
 QString CTblAdmin::isAccessCode(QString code)
 {
-    qDebug() << "CTblAdmin::isAccessCode():" << code << " =? " << _currentAdmin.getAccessCode();
-
     QString access_code = _currentAdmin.getAccessCode();  // already unencrypted
     QString assist_code = _currentAdmin.getAssistCode();  // already unencrypted
     QString access_code_old = _currentAdmin.getAccessCodeOld();
-
-    //quit code
-    QString quit_code = QStringLiteral("123456789987654321");
-    if (code == quit_code)
-    {
-        qDebug() << "CTblAdmin::isAccessCode(): shutting down!";
-        QCoreApplication::quit();
-    }
 
     if (code == access_code || code == access_code_old)
     {

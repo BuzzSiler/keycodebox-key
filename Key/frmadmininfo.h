@@ -62,14 +62,12 @@ signals:
     void __OnRequestCurrentAdmin();
     void __UpdateCurrentAdmin(CAdminRec *adminInfo);
     void __OnUpdatedCurrentAdmin(bool bSuccess);
-    void __OnOpenLockRequest(QString LockNums, bool is_user);
+    void __OnOpenLockRequest(QString LockNums);
     void __OnReadDoorLocksState();
     void __OnBrightnessChanged(int nValue);
     void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd);
     void __OnAdminInfoCodes(QString code1, QString code2);
 
-    //void __LocalOnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
-    //void __LocalOnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
     void __OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);
     void __OnLockSet(CLockSet *pLockSet);
     void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);

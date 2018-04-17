@@ -56,7 +56,7 @@ class LockCabinetWidget : public QWidget
         QList<QPushButton *> m_lock_buttons;
 
         QSignalMapper& m_mapper;
-        QPalette m_default_palette;
+        QString m_default_stylesheet;
         Ui::LockCabinetWidget *ui;
         void selectClearAllLocks(bool select_clear);
         void updateUi();
@@ -64,6 +64,7 @@ class LockCabinetWidget : public QWidget
         void clrLocksInCabinet(quint8 cab_index);
         void StringToVector(QString str, QVector<int>& vtr);
         void VectorToString(QVector<int> vtr, QString& str);
+
 };
 
 #endif // LOCKCABINETWIDGET_H

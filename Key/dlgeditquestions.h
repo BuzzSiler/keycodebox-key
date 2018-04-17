@@ -20,10 +20,6 @@ class CDlgEditQuestions : public QDialog
         void getValues(QVector<QString>& questions);
         void setValues(QVector<QString>& questions);
 
-
-
-
-
     private slots:
 
         void on_edtQuestion1_clicked();
@@ -41,6 +37,7 @@ class CDlgEditQuestions : public QDialog
         Ui::CDlgEditQuestions *ui;
 
         void showKeyboard(CClickableLineEdit *p_lineEdit);
+        void enableOk();
 };
 
 #endif // DLGEDITQUESTIONS_H

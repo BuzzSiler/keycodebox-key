@@ -7,6 +7,7 @@
 #include "usbprovider.h"
 #include <QDebug>
 #include <QString>
+#include "kcbcommon.h"
 
 
 CLockController::CLockController(QObject *parent) : QObject(parent)
@@ -75,8 +76,8 @@ union inttohex_t {
 void CLockController::openLock(uint16_t nLockNum)
 {
     static unsigned char    seqNum = 0;
-    qDebug() << "CLockController::openLock #" << QVariant(nLockNum).toString();
-    if(this->isConnected())
+
+    if (this->isConnected())
     {
         unsigned char commands[9] = { 0x5D, 0x8E, 0x01, 0x00, 0xC8, 0x01, 0x20, 0x00, 0x8A };
 
@@ -94,7 +95,7 @@ void CLockController::openLock(uint16_t nLockNum)
         {
             nchksum += commands[i];
         }
-        qDebug() << "  checksum:" << QString::number(nchksum);
+
         commands[8] = (unsigned char)nchksum;
         _pport->WriteData(QByteArray((char *) commands, 9));
 
@@ -122,8 +123,8 @@ void CLockController::openLocks(QString lockNums)
 
     if (lockNums.contains(','))
     {
-        QStringList list_str = lockNums.split(',');
-        foreach (QString lock_str, list_str)
+        auto list_str = lockNums.split(',');
+        foreach (auto lock_str, list_str)
         {
             openLock(lock_str.toInt());
         }
@@ -178,8 +179,8 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
         commands[2] -= 0x30;
 
         commands[4] |= seqNum;
-//        commands[4] |= 0x50;    // Send msg on Reverse Loop?
-//        commands[4] |= 0x80;    // Send msg on Fwd loop?
+        commands[4] |= 0x50;    // Send msg on Reverse Loop?
+        commands[4] |= 0x80;    // Send msg on Fwd loop?
 
         commands[5] = sPulseCount[0];
         commands[6] = sPulseOn[0];
@@ -210,7 +211,7 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
         }
 
         QByteArray response;
-        int num_bytes = _pport->ReadData(response);        
+        int num_bytes = _pport->ReadData(response);    
         Q_UNUSED(num_bytes);
     }
 }
@@ -268,8 +269,6 @@ std::string CLockController::readCommandResponse()
     std::string rsp = "";
     int  nCount = 0;
 
-    qDebug() << "CLockController::readCommandResponse";
-
     if( this->isConnected() && _pport ) 
     {
         QByteArray data;
@@ -277,8 +276,10 @@ std::string CLockController::readCommandResponse()
         rsp = QString(data).toStdString();        
     }
 
-    if (nCount < 9) {
+    if (nCount < 9) 
+    {
         // it must have timed out.
+        KCB_DEBUG_TRACE("Didn't get enough bytes");
         throw std::runtime_error("Read timed out!");
     }
     return rsp;

@@ -136,6 +136,10 @@ void KcbKeyboardWidget::alphaClicked(QString value)
             updateValue(value.toLower());
         }
     }
+    else
+    {
+        updateValue(value);
+    }
 }
 
 void KcbKeyboardWidget::controlClicked(QString value)
@@ -156,10 +160,18 @@ void KcbKeyboardWidget::controlClicked(QString value)
     {
         if ( ui->pbCtrlUpperLower->isChecked() )
         {
+            foreach (auto l, m_letters)
+            {
+                l->setText(l->text().toUpper());
+            }
             ui->pbCtrlUpperLower->setText(tr("Upper"));
         }
         else
         {
+            foreach (auto l, m_letters)
+            {
+                l->setText(l->text().toLower());
+            }
             ui->pbCtrlUpperLower->setText(tr("Lower"));
         }
     }

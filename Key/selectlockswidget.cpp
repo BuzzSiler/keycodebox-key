@@ -7,6 +7,7 @@
 #include <QVector>
 #include "lockcabinetwidget.h"
 #include "kcbutils.h"
+#include "kcbcommon.h"
 
 SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role, int num_cabs) :
     QWidget(parent),
@@ -21,7 +22,6 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role, int num_cabs) :
 
     connect(&m_lock_cab, SIGNAL(NotifyLockSelected(QString, bool)), this, SLOT(OnNotifyLockSelected(QString, bool)));
 
-    
     if (m_role == USER)
     {
         ui->btnCancelOpen->setEnabled(true);
@@ -43,10 +43,8 @@ void SelectLocksWidget::setLocks(QString locks)
 
     m_lock_cab.disableAllLocks();
     m_lock_cab.setEnabledLocks(locks);
-    m_lock_cab.setSelectedLocks(locks);
 
     ui->lstSelectedLocks->clear();
-    addLocksToList(locks);
 
     ui->btnOpenSelected->setEnabled(locks.length() > 0 ? true : false);
 }
@@ -72,14 +70,11 @@ QString SelectLocksWidget::getLocks()
 void SelectLocksWidget::createLockListStr(QString cab, QString lock, QString& str)
 {
     str = QString(tr("Cabinet %1 - Lock %2")).arg(cab, 3, '0').arg(lock, 3, '0');
-    //qDebug() << "Cabinet:" << cab << "Lock:" << lock << "Lock List Str:" << str;
 }
 
 void SelectLocksWidget::addLockToList(QString lock)
 {
     QString item_str;
-
-    //qDebug() << "Cab Index:" << m_lock_cab.getSelectedCabinet() << "Lock Index:" << lock;
 
     createLockListStr(m_lock_cab.getSelectedCabinet(), lock, item_str);
 
@@ -109,8 +104,6 @@ void SelectLocksWidget::removeLockFromList(QString lock)
     QString item_str;
     QList<QListWidgetItem *> items;
     int row;
-
-    //qDebug() << "Cab Index:" << m_lock_cab.getSelectedCabinet() << "Lock Index:" << lock;
 
     createLockListStr(m_lock_cab.getSelectedCabinet(), lock, item_str);
 
@@ -145,8 +138,6 @@ void SelectLocksWidget::getCabinetLockFromStr(QString& str, QString& cab, QStrin
     QVector<QString> cab_lock_vtr = cab_lock.toVector();
     cab = cab_lock_vtr[1];
     lock = cab_lock_vtr[4];
-
-    //qDebug() << "Item String:" << str << "Cabinet:" << cab << "Lock:" << lock;
 }
 
 void SelectLocksWidget::openDoorTimer()
@@ -155,15 +146,13 @@ void SelectLocksWidget::openDoorTimer()
     QString lock;
     QString str;
 
-    //qDebug() << "Opening" << ui->lstSelectedLocks->item(0)->text();
-
     str = ui->lstSelectedLocks->item(0)->text();
     delete ui->lstSelectedLocks->item(0);
     getCabinetLockFromStr(str, cab, lock);
 
     m_lock_cab.setSelectedCabinet(cab);
     m_lock_cab.clrSelectedLocks(lock);
-    emit NotifyRequestLockOpen(lock, false);
+    emit NotifyRequestLockOpen(QString::number(lock.toInt()), false);
 
     if (m_cancel_open || ui->lstSelectedLocks->count() == 0)
     {
@@ -172,7 +161,20 @@ void SelectLocksWidget::openDoorTimer()
     }
     else
     {
-        QTimer::singleShot(2000, this, SLOT(openDoorTimer()));
+        QTimer::singleShot(500, this, SLOT(openDoorTimer()));
+    }
+}
+
+
+void SelectLocksWidget::on_btnCancelOpen_clicked()
+{
+    if (m_role == ADMIN)
+    {
+        m_cancel_open = true;
+    }
+    else // m_role == USER
+    {
+        emit NotifyClose();
     }
 }
 
@@ -188,17 +190,5 @@ void SelectLocksWidget::on_btnOpenSelected_clicked()
     else // m_role == USER
     {
         emit NotifyOpen();
-    }
-}
-
-void SelectLocksWidget::on_btnCancelOpen_clicked()
-{
-    if (m_role == ADMIN)
-    {
-        m_cancel_open = true;
-    }
-    else // m_role == USER
-    {
-        emit NotifyClose();
     }
 }

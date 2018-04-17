@@ -537,10 +537,8 @@ void CSystemController::OnUserCodeCancel()
 void CSystemController::OnOpenLockRequest(QString lockNum)
 {
     KCB_DEBUG_TRACE(lockNum);
-    // Open the lock
-    qDebug() << "Lock Open";
-    emit __OnCodeMessage(tr("Lock Open"));
     _LockController.openLocks(lockNum);
+    emit __OnCodeMessage(tr("Lock Open"));
 }
 
 void CSystemController::reportActivity(QString locknums)
@@ -579,6 +577,7 @@ void CSystemController::OnReadLockStatus()
 
 void CSystemController::OnSecurityCheckSuccess(QString locks)
 {    
+    KCB_DEBUG_ENTRY;
     KCB_DEBUG_TRACE(locks);
 
     if (_pdFingerprintVerify)
@@ -620,7 +619,7 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
 
     reportActivity(_locks);
     _systemState = EThankYou;
-            
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnSecurityCheckedFailed()
