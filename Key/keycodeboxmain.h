@@ -88,7 +88,7 @@ private slots:
 
     void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3);
     void OnQuestionUserDialogClose();
-    
+
 private:
     void initialize();
     void hideFormsExcept(QDialog *pfrm);
