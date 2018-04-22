@@ -282,6 +282,3 @@ void CFrmUserCode::OnDisplayShowHideButton(bool state)
 {
     SetDisplayShowHideButton(state);
 }
-
-
-

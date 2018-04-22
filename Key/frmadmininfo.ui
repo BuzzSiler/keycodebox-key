@@ -43,7 +43,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tabAdministrator">
     <attribute name="title">
@@ -654,40 +654,12 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QDial" name="dialBright">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>650</x>
-       <y>45</y>
-       <width>141</width>
-       <height>131</height>
-      </rect>
-     </property>
-     <property name="minimum">
-      <number>25</number>
-     </property>
-     <property name="maximum">
-      <number>255</number>
-     </property>
-     <property name="value">
-      <number>75</number>
-     </property>
-     <property name="notchTarget">
-      <double>10.000000000000000</double>
-     </property>
-     <property name="notchesVisible">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QPushButton" name="btnSetupSMTP">
      <property name="geometry">
       <rect>
-       <x>330</x>
-       <y>20</y>
-       <width>171</width>
+       <x>310</x>
+       <y>30</y>
+       <width>141</width>
        <height>50</height>
       </rect>
      </property>
@@ -704,9 +676,9 @@
     <widget class="QPushButton" name="btnSetupVNC">
      <property name="geometry">
       <rect>
-       <x>330</x>
-       <y>80</y>
-       <width>281</width>
+       <x>310</x>
+       <y>90</y>
+       <width>241</width>
        <height>51</height>
       </rect>
      </property>
@@ -720,32 +692,11 @@
       <string>Remote Desktop Settings</string>
      </property>
     </widget>
-    <widget class="QLabel" name="lblBrightness">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>650</x>
-       <y>0</y>
-       <width>91</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Brightness</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="lblIpAddress">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>100</y>
+       <x>10</x>
+       <y>120</y>
        <width>101</width>
        <height>28</height>
       </rect>
@@ -763,9 +714,9 @@
     <widget class="QLabel" name="lblIPAddress">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>100</y>
-       <width>161</width>
+       <x>110</x>
+       <y>120</y>
+       <width>171</width>
        <height>28</height>
       </rect>
      </property>
@@ -783,7 +734,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>180</y>
        <width>111</width>
        <height>51</height>
       </rect>
@@ -807,9 +758,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>250</y>
-       <width>480</width>
-       <height>181</height>
+       <y>240</y>
+       <width>591</width>
+       <height>191</height>
       </rect>
      </property>
      <attribute name="headerCascadingSectionResizes">
@@ -825,9 +776,9 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>189</y>
-       <width>111</width>
+       <x>630</x>
+       <y>220</y>
+       <width>161</width>
        <height>51</height>
       </rect>
      </property>
@@ -852,9 +803,9 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>300</x>
-       <y>189</y>
-       <width>131</width>
+       <x>630</x>
+       <y>300</y>
+       <width>161</width>
        <height>51</height>
       </rect>
      </property>
@@ -876,9 +827,9 @@
     <widget class="QLabel" name="lblBrandingImage">
      <property name="geometry">
       <rect>
-       <x>500</x>
-       <y>160</y>
-       <width>191</width>
+       <x>630</x>
+       <y>350</y>
+       <width>151</width>
        <height>28</height>
       </rect>
      </property>
@@ -898,8 +849,8 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>500</x>
-       <y>189</y>
+       <x>630</x>
+       <y>380</y>
        <width>75</width>
        <height>51</height>
       </rect>
@@ -925,8 +876,8 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>585</x>
-       <y>189</y>
+       <x>720</x>
+       <y>380</y>
        <width>75</width>
        <height>51</height>
       </rect>
@@ -949,9 +900,9 @@
     <widget class="QPushButton" name="btnPurgeCodes">
      <property name="geometry">
       <rect>
-       <x>550</x>
-       <y>290</y>
-       <width>251</width>
+       <x>600</x>
+       <y>30</y>
+       <width>221</width>
        <height>45</height>
       </rect>
      </property>
@@ -967,9 +918,9 @@
     <widget class="QPushButton" name="btnRebootSystem">
      <property name="geometry">
       <rect>
-       <x>550</x>
-       <y>350</y>
-       <width>251</width>
+       <x>600</x>
+       <y>90</y>
+       <width>221</width>
        <height>45</height>
       </rect>
      </property>
@@ -986,8 +937,8 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>140</y>
-       <width>521</width>
+       <y>160</y>
+       <width>811</width>
        <height>20</height>
       </rect>
      </property>
@@ -998,9 +949,9 @@
     <widget class="QLabel" name="lblInstallNewApp">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>160</y>
-       <width>271</width>
+       <x>630</x>
+       <y>190</y>
+       <width>191</width>
        <height>28</height>
       </rect>
      </property>
@@ -1011,15 +962,15 @@
       </font>
      </property>
      <property name="text">
-      <string>Install new KeyCodeBox App</string>
+      <string>Install KeyCodeBox App</string>
      </property>
     </widget>
     <widget class="QLabel" name="lblLoadBulkCodes">
      <property name="geometry">
       <rect>
-       <x>300</x>
-       <y>160</y>
-       <width>171</width>
+       <x>630</x>
+       <y>270</y>
+       <width>151</width>
        <height>28</height>
       </rect>
      </property>
@@ -1036,8 +987,8 @@
     <widget class="QCheckBox" name="chkDisplayFingerprintButton">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>20</y>
+       <x>10</x>
+       <y>10</y>
        <width>250</width>
        <height>28</height>
       </rect>
@@ -1055,8 +1006,8 @@
     <widget class="QCheckBox" name="chkDisplayShowHideButton">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>60</y>
+       <x>10</x>
+       <y>50</y>
        <width>251</width>
        <height>17</height>
       </rect>
@@ -1073,9 +1024,9 @@
     <widget class="QPushButton" name="btnTestEmail">
      <property name="geometry">
       <rect>
-       <x>510</x>
-       <y>20</y>
-       <width>101</width>
+       <x>460</x>
+       <y>30</y>
+       <width>91</width>
        <height>50</height>
       </rect>
      </property>
@@ -1086,6 +1037,100 @@
      </property>
      <property name="text">
       <string>Test Email</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_5">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>10</y>
+       <width>20</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_6">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>10</y>
+       <width>20</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbDisplayPowerDownTimeout">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>80</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <item>
+      <property name="text">
+       <string>None</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>10 sec</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>30 sec</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1 min</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>5 min</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>10 min</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>30 min</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="lblDisplayPowerDown">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>84</y>
+       <width>161</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Display Power Down</string>
      </property>
     </widget>
    </widget>
@@ -1872,7 +1917,7 @@
       </font>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>0</x>
