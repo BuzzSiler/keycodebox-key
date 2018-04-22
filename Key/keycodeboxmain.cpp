@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QDateTime>
+#include <QProcess>
 #include <iostream>
 #include <cstdlib>
 
@@ -19,6 +20,7 @@
 #include "systemcontroller.h"
 #include "kcbcommon.h"
 
+MainWindow::DISP_POWER_STATE MainWindow::display_power_state = MainWindow::DISP_POWER_ON;
 MainWindow      *gpmainWindow;
 
 void MainWindow::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
@@ -38,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _psystemController(new CSystemController(this))
 {
     ui->setupUi(this);
+
+    system(qPrintable("vcgencmd display_power 1"));
+    MainWindow::display_power_state = MainWindow::DISP_POWER_ON;
+
     QMainWindow::showFullScreen();
     QMainWindow::activateWindow();
     QMainWindow::raise();
@@ -66,6 +72,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->graphicsView->setClickedFunc(&(this->OnImageClicked) );
 
+    _pdisplayPowerDown = new QTimer();
+   
+
     QDateTime currdt = QDateTime::currentDateTime();
     QDateTime dt = CEncryption::roundDateTime(10, currdt);
 
@@ -76,7 +85,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&_sysControlThread, SIGNAL(started()), _psystemController, SLOT(start()));
 
-    connect(this, SIGNAL(__TouchScreenTouched()), _psystemController, SLOT(OnTouchScreenTouched()));
+    // When the touch screen is touched, we want to 
+    //     - notify the system controller
+    //     - stop the display power down timer
+    connect(this, SIGNAL(__TouchScreenTouched()), _psystemController, SLOT(OnTouchScreenTouched()));    
+    connect(this, SIGNAL(__TouchScreenTouched()), _pdisplayPowerDown, SLOT(stop()));
+    // When the display is powered up, we want to start the display power down timer
+    connect(this, SIGNAL(__DisplayPoweredOn()), this, SLOT(OnDisplayPoweredOn()));
+    // When the display power down timer expires, we want to power down the display
+    connect(_pdisplayPowerDown, SIGNAL(timeout()), this, SLOT(OnDisplayPowerDown()));    
+
     connect(_psystemController, SIGNAL(__OnDisplayTimeoutScreen()), this, SLOT(OnDisplayTimeoutScreen()));
 
     connect(_psystemController, SIGNAL(__onUserCodeOne(QString)), this, SLOT(OnUserCodeOne(QString)));
@@ -149,10 +167,43 @@ MainWindow::~MainWindow()
     delete _psystemController;
 }
 
+void MainWindow::OnDisplayPowerDown()
+{
+    system(qPrintable("vcgencmd display_power 0"));
+    MainWindow::display_power_state = MainWindow::DISP_POWER_OFF;
+}
+
+void MainWindow::OnDisplayPoweredOn()
+{
+    if (display_power_state == MainWindow::DISP_POWER_ON)
+    {
+        if (!_pfAdminInfo)
+        {
+            return;
+        }
+
+        int timeout = _pfAdminInfo->getDisplayPowerDownTimeout();
+        if (timeout > 0)
+        {
+            _pdisplayPowerDown->start(timeout);
+        }
+    }
+}
+
 void MainWindow::OnImageClicked()
 {
-    qDebug() << "OnImageClicked";
-    emit gpmainWindow->__TouchScreenTouched();
+    if (display_power_state == MainWindow::DISP_POWER_ON)
+    {
+        emit gpmainWindow->__TouchScreenTouched();
+    }
+    else
+    {
+        qDebug() << "Powering on display";
+        system(qPrintable("vcgencmd display_power 1"));
+        display_power_state = MainWindow::DISP_POWER_ON;
+
+        emit gpmainWindow->__DisplayPoweredOn();
+    }
 }
 
 void MainWindow::OnDisplayTimeoutScreen()
@@ -180,6 +231,8 @@ void MainWindow::OnDisplayTimeoutScreen()
     {
         _pQuestions->hide();
     }
+
+    OnDisplayPoweredOn();
 
     KCB_DEBUG_EXIT;
 }

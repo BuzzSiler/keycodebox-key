@@ -4,6 +4,9 @@
 #include "kcbkeyboarddialog.h"
 #include "kcbutils.h"
 
+static const QString css_warn = "color: black; background-color: red";
+static const QString css_none = "";
+
 CDlgQuestions::CDlgQuestions(QWidget *parent) :
     QDialog(parent),
     _lockNum(""),
@@ -102,7 +105,6 @@ void CDlgQuestions::on_edtAnswer3_clicked()
 
 void CDlgQuestions::on_clrAnswer1_clicked()
 {
-    ui->clrAnswer1->setDisabled(true);
     ui->edtAnswer1->setText("");
     ui->edtAnswer1->setFocus();
     enableOk();
@@ -110,7 +112,6 @@ void CDlgQuestions::on_clrAnswer1_clicked()
 
 void CDlgQuestions::on_clrAnswer2_clicked()
 {
-    ui->clrAnswer2->setDisabled(true);
     ui->edtAnswer2->setText("");
     ui->edtAnswer2->setFocus();
     enableOk();
@@ -118,7 +119,6 @@ void CDlgQuestions::on_clrAnswer2_clicked()
 
 void CDlgQuestions::on_clrAnswer3_clicked()
 {
-    ui->clrAnswer3->setDisabled(true);
     ui->edtAnswer3->setText("");
     ui->edtAnswer3->setFocus();
     enableOk();
@@ -149,6 +149,14 @@ void CDlgQuestions::enableOk()
     bool q1_valid = !q1_required || (q1_required && q1_specified);
     bool q2_valid = !q2_required || (q2_required && q2_specified);
     bool q3_valid = !q3_required || (q3_required && q3_specified);
+
+    ui->edtAnswer1->setStyleSheet(q1_valid ? css_none : css_warn);
+    ui->edtAnswer2->setStyleSheet(q2_valid ? css_none : css_warn);
+    ui->edtAnswer3->setStyleSheet(q3_valid ? css_none : css_warn);
+
+    ui->clrAnswer1->setEnabled(q1_specified);
+    ui->clrAnswer2->setEnabled(q2_specified);
+    ui->clrAnswer3->setEnabled(q3_specified);
 
     ui->bbOkCancel->button(QDialogButtonBox::Ok)->setEnabled(q1_valid && q2_valid && q3_valid);
 

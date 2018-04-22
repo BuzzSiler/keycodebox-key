@@ -44,6 +44,7 @@ private:
     QGraphicsScene      *_pscene;
     QPixmap             *_pPixmap;
     CClickableGraphicsItem  *_pPixmapItem;
+    QTimer *_pdisplayPowerDown;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -53,8 +54,12 @@ public:
     void ExtractCommandOutput(FILE *pF, std::string &rtnStr);
     bool isInternetTime();
     
+    typedef enum {DISP_POWER_OFF, DISP_POWER_ON} DISP_POWER_STATE;
+    static DISP_POWER_STATE display_power_state;
+
 signals:
     void __TouchScreenTouched();
+    void __DisplayPoweredOn();
     void __onCode(QString sCode);
 
     void __onFingerprintCode(QString sCode);
@@ -63,7 +68,7 @@ signals:
     void __onFingerprintEnrollment(int code);
 
     void __StopUserTimeout();
-    
+
 private slots:
 
     void OnDisplayTimeoutScreen();
@@ -88,6 +93,9 @@ private slots:
 
     void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3);
     void OnQuestionUserDialogClose();
+
+    void OnDisplayPoweredOn();
+    void OnDisplayPowerDown();
 
 private:
     void initialize();

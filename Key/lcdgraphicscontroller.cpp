@@ -4,13 +4,17 @@
 #include <cstdlib>
 #include <unistd.h>
 
+
+// Note: The following sys directory doesn't exist in the current image.  Consequently, brightness
+// control doesn't work.  It is being investigated, but is disabled in the interim.
+
+
 CLCDGraphicsController::CLCDGraphicsController(QObject *parent) : 
     QObject(parent),
     _timerDim(this)
 {
 
 }
-
 
 void CLCDGraphicsController::startScreenDimTimer()
 {
@@ -21,9 +25,10 @@ void CLCDGraphicsController::startScreenDimTimer()
 void CLCDGraphicsController::setBrightness(unsigned int unValue)
 {
     std::string sCmd = "";
-    // Run linux cmd line
-    // echo 0 > /sys/class/backlight/rpi_backlight/brightness
-    if( unValue > 255 ) { unValue = 255; }
+    if( unValue > 255 ) 
+    { 
+        unValue = 255; 
+    }
 
     sCmd = std::string("sudo bash -c 'echo ") + std::to_string(unValue) + " > /sys/class/backlight/rpi_backlight/brightness'";
     qDebug() << sCmd.c_str();
@@ -32,13 +37,11 @@ void CLCDGraphicsController::setBrightness(unsigned int unValue)
 
 void CLCDGraphicsController::turnBacklightOn()
 {
-    // echo 1 > /sys/class/backlight/rpi_backlight/bl_power
     system("sudo bash -c 'echo 1 > /sys/class/backlight/rpi_backlight/bl_power'");
 }
 
 void CLCDGraphicsController::turnBacklightOff()
 {
-    // echo 0 > /sys/class/backlight/rpi_backlight/bl_power
     system("sudo bash -c 'echo 0 > /sys/class/backlight/rpi_backlight/bl_power'");
 }
 

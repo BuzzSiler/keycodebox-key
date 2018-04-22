@@ -113,6 +113,9 @@ public:
 
     bool setFromJsonObject(QJsonObject jsonObj);
     bool setFromJsonString(QString strJson);
+    
+    int getDisplayPowerDownTimeout() { return display_power_down_timeout; }
+    void setDisplayPowerDownTimeout(int index) { display_power_down_timeout = index; }
 
 private:
     int ids;    //  integer primary key unique,
@@ -148,7 +151,8 @@ private:
     
     bool        report_via_email;
     bool        report_save_to_file;
-    QString report_directory;
+    QString     report_directory;
+    int        display_power_down_timeout;
 };
 
 class CTblAdmin
@@ -183,7 +187,8 @@ public:
                      QString smtpserver, int smptport, int smtptype,
                      QString smtpusername, QString smtppassword,
                      int vncport, QString vncpasword,
-                     bool bEmailReport, bool bSaveReport, QString reportDirectory);
+                     bool bEmailReport, bool bSaveReport, QString reportDirectory,
+                     int displayPowerDownTimeout);
 
     bool updateAdminClear(QString name, QString email, QString phone,
                      bool activeReport, QDateTime repFreq, QDateTime startReport,
@@ -195,7 +200,8 @@ public:
                      QString smtpserver, int smptport, int smtptype,
                      QString smtpusername, QString smtppassword,
                      int vncport, QString vncpassword,
-                     bool bEmailReport, bool bSaveReport, QString reportDirectory);
+                     bool bEmailReport, bool bSaveReport, QString reportDirectory,
+                     int displayPowerDownTimeout);
     bool updateAdmin(CAdminRec &rec);
     bool updateAdmin(QJsonObject adminObj);
 

@@ -1,4 +1,7 @@
 #include "clickablegraphicsitem.h"
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
 
 void CClickableGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {

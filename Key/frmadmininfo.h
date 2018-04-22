@@ -52,6 +52,7 @@ public:
     void checkAndCreateCodeEditForm();
     void resizeTreeViewColumns();
     void show();
+    int getDisplayPowerDownTimeout();
 
 
 signals:
@@ -179,7 +180,7 @@ private slots:
     void OnCodeEditAccept();
 
 
-private:
+    private:
     Ui::CFrmAdminInfo   *ui;
     CSystemController   *_psysController;
     bool                _bClose;

@@ -4,6 +4,9 @@
 #include "kcbutils.h"
 #include "kcbkeyboarddialog.h"
 
+static const QString css_warn = "color: black; background-color: red";
+static const QString css_none = "";
+
 CDlgEditQuestions::CDlgEditQuestions(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CDlgEditQuestions)
@@ -63,6 +66,8 @@ void CDlgEditQuestions::setValues(QVector<QString>& questions)
             }
         }
     }
+
+    updateUi();    
 }
 
 void CDlgEditQuestions::showKeyboard(CClickableLineEdit *p_lineEdit)
@@ -73,6 +78,7 @@ void CDlgEditQuestions::showKeyboard(CClickableLineEdit *p_lineEdit)
     if (kkd.exec())
     {
         auto text = kkd.getValue();
+
         p_lineEdit->setText(text);
         ui->buttonBoxQuestions->button(QDialogButtonBox::Save)->setEnabled(!text.isEmpty());
     }
@@ -81,9 +87,7 @@ void CDlgEditQuestions::showKeyboard(CClickableLineEdit *p_lineEdit)
 void CDlgEditQuestions::on_edtQuestion1_clicked()
 {
     showKeyboard(ui->edtQuestion1);
-    bool is_empty = ui->edtQuestion1->text().isEmpty();
-    ui->clrQuestion1->setDisabled(is_empty);
-    ui->edtQuestion2->setDisabled(is_empty);
+    updateUi();
 }
 
 void CDlgEditQuestions::on_edtQuestion2_clicked()
@@ -91,10 +95,7 @@ void CDlgEditQuestions::on_edtQuestion2_clicked()
     if (ui->edtQuestion2->isEnabled())
     {
         showKeyboard(ui->edtQuestion2);
-        bool is_empty = ui->edtQuestion2->text().isEmpty();
-        ui->clrQuestion1->setDisabled(true);
-        ui->clrQuestion2->setDisabled(is_empty);
-        ui->edtQuestion3->setDisabled(is_empty);
+        updateUi();
     }
 }
 
@@ -103,45 +104,62 @@ void CDlgEditQuestions::on_edtQuestion3_clicked()
     if (ui->edtQuestion3->isEnabled())
     {
         showKeyboard(ui->edtQuestion3);
-        bool is_empty = ui->edtQuestion3->text().isEmpty();
-        ui->clrQuestion1->setDisabled(true);
-        ui->clrQuestion2->setDisabled(true);
-        ui->clrQuestion3->setDisabled(is_empty);
+        updateUi();
     }
-}
-
-void CDlgEditQuestions::enableOk()
-{
-    bool q1_is_empty = ui->edtQuestion1->text().isEmpty();
-    bool q2_is_empty = ui->edtQuestion2->text().isEmpty();
-    bool q3_is_empty = ui->edtQuestion3->text().isEmpty();
-
-    ui->buttonBoxQuestions->button(QDialogButtonBox::Save)->setEnabled(!q1_is_empty || !q2_is_empty || !q3_is_empty);
 }
 
 void CDlgEditQuestions::on_clrQuestion1_clicked()
 {
-    ui->edtQuestion1->setText("");
-    ui->clrQuestion1->setDisabled(true);
-    ui->edtQuestion2->setDisabled(true);
-    enableOk();
+    if (ui->clrQuestion1->isEnabled())
+    {
+        ui->edtQuestion1->setText("");
+        updateUi();
+    }
 }
 
 void CDlgEditQuestions::on_clrQuestion2_clicked()
 {
-  ui->edtQuestion2->setText("");
-  ui->clrQuestion2->setDisabled(true);
-  ui->edtQuestion3->setDisabled(true);
-  ui->clrQuestion1->setEnabled(true);
-  enableOk();
+    if (ui->clrQuestion2->isEnabled())
+    {
+        ui->edtQuestion2->setText("");
+        updateUi();
+    }
 }
 
 void CDlgEditQuestions::on_clrQuestion3_clicked()
 {
-  ui->edtQuestion3->setText("");
-  ui->clrQuestion3->setDisabled(true);
-  ui->clrQuestion2->setEnabled(true);
-  enableOk();
+    if (ui->clrQuestion3->isEnabled())
+    {
+        ui->edtQuestion3->setText("");
+        updateUi();
+    }
+}
+
+void CDlgEditQuestions::updateUi()
+{
+    bool questions_valid = false;
+    bool q1_specified = !ui->edtQuestion1->text().isEmpty();
+    bool q2_specified = !ui->edtQuestion2->text().isEmpty();
+    bool q3_specified = !ui->edtQuestion3->text().isEmpty();
+
+    ui->clrQuestion1->setEnabled(q1_specified);
+    ui->edtQuestion1->setStyleSheet(q1_specified ? css_none : css_warn);
+
+    ui->edtQuestion2->setStyleSheet(css_none);
+    ui->edtQuestion2->setEnabled(q1_specified);
+    ui->clrQuestion2->setEnabled(ui->edtQuestion2->isEnabled() && q2_specified);
+    ui->edtQuestion2->setStyleSheet(q1_specified && !q2_specified && q3_specified ? css_warn : css_none);
+
+    ui->edtQuestion3->setEnabled(q1_specified && q2_specified);
+    ui->clrQuestion3->setEnabled(ui->edtQuestion3->isEnabled() && q3_specified);
+
+    bool only_q1_specified = q1_specified && !(q2_specified || q3_specified);
+    bool q1_and_q2_specified = (q1_specified && q2_specified) && !q3_specified;
+    bool all_specified = q1_specified && q2_specified && q3_specified;
+
+    questions_valid = only_q1_specified || q1_and_q2_specified || all_specified;
+
+    ui->buttonBoxQuestions->button(QDialogButtonBox::Save)->setEnabled(questions_valid);
 }
 
 void CDlgEditQuestions::on_buttonBoxQuestions_accepted()
