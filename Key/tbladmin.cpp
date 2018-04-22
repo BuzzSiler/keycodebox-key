@@ -370,21 +370,23 @@ bool CTblAdmin::createTable()
                 " default_report_freq DATETIME,"
                 " default_report_start DATETIME, password text, "
                 " access_code text,"
-                " assist_password text, assist_code text, show_fingerprint bool,"
+                " assist_password text, assist_code text, show_fingerprint bool, show_password bool, "
                 " use_predictive_access_code bool, "
                 " predictive_key text, predictive_resolution integer,"
-                " max_locks,"
-                " smtp_server, smtp_port, smtp_type, smtp_username, smtp_password,"
-                " vnc_port, vnc_password,"
-                " report_via_email, report_to_file, report_directory, display_power_down_timeout)";
+                " max_locks text,"
+                " smtp_server text, smtp_port text, smtp_type text, smtp_username text, smtp_password text,"
+                " vnc_port text, vnc_password text,"
+                " report_via_email text, report_to_file text, report_directory text, display_power_down_timeout integer)";
 
         qry.prepare( sql );
 
-        if( !qry.exec() ) {
+        if( !qry.exec() ) 
+        {
             qDebug() << qry.lastError();
             return false;
         }
-        else {
+        else 
+        {
             qDebug() << "Table created!";
             return true;
         }
@@ -392,12 +394,6 @@ bool CTblAdmin::createTable()
     return false;
 }
 
-/**
- * @brief CTblAdmin::currentTimeFormat
- * @param format
- * @param strBuffer
- * @param nExpectedLength = expected length of the return string
- */
 void CTblAdmin::currentTimeFormat(QString format, QString strBuffer, int nExpectedLength)
 {
     time_t rawtime;
@@ -417,8 +413,8 @@ bool CTblAdmin::createAdminDefault()
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("INSERT OR IGNORE INTO ") + TABLENAME +
-                    QString("(admin_name,"\
-                            "admin_email, admin_phone, email_report_active, default_report_freq, "\
+                    QString("(admin_name, "
+                            "admin_email, admin_phone, email_report_active, default_report_freq, "
                             "default_report_start, password, access_code, "
                             "assist_password, assist_code, show_fingerprint, show_password,"
                             "use_predictive_access_code, "
@@ -426,13 +422,18 @@ bool CTblAdmin::createAdminDefault()
                             "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
                             "report_via_email, report_to_file, report_directory, "
                             "vnc_port, vnc_password, display_power_down_timeout)"
-                  " VALUES ('admin', 'admin@email.com', '555.555.5555', 1, :freq, "\
-                            ":start, :pw, :code, :assistpw, :assistCode, :showFingerprint, "
-                            ":use_pred, :pred_key, :pred_res, 32, "
-                            "'', 0, 0, '', '', "
+                  " VALUES ('admin', "
+                            "'admin@email.com', '555.555.5555', 1, :freq, "
+                            ":start, :pw, :code, "
+                            ":assistpw, :assistCode, :showFingerprint, :showPassword, "
+                            ":use_pred, "
+                            ":pred_key, :pred_res, 32, "
+                            ":smtp_server, :smtp_port, :smtp_type, :smtp_username, :smtp_password, "
                             "1, 0, '', "
                             "5900, 'vnc_password', 0)");
     qry.prepare(sql);
+
+    qDebug() << "SQL:" << sql;
 
     QString sTime;
     sTime = QDateTime(QDate(1,1,1), QTime(12,0)).toString("yyyy-MM-dd HH:mm:ss");
@@ -446,9 +447,9 @@ bool CTblAdmin::createAdminDefault()
     qry.bindValue(":start", sStart);
 
     QString encPW = CEncryption::encryptString("");
-    QString encCode = CEncryption::encryptString("112233");
+    QString encCode = CEncryption::encryptString("99123");
     QString encAssistPw = CEncryption::encryptString("");
-    QString encAssistCode = CEncryption::encryptString("332211");
+    QString encAssistCode = CEncryption::encryptString("99321");
     QString encSMTPPW = CEncryption::encryptString("keycodebox");
     QString encVNCPW = CEncryption::encryptString("keycodebox");
 
@@ -474,11 +475,13 @@ bool CTblAdmin::createAdminDefault()
     QMap<QString, QVariant> mapVals = qry.boundValues();
     qDebug() << "Mapped count:" << mapVals.count();
 
-    if( !qry.exec() ) {
+    if( !qry.exec() ) 
+    {
         qDebug() << "CTblAdmin::createAdminDefault():" << qry.lastError();
         return false;
     }
-    else {
+    else 
+    {
         qDebug( "Inserted!" );
         return true;
     }
