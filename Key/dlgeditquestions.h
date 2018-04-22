@@ -37,7 +37,7 @@ class CDlgEditQuestions : public QDialog
         Ui::CDlgEditQuestions *ui;
 
         void showKeyboard(CClickableLineEdit *p_lineEdit);
-        void enableOk();
+        void updateUi();
 };
 
 #endif // DLGEDITQUESTIONS_H

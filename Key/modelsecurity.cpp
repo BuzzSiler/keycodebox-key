@@ -54,9 +54,9 @@ void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDa
     CLockHistorySet *pLockHistorySet;
     CLockHistoryRec  *pState;
 
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE("Locks" << LockNums);
+    // KCB_DEBUG_TRACE("Locks" << LockNums);
     _ptblCodeHistory->selectLockCodeHistorySet(LockNums, start, end, &pLockHistorySet);
     Q_ASSERT_X(pLockHistorySet != nullptr, Q_FUNC_INFO, "pLockHistorySet is null");
 
@@ -69,7 +69,7 @@ void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDa
     }
 
     emit __OnLockHistorySet(pLockHistorySet);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
@@ -84,7 +84,8 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
                                                  adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
                                                  adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
                                                  adminInfo->getVNCPort(), adminInfo->getVNCPassword(),
-                                                 adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory());
+                                                 adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory(),
+                                                 adminInfo->getDisplayPowerDownTimeout());
     emit __OnUpdatedCurrentAdmin(bSuccess);
 }
 
@@ -660,7 +661,7 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
         _ptblCodeHistory->selectLastLockCodeHistorySet(LockNums, time, now, &_pHistorySet);
 
         // Predictive - so history rec
-        CLockHistoryRec *plockHistoryRec;
+        // CLockHistoryRec *plockHistoryRec;
 
 //        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++)
 //        {

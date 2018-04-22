@@ -177,7 +177,16 @@ void MainWindow::OnDisplayPoweredOn()
 {
     if (display_power_state == MainWindow::DISP_POWER_ON)
     {
-        _pdisplayPowerDown->start(30000);
+        if (!_pfAdminInfo)
+        {
+            return;
+        }
+
+        int timeout = _pfAdminInfo->getDisplayPowerDownTimeout();
+        if (timeout > 0)
+        {
+            _pdisplayPowerDown->start(timeout);
+        }
     }
 }
 
@@ -190,20 +199,8 @@ void MainWindow::OnImageClicked()
     else
     {
         qDebug() << "Powering on display";
-        auto process = new QProcess();
-        process->start("tvservice -M");
-
         system(qPrintable("vcgencmd display_power 1"));
-        process->waitForFinished(3000);
-
-        QString stderr(process->readAllStandardError());
-        qDebug() << stderr;
-        if (stderr.contains("HDMI is attached"))
-        {
-            display_power_state = MainWindow::DISP_POWER_ON;
-        }
-        qDebug() << "Power State" <<  display_power_state;
-        process->kill();
+        display_power_state = MainWindow::DISP_POWER_ON;
 
         emit gpmainWindow->__DisplayPoweredOn();
     }

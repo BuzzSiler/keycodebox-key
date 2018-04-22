@@ -40,6 +40,15 @@ static const char CMD_LIST_SYSTEM_FLAGS[] = "ls /home/pi/run/* | grep 'flag'";
 static const char CMD_READ_TIME_ZONE[] = "readlink /etc/localtime";
 static const char CMD_REMOVE_FP_FILE[] = "sudo rm -rf /home/pi/run/prints/\%1";
 
+static const int DISPLAY_POWER_DOWN_TIMEOUT[] = {
+     0,             // None
+    10 * 1000,      // 10 seconds
+    30 * 1000,      // 30 seconds
+    60 * 1000,      // 1 mins
+    5 * 60 * 1000,  // 5 mins
+    10 * 60 * 1000, // 10 mins
+    30 * 60 * 1000, // 30 mins
+};
 
 void CFrmAdminInfo::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 {
@@ -169,6 +178,13 @@ void CFrmAdminInfo::show()
         emit ui->tabWidget->currentChanged(0);
     }
 
+}
+
+int CFrmAdminInfo::getDisplayPowerDownTimeout()
+{
+    int index = ui->cbDisplayPowerDownTimeout->currentIndex();
+    Q_ASSERT_X(index >= 0 && index < sizeof(DISPLAY_POWER_DOWN_TIMEOUT), Q_FUNC_INFO, "Display power down timeout index out of range");
+    return DISPLAY_POWER_DOWN_TIMEOUT[index];
 }
 
 bool CFrmAdminInfo::isInternetTime()
@@ -940,6 +956,7 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
     _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
     _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
     _tmpAdminRec.setReportDirectory(_reportDirectory);
+    _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
 
     _bClose = false;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
@@ -998,11 +1015,11 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setPredictiveKey(ui->lblKey->text());
     _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
 
-    //_tmpAdminRec.setMaxLocks(ui->spinMaxLocks->value());
-
     _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
     _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
     _tmpAdminRec.setReportDirectory(_reportDirectory);
+
+    _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
 
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
@@ -1037,6 +1054,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->lblAssistPassword->setText(adminInfo->getAssistPassword());
         ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayFingerprintButton());
         ui->chkDisplayShowHideButton->setChecked(adminInfo->getDisplayShowHideButton());
+        ui->cbDisplayPowerDownTimeout->setCurrentIndex(adminInfo->getDisplayPowerDownTimeout());
 
         QString sFreq;
         QDateTime dtFreq = adminInfo->getDefaultReportFreq();
@@ -1393,7 +1411,7 @@ void CFrmAdminInfo::setupCodeTableContextMenu()
 
 void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
 {
-    KCB_DEBUG_TRACE(pSet);
+    // KCB_DEBUG_TRACE(pSet);
 
     Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
 
@@ -1444,10 +1462,10 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     while (itor.hasNext())
     {
         pState = itor.next();
-        qDebug() << "Adding row of History Lock State - Codes. Lock Num:" << pState->getLockNums();
+        // qDebug() << "Adding row of History Lock State - Codes. Lock Num:" << pState->getLockNums();
         
         QString locks = pState->getLockNums();
-        KCB_DEBUG_TRACE("Locks" << locks);
+        // KCB_DEBUG_TRACE("Locks" << locks);
         QStringList sl = locks.split(',');
         foreach (auto s, sl)
         {

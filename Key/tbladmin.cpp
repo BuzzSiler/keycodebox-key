@@ -40,6 +40,7 @@ const char *fvncpassword = "vnc_password";
 const char *freportviaemail = "report_via_email";
 const char *freporttofile = "report_to_file";
 const char *freportdirectory = "report_directory";
+const char *fdisplaypowerdown = "display_power_down_timeout";
 
 CAdminRec::CAdminRec() : 
     QObject(nullptr),
@@ -79,6 +80,8 @@ CAdminRec::CAdminRec() :
     report_via_email = false;
     report_save_to_file = false;
     report_directory = "";
+
+    display_power_down_timeout = 0;
 }
 
 CAdminRec &CAdminRec::operator=(CAdminRec &newRec) 
@@ -114,6 +117,8 @@ CAdminRec &CAdminRec::operator=(CAdminRec &newRec)
     report_via_email = newRec.report_via_email;
     report_save_to_file = newRec.report_save_to_file;
     report_directory = newRec.report_directory;
+
+    display_power_down_timeout = newRec.display_power_down_timeout;
 
     return *this;
 }
@@ -371,7 +376,7 @@ bool CTblAdmin::createTable()
                 " max_locks,"
                 " smtp_server, smtp_port, smtp_type, smtp_username, smtp_password,"
                 " vnc_port, vnc_password,"
-                " report_via_email, report_to_file, report_directory)";
+                " report_via_email, report_to_file, report_directory, display_power_down_timeout)";
 
         qry.prepare( sql );
 
@@ -420,13 +425,13 @@ bool CTblAdmin::createAdminDefault()
                             "predictive_key, predictive_resolution, max_locks, "
                             "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
                             "report_via_email, report_to_file, report_directory, "
-                            "vnc_port, vnc_password)"
+                            "vnc_port, vnc_password, display_power_down_timeout)"
                   " VALUES ('admin', 'admin@email.com', '555.555.5555', 1, :freq, "\
                             ":start, :pw, :code, :assistpw, :assistCode, :showFingerprint, "
                             ":use_pred, :pred_key, :pred_res, 32, "
                             "'', 0, 0, '', '', "
                             "1, 0, '', "
-                            "5900, 'vnc_password')");
+                            "5900, 'vnc_password', 0)");
     qry.prepare(sql);
 
     QString sTime;
@@ -484,14 +489,14 @@ bool CTblAdmin::readAdmin()
     qDebug( )<< "CTblAdmin::readAdmin()";
 
     QSqlQuery query(*_pDB);
-    QString sql = "SELECT admin_name, admin_email, admin_phone, default_report_freq," \
+    QString sql = "SELECT admin_name, admin_email, admin_phone, email_report_active, default_report_freq," \
                   "default_report_start, password, access_code, "
                   "assist_password, assist_code, show_fingerprint, show_password, "
                   "use_predictive_access_code, "
                   "predictive_key, predictive_resolution, max_locks, "
                   "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
                   "vnc_port,vnc_password, "
-                  "report_via_email, report_to_file, report_directory"
+                  "report_via_email, report_to_file, report_directory, display_power_down_timeout"
                   " FROM ";
     sql += TABLENAME;
 
@@ -523,6 +528,9 @@ bool CTblAdmin::readAdmin()
         int fldReportToEmail = query.record().indexOf(freportviaemail);
         int fldReportToFile = query.record().indexOf(freporttofile);
         int fldReportDirectory = query.record().indexOf(freportdirectory);
+        int fldDisplayPowerDownTimeout = query.record().indexOf(fdisplaypowerdown);
+
+        qDebug() << "fldDisplayPowerDownTimeout" << fldDisplayPowerDownTimeout << "fdisplaypowerdown" << fdisplaypowerdown;
 
         qDebug() << "fdls: Predictive:" << QString::number(fldPredictive) << " PredKey:" << QString::number(fldPredKey) << " PredRes:" << QString::number(fldPredRes);
 
@@ -584,12 +592,15 @@ bool CTblAdmin::readAdmin()
             _currentAdmin.setReportToFile(query.value(fldReportToFile).toBool());
             _currentAdmin.setReportDirectory(query.value(fldReportDirectory).toString());
 
+            _currentAdmin.setDisplayPowerDownTimeout(query.value(fldDisplayPowerDownTimeout).toInt());
+
             qDebug() << "CTblAdmin::readAdmin(): vCode:" << query.value(fldCode).toString() << " len:" << query.value(fldCode).toString().size();
             qDebug() << "CTblAdmin::readAdmin(): :access_code:" <<_currentAdmin.getAccessCode() << " len:" << _currentAdmin.getAccessCode().size();
             qDebug() << "CTblAdmin::readAdmin(): Use Pred:" << QVariant(_currentAdmin.getUsePredictiveAccessCode()).toString();
             qDebug() << "    Pred Key:" << _currentAdmin.getPredictiveKey();
             qDebug() << "    Pred Res:" << QString::number(_currentAdmin.getPredictiveResolution());
             qDebug() << "SMTP:" << _currentAdmin.getSMTPServer() << ":" << QVariant(_currentAdmin.getSMTPPort()).toString();
+            qDebug() << "DisplayPowerDownTimeout:" << _currentAdmin.getDisplayPowerDownTimeout();
 
             return true;
         }
@@ -612,7 +623,8 @@ bool CTblAdmin::updateAdminClear(QString name, QString email, QString phone,
                 QString smtpserver, int smtpport, int smtptype,
                 QString smtpusername, QString smtppassword,
                 int vncport, QString vncpassword,
-                bool bReportToEmail, bool bReportToFile, QString reportDirectory)
+                bool bReportToEmail, bool bReportToFile, QString reportDirectory,
+                int displayPowerDownTimeout)
 {
     QString encPW = CEncryption::encryptString(passwordClear);
     QString encCode = CEncryption::encryptString(accessCdClear);
@@ -626,7 +638,7 @@ bool CTblAdmin::updateAdminClear(QString name, QString email, QString phone,
     return updateAdmin(name, email, phone, emailReportActive, repFreq, startReport, encPW, encCode,
                        encAssistPw, encAssistCode, showFingerprint, showPassword, usePredictive, predKey, predRes,
                        nMaxLocks, smtpserver, smtpport, smtptype, smtpusername, encSMTPPW, vncport,
-                       encVNCPW, bReportToEmail, bReportToFile, reportDirectory);
+                       encVNCPW, bReportToEmail, bReportToFile, reportDirectory, displayPowerDownTimeout);
 }
 
 bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
@@ -639,9 +651,12 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
                 QString smtpserver, int smtpport, int smtptype,
                 QString smtpusername, QString smtppassword,
                 int vncport, QString vncpassword,
-                bool bReportToEmail, bool bReportToFile, QString reportDirectory)
+                bool bReportToEmail, bool bReportToFile, QString reportDirectory,
+                int displayPowerDownTimeout)
 {
-    qDebug() << "CTblAdmin::updateAdminDefault()";
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("power down timeout" << displayPowerDownTimeout);
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
@@ -655,7 +670,8 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
                   "smtp_server=:smtpserver, smtp_port=:smtpport, smtp_type=:smtptype, "
                   "smtp_username=:smtpusername, smtp_password=:smtppassword, "
                   "vnc_port=:vncport, vnc_password=:vncpassword, "
-                  "report_via_email=:reportViaEmail, report_to_file=:reportToFile, report_directory=:reportDir"
+                  "report_via_email=:reportViaEmail, report_to_file=:reportToFile, report_directory=:reportDir, "
+                  "display_power_down_timeout=:displayPowerDownTimeout"
                   " WHERE 1;");
     qry.prepare(sql);
 
@@ -693,6 +709,8 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
     qry.bindValue(":reportToFile", bReportToFile);
     qry.bindValue(":reportDir", reportDirectory);
 
+    qry.bindValue(":displayPowerDownTimeout", displayPowerDownTimeout);
+
     QMap<QString, QVariant> mapVals = qry.boundValues();
     qDebug() << "Mapped count:" << mapVals.count();
 
@@ -726,7 +744,8 @@ bool CTblAdmin::updateAdmin(CAdminRec &rec)
                        rec.getSMTPServer(), rec.getSMTPPort(), rec.getSMTPType(),
                        rec.getSMTPUsername(), rec.getSMTPPassword(),
                        rec.getVNCPort(), rec.getVNCPassword(),
-                       rec.getReportViaEmail(), rec.getReportToFile(), rec.getReportDirectory());
+                       rec.getReportViaEmail(), rec.getReportToFile(), rec.getReportDirectory(),
+                       rec.getDisplayPowerDownTimeout());
 }
 
 /**
@@ -750,6 +769,7 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     int smtpport, smtptype, vncport;
     bool bReportToEmail, bReportToFile;
     QString reportDir;
+    int displayPowerDown;
 
     if( adminObj.value(fname).isUndefined() ||
             adminObj.value(femail).isUndefined() ||
@@ -776,7 +796,8 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
             adminObj.value(fvncpassword).isUndefined() ||
             adminObj.value(freportviaemail).isUndefined() ||
             adminObj.value(freporttofile).isUndefined() ||
-            adminObj.value(freportdirectory).isUndefined()
+            adminObj.value(freportdirectory).isUndefined() ||
+            adminObj.value(fdisplaypowerdown).isUndefined()
             )
     {
         qDebug() << "Failed to update admin";
@@ -843,9 +864,11 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     bReportToFile= adminObj.value(freporttofile).toBool();
     reportDir = adminObj.value(freportdirectory).toString();
 
+    displayPowerDown = adminObj.value(fdisplaypowerdown).toInt();
+
     return updateAdminClear(name, email, phone, active, freq, start, pw, accessCd, assistpw, assistCode, showFingerprint,
                             showPassword, usePredictive, predKey, predResolution, unMaxLocks, smtpserver, smtpport, smtptype,
-                            smtpusername, smtppassword, vncport, vncpassword, bReportToEmail, bReportToFile, reportDir);
+                            smtpusername, smtppassword, vncport, vncpassword, bReportToEmail, bReportToFile, reportDir, displayPowerDown);
 }
 
 bool CTblAdmin::tableExists()
