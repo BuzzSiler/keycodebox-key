@@ -468,7 +468,7 @@ bool CTblAdmin::createAdminDefault()
     qry.bindValue(":smtp_password", encSMTPPW);
     qry.bindValue(":vnc_password", encVNCPW);
 
-    qry.bindValue(":use_pred", QVariant(true));
+    qry.bindValue(":use_pred", QVariant(false));
     qry.bindValue(":pred_key", QVariant("\*phzNZ2'od:9g\"J]Yc%1_m6Y51NpHImY8dz3,VVXU|jp7B]HG8@SxuC\od9;_>"));
     qry.bindValue(":pred_res", QVariant(10));
 
