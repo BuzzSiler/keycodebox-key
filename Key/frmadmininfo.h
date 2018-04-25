@@ -33,6 +33,7 @@ class CFrmAdminInfo;
 #define COL_END     5
 
 class SelectLocksWidget;
+class CheckableStringListModel;
 
 
 class CFrmAdminInfo : public QDialog
@@ -179,6 +180,17 @@ private slots:
     void OnCodeEditReject();
     void OnCodeEditAccept();
 
+    void on_cbStoreToUsbDrive_2_stateChanged(int state);
+
+    void on_cbUsbDrives_currentIndexChanged(const QString &arg1);
+
+    void on_cbSaveToFile_2_stateChanged(int state);
+
+    void on_pbGenerateReport_2_clicked();
+
+    void on_pbSave_clicked();
+
+    void on_pbClearAll_2_clicked();
 
     private:
     Ui::CFrmAdminInfo   *ui;
@@ -239,6 +251,8 @@ private slots:
 
     SelectLocksWidget&  m_select_locks;
     QStringList         _codesInUse;
+
+    CheckableStringListModel& m_model;
 
     void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
     std::string rtrim(std::string &s);

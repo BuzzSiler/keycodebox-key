@@ -23,6 +23,7 @@
 #include <QHostAddress>
 #include <QNetworkInterface>
 #include <QAbstractSocket>
+#include <QFileDialog>
 #include "lockset.h"
 #include "lockstate.h"
 #include "menupushbutton.h"
@@ -33,12 +34,15 @@
 #include "selectlockswidget.h"
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
+#include "checkablestringlistmodel.h"
 
 
 static const char CMD_REMOVE_ALL_FP_FILES[] = "sudo rm -rf /home/pi/run/prints/*";
 static const char CMD_LIST_SYSTEM_FLAGS[] = "ls /home/pi/run/* | grep 'flag'";
 static const char CMD_READ_TIME_ZONE[] = "readlink /etc/localtime";
-static const char CMD_REMOVE_FP_FILE[] = "sudo rm -rf /home/pi/run/prints/\%1";
+static const QString CMD_REMOVE_FP_FILE = "sudo rm -rf /home/pi/run/prints/\%1";
+
+static const char DEFAULT_REPORT_DIRECTORY[] = "/home/pi/kcb-config/reports";
 
 static const int DISPLAY_POWER_DOWN_TIMEOUT[] = {
      0,             // None
@@ -67,7 +71,8 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     _pworkingSet(0),
     // Explicit initialization needed to prevent spurious test emails
     _testEmail(false),
-    m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN))
+    m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
+    m_model(* new CheckableStringListModel())
 
 {
     ui->setupUi(this);
@@ -79,6 +84,8 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     initialize();
 
     setAttribute(Qt::WA_AcceptTouchEvents, true);
+
+    ui->lvAvailableReports_2->setModel(&m_model);
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -232,7 +239,8 @@ void CFrmAdminInfo::initialize()
     
     ui->dtEndCodeList->setDateTime(QDateTime().currentDateTime());
     ui->dtEndCodeHistoryList->setDateTime(QDateTime().currentDateTime());
-    ui->dtEndReport->setDateTime(QDateTime().currentDateTime());
+    // ui->dtEndReport->setDateTime(QDateTime().currentDateTime());
+    ui->dtEnd_2->setDateTime(QDateTime().currentDateTime());
 
     setupCodeTableContextMenu();
 
@@ -476,7 +484,9 @@ void CFrmAdminInfo::populateFileWidget(QString sDirectory, QString sFilter)
     }
 
     if(!_pmodel)
+    {
         _pmodel = new QFileSystemModel();
+    }
 
     QStringList list;
     list << sDirectory << "KeycodeboxReports";
@@ -902,7 +912,8 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
     KCB_DEBUG_ENTRY;
     QDateTime   freq;
     bool    bNever = false;
-    QString sFreq = ui->cbReportFreq->currentText();
+    // QString sFreq = ui->cbReportFreq->currentText();
+    QString sFreq = ui->cbFrequency_2->currentText();
 
     if(sFreq.compare(fNever) == 0)
     {
@@ -939,7 +950,8 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
     _tmpAdminRec.setAdminEmail(ui->lblEmail->text());
     _tmpAdminRec.setAdminPhone(ui->lblPhone->text());
     _tmpAdminRec.setDefaultReportFreq(freq);
-    _tmpAdminRec.setDefaultReportStart(ui->dtStart->dateTime());
+    // _tmpAdminRec.setDefaultReportStart(ui->dtStart->dateTime());
+    _tmpAdminRec.setDefaultReportStart(ui->dtStartDateTime_2->dateTime());
     _tmpAdminRec.setEmailReportActive(bNever);
     _tmpAdminRec.setPassword(ui->lblPassword->text());
     _tmpAdminRec.setAccessCode(ui->lblAccessCode->text());
@@ -951,10 +963,11 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
     _tmpAdminRec.setPredictiveKey(ui->lblKey->text());
     _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
 
-    //_tmpAdminRec.setMaxLocks(ui->spinMaxLocks->value());
-
-    _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
-    _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
+    // _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());    
+    _tmpAdminRec.setReportViaEmail(ui->cbSendViaEmail_2->isChecked());    
+    // _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
+    _tmpAdminRec.setReportToFile(ui->cbSaveToFile_2->isChecked());
+    KCB_DEBUG_TRACE(_reportDirectory);
     _tmpAdminRec.setReportDirectory(_reportDirectory);
     _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
 
@@ -967,7 +980,9 @@ void CFrmAdminInfo::on_btnDone_clicked()
 {
     QDateTime   freq;
     bool    bNever = false;
-    QString sFreq = ui->cbReportFreq->currentText();
+    // QString sFreq = ui->cbReportFreq->currentText();
+    QString sFreq = ui->cbFrequency_2->currentText();
+    
     if(sFreq.compare(fNever) == 0)
     {
         freq = QDateTime(QDate(), QTime(0,0));
@@ -1003,7 +1018,8 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setAdminEmail(ui->lblEmail->text());
     _tmpAdminRec.setAdminPhone(ui->lblPhone->text());
     _tmpAdminRec.setDefaultReportFreq(freq);
-    _tmpAdminRec.setDefaultReportStart(ui->dtStart->dateTime());
+    // _tmpAdminRec.setDefaultReportStart(ui->dtStart->dateTime());
+    _tmpAdminRec.setDefaultReportStart(ui->dtStartDateTime_2->dateTime());    
     _tmpAdminRec.setEmailReportActive(bNever);
     _tmpAdminRec.setPassword(ui->lblPassword->text());
     _tmpAdminRec.setAccessCode(ui->lblAccessCode->text());
@@ -1015,8 +1031,13 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setPredictiveKey(ui->lblKey->text());
     _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
 
-    _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
-    _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
+
+    // _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
+    _tmpAdminRec.setReportViaEmail(ui->cbSendViaEmail_2->isChecked());    
+    // _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
+    _tmpAdminRec.setReportToFile(ui->cbSaveToFile_2->isChecked());
+
+    KCB_DEBUG_TRACE(_reportDirectory);
     _tmpAdminRec.setReportDirectory(_reportDirectory);
 
     _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
@@ -1059,49 +1080,69 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         QString sFreq;
         QDateTime dtFreq = adminInfo->getDefaultReportFreq();
         qDebug() << "AdminInfo freq date:" << dtFreq.toString("yyyy-MM-dd HH:mm:ss");
-        if(dtFreq == QDateTime(QDate(), QTime(0,0))) {
+        if(dtFreq == QDateTime(QDate(), QTime(0,0)))
+        {
             sFreq = fNever;
         }
-        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(0,0))) {
+        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(0,0)))
+        {
             sFreq = fEach;
         }
-        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(1,0))) {
+        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(1,0)))
+        {
             sFreq = fHourly;
         }
-        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(12,0))) {
+        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(12,0)))
+        {
             sFreq = fEvery12Hours;
         }
-        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(23,59))) {
+        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(23,59)))
+        {
             sFreq = fDaily;
         }
-        else if(dtFreq == QDateTime(QDate(1,1,7), QTime(0,0))) {
+        else if(dtFreq == QDateTime(QDate(1,1,7), QTime(0,0)))
+        {
             sFreq = fWeekly;
         }
         else if(dtFreq == QDateTime(QDate(1,12,1), QTime(0,0)))
         {
             sFreq = fMonthly;
         }
-        ui->cbReportFreq->setCurrentText(sFreq);
+        // ui->cbReportFreq->setCurrentText(sFreq);
+        ui->cbFrequency_2->setCurrentText(sFreq);
 
         QDateTime dtStart = adminInfo->getDefaultReportStart();
-        ui->dtStart->setDateTime(dtStart);
+        // ui->dtStart->setDateTime(dtStart);
+        ui->dtStartDateTime_2->setDateTime(dtStart);
         ui->chkUsePredictive->setChecked(adminInfo->getUsePredictiveAccessCode());
         ui->lblKey->setText(adminInfo->getPredictiveKey());
         ui->spinCodeGenResolution->setValue(adminInfo->getPredictiveResolution());
-        //ui->spinMaxLocks->setValue(adminInfo->getMaxLocks());
 
         qDebug() << "PRINT REPORT PRESSED";
         qDebug() << adminInfo->getReportViaEmail();
         qDebug() << adminInfo->getReportToFile();
 
-        if(adminInfo->getReportViaEmail())
+        ui->cbSendViaEmail_2->setChecked(adminInfo->getReportViaEmail());
+        ui->cbSaveToFile_2->setChecked(adminInfo->getReportToFile());
+
+        KCB_DEBUG_TRACE(_reportDirectory << usbDevice0 << usbDevice1);
+        if ((!usbDevice0.isEmpty() && _reportDirectory.contains(usbDevice0)) || (!usbDevice1.isEmpty() && _reportDirectory.contains(usbDevice1)))
         {
-            ui->cbReportViaEmail->setChecked(true);
+            ui->cbStoreToUsbDrive_2->setChecked(true);
         }
-        if(adminInfo->getReportToFile())
+        else
         {
-            ui->cbReportToFile->setChecked(true);
+            ui->cbStoreToUsbDrive_2->setChecked(false);
         }
+
+        // if(adminInfo->getReportViaEmail())
+        // {
+        //     // ui->cbReportViaEmail->setChecked(true);
+        // }
+        // if(adminInfo->getReportToFile())
+        // {
+        //     // ui->cbReportToFile->setChecked(true);
+        // }
 
         ui->tabWidget->setCurrentIndex(0);
         
@@ -1154,6 +1195,42 @@ void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
     usbDevice1 = QString(device1);
     qDebug() << usbDevice0;
     qDebug() << usbDevice1;
+
+    ui->cbUsbDrives->clear();
+    if (!usbDevice0.isEmpty())
+    {
+        if (ui->cbUsbDrives->findText(usbDevice0) < 0)
+        {
+            ui->cbUsbDrives->addItem(usbDevice0);
+        }
+    }
+    else if (!usbDevice1.isEmpty())
+    {
+        if (ui->cbUsbDrives->findText(usbDevice1) < 0)
+        {
+            ui->cbUsbDrives->addItem(usbDevice1);
+        }
+    }
+
+    // Update the report directory if the USB drive has been removed
+    // Compare the report directory obtained from the database with the available usb devices
+    //    If either usb device is in the report directory path then set the _reportDirectory
+    //    per the database
+    //    If neither usb device is in the report directory path then set the _reportDirectory
+    //    to the default path (/home/pi/kcb-config/reports)
+    //    Also, update the "Store to USB Drive" checkbox (disable) and USB drive combo box
+    //      ui->cbStoreToUsbDrive_2->setChecked(false);
+    if (_reportDirectory.contains(usbDevice0) || _reportDirectory.contains(usbDevice1))
+    {
+        // Nothing to do 
+    }
+    else
+    {
+        _reportDirectory = DEFAULT_REPORT_DIRECTORY;
+        ui->cbStoreToUsbDrive_2->setChecked(false);
+    }
+    KCB_DEBUG_TRACE(_reportDirectory);
+
 
     ui->btnCopyToggleSource->setText(tr("Source #1"));
 
@@ -1715,15 +1792,34 @@ void CFrmAdminInfo::on_btnPrintReport_clicked()
 {
     // Print report
     QDateTime   dtStart, dtEnd;
-    dtStart = ui->dtStartReport->dateTime();
-    dtEnd = ui->dtEndReport->dateTime();
+    // dtStart = ui->dtStartReport->dateTime();
+    dtStart = ui->dtStart_3->dateTime();
+    // dtEnd = ui->dtEndReport->dateTime();
+    dtEnd = ui->dtEnd_2->dateTime();
 
-    _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
-    _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
+    // _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
+    _tmpAdminRec.setReportViaEmail(ui->cbSendViaEmail_2->isChecked());
+    // _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
+    _tmpAdminRec.setReportToFile(ui->cbSaveToFile_2->isChecked());
+    _tmpAdminRec.setReportDirectory(_reportDirectory); 
     _bClose = false;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
-
     emit __OnImmediateReportRequest(dtStart, dtEnd);
+
+    auto dir = QDir(_reportDirectory);
+    QStringList strList = dir.entryList(QDir::Files, QDir::Time);
+    m_model.setStringList(strList);    
+    if (strList.count() > 0)
+    {
+        m_model.setStringList(strList);
+        ui->pbSelectAll->setEnabled(true);
+        ui->pbClearAll->setEnabled(true);
+    }
+    else
+    {
+        ui->pbSelectAll->setEnabled(false);
+        ui->pbClearAll->setEnabled(false);
+    }
 }
 
 void CFrmAdminInfo::on_btnToggleSource_clicked(bool checked)
@@ -2232,7 +2328,7 @@ void CFrmAdminInfo::on_btnPurgeCodes_clicked()
 
 void CFrmAdminInfo::OnTabSelected(int index)
 {
-    qDebug() << "CFrmAdminInfo::OnTabSelected" << index;
+    KCB_DEBUG_TRACE(index);
 
     QDateTime dt = QDateTime().currentDateTime();
     ui->dtEndCodeHistoryList->setDateTime(dt);
@@ -2242,6 +2338,9 @@ void CFrmAdminInfo::OnTabSelected(int index)
     emit ui->btnReadCodes->clicked();
     emit ui->btnRead->clicked();
 
+    auto dir = QDir(_reportDirectory);
+    QStringList strList = dir.entryList(QDir::Files, QDir::Time);
+    m_model.setStringList(strList);
 }
 
 void CFrmAdminInfo::on_btnTestEmail_clicked()
@@ -2274,4 +2373,104 @@ void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
     // Note: It should never be the case that we are not admin
     Q_ASSERT_X(is_user == false, Q_FUNC_INFO, "We are not admin");
     emit __OnOpenLockRequest(lock);
+}
+
+void CFrmAdminInfo::on_cbStoreToUsbDrive_2_stateChanged(int state)
+{
+    if (state == Qt::Checked)
+    {
+        ui->cbUsbDrives->clear();
+        if (!usbDevice0.isEmpty())
+        {
+            ui->cbUsbDrives->addItem(usbDevice0);
+        }
+        if (!usbDevice1.isEmpty())
+        {
+            ui->cbUsbDrives->addItem(usbDevice1);
+        }
+        ui->cbUsbDrives->setCurrentIndex(0);
+        on_cbUsbDrives_currentIndexChanged(ui->cbUsbDrives->currentText());
+        ui->cbUsbDrives->setEnabled(true);
+    }
+    else if (state == Qt::Unchecked)
+    {
+        ui->cbUsbDrives->clear();
+        ui->cbUsbDrives->addItem("Default");
+        ui->cbUsbDrives->setDisabled(true);
+        _reportDirectory = DEFAULT_REPORT_DIRECTORY;
+    }
+    KCB_DEBUG_TRACE(_reportDirectory);
+    _tmpAdminRec.setReportDirectory(_reportDirectory);
+
+    auto dir = QDir(_reportDirectory);
+    QStringList strList = dir.entryList(QDir::Files, QDir::Time);
+    if (strList.count() > 0)
+    {
+        m_model.setStringList(strList);
+        ui->pbSelectAll->setEnabled(true);
+        ui->pbClearAll->setEnabled(true);
+    }
+    else
+    {
+        ui->pbSelectAll->setEnabled(false);
+        ui->pbClearAll->setEnabled(false);
+    }
+}
+
+void CFrmAdminInfo::on_cbUsbDrives_currentIndexChanged(const QString &arg1)
+{
+    if (!arg1.isEmpty() && arg1 != "Default")
+    {
+        _reportDirectory = QString("/media/pi/%1/KeycodeboxReports").arg(arg1);
+    }
+}
+
+void CFrmAdminInfo::on_cbSaveToFile_2_stateChanged(int state)
+{
+    bool enable = state == Qt::Checked ? true : false;
+
+    ui->lblDeleteOlderThan_2->setEnabled(enable);
+    ui->cbDeleteOlderThan_2->setEnabled(enable);
+    ui->cbStoreToUsbDrive_2->setEnabled(enable);
+    on_cbStoreToUsbDrive_2_stateChanged(ui->cbStoreToUsbDrive_2->checkState());
+}
+
+void CFrmAdminInfo::on_pbGenerateReport_2_clicked()
+{
+    on_btnPrintReport_clicked();
+}
+
+void CFrmAdminInfo::on_pbSave_clicked()
+{
+    on_btnSaveSettings_clicked();
+}
+
+//void CFrmAdminInfo::on_pbClearAll_clicked()
+//{
+//    auto dir = QDir(_reportDirectory);
+//    dir.remove(_reportDirectory);
+//    QStringList strList = dir.entryList(QDir::Files, QDir::Time);
+//    m_model.setStringList(strList);
+//    dir.mkdir(_reportDirectory);
+//    KCB_DEBUG_ENTRY;
+//    int count = m_model.rowCount();
+//    KCB_DEBUG_TRACE(count);
+//    for(int row = 0; row < count; row++)
+//    {
+//        QModelIndex vIndex = m_model.index(row,0);
+//        auto checkstate = Qt::CheckState(m_model.data(vIndex, Qt::CheckStateRole).toUInt());
+//        qDebug() << checkstate;
+//        if (checkstate == Qt::Checked)
+//        {
+//            KCB_DEBUG_TRACE(row << "checked");
+//            m_model.setData(vIndex, Qt::Unchecked, Qt::CheckStateRole);
+//        }
+//    }
+//    KCB_DEBUG_EXIT;
+//}
+
+void CFrmAdminInfo::on_pbClearAll_2_clicked()
+{
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_EXIT;
 }

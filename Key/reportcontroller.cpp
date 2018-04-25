@@ -191,18 +191,23 @@ void CReportController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime d
     {
         buildReportFile(pLockHistorySet, _padminInfo, &_pFile);
 
-        if( _padminInfo->getReportViaEmail() ) {
+        if( _padminInfo->getReportViaEmail() ) 
+        {
             qDebug() << "CReportController::OnCodeHistoryForDateRange() >> PrepareToSendEmail(...)";
             PrepareToSendEmail(_padminInfo, _pFile);
         }
-        if( _padminInfo->getReportToFile()) {
+        if( _padminInfo->getReportToFile()) 
+        {
             qDebug() << "CReportController::OnCodeHistoryForDateRange() >> Save to file";
             // Save it
             // Already saved...
-        } else {
+        } 
+        else 
+        {
             qDebug() << "CReportController::OnCodeHistoryForDateRange() >> DON'T Save to file. Deleting file.";
             // Remove it
-            if(_pFile) {
+            if(_pFile) 
+            {
                 _pFile->remove();
             }
         }
@@ -212,7 +217,8 @@ void CReportController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime d
 
 bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStart, QDateTime &dtReportEnd)
 {
-    if( !_ptblCodeHistory) {
+    if( !_ptblCodeHistory) 
+    {
         qDebug() << "CReportController::timetoSendReport(). Requires TblCodeHistory to be set.";
         return false;
     }
@@ -304,12 +310,18 @@ void CReportController::requestCurrentAdminRecord()
     emit __OnRequestCurrentAdmin();
 }
 
-
 void CReportController::OnCheckIfReportingTimeEvent()
 {
     // Check if we need to send a report.
     QDateTime   dtNow = QDateTime::currentDateTime();
     QDateTime dtReportStart, dtReportEnd;
+    
+    //RemoveOldReports(dtNow);
+    //   Get a list of reports from the report directory sorted by date/time
+    //   Get the 'delete reports older than' value
+    //   Determine what files in the list need to be deleted
+    //   Delete the relevant files
+
     if(!timetoSendReport(dtNow, dtReportStart, dtReportEnd)) 
     {
         return;

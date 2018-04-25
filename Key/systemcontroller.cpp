@@ -708,6 +708,7 @@ void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 
 int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mountedDeviceCount)
 {
+    static int lastFoundDeviceCount = 0;
     std::string listCmd = "ls /media/pi/";
     FILE *cmdF;
     std::string sOutput;
@@ -783,8 +784,17 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
         {
             strcpy(mountedDevices[i],foundDevices[i]);
             refreshAdminDeviceList = true;
+            lastFoundDeviceCount = foundDeviceCount;
         }
     }
+
+    // Handles the case when USB drives are removed and the device count is 0
+    if (foundDeviceCount == 0 && foundDeviceCount != lastFoundDeviceCount)
+    {
+        lastFoundDeviceCount = foundDeviceCount;
+        refreshAdminDeviceList = true;
+    }
+
     std::string dev0 = mountedDevices[0];
     std::string dev1 = mountedDevices[1];
 
@@ -813,7 +823,9 @@ void CSystemController::start()
         QCoreApplication::processEvents();
 
         if( _fingerprintReader )
+        {
             _fingerprintReader->handleEvents();
+        }
 
         // dirty hack for events that need to be triggered after the
         //   admin has been setup (signals need to be connected there before

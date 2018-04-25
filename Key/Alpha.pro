@@ -79,7 +79,8 @@ SOURCES += main.cpp\
     lockcabinetwidget.cpp \
     kcbkeyboardwidget.cpp \
     kcbkeyboarddialog.cpp \
-    kcbutils.cpp
+    kcbutils.cpp \
+    checkablestringlistmodel.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -144,7 +145,8 @@ HEADERS  += keycodeboxmain.h \
     kcbcommon.h \
     kcbkeyboardwidget.h \
     kcbkeyboarddialog.h \
-    kcbutils.h
+    kcbutils.h \
+    checkablestringlistmodel.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \
