@@ -86,6 +86,7 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     setAttribute(Qt::WA_AcceptTouchEvents, true);
 
     ui->lvAvailableReports_2->setModel(&m_model);
+    m_model.setStringList(QStringList());
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -1125,14 +1126,25 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->cbSendViaEmail_2->setChecked(adminInfo->getReportViaEmail());
         ui->cbSaveToFile_2->setChecked(adminInfo->getReportToFile());
 
-        KCB_DEBUG_TRACE(_reportDirectory << usbDevice0 << usbDevice1);
-        if ((!usbDevice0.isEmpty() && _reportDirectory.contains(usbDevice0)) || (!usbDevice1.isEmpty() && _reportDirectory.contains(usbDevice1)))
+        /* There are three possible values for the report directory
+               1. Empty - this means that we are not storing reports to a file
+               2. /media/pi/<usbdrive>/KeycodeboxReports - this means that we are storing reports on a USB drive
+               3. /home/pi/kcb-config/reports - this means that we are storing reports in the default location
+            Note: cbSaveToFile_2 is checked only for 2. and 3.
+        */
+        ui->cbSaveToFile_2->setChecked(_reportDirectory.isEmpty() ? false : true);
+
+        if (ui->cbSaveToFile_2->isChecked())
         {
-            ui->cbStoreToUsbDrive_2->setChecked(true);
-        }
-        else
-        {
-            ui->cbStoreToUsbDrive_2->setChecked(false);
+            KCB_DEBUG_TRACE(_reportDirectory << usbDevice0 << usbDevice1);
+            if ((!usbDevice0.isEmpty() && _reportDirectory.contains(usbDevice0)) || (!usbDevice1.isEmpty() && _reportDirectory.contains(usbDevice1)))
+            {
+                ui->cbStoreToUsbDrive_2->setChecked(true);
+            }
+            else
+            {
+                ui->cbStoreToUsbDrive_2->setChecked(false);
+            }
         }
 
         // if(adminInfo->getReportViaEmail())
@@ -1806,19 +1818,22 @@ void CFrmAdminInfo::on_btnPrintReport_clicked()
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
     emit __OnImmediateReportRequest(dtStart, dtEnd);
 
-    auto dir = QDir(_reportDirectory);
-    QStringList strList = dir.entryList(QDir::Files, QDir::Time);
-    m_model.setStringList(strList);    
-    if (strList.count() > 0)
+    if (ui->cbSaveToFile_2->isEnabled())
     {
+        auto dir = QDir(_reportDirectory);
+        QStringList strList = dir.entryList(QDir::Files, QDir::Time);
         m_model.setStringList(strList);
-        ui->pbSelectAll->setEnabled(true);
-        ui->pbClearAll->setEnabled(true);
-    }
-    else
-    {
-        ui->pbSelectAll->setEnabled(false);
-        ui->pbClearAll->setEnabled(false);
+        if (strList.count() > 0)
+        {
+            m_model.setStringList(strList);
+            ui->pbSelectAll_2->setEnabled(true);
+            ui->pbClearAll_2->setEnabled(true);
+        }
+        else
+        {
+            ui->pbSelectAll_2->setEnabled(false);
+            ui->pbClearAll_2->setEnabled(false);
+        }
     }
 }
 
@@ -2338,9 +2353,12 @@ void CFrmAdminInfo::OnTabSelected(int index)
     emit ui->btnReadCodes->clicked();
     emit ui->btnRead->clicked();
 
-    auto dir = QDir(_reportDirectory);
-    QStringList strList = dir.entryList(QDir::Files, QDir::Time);
-    m_model.setStringList(strList);
+    if (ui->cbSaveToFile_2->isEnabled())
+    {
+        auto dir = QDir(_reportDirectory);
+        QStringList strList = dir.entryList(QDir::Files, QDir::Time);
+        m_model.setStringList(strList);
+    }
 }
 
 void CFrmAdminInfo::on_btnTestEmail_clicked()
@@ -2377,6 +2395,7 @@ void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
 
 void CFrmAdminInfo::on_cbStoreToUsbDrive_2_stateChanged(int state)
 {
+    KCB_DEBUG_ENTRY;
     if (state == Qt::Checked)
     {
         ui->cbUsbDrives->clear();
@@ -2388,9 +2407,8 @@ void CFrmAdminInfo::on_cbStoreToUsbDrive_2_stateChanged(int state)
         {
             ui->cbUsbDrives->addItem(usbDevice1);
         }
-        ui->cbUsbDrives->setCurrentIndex(0);
-        on_cbUsbDrives_currentIndexChanged(ui->cbUsbDrives->currentText());
         ui->cbUsbDrives->setEnabled(true);
+        ui->cbUsbDrives->setCurrentIndex(0);
     }
     else if (state == Qt::Unchecked)
     {
@@ -2398,46 +2416,85 @@ void CFrmAdminInfo::on_cbStoreToUsbDrive_2_stateChanged(int state)
         ui->cbUsbDrives->addItem("Default");
         ui->cbUsbDrives->setDisabled(true);
         _reportDirectory = DEFAULT_REPORT_DIRECTORY;
+        _tmpAdminRec.setReportDirectory(_reportDirectory);
     }
     KCB_DEBUG_TRACE(_reportDirectory);
-    _tmpAdminRec.setReportDirectory(_reportDirectory);
 
     auto dir = QDir(_reportDirectory);
     QStringList strList = dir.entryList(QDir::Files, QDir::Time);
     if (strList.count() > 0)
     {
         m_model.setStringList(strList);
-        ui->pbSelectAll->setEnabled(true);
-        ui->pbClearAll->setEnabled(true);
+        ui->pbSelectAll_2->setEnabled(true);
+        ui->pbClearAll_2->setEnabled(true);
     }
     else
     {
-        ui->pbSelectAll->setEnabled(false);
-        ui->pbClearAll->setEnabled(false);
+        ui->pbSelectAll_2->setEnabled(false);
+        ui->pbClearAll_2->setEnabled(false);
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_cbUsbDrives_currentIndexChanged(const QString &arg1)
 {
+    KCB_DEBUG_ENTRY;
     if (!arg1.isEmpty() && arg1 != "Default")
     {
         _reportDirectory = QString("/media/pi/%1/KeycodeboxReports").arg(arg1);
+        _tmpAdminRec.setReportDirectory(_reportDirectory);      
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_cbSaveToFile_2_stateChanged(int state)
 {
+    KCB_DEBUG_ENTRY;
     bool enable = state == Qt::Checked ? true : false;
 
     ui->lblDeleteOlderThan_2->setEnabled(enable);
     ui->cbDeleteOlderThan_2->setEnabled(enable);
     ui->cbStoreToUsbDrive_2->setEnabled(enable);
-    on_cbStoreToUsbDrive_2_stateChanged(ui->cbStoreToUsbDrive_2->checkState());
+    ui->cbUsbDrives->setEnabled(enable);
+
+    if (state == Qt::Checked)
+    {
+        _reportDirectory = DEFAULT_REPORT_DIRECTORY;
+    }
+    else if (state == Qt::Unchecked)
+    {
+        QString title = tr("Disabling Store Report to File");
+        QString message = tr("You are disabling 'Store Report to File'\n"
+                          "Selecting 'yes' will delete all existing report files\n"
+                          "Do you want to continue?");
+        auto button = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
+        if (button == QMessageBox::No)
+        {
+            ui->cbSaveToFile_2->setChecked(true);
+        }
+        else
+        {
+            ui->cbStoreToUsbDrive_2->setCheckState(Qt::Unchecked);
+            auto dir = QDir(_reportDirectory);
+            dir.removeRecursively();
+            dir.mkdir(_reportDirectory);
+            QStringList strList = dir.entryList(QDir::Files, QDir::Time);
+            m_model.setStringList(strList);
+            _reportDirectory = "";
+        }
+    }
+    _tmpAdminRec.setReportDirectory(_reportDirectory);
+    KCB_DEBUG_TRACE(_reportDirectory);
+
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_pbGenerateReport_2_clicked()
 {
-    on_btnPrintReport_clicked();
+    if (ui->cbSaveToFile_2->isChecked())
+    {
+        on_btnPrintReport_clicked();
+    }
 }
 
 void CFrmAdminInfo::on_pbSave_clicked()
@@ -2445,32 +2502,125 @@ void CFrmAdminInfo::on_pbSave_clicked()
     on_btnSaveSettings_clicked();
 }
 
-//void CFrmAdminInfo::on_pbClearAll_clicked()
-//{
 //    auto dir = QDir(_reportDirectory);
 //    dir.remove(_reportDirectory);
 //    QStringList strList = dir.entryList(QDir::Files, QDir::Time);
 //    m_model.setStringList(strList);
 //    dir.mkdir(_reportDirectory);
-//    KCB_DEBUG_ENTRY;
-//    int count = m_model.rowCount();
-//    KCB_DEBUG_TRACE(count);
-//    for(int row = 0; row < count; row++)
-//    {
-//        QModelIndex vIndex = m_model.index(row,0);
-//        auto checkstate = Qt::CheckState(m_model.data(vIndex, Qt::CheckStateRole).toUInt());
-//        qDebug() << checkstate;
-//        if (checkstate == Qt::Checked)
-//        {
-//            KCB_DEBUG_TRACE(row << "checked");
-//            m_model.setData(vIndex, Qt::Unchecked, Qt::CheckStateRole);
-//        }
-//    }
-//    KCB_DEBUG_EXIT;
-//}
+
+void CFrmAdminInfo::ClearSelectAllReports(Qt::CheckState state)
+{
+    int count = m_model.rowCount();
+    for(int row = 0; row < count; row++)
+    {
+        QModelIndex vIndex = m_model.index(row,0);
+        m_model.setData(vIndex, state, Qt::CheckStateRole);
+    }
+}
+
+void CFrmAdminInfo::GetSelectedReports(QStringList& list)
+{
+    int count = m_model.rowCount();
+    for(int row = 0; row < count; row++)
+    {
+        QModelIndex vIndex = m_model.index(row,0);
+        auto state = Qt::CheckState(m_model.data(vIndex, Qt::CheckStateRole).toInt());
+        if (state == Qt::Checked)
+        {
+            auto entry = m_model.data(vIndex, Qt::DisplayRole).toString();
+            KCB_DEBUG_TRACE(entry);
+            list.append(entry);
+        }
+    }
+}
 
 void CFrmAdminInfo::on_pbClearAll_2_clicked()
 {
     KCB_DEBUG_ENTRY;
+    ClearSelectAllReports(Qt::Unchecked);
+    ui->pbDeleteSelectedReports_2->setEnabled(false);
+    ui->pbDownloadSelectedReports_2->setEnabled(false);
+
     KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::on_pbSelectAll_2_clicked()
+{
+    KCB_DEBUG_ENTRY;
+    ClearSelectAllReports(Qt::Checked);
+    ui->pbDeleteSelectedReports_2->setEnabled(true);
+    ui->pbDownloadSelectedReports_2->setEnabled(true);
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::on_cbDeleteOlderThan_2_currentIndexChanged(int index)
+{
+
+}
+
+void CFrmAdminInfo::on_pbDeleteSelectedReports_2_clicked()
+{
+    KCB_DEBUG_ENTRY;
+    QStringList list;
+    GetSelectedReports(list);
+
+//    KCB_DEBUG_TRACE(list.count());
+
+    QDir dir(_reportDirectory);
+
+    foreach (auto entry, list)
+    {
+        QFile file(dir.filePath(entry));
+        file.remove();
+    }
+
+    QStringList strList = dir.entryList(QDir::Files, QDir::Time);
+    m_model.setStringList(strList);
+
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::on_pbDownloadSelectedReports_2_clicked()
+{
+    QMessageBox::warning(this, "Download Reports",
+                         "You have selected to download reports\n"
+                         "Download is only possible is reports are stored in default location\n"
+                         "Clicking download should first warn the user that reports will be deleted\n"
+                         "If the user click 'yes' to continue, then a dialog will be displayed\n"
+                         "If the user clicks 'no', the message box is dismissed\n"
+                         "The download dialog will prompt the user to insert a USB drive if one hasn't already been inserted\n"
+                         "Note: maybe we shouldn't enable download is a USB drive isn't already inserted?"
+                         "The download dialog will show the USB drive inserted, a progress bar, and a start button\n"
+                         "If the download is successful, i.e., all file copied to USB drive and deleted from default location\n"
+                         "Then the download dialog will be dismissed\n"
+                         "If there was an error present a messagebox, wait for close, and dismiss download dialog",
+                         QMessageBox::Ok);
+}
+
+void CFrmAdminInfo::on_lvAvailableReports_2_clicked(const QModelIndex &index)
+{
+    auto state = Qt::CheckState(m_model.data(index, Qt::CheckStateRole).toInt());
+    if (state == Qt::Checked)
+    {
+        ui->pbDeleteSelectedReports_2->setEnabled(true);
+        ui->pbDownloadSelectedReports_2->setEnabled(true);
+    }
+    else
+    {
+        QStringList list;
+        GetSelectedReports(list);
+        KCB_DEBUG_TRACE(list.count());
+        if (list.count() == 0)
+        {
+            ui->pbDeleteSelectedReports_2->setEnabled(false);
+            ui->pbDownloadSelectedReports_2->setEnabled(false);
+        }
+    }
+}
+
+void CFrmAdminInfo::on_cbSendViaEmail_2_stateChanged(int state)
+{
+    Q_UNUSED(state);
+    bool one_or_more_rpt_options = ui->cbSendViaEmail_2->isChecked() || ui->cbSaveToFile_2->isChecked();
+    ui->pbGenerateReport_2->setEnabled(one_or_more_rpt_options);
 }

@@ -190,7 +190,21 @@ private slots:
 
     void on_pbSave_clicked();
 
+    void ClearSelectAllReports(Qt::CheckState state);
+    void GetSelectedReports(QStringList& list);
+    
     void on_pbClearAll_2_clicked();
+    void on_pbSelectAll_2_clicked();
+
+    void on_cbDeleteOlderThan_2_currentIndexChanged(int index);
+
+    void on_pbDeleteSelectedReports_2_clicked();
+
+    void on_pbDownloadSelectedReports_2_clicked();
+
+    void on_lvAvailableReports_2_clicked(const QModelIndex &index);
+
+    void on_cbSendViaEmail_2_stateChanged(int state);
 
     private:
     Ui::CFrmAdminInfo   *ui;

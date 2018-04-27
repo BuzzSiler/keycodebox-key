@@ -62,8 +62,6 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
 
         return;
     }
-    // Check for directory "KeyCodeBoxReports"
-    // Create if it doesn't exist
     if(!dir.exists())
     {
         qDebug() << " Path doesn't exist. Creating entire path";
