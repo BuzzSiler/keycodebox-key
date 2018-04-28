@@ -266,7 +266,7 @@ void CSecurityController::OnAdminSecurityCheckFailed()
 
 void CSecurityController::OnSecurityCheckSuccess(QString locks)
 {
-    KCB_DEBUG_TRACE("locks:" << locks);
+    // KCB_DEBUG_TRACE("locks:" << locks);
     emit __OnSecurityCheckSuccess(locks);
     //emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
 }

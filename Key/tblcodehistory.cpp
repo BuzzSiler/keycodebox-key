@@ -82,7 +82,6 @@ void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistory
         auto seq = QUERY_VALUE(qry, "sequence").toString();
         auto seq_order = QUERY_VALUE(qry, "sequence_order").toInt();
         auto lock_nums = QUERY_VALUE(qry, "locknums").toString();
-        KCB_DEBUG_TRACE("Locks:" << lock_nums);
         auto desc = QUERY_VALUE(qry, "description").toString();
         auto sCode1 = QUERY_VALUE(qry, "code1").toString();
         auto sCode2 = QUERY_VALUE(qry, "code2").toString();
