@@ -182,8 +182,8 @@ void CFrmAdminInfo::show()
 
 int CFrmAdminInfo::getDisplayPowerDownTimeout()
 {
-    int index = ui->cbDisplayPowerDownTimeout->currentIndex();
-    Q_ASSERT_X(index >= 0 && index < sizeof(DISPLAY_POWER_DOWN_TIMEOUT), Q_FUNC_INFO, "Display power down timeout index out of range");
+    quint16 index = ui->cbDisplayPowerDownTimeout->currentIndex();
+    Q_ASSERT_X(index < sizeof(DISPLAY_POWER_DOWN_TIMEOUT), Q_FUNC_INFO, "Display power down timeout index out of range");
     return DISPLAY_POWER_DOWN_TIMEOUT[index];
 }
 

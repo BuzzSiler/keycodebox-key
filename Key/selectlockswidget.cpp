@@ -39,7 +39,7 @@ void SelectLocksWidget::setLocks(QString locks)
     Q_ASSERT(m_role == USER);
     Q_ASSERT(locks != "");
 
-    qDebug() << "Locks:" << locks;
+    // qDebug() << "Locks:" << locks;
 
     m_lock_cab.disableAllLocks();
     m_lock_cab.setEnabledLocks(locks);
