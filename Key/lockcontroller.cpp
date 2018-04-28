@@ -10,6 +10,13 @@
 #include "kcbcommon.h"
 
 
+#define MAIN_APP_GENS_SEQ 0x04
+#define REQUEST_ADDL_IMMED_MSG_ACK 0x10
+#define MAIN_APP_SENDS_MSG 0x20
+#define SEND_MSG_ON_REVERSE_LOOP 0x40
+#define SEND_MSG_ON_FORWARD_LOOP 0x80
+
+
 CLockController::CLockController(QObject *parent) : QObject(parent)
 {
 }
@@ -79,7 +86,7 @@ void CLockController::openLock(uint16_t nLockNum)
 
     if (this->isConnected())
     {
-        unsigned char commands[9] = { 0x5D, 0x8E, 0x01, 0x00, 0xC8, 0x01, 0x20, 0x00, 0x8A };
+        unsigned char commands[9] = { 0x5D, 0x8E, 0x01, 0x00, 0x00, 0x01, 0x20, 0x00, 0x8A };
 
         inttohex.number = nLockNum;
 
@@ -87,8 +94,11 @@ void CLockController::openLock(uint16_t nLockNum)
         commands[2] = inttohex.bytes.byte_low;
 
         commands[4] |= seqNum;
-        commands[4] |= 0x50;    // Send msg on Reverse Loop?
-        commands[4] |= 0x80;    // Send msg on Fwd loop?
+        commands[4] &= ~MAIN_APP_GENS_SEQ;
+        commands[4] = REQUEST_ADDL_IMMED_MSG_ACK;
+        commands[4] &= ~MAIN_APP_SENDS_MSG;
+        commands[4] |= SEND_MSG_ON_REVERSE_LOOP;
+        commands[4] |= SEND_MSG_ON_FORWARD_LOOP;
 
         uint8_t nchksum = 0;
         for(int i=1; i<8; i++)
@@ -171,7 +181,8 @@ void CLockController::openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, 
         std::string sPulseOff = to_hex(nPulseOffTimeMS);
         qDebug() << "openLockWithPulse:" << QString::fromStdString(sLockNum) << " Pulse ON (/10):" << QString::fromStdString(sPulseOn) << " Pulse OFF(/10):" << QString::fromStdString(sPulseOff);
 
-        if(sLockNum.length()>1) {
+        if(sLockNum.length()>1)
+        {
             commands[3] = sLockNum[1];
             commands[3] -= 0x30;
         }

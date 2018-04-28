@@ -50,21 +50,25 @@ class LockCabinetWidget : public QWidget
 
         quint8 m_num_cabs;
         quint8 m_locks_per_cab;
-        QVector<int> m_selected_locks;
+        QVector<QString> m_selected_locks;
         QVector<CAB_STATE> m_cabs;
         quint8 m_current_cab;
+        quint16 m_max_locks;
         QList<QPushButton *> m_lock_buttons;
 
         QSignalMapper& m_mapper;
         QString m_default_stylesheet;
         Ui::LockCabinetWidget *ui;
-        void selectClearAllLocks(bool select_clear);
+
         void updateUi();
+        void selectClearAllLocks(bool select_clear);
         void enableDisableLocksInCabinet(quint8 cab_index, bool enable_disable);
         void clrLocksInCabinet(quint8 cab_index);
-        void StringToVector(QString str, QVector<int>& vtr);
-        void VectorToString(QVector<int> vtr, QString& str);
-
+        void StringToVector(QString str, QVector<QString>& vtr);
+        void VectorToString(QVector<QString> vtr, QString& str);
+        void AddLockToSelected(const QString lock);
+        void RemoveLockFromSelected(const QString lock);
+        void CalcLockCabIndecies(const QString lock, quint8& cab_index, quint16& lock_index);
 };
 
 #endif // LOCKCABINETWIDGET_H
