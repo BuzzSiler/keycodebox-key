@@ -27,7 +27,6 @@ class ReportControlWidget : public QWidget
     signals:
         void NotifyUsbDrive(const QStringList drives);
         void NotifyGenerateReport();
-        void NotifySaveReportSettings();
 
     public slots:
         void OnNotifyUsbDrive(const QStringList drives);        
@@ -45,8 +44,6 @@ class ReportControlWidget : public QWidget
         void on_pbDownloadSelectedReports_clicked();
         void on_cbUsbDrives_currentTextChanged(const QString &text);
         void on_pbGenerateReport_clicked();
-        void on_pbSaveReportSettings_clicked();
-
         void on_dtStartDateTime_dateTimeChanged(const QDateTime &dateTime);
 
     private:
@@ -67,6 +64,8 @@ class ReportControlWidget : public QWidget
         void GetSelectedReports(QStringList& list);
         bool OneOrMoreReportsSelected();
         void ClearSelectAllReports(Qt::CheckState state);
+        void checkInvalidReportStorage();
+        bool ConfirmDisableSafeToFile();
 };
 
 #endif // REPORTCONTROLWIDGET_H

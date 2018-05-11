@@ -29,9 +29,9 @@ ReportControlWidget::ReportControlWidget(QWidget *parent) :
 
     // Set UI Defaults
     ui->gbAutoReport->setChecked(false);
+    ui->gbAutoReport->setDisabled(true);
     ui->pbGenerateReport->setDisabled(true);
     ui->cbSaveToFile->setEnabled(true);
-    ui->pbSaveReportSettings->setDisabled(true);
 
     ui->cbFrequency->insertItem(0, "None");
     ui->cbFrequency->setCurrentIndex(0);
@@ -43,6 +43,10 @@ ReportControlWidget::ReportControlWidget(QWidget *parent) :
 
     ui->lvAvailableReports->setModel(&m_lv_model);
     m_lv_model.setStringList(QStringList());
+
+    ui->cbUsbDrives->clear();
+    ui->cbUsbDrives->addItem("DEFAULT");
+    ui->cbUsbDrives->setCurrentIndex(0);
 
     updateUi();
 }
@@ -111,6 +115,13 @@ void ReportControlWidget::setValues(CAdminRec& adminInfo)
 void ReportControlWidget::getValues(CAdminRec& adminInfo)
 {
     KCB_DEBUG_ENTRY;
+
+    if (!isModified())
+    {
+        KCB_DEBUG_EXIT;
+        return;
+    }
+
     QDateTime reportFreq = NEVER;
     if (ui->gbAutoReport->isChecked())
     {
@@ -219,8 +230,52 @@ void ReportControlWidget::on_gbAutoReport_toggled(bool state)
     KCB_DEBUG_EXIT;
 }
 
+void ReportControlWidget::checkInvalidReportStorage()
+{
+    if (!ui->cbSendViaEmail->isChecked() && !ui->cbSaveToFile->isChecked())
+    {
+        if (ui->gbAutoReport->isChecked())
+        {
+            ui->gbAutoReport->setChecked(false);
+        }
+    }
+}
+
+bool ReportControlWidget::ConfirmDisableSafeToFile()
+{
+    bool confirmed = true;
+
+    QDir dir(m_curr_report_directory);
+    QStringList strList = dir.entryList(QStringList() << "KeyCodeBox*.txt", QDir::Files, QDir::Time);
+    if (!strList.isEmpty())
+    {
+        QString title = "Disable Store Report to File";
+        QString message = "You are disabling 'Store Report to File'\n"
+                            "Continung will delete all report files in the default location.\n"
+                            "To save the report files, select 'No', insert a USB drive and download the reports.\n"
+                            "Do you want to continue?";
+        auto btn = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
+        if (btn == QMessageBox::No)
+        {
+            confirmed = false;
+        }
+        else
+        {
+            foreach (auto entry, strList)
+            {
+                QFile file(dir.filePath(entry));
+                file.remove();
+            }
+
+        }
+    }
+
+    return confirmed;
+}
+
 void ReportControlWidget::on_cbSendViaEmail_clicked()
 {
+    checkInvalidReportStorage();
     updateUi();
 }
 
@@ -232,38 +287,17 @@ void ReportControlWidget::on_cbSaveToFile_clicked()
     }
     else
     {
-        QDir dir(m_curr_report_directory);
-        QStringList strList = dir.entryList(QStringList() << "KeyCodeBox*.txt", QDir::Files, QDir::Time);
-        if (!strList.isEmpty())
+        bool confirmed = ConfirmDisableSafeToFile();
+        if (confirmed)
         {
-            QString title = "Disable Store Report to File";
-            QString message = "You are disabling 'Store Report to File'\n"
-                              "Continung will delete all report files in the default location.\n"
-                              "To save the report files, select 'No', insert a USB drive and download the reports.\n"
-                              "Do you want to continue?";
-            auto btn = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
-            if (btn == QMessageBox::Yes)
-            {
-                QDir dir(m_curr_report_directory);
-                QStringList strList = dir.entryList(QStringList() << "KeyCodeBox*.txt", QDir::Files, QDir::Time);
-                foreach (auto entry, strList)
-                {
-                    QFile file(dir.filePath(entry));
-                    file.remove();
-                }
-
-                ui->cbStoreToUsbDrive->setChecked(false);
-                m_curr_report_directory = "None";
-            }
-            else
-            {
-                ui->cbSaveToFile->setChecked(true);
-            }
+            m_curr_report_directory = "None";
+            checkInvalidReportStorage();
         }
         else
         {
-            m_curr_report_directory = "None";
+            ui->cbSaveToFile->setChecked(true);
         }
+
     }
     updateUi();
 }
@@ -519,12 +553,6 @@ bool ReportControlWidget::isModified()
 void ReportControlWidget::updateUi()
 {
     KCB_DEBUG_ENTRY;
-    // valid report freq must be checked and have a actual frequency (not NEVER) or
-    // unchecked and have NEVER as a frequency.
-    int index = ui->cbFrequency->currentIndex();
-    KCB_DEBUG_TRACE(index);
-    Q_ASSERT_X(index >= 0 && index <= m_report_frequencies.count(), Q_FUNC_INFO, "report frequency index out of range");
-    bool valid_report_freq = (ui->gbAutoReport->isChecked() && m_report_frequencies[index] != NEVER) || !ui->gbAutoReport->isChecked();
     bool send_email_enabled = ui->cbSendViaEmail->isChecked();
     bool store_file_enabled = ui->cbSaveToFile->isChecked();
     bool store_usb_enabled = store_file_enabled && m_usb_drives.count() > 0;
@@ -532,6 +560,7 @@ void ReportControlWidget::updateUi()
     bool valid_report_storage = send_email_enabled || store_file_enabled;
 
     ui->pbGenerateReport->setEnabled(valid_report_storage);
+    ui->gbAutoReport->setEnabled(valid_report_storage);
     ui->lblDeleteOlderThan->setEnabled(store_file_enabled);
     ui->cbDeleteOlderThan->setEnabled(store_file_enabled);
     ui->cbStoreToUsbDrive->setEnabled(store_usb_enabled);
@@ -562,18 +591,5 @@ void ReportControlWidget::updateUi()
     ui->pbDeleteSelectedReports->setEnabled(one_or_more_selected);
     ui->pbDownloadSelectedReports->setEnabled(!ui->cbStoreToUsbDrive->isChecked() && one_or_more_selected);
 
-    KCB_DEBUG_TRACE("valid_report_freq" << valid_report_freq);
-    KCB_DEBUG_TRACE("valid_report_storage" << valid_report_storage);
-
-    bool valid_settings = valid_report_freq && valid_report_storage;
-
-    bool enable_save = isModified() && valid_settings;
-
-    ui->pbSaveReportSettings->setEnabled(enable_save);
     KCB_DEBUG_EXIT;
-}
-
-void ReportControlWidget::on_pbSaveReportSettings_clicked()
-{
-    emit NotifySaveReportSettings();
 }

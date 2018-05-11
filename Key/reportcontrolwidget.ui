@@ -247,9 +247,9 @@
    <property name="geometry">
     <rect>
      <x>5</x>
-     <y>140</y>
-     <width>342</width>
-     <height>181</height>
+     <y>190</y>
+     <width>348</width>
+     <height>236</height>
     </rect>
    </property>
    <property name="font">
@@ -264,9 +264,9 @@
     <property name="geometry">
      <rect>
       <x>135</x>
-      <y>30</y>
-      <width>200</width>
-      <height>31</height>
+      <y>40</y>
+      <width>207</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="minimumDateTime">
@@ -287,9 +287,9 @@
     <property name="geometry">
      <rect>
       <x>135</x>
-      <y>80</y>
-      <width>200</width>
-      <height>31</height>
+      <y>100</y>
+      <width>207</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="minimumDateTime">
@@ -310,9 +310,9 @@
     <property name="geometry">
      <rect>
       <x>8</x>
-      <y>30</y>
+      <y>40</y>
       <width>131</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -326,9 +326,9 @@
     <property name="geometry">
      <rect>
       <x>8</x>
-      <y>80</y>
+      <y>100</y>
       <width>131</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -341,8 +341,8 @@
    <widget class="QPushButton" name="pbGenerateReport">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>127</y>
+      <x>80</x>
+      <y>170</y>
       <width>181</width>
       <height>41</height>
      </rect>
@@ -352,19 +352,6 @@
     </property>
    </widget>
   </widget>
-  <widget class="QPushButton" name="pbSaveReportSettings">
-   <property name="geometry">
-    <rect>
-     <x>115</x>
-     <y>360</y>
-     <width>111</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </widget>
   <widget class="QGroupBox" name="gbAutoReport">
    <property name="enabled">
     <bool>true</bool>
@@ -373,8 +360,8 @@
     <rect>
      <x>5</x>
      <y>5</y>
-     <width>342</width>
-     <height>131</height>
+     <width>348</width>
+     <height>181</height>
     </rect>
    </property>
    <property name="font">
@@ -395,9 +382,9 @@
     <property name="geometry">
      <rect>
       <x>8</x>
-      <y>80</y>
+      <y>100</y>
       <width>131</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -410,7 +397,7 @@
       <x>8</x>
       <y>40</y>
       <width>121</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -422,8 +409,8 @@
      <rect>
       <x>135</x>
       <y>40</y>
-      <width>181</width>
-      <height>31</height>
+      <width>207</width>
+      <height>41</height>
      </rect>
     </property>
     <item>
@@ -461,9 +448,9 @@
     <property name="geometry">
      <rect>
       <x>135</x>
-      <y>80</y>
-      <width>200</width>
-      <height>31</height>
+      <y>100</y>
+      <width>207</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="minimumDateTime">

@@ -353,6 +353,7 @@ void FrmCodeEditMulti::on_edUsername_clicked()
 
 void FrmCodeEditMulti::OnNotifyLockSelected(QString lock, bool is_selected)
 {
+    Q_UNUSED(lock);
     Q_UNUSED(is_selected);
     updateUi();
 }

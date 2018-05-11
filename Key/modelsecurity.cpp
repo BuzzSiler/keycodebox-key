@@ -65,7 +65,7 @@ void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDa
     while (itor.hasNext())
     {
         pState = itor.next();
-        KCB_DEBUG_TRACE(pState->getLockNums());
+        // KCB_DEBUG_TRACE(pState->getLockNums());
     }
 
     emit __OnLockHistorySet(pLockHistorySet);
@@ -75,7 +75,7 @@ void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDa
 void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 {
     bool bSuccess = _ptblAdmin->updateAdminClear(adminInfo->getAdminName(), adminInfo->getAdminEmail(), adminInfo->getAdminPhone(),
-                                                 adminInfo->getEmailReportActive(), adminInfo->getDefaultReportFreq(),
+                                                 adminInfo->getDefaultReportFreq(),
                                                  adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
                                                  adminInfo->getAssistPassword(), adminInfo->getAssistCode(),
                                                  adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(),
@@ -85,7 +85,8 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
                                                  adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
                                                  adminInfo->getVNCPort(), adminInfo->getVNCPassword(),
                                                  adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory(),
-                                                 adminInfo->getDisplayPowerDownTimeout());
+                                                 adminInfo->getDisplayPowerDownTimeout(),
+                                                 adminInfo->getDefaultReportDeleteFreq());
     emit __OnUpdatedCurrentAdmin(bSuccess);
 }
 

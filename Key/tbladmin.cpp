@@ -13,7 +13,6 @@ const char *fid = "ids";
 const char *fname = "admin_name";
 const char *femail = "admin_email";
 const char *fphone = "admin_phone";
-const char *freportActive = "email_report_active";
 const char *ffreq = "default_report_freq";
 const char *fstart = "default_report_start";
 const char *fpassword = "password";
@@ -41,19 +40,19 @@ const char *freportviaemail = "report_via_email";
 const char *freporttofile = "report_to_file";
 const char *freportdirectory = "report_directory";
 const char *fdisplaypowerdown = "display_power_down_timeout";
+const char *freportdeletion = "report_deletion";
 
 CAdminRec::CAdminRec() : 
     QObject(nullptr),
-    default_report_freq(*new QDateTime(QDate(), QTime(24, 0, 0))),
-    default_report_start(*new QDateTime(QDate(2016, 6, 1), QTime(00, 00)))
+    default_report_freq(*new QDateTime(NEVER)),
+    default_report_start(*new QDateTime(DEFAULT_DATE_TIME)),
+    default_report_delete_freq(*new QDateTime(MONTHLY))
 {
     ids = -1;
     admin_name = "";
     admin_email = "";
     admin_phone = "";
 
-    //default_report_freq = QDateTime(QDate(), QTime(24, 0, 0)); // TIME, Daily
-    //default_report_start = QDateTime(QDate(2016, 6, 1), QTime(00, 00));    // DATETIME,
     password = "";
     access_code_old = "";
     access_code = "";
@@ -90,7 +89,6 @@ CAdminRec &CAdminRec::operator=(CAdminRec &newRec)
     admin_name = newRec.admin_name;
     admin_email = newRec.admin_email;
     admin_phone = newRec.admin_phone;
-    email_report_active = newRec.email_report_active;
     default_report_freq = newRec.default_report_freq;
     default_report_start = newRec.default_report_start;
     password = newRec.password;
@@ -120,6 +118,8 @@ CAdminRec &CAdminRec::operator=(CAdminRec &newRec)
 
     display_power_down_timeout = newRec.display_power_down_timeout;
 
+    default_report_delete_freq = newRec.default_report_delete_freq;
+
     return *this;
 }
 
@@ -130,9 +130,9 @@ QJsonObject& CAdminRec::jsonRecord(QJsonObject &json)
     json.insert(fname, QJsonValue(admin_name));
     json.insert(femail, QJsonValue(admin_email)); // text,
     json.insert(fphone, QJsonValue(admin_phone)); // text,
-    json.insert(freportActive, QJsonValue(email_report_active));
-    json.insert(ffreq, QJsonValue(default_report_freq.toString("yyyy-MM-dd HH:mm:ss")));
-    json.insert(fstart, QJsonValue(default_report_start.toString("yyyy-MM-dd HH:mm:ss")));    // DATETIME,
+
+    json.insert(ffreq, QJsonValue(default_report_freq.toString(DATETIME_FORMAT)));
+    json.insert(fstart, QJsonValue(default_report_start.toString(DATETIME_FORMAT)));    // DATETIME,
     json.insert(fpassword, QJsonValue(password));    // text,
     json.insert(faccesscd, QJsonValue(access_code)); // text
     json.insert(fassistpassword, QJsonValue(assist_password)); //text
@@ -157,6 +157,7 @@ QJsonObject& CAdminRec::jsonRecord(QJsonObject &json)
     json.insert(freportviaemail, QJsonValue(report_via_email));
     json.insert(freporttofile, QJsonValue(report_save_to_file));
     json.insert(freportdirectory, QJsonValue(report_directory));
+    json.insert(freportdeletion, QJsonValue(default_report_delete_freq.toString(DATETIME_FORMAT)));
 
     return json;
 }
@@ -185,10 +186,6 @@ bool CAdminRec::setFromJsonObject(QJsonObject jsonObj)
         if(!jsonObj.value(fphone).isUndefined())
         {
             admin_phone = jsonObj.value(fphone).toString();
-        }
-        if(!jsonObj.value(freportActive).isUndefined())
-        {
-            email_report_active = jsonObj.value(freportActive).toBool();
         }
         if(!jsonObj.value(ffreq).isUndefined())
         {            
@@ -274,6 +271,8 @@ bool CAdminRec::setFromJsonObject(QJsonObject jsonObj)
         {
             report_directory = jsonObj.value(freportdirectory).toString();
         }
+
+        // Add power down and report deletion
     } catch(std::exception &e)
     {
         qDebug() << "CAdminRec::setFromJsonObject()" << e.what();
@@ -366,7 +365,7 @@ bool CTblAdmin::createTable()
         QSqlQuery qry(*_pDB);
         QString sql = "CREATE TABLE IF NOT EXISTS " + TABLENAME +
                 "(ids integer primary key unique, admin_name text,"
-                " admin_email text, admin_phone text, email_report_active bool,"
+                " admin_email text, admin_phone text, "
                 " default_report_freq DATETIME,"
                 " default_report_start DATETIME, password text, "
                 " access_code text,"
@@ -376,7 +375,8 @@ bool CTblAdmin::createTable()
                 " max_locks text,"
                 " smtp_server text, smtp_port text, smtp_type text, smtp_username text, smtp_password text,"
                 " vnc_port text, vnc_password text,"
-                " report_via_email text, report_to_file text, report_directory text, display_power_down_timeout integer)";
+                " report_via_email text, report_to_file text, report_directory text, display_power_down_timeout integer,"
+                " report_deletion DATETIME)";
 
         qry.prepare( sql );
 
@@ -414,37 +414,39 @@ bool CTblAdmin::createAdminDefault()
     QSqlQuery qry(*_pDB);
     QString sql = QString("INSERT OR IGNORE INTO ") + TABLENAME +
                     QString("(admin_name, "
-                            "admin_email, admin_phone, email_report_active, default_report_freq, "
+                            "admin_email, admin_phone, default_report_freq, "
                             "default_report_start, password, access_code, "
                             "assist_password, assist_code, show_fingerprint, show_password,"
                             "use_predictive_access_code, "
                             "predictive_key, predictive_resolution, max_locks, "
                             "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
                             "report_via_email, report_to_file, report_directory, "
-                            "vnc_port, vnc_password, display_power_down_timeout)"
+                            "vnc_port, vnc_password, display_power_down_timeout, "
+                            "report_deletion)"
                   " VALUES ('admin', "
-                            "'admin@email.com', '555.555.5555', 1, :freq, "
+                            "'admin@email.com', '555.555.5555', :freq, "
                             ":start, :pw, :code, "
                             ":assistpw, :assistCode, :showFingerprint, :showPassword, "
                             ":use_pred, "
                             ":pred_key, :pred_res, 32, "
                             ":smtp_server, :smtp_port, :smtp_type, :smtp_username, :smtp_password, "
                             "1, 0, '', "
-                            "5900, 'vnc_password', 0)");
+                            "5901, 'vnc_password', 0, :deletion)");
     qry.prepare(sql);
 
     qDebug() << "SQL:" << sql;
 
     QString sTime;
-    sTime = QDateTime(QDate(1,1,1), QTime(12,0)).toString("yyyy-MM-dd HH:mm:ss");
-    qDebug() << "createAdminDefault(): freq:" << sTime;
+    sTime = EVERY_12_HOURS.toString(DATETIME_FORMAT);
     qry.bindValue(":freq", sTime);
 
     QString sStart;
     QDateTime   dtTime = QDateTime::currentDateTime();
-    sStart = dtTime.toString("yyyy-MM-dd HH:mm:ss");
-    qDebug() << "createAdminDefault(): start:" << sStart;
+    sStart = dtTime.toString(DATETIME_FORMAT);
     qry.bindValue(":start", sStart);
+
+    QString sDeletion = MONTHLY.toString(DATETIME_FORMAT);
+    qry.bindValue(":deletion", sDeletion);
 
     QString encPW = CEncryption::encryptString("");
     QString encCode = CEncryption::encryptString("99123");
@@ -472,9 +474,6 @@ bool CTblAdmin::createAdminDefault()
     qry.bindValue(":pred_key", QVariant("\*phzNZ2'od:9g\"J]Yc%1_m6Y51NpHImY8dz3,VVXU|jp7B]HG8@SxuC\od9;_>"));
     qry.bindValue(":pred_res", QVariant(10));
 
-    QMap<QString, QVariant> mapVals = qry.boundValues();
-    qDebug() << "Mapped count:" << mapVals.count();
-
     if( !qry.exec() ) 
     {
         qDebug() << "CTblAdmin::createAdminDefault():" << qry.lastError();
@@ -492,14 +491,16 @@ bool CTblAdmin::readAdmin()
     qDebug( )<< "CTblAdmin::readAdmin()";
 
     QSqlQuery query(*_pDB);
-    QString sql = "SELECT admin_name, admin_email, admin_phone, email_report_active, default_report_freq," \
+    QString sql = "SELECT admin_name, admin_email, admin_phone, "
+                  "default_report_freq,"
                   "default_report_start, password, access_code, "
                   "assist_password, assist_code, show_fingerprint, show_password, "
                   "use_predictive_access_code, "
                   "predictive_key, predictive_resolution, max_locks, "
                   "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
                   "vnc_port,vnc_password, "
-                  "report_via_email, report_to_file, report_directory, display_power_down_timeout"
+                  "report_via_email, report_to_file, report_directory, display_power_down_timeout, "
+                  "report_deletion"
                   " FROM ";
     sql += TABLENAME;
 
@@ -508,7 +509,6 @@ bool CTblAdmin::readAdmin()
         int fldAdmin_name= query.record().indexOf(fname);
         int fldAdmin_email = query.record().indexOf(femail);
         int fldAdmin_phone = query.record().indexOf(fphone);
-        int fldEmail_report_active = query.record().indexOf(freportActive);
         int fldReport_freq = query.record().indexOf(ffreq);
         int fldReport_start = query.record().indexOf(fstart);
         int fldPassword = query.record().indexOf(fpassword);
@@ -532,10 +532,8 @@ bool CTblAdmin::readAdmin()
         int fldReportToFile = query.record().indexOf(freporttofile);
         int fldReportDirectory = query.record().indexOf(freportdirectory);
         int fldDisplayPowerDownTimeout = query.record().indexOf(fdisplaypowerdown);
+        int fldReportDeletion = query.record().indexOf(freportdeletion);
 
-        qDebug() << "fldDisplayPowerDownTimeout" << fldDisplayPowerDownTimeout << "fdisplaypowerdown" << fdisplaypowerdown;
-
-        qDebug() << "fdls: Predictive:" << QString::number(fldPredictive) << " PredKey:" << QString::number(fldPredKey) << " PredRes:" << QString::number(fldPredRes);
 
         if (query.next())
         {
@@ -543,13 +541,11 @@ bool CTblAdmin::readAdmin()
             _currentAdmin.setAdminName(query.value(fldAdmin_name).toString());
             _currentAdmin.setAdminEmail(query.value(fldAdmin_email).toString());
             _currentAdmin.setAdminPhone(query.value(fldAdmin_phone).toString());
-            _currentAdmin.setEmailReportActive(query.value(fldEmail_report_active).toBool());
             _currentAdmin.setDefaultReportFreq( QDateTime::fromString(query.value(fldReport_freq).toDateTime().toString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss") ); // t is now your desired time_t
             _currentAdmin.setDefaultReportStart( QDateTime::fromString(query.value(fldReport_start).toDateTime().toString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss") );
 
             QString accessCode = query.value(fldCode).toString();
             std::string accessCodeOld = accessCode.toStdString();
-            qDebug() << "CTblAdmin::readAdmin():code before encryptDecrypt():" << accessCode;
 
             accessCodeOld = CEncryption::encryptDecryptOld(accessCodeOld.size(), accessCodeOld);  // Old version
 
@@ -597,13 +593,9 @@ bool CTblAdmin::readAdmin()
 
             _currentAdmin.setDisplayPowerDownTimeout(query.value(fldDisplayPowerDownTimeout).toInt());
 
-            qDebug() << "CTblAdmin::readAdmin(): vCode:" << query.value(fldCode).toString() << " len:" << query.value(fldCode).toString().size();
-            qDebug() << "CTblAdmin::readAdmin(): :access_code:" <<_currentAdmin.getAccessCode() << " len:" << _currentAdmin.getAccessCode().size();
-            qDebug() << "CTblAdmin::readAdmin(): Use Pred:" << QVariant(_currentAdmin.getUsePredictiveAccessCode()).toString();
-            qDebug() << "    Pred Key:" << _currentAdmin.getPredictiveKey();
-            qDebug() << "    Pred Res:" << QString::number(_currentAdmin.getPredictiveResolution());
-            qDebug() << "SMTP:" << _currentAdmin.getSMTPServer() << ":" << QVariant(_currentAdmin.getSMTPPort()).toString();
-            qDebug() << "DisplayPowerDownTimeout:" << _currentAdmin.getDisplayPowerDownTimeout();
+            _currentAdmin.setDefaultReportDeleteFreq( QDateTime::fromString(query.value(fldReportDeletion).toDateTime().toString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss"));
+            
+
 
             return true;
         }
@@ -617,7 +609,7 @@ void CTblAdmin::addAdmin()
 }
 
 bool CTblAdmin::updateAdminClear(QString name, QString email, QString phone,
-                bool emailReportActive, QDateTime repFreq, QDateTime startReport,
+                QDateTime repFreq, QDateTime startReport,
                 QString passwordClear, QString accessCdClear,
                 QString assistPasswordClear, QString assistCodeClear,
                 bool showFingerprint, bool showPassword,
@@ -627,7 +619,7 @@ bool CTblAdmin::updateAdminClear(QString name, QString email, QString phone,
                 QString smtpusername, QString smtppassword,
                 int vncport, QString vncpassword,
                 bool bReportToEmail, bool bReportToFile, QString reportDirectory,
-                int displayPowerDownTimeout)
+                int displayPowerDownTimeout, QDateTime reportDeletion)
 {
     QString encPW = CEncryption::encryptString(passwordClear);
     QString encCode = CEncryption::encryptString(accessCdClear);
@@ -638,14 +630,15 @@ bool CTblAdmin::updateAdminClear(QString name, QString email, QString phone,
 
     QString encVNCPW = CEncryption::encryptString(vncpassword);
 
-    return updateAdmin(name, email, phone, emailReportActive, repFreq, startReport, encPW, encCode,
+    return updateAdmin(name, email, phone, repFreq, startReport, encPW, encCode,
                        encAssistPw, encAssistCode, showFingerprint, showPassword, usePredictive, predKey, predRes,
                        nMaxLocks, smtpserver, smtpport, smtptype, smtpusername, encSMTPPW, vncport,
-                       encVNCPW, bReportToEmail, bReportToFile, reportDirectory, displayPowerDownTimeout);
+                       encVNCPW, bReportToEmail, bReportToFile, reportDirectory, displayPowerDownTimeout,
+                       reportDeletion);
 }
 
 bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
-                bool emailReportActive, QDateTime repFreq, QDateTime startReport,
+                QDateTime repFreq, QDateTime startReport,
                 QString passwordEnc, QString accessCdEnc,
                 QString assistPasswordEnc, QString assistCodeEnc,
                 bool showFingerprint, bool showPassword,
@@ -655,16 +648,15 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
                 QString smtpusername, QString smtppassword,
                 int vncport, QString vncpassword,
                 bool bReportToEmail, bool bReportToFile, QString reportDirectory,
-                int displayPowerDownTimeout)
+                int displayPowerDownTimeout,
+                QDateTime reportDeletion)
 {
     KCB_DEBUG_ENTRY;
-
-    KCB_DEBUG_TRACE("power down timeout" << displayPowerDownTimeout);
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
                   " SET " + QString("admin_name=:name,"\
-                  "admin_email=:email, admin_phone=:phone, email_report_active=:active, "
+                  "admin_email=:email, admin_phone=:phone, "
                   "default_report_freq=:freq, "
                   "default_report_start=:start, password=:pw, access_code=:code, "
                   "assist_password=:assistpw, assist_code=:assistcode, show_fingerprint=:showFingerprint, show_password=:showPassword, "
@@ -674,18 +666,18 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
                   "smtp_username=:smtpusername, smtp_password=:smtppassword, "
                   "vnc_port=:vncport, vnc_password=:vncpassword, "
                   "report_via_email=:reportViaEmail, report_to_file=:reportToFile, report_directory=:reportDir, "
-                  "display_power_down_timeout=:displayPowerDownTimeout"
+                  "display_power_down_timeout=:displayPowerDownTimeout, "
+                  "report_deletion=:reportDeletion "
                   " WHERE 1;");
     qry.prepare(sql);
 
     qry.bindValue(":name", name);
     qry.bindValue(":email", email);
     qry.bindValue(":phone", phone);
-    qry.bindValue(":active", emailReportActive);
-    QString sTime = repFreq.toString("yyyy-MM-dd HH:mm:ss");
+    QString sTime = repFreq.toString(DATETIME_FORMAT);
     qry.bindValue(":freq", sTime);
 
-    QString sStart  = startReport.toString("yyyy-MM-dd HH:mm:ss");
+    QString sStart  = startReport.toString(DATETIME_FORMAT);
     qry.bindValue(":start", sStart);
 
     qry.bindValue(":pw", passwordEnc);
@@ -714,14 +706,15 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
 
     qry.bindValue(":displayPowerDownTimeout", displayPowerDownTimeout);
 
-    QMap<QString, QVariant> mapVals = qry.boundValues();
-    qDebug() << "Mapped count:" << mapVals.count();
+    qry.bindValue(":reportDeletion", reportDeletion);
 
-    if( !qry.exec() ) {
+    if( !qry.exec() ) 
+    {
         qDebug() << "CTblAdmin::updateAdmin():" << qry.lastError();
         return false;
     }
-    else {
+    else 
+    {
         _pDB->commit();
         qDebug() << "Updated Admin! SMTP Server:" << smtpserver << ":" << QVariant(smtpport).toString();
         readAdmin();
@@ -730,15 +723,10 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
 
 }
 
-/**
- * @brief CTblAdmin::updateAdmin
- * @param rec
- * @return
- */
 bool CTblAdmin::updateAdmin(CAdminRec &rec)
 {
     return updateAdmin(rec.getAdminName(), rec.getAdminEmail(), rec.getAdminPhone(),
-                       rec.getEmailReportActive(), rec.getDefaultReportFreq(), rec.getDefaultReportStart(),
+                       rec.getDefaultReportFreq(), rec.getDefaultReportStart(),
                        rec.getPassword(), rec.getAccessCode(),
                        rec.getAssistPassword(), rec.getAssistCode(), rec.getDisplayFingerprintButton(), rec.getDisplayShowHideButton(),
                        rec.getUsePredictiveAccessCode(),
@@ -748,18 +736,13 @@ bool CTblAdmin::updateAdmin(CAdminRec &rec)
                        rec.getSMTPUsername(), rec.getSMTPPassword(),
                        rec.getVNCPort(), rec.getVNCPassword(),
                        rec.getReportViaEmail(), rec.getReportToFile(), rec.getReportDirectory(),
-                       rec.getDisplayPowerDownTimeout());
+                       rec.getDisplayPowerDownTimeout(),
+                       rec.getDefaultReportDeleteFreq());
 }
 
-/**
- * @brief CTblAdmin::updateAdmin - update the admin record with the new values from JSON Object
- * @param adminObj - json object with given values
- * @return true on success, false otherwise
- */
 bool CTblAdmin::updateAdmin(QJsonObject adminObj)
 {
     QString name, email, phone;
-    bool active;
     QDateTime freq;
     QDateTime start;
     QString pw, accessCd, assistpw, assistCode;
@@ -773,11 +756,11 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     bool bReportToEmail, bReportToFile;
     QString reportDir;
     int displayPowerDown;
+    QDateTime reportDeletion;
 
     if( adminObj.value(fname).isUndefined() ||
             adminObj.value(femail).isUndefined() ||
             adminObj.value(fphone).isUndefined() ||
-            adminObj.value(freportActive).isUndefined() ||
             adminObj.value(ffreq).isUndefined() ||
             adminObj.value(fstart).isUndefined() ||
             adminObj.value(fpassword).isUndefined() ||
@@ -800,7 +783,8 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
             adminObj.value(freportviaemail).isUndefined() ||
             adminObj.value(freporttofile).isUndefined() ||
             adminObj.value(freportdirectory).isUndefined() ||
-            adminObj.value(fdisplaypowerdown).isUndefined()
+            adminObj.value(fdisplaypowerdown).isUndefined() ||
+            adminObj.value(freportdeletion).isUndefined()
             )
     {
         qDebug() << "Failed to update admin";
@@ -810,9 +794,8 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     name = adminObj.value(fname).toString();
     email = adminObj.value(femail).toString();
     phone = adminObj.value(fphone).toString();
-    active = adminObj.value(freportActive).toBool();
-    freq.fromString(adminObj.value(ffreq).toString(), "yyyy-MM-dd HH:mm:ss");
-    start.fromString(adminObj.value(fstart).toString(), "yyyy-MM-dd HH:mm:ss");
+    freq.fromString(adminObj.value(ffreq).toString(), DATETIME_FORMAT);
+    start.fromString(adminObj.value(fstart).toString(), DATETIME_FORMAT);
     pw = adminObj.value(fpassword).toString();
     accessCd = adminObj.value(faccesscd).toString();
     assistpw = adminObj.value(fassistpassword).toString();
@@ -868,10 +851,12 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     reportDir = adminObj.value(freportdirectory).toString();
 
     displayPowerDown = adminObj.value(fdisplaypowerdown).toInt();
+    reportDeletion.fromString(adminObj.value(freportdeletion).toString(), DATETIME_FORMAT);
 
-    return updateAdminClear(name, email, phone, active, freq, start, pw, accessCd, assistpw, assistCode, showFingerprint,
+    return updateAdminClear(name, email, phone, freq, start, pw, accessCd, assistpw, assistCode, showFingerprint,
                             showPassword, usePredictive, predKey, predResolution, unMaxLocks, smtpserver, smtpport, smtptype,
-                            smtpusername, smtppassword, vncport, vncpassword, bReportToEmail, bReportToFile, reportDir, displayPowerDown);
+                            smtpusername, smtppassword, vncport, vncpassword, bReportToEmail, bReportToFile, reportDir, displayPowerDown,
+                            reportDeletion);
 }
 
 bool CTblAdmin::tableExists()
@@ -882,7 +867,6 @@ bool CTblAdmin::tableExists()
     for(itor = lstTables.begin(); itor != lstTables.end(); itor++)
     {
         if((*itor)==TABLENAME.toStdString().c_str()) {
-            //
             return true;
         }
     }

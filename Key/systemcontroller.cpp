@@ -198,7 +198,6 @@ void CSystemController::initializeReaders()
         qDebug() << "No MagTekReader found";
     }
 
-    // Original HID Reader
     bool hid_reader_found = false;
     _phidReader = new CHWKeyboardReader();
     if( _phidReader->initHIDReader(0x04d8, 0x0055) )
@@ -215,7 +214,7 @@ void CSystemController::initializeReaders()
     {
         qDebug() << "No RF HID Reader found";
     }
-
+                
     if (hid_reader_found)
     {
         connect(_phidReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));

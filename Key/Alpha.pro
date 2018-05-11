@@ -80,7 +80,9 @@ SOURCES += main.cpp\
     kcbkeyboardwidget.cpp \
     kcbkeyboarddialog.cpp \
     kcbutils.cpp \
-    checkablestringlistmodel.cpp
+    checkablestringlistmodel.cpp \
+    reportcontrolwidget.cpp \
+    dlgdownloadreports.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -146,7 +148,9 @@ HEADERS  += keycodeboxmain.h \
     kcbkeyboardwidget.h \
     kcbkeyboarddialog.h \
     kcbutils.h \
-    checkablestringlistmodel.h
+    checkablestringlistmodel.h \
+    reportcontrolwidget.h \
+    dlgdownloadreports.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \
@@ -167,7 +171,9 @@ FORMS    += mainwindow.ui \
     frmcodeeditmulti.ui \
     lockcabinetwidget.ui \
     kcbkeyboardwidget.ui \
-    kcbkeyboarddialog.ui
+    kcbkeyboarddialog.ui \
+    reportcontrolwidget.ui \
+    dlgdownloadreports.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/debug/ -lqsqlite
