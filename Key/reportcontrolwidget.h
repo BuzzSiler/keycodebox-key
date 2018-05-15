@@ -45,6 +45,7 @@ class ReportControlWidget : public QWidget
         void on_cbUsbDrives_currentTextChanged(const QString &text);
         void on_pbGenerateReport_clicked();
         void on_dtStartDateTime_dateTimeChanged(const QDateTime &dateTime);
+        void updateAvailableReports();
 
     private:
         QDateTime m_report_freq;
@@ -58,6 +59,7 @@ class ReportControlWidget : public QWidget
         CheckableStringListModel& m_lv_model;
         QStringList m_usb_drives;
         bool m_auto_report_enabled;
+        int m_report_count;
         Ui::ReportControlWidget *ui;
         void updateUi();
         bool isModified();

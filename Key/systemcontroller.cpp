@@ -387,8 +387,8 @@ void CSystemController::initializeSecurityConnections()
 
     connect(&_ReportController, SIGNAL(__RequestCodeHistoryForDateRange(QDateTime,QDateTime)),
             &_securityController, SLOT(OnRequestCodeHistoryForDateRange(QDateTime,QDateTime)));
-    connect(&_securityController, SIGNAL(__OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)),
-            &_ReportController, SLOT(OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)));
+    connect(&_securityController, SIGNAL(__OnCodeHistoryForDateRange(CLockHistorySet*)),
+            &_ReportController, SLOT(OnCodeHistoryForDateRange(CLockHistorySet*)));
 
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), &_securityController, SLOT(OnUpdateCodeState(CLockState*)));
     connect(&_securityController, SIGNAL(__OnUpdatedCodeState(bool)), this, SLOT(OnUpdatedCodeState(bool)));

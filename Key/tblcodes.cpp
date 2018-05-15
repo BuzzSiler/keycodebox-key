@@ -308,19 +308,20 @@ void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry,
     
     if (!qry.exec())
     {
-        qDebug() << qry.lastError().text() << qry.lastQuery();
+        KCB_DEBUG_TRACE("Exec Failed: " << qry.lastError().text() << qry.lastQuery());
+        return;
     }
 
-    Q_ASSERT_X(qry.isActive(), Q_FUNC_INFO, "Query is not active");
-    Q_ASSERT_X(qry.isSelect(), Q_FUNC_INFO, "Query is not selected");
     if (!qry.isActive() || !qry.isSelect())
     {
-        KCB_DEBUG_TRACE("SQL Query Failure" << "Active" << qry.isActive() << "Select" << qry.isSelect());
+        KCB_DEBUG_TRACE("SQL Query Failure: " << "Active" << qry.isActive() << "Select" << qry.isSelect());
+        return;
     }
 
     if (!qry.first())
     {
-        KCB_WARNING_TRACE(qry.lastError().text() << qry.lastQuery());
+        KCB_WARNING_TRACE("First Failed: " << qry.lastError().text() << qry.lastQuery());
+        return;
     }
 
     *pLockSet = new CLockSet();

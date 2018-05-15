@@ -37,7 +37,7 @@ class CTblCodeHistory
         bool deleteLockCodeHistory(CLockHistoryRec &rec);
 
         bool updateRecord(CLockHistoryRec &rec);
-        void selectLockCodeHistorySet(QString &LockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet);
+        void selectLockCodeHistorySet(QString LockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet);
         bool updateLockCodeHistorySet(CLockHistorySet &lockHistorySet);
         bool updateLockCodeHistorySet(QJsonObject &jsonObj);
         void selectLastLockCodeHistorySet(QString &LockNums, QDateTime &start, QDateTime &end, CLockHistorySet **pLockHistorySet);

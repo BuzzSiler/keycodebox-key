@@ -34,6 +34,8 @@ class CFrmAdminInfo;
 
 class SelectLocksWidget;
 class ReportControlWidget;
+class AutoGenerateControlWidget;
+class SystemDisplayWidget;
 
 
 class CFrmAdminInfo : public QDialog
@@ -203,6 +205,8 @@ class CFrmAdminInfo : public QDialog
         SelectLocksWidget&  m_select_locks;
         QStringList         _codesInUse;
         ReportControlWidget& m_report;
+        AutoGenerateControlWidget& m_autogen;
+        SystemDisplayWidget& m_systemdisp;
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
 

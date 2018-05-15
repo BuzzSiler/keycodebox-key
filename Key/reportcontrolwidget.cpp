@@ -3,6 +3,7 @@
 
 #include <QDir>
 #include <QMessageBox>
+#include <QTimer>
 
 #include "tbladmin.h"
 #include "kcbcommon.h"
@@ -23,6 +24,7 @@ ReportControlWidget::ReportControlWidget(QWidget *parent) :
     m_lv_model(* new CheckableStringListModel(this)),
     m_usb_drives(QStringList()),
     m_auto_report_enabled(false),
+    m_report_count(0),
     ui(new Ui::ReportControlWidget)
 {
     ui->setupUi(this);
@@ -363,7 +365,7 @@ void ReportControlWidget::on_lvAvailableReports_clicked(const QModelIndex &index
     }
 
     // Note: It would preferrable to have these set in updateUi, but when updateUi
-    // is called, you can no longer check and item.  Something is conflicting.
+    // is called, you can no longer check an item.  Something is conflicting.
     // In the interim, the logic is duplicated.  Maybe put common logic in a
     // common function
 
@@ -462,8 +464,29 @@ void ReportControlWidget::on_cbUsbDrives_currentTextChanged(const QString &text)
 
 void ReportControlWidget::on_pbGenerateReport_clicked()
 {
+    // Get the current number of report files and save it
+    QDir dir(m_curr_report_directory);
+    QStringList strList = dir.entryList(QStringList() << "KeyCodeBox*.txt", QDir::Files, QDir::Time);
+    m_report_count = strList.count();
     emit NotifyGenerateReport();
     updateUi();
+    // Start a timer that compares the number of report files with the above
+    QTimer::singleShot(100, this, SLOT(updateAvailableReports()));
+}
+
+void ReportControlWidget::updateAvailableReports()
+{
+    QDir dir(m_curr_report_directory);
+    QStringList strList = dir.entryList(QStringList() << "KeyCodeBox*.txt", QDir::Files, QDir::Time);
+    if (strList.count() > m_report_count)
+    {
+        updateUi();
+        m_report_count = 0;
+    }
+    else
+    {
+        QTimer::singleShot(100, this, SLOT(updateAvailableReports()));
+    }
 }
 
 void ReportControlWidget::ClearSelectAllReports(Qt::CheckState state)

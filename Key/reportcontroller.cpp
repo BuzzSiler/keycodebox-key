@@ -20,6 +20,10 @@
 #define DAYS_IN_TWOWEEKS (2*DAYS_IN_WEEK)
 #define DAYS_IN_MONTH(dt) (dt.daysInMonth())
 
+#define SECS_IN_HOUR (3600)
+#define SECS_IN_12_HOURS (12*SECS_IN_HOUR)
+#define SECS_IN_DAY (24*SECS_IN_HOUR)
+#define SECS_IN_WEEK (7*SECS_IN_DAY)
 
 CReportController::CReportController(QObject *parent) : QObject(parent)
 {
@@ -50,6 +54,7 @@ void CReportController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
     KCB_DEBUG_ENTRY;
     _padminInfo = adminInfo;
     _bCurrentAdminRetrieved = true;
+    KCB_DEBUG_EXIT;
 }
 
 QString CReportController::createNewFileName()
@@ -75,7 +80,7 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
 
     if((*ppFile)->open(QIODevice::ReadWrite))
     {
-        KCB_DEBUG_TRACE("file open!:" << dir.absoluteFilePath(strFileName));
+        KCB_DEBUG_TRACE("file open:" << dir.absoluteFilePath(strFileName));
 
         QDateTime dtAccess;
         QString sDesc;
@@ -147,12 +152,7 @@ void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTim
     if(_bCurrentAdminRetrieved)
     {
         QFile       *pFile = NULL;
-        CLockHistorySet *pHistorySet = NULL;
-        processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
-        if (pHistorySet) 
-        {
-            delete pHistorySet;
-        }
+        processLockCodeHistoryReport(pFile, dtReportStart, dtReportEnd);
         if (pFile) 
         {
             delete pFile;
@@ -162,14 +162,11 @@ void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTim
     
 }
 
-void CReportController::processLockCodeHistoryReport(CLockHistorySet *_pHistorySet, 
-                                                     QFile *pFile, 
-                                                     QDateTime &dtReportStart, 
-                                                     QDateTime &dtReportEnd)
+void CReportController::processLockCodeHistoryReport(QFile *pFile, 
+                                                     QDateTime dtReportStart, 
+                                                     QDateTime dtReportEnd)
 {
     KCB_DEBUG_ENTRY;
-
-    Q_UNUSED(_pHistorySet);
 
     _pFile = pFile;
     _dtReportStart = dtReportStart;
@@ -184,16 +181,14 @@ void CReportController::assembleAndSendCodeRecordsForReportDate(QDateTime dtStar
 {
     KCB_DEBUG_ENTRY;
     emit __RequestCodeHistoryForDateRange(dtStart, dtEnd);
-    KCB_DEBUG_EXIT;
-    
+    KCB_DEBUG_EXIT;    
 }
 
-void CReportController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet)
+void CReportController::OnCodeHistoryForDateRange(CLockHistorySet *pLockHistorySet)
 {
-    Q_UNUSED(dtStart);
-    Q_UNUSED(dtEnd);
-
     KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(pLockHistorySet != nullptr, Q_FUNC_INFO, "LockHistorySet Pointer is null");
 
     requestCurrentAdminRecord();
     int nCount = 0;
@@ -203,23 +198,19 @@ void CReportController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime d
         usleep(100000);
         QCoreApplication::processEvents();
     }
+
     if(_bCurrentAdminRetrieved)
     {
         buildReportFile(pLockHistorySet, _padminInfo, &_pFile);
 
-        if( _padminInfo->getReportViaEmail() ) 
+        if ( _padminInfo->getReportViaEmail() ) 
         {
-            KCB_DEBUG_TRACE("calling PrepareToSendEmail");
             PrepareToSendEmail(_padminInfo, _pFile);
         }
-        if( _padminInfo->getReportToFile()) 
+
+        if ( !_padminInfo->getReportToFile()) 
         {
-            KCB_DEBUG_TRACE("Save to file");
-        } 
-        else 
-        {
-            KCB_DEBUG_TRACE("DON'T Save to file. Deleting file.");
-            if(_pFile) 
+            if (_pFile) 
             {
                 _pFile->remove();
             }
@@ -230,107 +221,99 @@ void CReportController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime d
 
 void CReportController::requestCurrentAdminRecord()
 {
+    KCB_DEBUG_ENTRY;
     _bCurrentAdminRetrieved = false;
     emit __OnRequestCurrentAdmin();
+    KCB_DEBUG_EXIT;
 }
 
-bool CReportController::timetoSendReport(QDateTime date, QDateTime &dtReportStart, QDateTime &dtReportEnd)
+bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart, QDateTime &dtReportEnd)
 {
     KCB_DEBUG_ENTRY;
-    if( !_ptblCodeHistory) 
-    {
-        KCB_DEBUG_TRACE("Requires TblCodeHistory to be set.");
-        return false;
-    }
 
     QDateTime dtFreq = _padminInfo->getDefaultReportFreq();
 
     // Note: It appears that 'every activity' is not generating a report
     // Is 'every activity' handled elsewhere?
+    // Yes, here -> void CSystemController::reportActivity(QString locknums)
 
-    if(dtFreq == QDateTime(QDate(), QTime(0,0)) ||
-            dtFreq == QDateTime(QDate(1,1,1), QTime(0,0)))   // Represents admin wants each access sent
-    {   // Never or each event are not sent from this process
+
+    if (dtFreq == QDateTime(QDate(), QTime(0,0)) ||
+        dtFreq == QDateTime(QDate(1,1,1), QTime(0,0)))
+    {
         KCB_DEBUG_EXIT;
         return false;
     }
 
     QDateTime   tmpDate;
     QFile       *pFile = NULL;
-    CLockHistorySet *pHistorySet = NULL;
+
+    qint64 numSecsSinceLastReport = _dtLastReportDate.secsTo(now);
+    KCB_DEBUG_TRACE("Seconds since last report" << numSecsSinceLastReport);
+
     if (IS_HOURLY(dtFreq))
     {
-        tmpDate = _dtLastReportDate.addSecs(3600);  // Add an hour in seconds
-        if(tmpDate >= _dtLastReportDate)
+        KCB_DEBUG_TRACE("Report hourly");
+        if (numSecsSinceLastReport >= SECS_IN_HOUR)
         {
-            dtReportStart = date.addSecs(-3600);
-            dtReportEnd = date.currentDateTime();
-            QString         LockNums;
-            // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
+            dtReportStart = _dtLastReportDate;
+            dtReportEnd = now.currentDateTime();
+            _dtLastReportDate = now.currentDateTime();
+            processLockCodeHistoryReport(pFile, dtReportStart, dtReportEnd);
         }
     } 
     else if (IS_EVERY_12_HOURS(dtFreq))
     {
-        tmpDate = _dtLastReportDate.addSecs(12 * 3600); // 12 hours
-        if(tmpDate >= _dtLastReportDate)
+        KCB_DEBUG_TRACE("Report every 12 hours");
+        if (numSecsSinceLastReport >= SECS_IN_12_HOURS)
         {
-            dtReportStart = date.addSecs(-3600 * 12);
-            dtReportEnd = date.currentDateTime();
-            QString         LockNums;
-            // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
+            dtReportStart = _dtLastReportDate;
+            dtReportEnd = now;
+            _dtLastReportDate = now;
+            processLockCodeHistoryReport(pFile, dtReportStart, dtReportEnd);
         }
     } 
     else if (IS_DAILY(dtFreq))
     {
-        tmpDate = _dtLastReportDate.addDays(1);
-        if(tmpDate >= _dtLastReportDate)
+        KCB_DEBUG_TRACE("Report daily");
+        if (numSecsSinceLastReport >= SECS_IN_DAY)
         {
-            dtReportStart = date.addDays(-1);
-            dtReportEnd = date.currentDateTime();
-            QString         LockNums;
-            // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
+            dtReportStart = _dtLastReportDate;
+            dtReportEnd = now;
+            _dtLastReportDate = now;
+            processLockCodeHistoryReport(pFile, dtReportStart, dtReportEnd);
         }
     } 
     else if (IS_WEEKLY(dtFreq))
     {
-        tmpDate = _dtLastReportDate.addDays(7);
-        if(tmpDate >= _dtLastReportDate)
+        KCB_DEBUG_TRACE("Report weekly");
+        if (numSecsSinceLastReport >= SECS_IN_WEEK)
         {
-            dtReportStart = date.addDays(-7);
-            dtReportEnd = date.currentDateTime();
-            QString         LockNums;
-            // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
+            dtReportStart = _dtLastReportDate;
+            dtReportEnd = now;
+            _dtLastReportDate = now;
+            processLockCodeHistoryReport(pFile, dtReportStart, dtReportEnd);
         }
     } 
     else if (IS_MONTHLY(dtFreq))
     {
-        tmpDate = _dtLastReportDate.addMonths(1);
-        if(tmpDate >= _dtLastReportDate)
+        KCB_DEBUG_TRACE("Report monthly");
+        qint64 numSecsInMonth = _dtLastReportDate.secsTo(_dtLastReportDate.addMonths(1));
+        if (numSecsSinceLastReport >= numSecsInMonth)
         {
-            dtReportStart = date.addMonths(-1);
-            dtReportEnd = date.currentDateTime();
-            QString         LockNums;
-            // Accumulate and send
-            processLockCodeHistoryReport(pHistorySet, pFile, dtReportStart, dtReportEnd);
+            dtReportStart = _dtLastReportDate;
+            dtReportEnd = now;
+            _dtLastReportDate = now;
+            processLockCodeHistoryReport(pFile, dtReportStart, dtReportEnd);
         }
     }
 
-    if(pHistorySet)
-    {
-        delete pHistorySet;
-    }
-
-    if(pFile) 
+    if (pFile) 
     {
         delete pFile;
         KCB_DEBUG_EXIT;
         return true;
     }
-
     else 
     {
         KCB_DEBUG_EXIT;

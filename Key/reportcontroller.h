@@ -20,8 +20,7 @@ class CReportController : public QObject
         void start();
         void setCodeHistoryTable(CTblCodeHistory *pTable);
         QString createNewFileName();
-        void processLockCodeHistoryReport(CLockHistorySet *_pHistorySet, QFile *pFile, QDateTime &dtReportStart, QDateTime &dtReportEnd);
-
+        void processLockCodeHistoryReport(QFile *pFile, QDateTime dtReportStart, QDateTime dtReportEnd);    
         void processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd);
 
     signals:
@@ -31,7 +30,7 @@ class CReportController : public QObject
         void __RequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd);
 
     public slots:
-        void OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet);
+        void OnCodeHistoryForDateRange(CLockHistorySet *pLockHistorySet);
         void OnSendEmail(const QString SMTPServer, const int &SMTPPort, const int &SMTPType,
                          const QString &SMTPUsername,
                          const QString &SMTPPassword, const QString &from, const QString &to,

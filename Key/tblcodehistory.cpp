@@ -57,27 +57,30 @@ QSqlQuery CTblCodeHistory::createQuery(QStringList column_list,
 
 void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistorySet **pLockHistorySet)
 {
-    CLockHistoryRec  *pLockHistoryRec;
-
     if (!qry.exec())
     {
-        qDebug() << qry.lastError().text() << qry.lastQuery();
+        KCB_DEBUG_TRACE("Exec Failed: " << qry.lastError().text() << qry.lastQuery());
+        return;
     }
 
-    KCB_DEBUG_TRACE("Active" << qry.isActive() << "Select" << qry.isSelect());
+    if (!qry.isActive() || !qry.isSelect())
+    {
+        KCB_DEBUG_TRACE("SQL Query Failure: " << "Active" << qry.isActive() << "Select" << qry.isSelect());
+        return;
+    }
 
     if (!qry.first())
     {
-        KCB_WARNING_TRACE(qry.lastError().text() << qry.lastQuery());
+        KCB_WARNING_TRACE("First Failed: " << qry.lastError().text() << qry.lastQuery());
+        return;
     }
     
-    *pLockHistorySet = new CLockHistorySet;
+    KCB_DEBUG_TRACE("Retrieving at least first record that was found!");
 
-    qDebug() << "Retrieving at least first record that was found!";
+    *pLockHistorySet = new CLockHistorySet();
+
     do
     {                    
-        pLockHistoryRec = new CLockHistoryRec();
-
         auto ids = QUERY_VALUE(qry, "ids").toInt();
         auto seq = QUERY_VALUE(qry, "sequence").toString();
         auto seq_order = QUERY_VALUE(qry, "sequence_order").toInt();
@@ -99,6 +102,8 @@ void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistory
         auto answer1 = QUERY_VALUE(qry, "answer1").toString();
         auto answer2 = QUERY_VALUE(qry, "answer2").toString();
         auto answer3 = QUERY_VALUE(qry, "answer3").toString();
+
+        CLockHistoryRec *pLockHistoryRec = new CLockHistoryRec();
 
         pLockHistoryRec->setID(ids);
         pLockHistoryRec->setSequence(seq);
@@ -129,10 +134,12 @@ void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistory
     } while (qry.next());
 }
 
-void CTblCodeHistory::selectLockCodeHistorySet(QString &lockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet)
+void CTblCodeHistory::selectLockCodeHistorySet(QString lockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet)
 {
     KCB_DEBUG_ENTRY;
     *pLockHistorySet = 0;
+
+    KCB_DEBUG_TRACE(lockNums);
 
     QStringList columns_list;
     columns_list << "ids" << "sequence" << "sequence_order";

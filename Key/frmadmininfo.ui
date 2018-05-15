@@ -43,11 +43,11 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>7</number>
    </property>
    <widget class="QWidget" name="tabAdministrator">
     <attribute name="title">
-     <string>Administrator</string>
+     <string>Admin</string>
     </attribute>
     <widget class="QPushButton" name="btnDone">
      <property name="geometry">
@@ -1718,6 +1718,38 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tabAutoGen">
+    <attribute name="title">
+     <string>Auto Gen</string>
+    </attribute>
+    <widget class="QWidget" name="verticalLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>841</width>
+       <height>441</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="vloAutoGenerate"/>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tabSystem">
+    <attribute name="title">
+     <string>System</string>
+    </attribute>
+    <widget class="QWidget" name="verticalLayoutWidget_4">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>841</width>
+       <height>441</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="vloSystemDisplay"/>
     </widget>
    </widget>
   </widget>

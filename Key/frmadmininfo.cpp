@@ -35,6 +35,8 @@
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
 #include "reportcontrolwidget.h"
+#include "autogeneratecontrolwidget.h"
+#include "systemdisplaywidget.h"
 
 #define ADMIN_TAB_INDEX (0)
 #define REPORT_TAB_INDEX (2)
@@ -74,8 +76,9 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     // Explicit initialization needed to prevent spurious test emails
     _testEmail(false),
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
-    m_report(* new ReportControlWidget(this))
-
+    m_report(* new ReportControlWidget(this)),
+    m_autogen(* new AutoGenerateControlWidget(this)),
+    m_systemdisp(* new SystemDisplayWidget(this))
 {
     ui->setupUi(this);
 
@@ -183,10 +186,11 @@ void CFrmAdminInfo::show()
         ui->gpAdminInfo->setVisible(true);
         ui->vloSelectLocks->addWidget(&m_select_locks);
         ui->vloReportSettings->addWidget(&m_report);
+        ui->vloAutoGenerate->addWidget(&m_autogen);
+        ui->vloSystemDisplay->addWidget(&m_systemdisp);
         // Force tabwidget to show administrator tab
-        emit ui->tabWidget->currentChanged(0);
+        emit ui->tabWidget->currentChanged(ADMIN_TAB_INDEX);
     }
-
 }
 
 int CFrmAdminInfo::getDisplayPowerDownTimeout()
@@ -891,7 +895,8 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
         m_report.setValues(_tmpAdminRec);
 
-        ui->tabWidget->setCurrentIndex(0);
+        // KCB_DEBUG_TRACE("Setting Current Index to 0");
+        // ui->tabWidget->setCurrentIndex(0);
     }
     else
     {
@@ -1987,8 +1992,7 @@ void CFrmAdminInfo::OnTabSelected(int index)
 
     if (last_index == REPORT_TAB_INDEX && index != last_index)
     {
-        // If we are changing to the Admin Tab (where we will press the 'Save and Close' button,
-        // we want to read the latest values
+        // If we are changing away from the Report Tab then we want to update to the latest values
         m_report.getValues(_tmpAdminRec);
     }
 

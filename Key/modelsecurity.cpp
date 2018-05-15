@@ -51,24 +51,19 @@ void CModelSecurity::OnReadLockSet(QString LockNums, QDateTime start, QDateTime 
 
 void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end)
 {
-    CLockHistorySet *pLockHistorySet;
-    CLockHistoryRec  *pState;
 
     // KCB_DEBUG_ENTRY;
 
     // KCB_DEBUG_TRACE("Locks" << LockNums);
+    CLockHistorySet *pLockHistorySet;
     _ptblCodeHistory->selectLockCodeHistorySet(LockNums, start, end, &pLockHistorySet);
     Q_ASSERT_X(pLockHistorySet != nullptr, Q_FUNC_INFO, "pLockHistorySet is null");
 
-    auto itor = pLockHistorySet->getIterator();
-
-    while (itor.hasNext())
+    if (pLockHistorySet)
     {
-        pState = itor.next();
-        // KCB_DEBUG_TRACE(pState->getLockNums());
+        emit __OnLockHistorySet(pLockHistorySet);
     }
 
-    emit __OnLockHistorySet(pLockHistorySet);
     // KCB_DEBUG_EXIT;
 }
 
@@ -736,12 +731,14 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
 
 void CModelSecurity::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd)
 {
-    CLockHistorySet     *pLockHistorySet = new CLockHistorySet();
-    // Get the data
-    QString LockNums;
-    _ptblCodeHistory->selectLockCodeHistorySet(LockNums, dtStart, dtEnd, &pLockHistorySet);
-    // Send it back
-    emit __OnCodeHistoryForDateRange(dtStart, dtEnd, pLockHistorySet);
+    KCB_DEBUG_ENTRY;
+    CLockHistorySet *pLockHistorySet;
+    _ptblCodeHistory->selectLockCodeHistorySet(QString(""), dtStart, dtEnd, &pLockHistorySet);
+    if (pLockHistorySet)
+    {
+        emit __OnCodeHistoryForDateRange(pLockHistorySet);
+    }
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnVerifyAdminPassword(QString code)
