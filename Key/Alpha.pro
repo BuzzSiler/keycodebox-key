@@ -84,7 +84,8 @@ SOURCES += main.cpp\
     reportcontrolwidget.cpp \
     dlgdownloadreports.cpp \
     autogeneratecontrolwidget.cpp \
-    systemdisplaywidget.cpp
+    systemdisplaywidget.cpp \
+    kcbsystem.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -154,7 +155,8 @@ HEADERS  += keycodeboxmain.h \
     reportcontrolwidget.h \
     dlgdownloadreports.h \
     autogeneratecontrolwidget.h \
-    systemdisplaywidget.h
+    systemdisplaywidget.h \
+    kcbsystem.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

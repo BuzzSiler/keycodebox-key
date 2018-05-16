@@ -73,7 +73,7 @@
      <x>260</x>
      <y>10</y>
      <width>571</width>
-     <height>191</height>
+     <height>101</height>
     </rect>
    </property>
    <property name="title">
@@ -84,7 +84,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>171</width>
+      <width>181</width>
       <height>31</height>
      </rect>
     </property>
@@ -97,7 +97,7 @@
      <rect>
       <x>10</x>
       <y>60</y>
-      <width>171</width>
+      <width>181</width>
       <height>31</height>
      </rect>
     </property>
@@ -108,9 +108,9 @@
    <widget class="QLabel" name="lbltxtSystemSerialNumber">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>190</x>
       <y>30</y>
-      <width>151</width>
+      <width>231</width>
       <height>31</height>
      </rect>
     </property>
@@ -121,35 +121,9 @@
    <widget class="QLabel" name="lbltxtRpiSerialNumber">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>190</x>
       <y>60</y>
-      <width>151</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lblMacAddress">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>171</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>MAC Address:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lbltxtMacAddress">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>90</y>
-      <width>151</width>
+      <width>231</width>
       <height>31</height>
      </rect>
     </property>
