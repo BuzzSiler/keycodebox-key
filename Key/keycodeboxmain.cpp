@@ -344,7 +344,9 @@ void MainWindow::hideFormsExcept(QDialog * pfrm) {
         _pfAdminPW->hide();
     }
     if(_pfUsercode && _pfUsercode != pfrm)
+    {
         _pfUsercode->hide();
+    }
     pfrm->activateWindow();
     pfrm->raise();
     pfrm->setFocus();

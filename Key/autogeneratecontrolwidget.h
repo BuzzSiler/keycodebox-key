@@ -15,6 +15,14 @@ class AutoGenerateControlWidget : public QWidget
         explicit AutoGenerateControlWidget(QWidget *parent = 0);
         ~AutoGenerateControlWidget();
 
+    private slots:
+
+        void on_cbSelectCode_currentIndexChanged(const QString &element);
+
+        void on_pbGenerateCodes_clicked();
+
+        void on_pbApplyCodes_clicked();
+
     private:
         Ui::AutoGenerateControlWidget *ui;
 };

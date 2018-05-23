@@ -85,7 +85,8 @@ SOURCES += main.cpp\
     dlgdownloadreports.cpp \
     autogeneratecontrolwidget.cpp \
     systemdisplaywidget.cpp \
-    kcbsystem.cpp
+    kcbsystem.cpp \
+    datetimeworker.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -156,7 +157,8 @@ HEADERS  += keycodeboxmain.h \
     dlgdownloadreports.h \
     autogeneratecontrolwidget.h \
     systemdisplaywidget.h \
-    kcbsystem.h
+    kcbsystem.h \
+    datetimeworker.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

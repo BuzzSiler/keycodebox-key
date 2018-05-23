@@ -3,11 +3,12 @@
 #include <QDateTime>
 #include "frmusercode.h"
 #include "ui_frmusercode.h"
-#include "hidreader.h"
-#include <libfprint/fprint.h>
+//#include "hidreader.h"
+//#include <libfprint/fprint.h>
 #include "dlgfingerprint.h"
 #include "version.h"
 #include "kcbcommon.h"
+
 
 
 CFrmUserCode::CFrmUserCode(QWidget *parent) :
@@ -30,6 +31,23 @@ void CFrmUserCode::initialize()
     _dtTimer.connect(&_dtTimer, SIGNAL(timeout()), this, SLOT(OnDateTimeTimerTimeout()));
     _dtTimer.start();
     ui->lVersion->setText(VERSION);
+    DisableControls();
+}
+
+void CFrmUserCode::DisableControls()
+{
+    ui->grpKeypad->setDisabled(true);
+    ui->btnShowHideCode->setDisabled(true);
+    ui->btnIdentifyFingerPrint->setDisabled(true);
+    ui->edCode->setDisabled(true);
+}
+
+void CFrmUserCode::EnableControls()
+{
+    ui->grpKeypad->setEnabled(true);
+    ui->btnShowHideCode->setEnabled(true);
+    ui->btnIdentifyFingerPrint->setEnabled(true);
+    ui->edCode->setEnabled(true);
 }
 
 void CFrmUserCode::OnDateTimeTimerTimeout()
@@ -104,7 +122,8 @@ void CFrmUserCode::onBackSpace()
     // Destructive Backspace
     QString sCode = ui->edCode->text();
     int nLen = sCode.length();
-    if( nLen > 0 ) {
+    if( nLen > 0 )
+    {
         sCode = sCode.left(nLen - 1);
         this->ui->edCode->setText(sCode);
     }
@@ -129,21 +148,18 @@ void CFrmUserCode::OnNewMessage(QString sMsg)
 
 void CFrmUserCode::OnClearCodeDisplay()
 {
-    qDebug() << "Pre CFrmUserCode::OnClearCodeDisplay()";
     ui->edCode->clear();
     ui->edCode->setText("");
-    qDebug() << "Post CFrmUserCode::OnClearCodeDisplay()";
 }
 
 void CFrmUserCode::OnSwipeCode(QString sCode)
 {
-    qDebug() << "CFrmUserCode::OnSwipeCode" << sCode;
     ui->edCode->setText(sCode);
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
     if(sCode.size() > 0 ) 
     {
-        emit __CodeEntered(sCode);     // Signal that the code was entered.
+        emit __CodeEntered(sCode);
     }
 }
 
@@ -152,7 +168,8 @@ void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
     ui->edCode->setPlaceholderText(sCodeMsg);
     OnClearCodeDisplay();
     // Start a timer for 4 seconds default
-    QTimer::singleShot(4000, this, SLOT(ResetPlaceholderText()));
+    //QTimer::singleShot(4000, this, SLOT(ResetPlaceholderText()));
+    ui->edCode->setFocus();
 }
 
 void CFrmUserCode::ResetPlaceholderText()
@@ -227,10 +244,13 @@ void CFrmUserCode::on_btn_Clear_clicked()
 
 void CFrmUserCode::on_btnShowHideCode_clicked(bool checked)
 {
-    if(checked) {
+    if(checked)
+    {
         ui->edCode->setEchoMode(QLineEdit::Normal);
         ui->btnShowHideCode->setText(tr("Hide"));
-    } else {
+    }
+    else
+    {
         ui->edCode->setEchoMode(QLineEdit::Password);
         ui->btnShowHideCode->setText(tr("Show"));
     }
@@ -273,6 +293,18 @@ void CFrmUserCode::SetDisplayShowHideButton(bool state)
     ui->btnShowHideCode->setVisible(state);
 }
 
+void CFrmUserCode::show()
+{
+    QDialog::show();
+    DisableControls();
+}
+
+void CFrmUserCode::hide()
+{
+    DisableControls();
+    QDialog::hide();
+}
+
 void CFrmUserCode::OnDisplayFingerprintButton(bool state)
 {
     SetDisplayFingerprintButton(state);
@@ -281,4 +313,14 @@ void CFrmUserCode::OnDisplayFingerprintButton(bool state)
 void CFrmUserCode::OnDisplayShowHideButton(bool state)
 {
     SetDisplayShowHideButton(state);
+}
+
+void CFrmUserCode::on_pbTake_clicked()
+{
+    EnableControls();
+}
+
+void CFrmUserCode::on_pbReturn_clicked()
+{
+    EnableControls();
 }

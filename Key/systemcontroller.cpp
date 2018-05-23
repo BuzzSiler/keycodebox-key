@@ -588,17 +588,18 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
     {
         KCB_DEBUG_TRACE("Multi Lock");
 
-        CFrmSelectLocks sl;
+        CFrmSelectLocks selectLocks;
 
-        sl.setLocks(locks);
-        if (sl.exec())
+        selectLocks.setLocks(locks);
+        if (selectLocks.exec())
         {
-            _locks = sl.getLocks();
+            _locks = selectLocks.getLocks();
 
             QStringList sl = _locks.split(",");
 
             foreach (auto s, sl)
             {
+                QCoreApplication::processEvents();
                 OnOpenLockRequest(s);
             }
 
@@ -946,7 +947,7 @@ void CSystemController::looprun()
             emit __OnNewMessage("");
 
             KCB_DEBUG_TRACE("EThankYou Timeout Active");
-            startTimeoutTimer(5000);
+            startTimeoutTimer(500);
         }
     }
     else if(_systemState == EAdminMain) 

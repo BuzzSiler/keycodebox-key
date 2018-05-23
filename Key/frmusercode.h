@@ -12,8 +12,6 @@ namespace Ui {
 class CFrmUserCode;
 }
 
-#define MAX_CODE_SIZE   15
-
 class CFrmUserCode : public QDialog
 {
     Q_OBJECT
@@ -25,9 +23,11 @@ public:
     void SetDisplayFingerprintButton(bool state);
     void SetDisplayShowHideButton(bool state);
 
+    void show();
+    void hide();
+
 private:
     Ui::CFrmUserCode *ui;
-
     QTimer  _dtTimer;
 
     void onButtonClick(char key);
@@ -37,6 +37,10 @@ private:
     void enableKeypad(bool bEnable);
     
     void initialize();
+
+    void EnableControls();
+    void DisableControls();
+
 signals:
     void __KeyPressed(char key);
     void __CodeEntered(QString sCode);
@@ -79,6 +83,8 @@ private slots:
     void on_btn_Cancel_clicked();
     void on_btnIdentifyFingerPrint_clicked();
     void OnDateTimeTimerTimeout();
+    void on_pbTake_clicked();
+    void on_pbReturn_clicked();
 };
 
 #endif // FRMUSERCODE_H

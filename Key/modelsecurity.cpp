@@ -475,6 +475,8 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
 
             KCB_DEBUG_TRACE("Ask Questions" << bAskQuestions);
 
+            /* Only Ask Questions if this is a return */
+
             if( bAskQuestions )
             {
                 qDebug() << "QUESTION1: " << question1;
@@ -656,16 +658,6 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
 
         _ptblCodeHistory->selectLastLockCodeHistorySet(LockNums, time, now, &_pHistorySet);
 
-        // Predictive - so history rec
-        // CLockHistoryRec *plockHistoryRec;
-
-//        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++)
-//        {
-//            plockHistoryRec = itor.value();
-//            //
-//            qDebug() << "  Found last successful login";
-//            emit __OnLastSuccessfulLogin(plockHistoryRec);
-//        }
     }
     else
     {
