@@ -12,6 +12,8 @@ namespace kcb
         stdOut = "";
         stdErr = "";
 
+        KCB_DEBUG_TRACE(program << arguments);
+
         proc.start(program, arguments);
         (void) proc.waitForStarted();
         (void) proc.waitForFinished();
@@ -60,6 +62,43 @@ namespace kcb
                 }
             }
         }
+    }
+
+    void SetVNCCredentials(QString vnc_port, QString vnc_password)
+    {
+        // echo '|<vncport> <vncpassword>|' > /home/pi/kcb-config/config/vnc_creds.txt
+
+        KCB_DEBUG_TRACE(vnc_port << vnc_password);
+
+        QString program = QString("echo '|%1 %2|' > /home/pi/kcb-config/config/vnc_creds.txt").arg(vnc_port).arg(vnc_password);
+        QStringList arguments;
+//        arguments << QString("'|%1 %2|'").arg(vnc_port).arg(vnc_password);
+//        arguments << QString(">");
+//        arguments << QString("/home/pi/kcb-config/config/vnc_creds.txt");
+        QString stdOut;
+        QString stdErr;
+
+        ExecuteCommand(program, arguments, stdOut, stdErr);
+
+        qDebug() << stdOut;
+        qDebug() << stdErr;
+
+        // FILE *pF;
+        // std::string sOutput = "";
+        // QString createCmd = "echo '|";
+        // createCmd += QString::number(vncport);
+        // createCmd += " ";
+        // createCmd += vncpassword;
+        // createCmd +="|' > /home/pi/run/vnc_creds.txt";
+
+        // pF = popen(createCmd.toStdString().c_str(), "r");
+        // if(!pF)
+        // {
+        //     qDebug() << "failed to create vnc file";
+        // }
+
+        // ExtractCommandOutput(pF, sOutput);
+        // fclose(pF);
     }
 
 }

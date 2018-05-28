@@ -20,6 +20,7 @@
 #include "dlgsmtp.h"
 #include "dlgvnc.h"
 #include "frmcodeeditmulti.h"
+#include "frmnetworksettings.h"
 
 namespace Ui {
 class CFrmAdminInfo;
@@ -36,6 +37,8 @@ class SelectLocksWidget;
 class ReportControlWidget;
 class AutoGenerateControlWidget;
 class SystemDisplayWidget;
+class FrmNetworkSettings;
+//class FrmTest;
 
 
 class CFrmAdminInfo : public QDialog
@@ -78,6 +81,8 @@ class CFrmAdminInfo : public QDialog
         void __OnSendTestEmail(int test_type);
         void __OnDisplayFingerprintButton(bool state);
         void __OnDisplayShowHideButton(bool state);
+        void __OnDisplayTakeReturnButtons(bool state);
+
     
     public slots:
         void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
@@ -99,6 +104,7 @@ class CFrmAdminInfo : public QDialog
         void OnTabSelected(int index);
         void OnDisplayFingerprintButton(bool);
         void OnDisplayShowHideButton(bool);
+        void OnDisplayTakeReturnButtons(bool);
         void OnOpenLockRequest(QString lock, bool is_user);
         void OnNotifyGenerateReport();    
 
@@ -169,6 +175,9 @@ class CFrmAdminInfo : public QDialog
         void OnCodeEditReject();
         void OnCodeEditAccept();
 
+        void on_pbNetworkSettings_clicked();
+        void OnNetworkSettingsFinished(int);
+
     private:
         Ui::CFrmAdminInfo   *ui;
         CSystemController   *_psysController;
@@ -207,6 +216,7 @@ class CFrmAdminInfo : public QDialog
         ReportControlWidget& m_report;
         AutoGenerateControlWidget& m_autogen;
         SystemDisplayWidget& m_systemdisp;
+        FrmNetworkSettings& m_network_settings;
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
 
@@ -242,6 +252,8 @@ class CFrmAdminInfo : public QDialog
                             QString question3,
                             int access_type);
         void RunKeyboard(QString& text, bool numbersOnly = false);
+        void updateVNCChanges(QString vncPort, QString vncPassword);
+        void updateSMTPChanges(QString smtpServer, QString smtpPort, QString smtpUsername, QString smtpPassword, int smtpType);
                          
 
     protected:

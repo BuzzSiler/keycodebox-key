@@ -3,11 +3,10 @@
 #include <QDateTime>
 #include "frmusercode.h"
 #include "ui_frmusercode.h"
-//#include "hidreader.h"
-//#include <libfprint/fprint.h>
 #include "dlgfingerprint.h"
 #include "version.h"
 #include "kcbcommon.h"
+#include "kcbapplication.h"
 
 
 
@@ -30,8 +29,11 @@ void CFrmUserCode::initialize()
     _dtTimer.setInterval(1000);
     _dtTimer.connect(&_dtTimer, SIGNAL(timeout()), this, SLOT(OnDateTimeTimerTimeout()));
     _dtTimer.start();
+
     ui->lVersion->setText(VERSION);
     DisableControls();
+
+    kcb::Application::clearAccessSelection();
 }
 
 void CFrmUserCode::DisableControls()
@@ -269,11 +271,17 @@ void CFrmUserCode::on_btnIdentifyFingerPrint_clicked()
 
 void CFrmUserCode::SetDisplayFingerprintButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE(state);
     ui->btnIdentifyFingerPrint->setVisible(state);
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::SetDisplayShowHideButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE(state);
     /* Set the Show Password button to unchecked state whenever it is checked
        so that we don't inadvertently enable showing the password.  This applies 
        to the transition of showing/hiding the Show Password button.
@@ -291,12 +299,43 @@ void CFrmUserCode::SetDisplayShowHideButton(bool state)
     }
 
     ui->btnShowHideCode->setVisible(state);
+    KCB_DEBUG_EXIT;
 }
 
-void CFrmUserCode::show()
+void CFrmUserCode::SetDisplayTakeReturnButtons(bool state)
 {
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE(state);
+    ui->pbTake->setVisible(state);
+    ui->pbReturn->setVisible(state);
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmUserCode::show(bool enabled)
+{
+    KCB_DEBUG_ENTRY;
+
+    if (ui->pbTake->isVisible() && ui->pbReturn->isVisible())
+    {
+        enabled == true ? EnableControls() : DisableControls();
+    }
+    else
+    {
+        EnableControls();
+    }
+
     QDialog::show();
-    DisableControls();
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmUserCode::OnDisplayButtonsUpdate(bool dispFp, bool dispShowHide, bool dispTakeReturn)
+{
+    KCB_DEBUG_ENTRY;
+    ui->btnIdentifyFingerPrint->setVisible(dispFp);
+    ui->btnShowHideCode->setVisible(dispShowHide);
+    ui->pbTake->setVisible(dispTakeReturn);
+    ui->pbReturn->setVisible(dispTakeReturn);
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::hide()
@@ -307,20 +346,33 @@ void CFrmUserCode::hide()
 
 void CFrmUserCode::OnDisplayFingerprintButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     SetDisplayFingerprintButton(state);
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayShowHideButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     SetDisplayShowHideButton(state);
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmUserCode::OnDisplayTakeReturnButtons(bool state)
+{
+    KCB_DEBUG_ENTRY;
+    SetDisplayTakeReturnButtons(state);
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::on_pbTake_clicked()
 {
-    EnableControls();
+    kcb::Application::setAccessSelection(kcb::ACCESS_TAKE);
+    EnableControls();    
 }
 
 void CFrmUserCode::on_pbReturn_clicked()
 {
+    kcb::Application::setAccessSelection(kcb::ACCESS_RETURN);
     EnableControls();
 }

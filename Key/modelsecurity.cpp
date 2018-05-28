@@ -10,6 +10,7 @@
 #include <QIODevice>
 #include <QDateTime>
 #include "kcbcommon.h"
+#include "kcbapplication.h"
 
 void CModelSecurity::openDatabase()
 {
@@ -73,7 +74,7 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
                                                  adminInfo->getDefaultReportFreq(),
                                                  adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
                                                  adminInfo->getAssistPassword(), adminInfo->getAssistCode(),
-                                                 adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(),
+                                                 adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(), adminInfo->getDisplayTakeReturnButtons(),
                                                  adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
                                                  adminInfo->getMaxLocks(),
                                                  adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
@@ -417,6 +418,9 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     QString question2 = "";
     QString question3 = "";
 
+    bool isReturn = kcb::Application::isReturnSelection();
+    (void) kcb::Application::getAccessSelection();
+
     _updateCodeLockboxState = false;
     if(_type == "Admin" || _type == "Assist") 
     {
@@ -474,10 +478,8 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
             }
 
             KCB_DEBUG_TRACE("Ask Questions" << bAskQuestions);
-
-            /* Only Ask Questions if this is a return */
-
-            if( bAskQuestions )
+            
+            if (isReturn && bAskQuestions)
             {
                 qDebug() << "QUESTION1: " << question1;
                 qDebug() << "QUESTION2: " << question2;

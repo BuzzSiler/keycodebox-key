@@ -25,13 +25,9 @@ CSystemController::CSystemController(QObject *parent) :
     _fingerprintReader(0),
     _systemState(ETimeoutScreen),
     _systemStateDisplay(ENone),
-    _pfUsercode(0),
     _pdFingerprintVerify(0),
     _ptimer(0)
 {
-    Q_UNUSED(parent);
-
-    //qRegisterMetaType<QVector<int> >("QVector<int>");
 }
 
 CSystemController::~CSystemController()
@@ -477,6 +473,10 @@ void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
     qDebug() << "CSystemController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(adminInfo);
+
+    emit __DisplayButtonsUpdate(_padminInfo->getDisplayFingerprintButton(), 
+                                _padminInfo->getDisplayShowHideButton(), 
+                                _padminInfo->getDisplayTakeReturnButtons());
 }
 
 void CSystemController::OnAdminDialogClosed()
@@ -679,20 +679,26 @@ void CSystemController::OnRequestCurrentAdmin()
 
 bool CSystemController::getDisplayFingerprintButton()
 {
-    return _padminInfo->getDisplayFingerprintButton();
+    KCB_DEBUG_ENTRY;
+    bool result = _padminInfo->getDisplayFingerprintButton();
+    KCB_DEBUG_EXIT;
+    return result;
 }
 
 bool CSystemController::getDisplayShowHideButton()
 {
-    return _padminInfo->getDisplayShowHideButton();
+    KCB_DEBUG_ENTRY;
+    bool result = _padminInfo->getDisplayShowHideButton();
+    KCB_DEBUG_EXIT;
+    return result;
 }
 
-CFrmUserCode* CSystemController::getUserCodeOne()
+bool CSystemController::getDisplayTakeReturnButtons()
 {
-    if(!_pfUsercode)
-    {
-    }
-    return (CFrmUserCode *)NULL;
+    KCB_DEBUG_ENTRY;
+    bool result = _padminInfo->getDisplayTakeReturnButtons();
+    KCB_DEBUG_EXIT;
+    return result;
 }
 
 void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)

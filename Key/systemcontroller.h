@@ -37,6 +37,7 @@ public:
     SystemState getSystemStateDisplay() { return _systemStateDisplay; }
     bool getDisplayFingerprintButton();
     bool getDisplayShowHideButton();
+    bool getDisplayTakeReturnButtons();
     QString getAdminType() { return _adminType; }
 
     void setMainWindow(QMainWindow *mw) { _pmainWindow = mw; }
@@ -72,7 +73,6 @@ private:
     bool            _bCurrentAdminRetrieved;
     CAdminRec       *_padminInfo;
 
-    CFrmUserCode *_pfUsercode;
     CDlgFingerprintVerify *_pdFingerprintVerify;    
 
 
@@ -88,7 +88,6 @@ private:
     void initializeSecurityConnections();
     void initializeLockController();
 
-    CFrmUserCode *getUserCodeOne();
     void initializeReportController();
     void startTimeoutTimer(int duration);
     void stopTimeoutTimer();
@@ -131,6 +130,7 @@ signals:
     void __OnDisplayFingerprintButton(bool);
     void __OnDisplayShowHideButton(bool);
     void __OnHideShowPassword(bool);
+    void __OnDisplayTakeReturnButtons(bool);
 
     void __onUserCodeOne(QString sCode1);
     void __onUserCodeTwo(QString sCode2);
@@ -139,6 +139,8 @@ signals:
     void __onUserFingerprintCodeTwo(QString sCode2);
 
     void __onUserCodes(QString sCode1, QString sCode2);
+
+    void __DisplayButtonsUpdate(bool, bool, bool);
 
 signals:
     void __OnReadLockSet(QString LockNums, QDateTime start, QDateTime end);

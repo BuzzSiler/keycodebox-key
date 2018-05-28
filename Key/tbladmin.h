@@ -77,6 +77,9 @@ public:
     bool getDisplayShowHideButton() { return show_password; }
     void setDisplayShowHideButton(bool showPassword) { show_password = showPassword; }
 
+    bool getDisplayTakeReturnButtons() { return show_takereturn; }
+    void setDisplayTakeReturnButtons(bool showTakeReturn) { show_takereturn = showTakeReturn; }
+
     int getSMTPPort() { return smtp_port; }
     void setSMTPPort(int port) { smtp_port = port; }
 
@@ -137,6 +140,7 @@ private:
 
     bool        show_fingerprint; // bool: true = display button
     bool        show_password; // bool: true = display button
+    bool        show_takereturn;
     QString smtp_server;
     int smtp_port;
     int smtp_type;
@@ -181,7 +185,7 @@ public:
                      QDateTime repFreq, QDateTime startReport,
                      QString passwordEnc, QString accessCdEnc,
                      QString assistPasswordEnc, QString assistCodeEnc,
-                     bool showFingerprint, bool showPassword,
+                     bool showFingerprint, bool showPassword, bool showTakeReturn,
                      bool usePredictive, QString predKey, int predRes,
                      uint32_t nMaxLocks,
                      QString smtpserver, int smptport, int smtptype,
@@ -195,7 +199,7 @@ public:
                      QDateTime repFreq, QDateTime startReport,
                      QString passwordClear, QString accessCdClear,
                      QString assistPasswordClear, QString assistCodeClear,
-                     bool showFingerprint, bool showPassword,
+                     bool showFingerprint, bool showPassword, bool showTakeReturn,
                      bool usePredictive, QString predKey, int predRes,
                      uint32_t nMaxLocks,
                      QString smtpserver, int smptport, int smtptype,

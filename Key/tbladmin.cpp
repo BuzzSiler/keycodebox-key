@@ -21,6 +21,7 @@ const char *fassistpassword = "assist_password";
 const char *fassistcode = "assist_code";
 const char *fshowFingerprint = "show_fingerprint";
 const char *fshowPassword = "show_password";
+const char *fshowTakeReturn = "show_takereturn";
 const char *fpredictivecode = "use_predictive_access_code";
 const char *fpredkey = "predictive_key";
 const char *fpredres = "predictive_resolution";
@@ -65,6 +66,7 @@ CAdminRec::CAdminRec() :
 
     show_fingerprint = false;
     show_password = false;
+    show_takereturn = false;
     smtp_server = "";
     smtp_port = 0;
     smtp_type = 0; // 0=TCP, 1=SSL, 2=TSL
@@ -103,6 +105,7 @@ CAdminRec &CAdminRec::operator=(CAdminRec &newRec)
 
     show_fingerprint = newRec.show_fingerprint;
     show_password = newRec.show_password;
+    show_takereturn = newRec.show_takereturn;
     smtp_server = newRec.smtp_server;
     smtp_port = newRec.smtp_port;
     smtp_type = newRec.smtp_type;
@@ -139,6 +142,7 @@ QJsonObject& CAdminRec::jsonRecord(QJsonObject &json)
     json.insert(fassistcode, QJsonValue(assist_code)); //text
     json.insert(fshowFingerprint, QJsonValue(show_fingerprint));
     json.insert(fshowPassword, QJsonValue(show_password));
+    json.insert(fshowTakeReturn, QJsonValue(show_takereturn));
     json.insert(fpredictivecode, QJsonValue(use_predictive_access_code));
     json.insert(fpredkey, QJsonValue(pred_key));
     json.insert(fpredres, QJsonValue(pred_resolution));
@@ -219,6 +223,10 @@ bool CAdminRec::setFromJsonObject(QJsonObject jsonObj)
         {            
             show_password = jsonObj.value(fshowPassword).toBool();
         }        
+        if(!jsonObj.value(fshowTakeReturn).isUndefined())
+        {
+            show_password = jsonObj.value(fshowTakeReturn).toBool();
+        }
         if(!jsonObj.value(fpredictivecode).isUndefined())
         {            
             use_predictive_access_code = jsonObj.value(fpredictivecode).toBool();
@@ -517,6 +525,7 @@ bool CTblAdmin::readAdmin()
         int fldAssistCode = query.record().indexOf(fassistcode);
         int fldShowFingerprint = query.record().indexOf(fshowFingerprint);
         int fldShowPassword = query.record().indexOf(fshowPassword);
+        int fldShowTakeReturn = query.record().indexOf(fshowTakeReturn);
         int fldPredictive = query.record().indexOf(fpredictivecode);
         int fldPredKey = query.record().indexOf(fpredkey);
         int fldPredRes = query.record().indexOf(fpredres);
@@ -569,6 +578,7 @@ bool CTblAdmin::readAdmin()
 
             _currentAdmin.setDisplayFingerprintButton(query.value(fldShowFingerprint).toBool());
             _currentAdmin.setDisplayShowHideButton(query.value(fldShowPassword).toBool());
+            _currentAdmin.setDisplayTakeReturnButtons(query.value(fldShowTakeReturn).toBool());
             _currentAdmin.setUsePredictiveAccessCode(query.value(fldPredictive).toBool());
             _currentAdmin.setPredictiveKey(query.value(fldPredKey).toString());
             _currentAdmin.setPredictiveResolution(query.value(fldPredRes).toInt());
@@ -612,7 +622,7 @@ bool CTblAdmin::updateAdminClear(QString name, QString email, QString phone,
                 QDateTime repFreq, QDateTime startReport,
                 QString passwordClear, QString accessCdClear,
                 QString assistPasswordClear, QString assistCodeClear,
-                bool showFingerprint, bool showPassword,
+                bool showFingerprint, bool showPassword, bool showTakeReturn,
                 bool usePredictive, QString predKey, int predRes,
                 uint32_t nMaxLocks,
                 QString smtpserver, int smtpport, int smtptype,
@@ -631,7 +641,7 @@ bool CTblAdmin::updateAdminClear(QString name, QString email, QString phone,
     QString encVNCPW = CEncryption::encryptString(vncpassword);
 
     return updateAdmin(name, email, phone, repFreq, startReport, encPW, encCode,
-                       encAssistPw, encAssistCode, showFingerprint, showPassword, usePredictive, predKey, predRes,
+                       encAssistPw, encAssistCode, showFingerprint, showPassword, showTakeReturn, usePredictive, predKey, predRes,
                        nMaxLocks, smtpserver, smtpport, smtptype, smtpusername, encSMTPPW, vncport,
                        encVNCPW, bReportToEmail, bReportToFile, reportDirectory, displayPowerDownTimeout,
                        reportDeletion);
@@ -641,7 +651,7 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
                 QDateTime repFreq, QDateTime startReport,
                 QString passwordEnc, QString accessCdEnc,
                 QString assistPasswordEnc, QString assistCodeEnc,
-                bool showFingerprint, bool showPassword,
+                bool showFingerprint, bool showPassword, bool showTakeReturn,
                 bool usePredictive, QString predKey, int predRes,
                 uint32_t nMaxLocks,
                 QString smtpserver, int smtpport, int smtptype,
@@ -659,7 +669,7 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
                   "admin_email=:email, admin_phone=:phone, "
                   "default_report_freq=:freq, "
                   "default_report_start=:start, password=:pw, access_code=:code, "
-                  "assist_password=:assistpw, assist_code=:assistcode, show_fingerprint=:showFingerprint, show_password=:showPassword, "
+                  "assist_password=:assistpw, assist_code=:assistcode, show_fingerprint=:showFingerprint, show_password=:showPassword, show_takereturn=:showTakeReturn, "
                   "use_predictive_access_code=:usePred, predictive_key=:pKey, predictive_resolution=:pRes, "
                   "max_locks=:maxLocks, "
                   "smtp_server=:smtpserver, smtp_port=:smtpport, smtp_type=:smtptype, "
@@ -686,6 +696,7 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
     qry.bindValue(":assistcode", assistCodeEnc);
     qry.bindValue(":showFingerprint", showFingerprint);
     qry.bindValue(":showPassword", showPassword);
+    qry.bindValue(":showTakeReturn", showTakeReturn);
     qry.bindValue(":usePred", usePredictive);
     qry.bindValue(":pKey", predKey);
     qry.bindValue(":pRes", predRes);
@@ -728,7 +739,8 @@ bool CTblAdmin::updateAdmin(CAdminRec &rec)
     return updateAdmin(rec.getAdminName(), rec.getAdminEmail(), rec.getAdminPhone(),
                        rec.getDefaultReportFreq(), rec.getDefaultReportStart(),
                        rec.getPassword(), rec.getAccessCode(),
-                       rec.getAssistPassword(), rec.getAssistCode(), rec.getDisplayFingerprintButton(), rec.getDisplayShowHideButton(),
+                       rec.getAssistPassword(), rec.getAssistCode(),
+                       rec.getDisplayFingerprintButton(), rec.getDisplayShowHideButton(), rec.getDisplayTakeReturnButtons(),
                        rec.getUsePredictiveAccessCode(),
                        rec.getPredictiveKey(), rec.getPredictiveResolution(),
                        rec.getMaxLocks(),
@@ -746,7 +758,7 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     QDateTime freq;
     QDateTime start;
     QString pw, accessCd, assistpw, assistCode;
-    bool showFingerprint, showPassword, usePredictive;
+    bool showFingerprint, showPassword, showTakeReturn, usePredictive;
     QString predKey;
     int predResolution;
     uint32_t unMaxLocks;
@@ -769,6 +781,7 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
             adminObj.value(fassistcode).isUndefined() ||
             adminObj.value(fshowFingerprint).isUndefined() ||
             adminObj.value(fshowPassword).isUndefined() ||
+            adminObj.value(fshowTakeReturn).isUndefined() ||
             adminObj.value(fpredictivecode).isUndefined() ||
             adminObj.value(fpredkey).isUndefined() ||
             adminObj.value(fpredres).isUndefined() ||
@@ -802,6 +815,7 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     assistCode = adminObj.value(fassistcode).toString();
     showFingerprint = adminObj.value(fshowFingerprint).toBool();
     showPassword = adminObj.value(fshowPassword).toBool();
+    showTakeReturn = adminObj.value(fshowTakeReturn).toBool();
     usePredictive = adminObj.value(fpredictivecode).toBool();
     predKey = adminObj.value(fpredkey).toString();
     predResolution = adminObj.value(fpredres).toInt();
@@ -854,7 +868,7 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
     reportDeletion.fromString(adminObj.value(freportdeletion).toString(), DATETIME_FORMAT);
 
     return updateAdminClear(name, email, phone, freq, start, pw, accessCd, assistpw, assistCode, showFingerprint,
-                            showPassword, usePredictive, predKey, predResolution, unMaxLocks, smtpserver, smtpport, smtptype,
+                            showPassword, showTakeReturn, usePredictive, predKey, predResolution, unMaxLocks, smtpserver, smtpport, smtptype,
                             smtpusername, smtppassword, vncport, vncpassword, bReportToEmail, bReportToFile, reportDir, displayPowerDown,
                             reportDeletion);
 }
