@@ -136,10 +136,10 @@ public slots:
 
 signals:
     void __RequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd);
-    void __OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet);
+    void __OnCodeHistoryForDateRange(CLockHistorySet *pLockHistorySet);
 public slots:
     void OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd);
-    void OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet);
+    void OnCodeHistoryForDateRange(CLockHistorySet *pLockHistorySet);
 
 public slots:
     void    OnUpdateCurrentAdmin(CAdminRec *adminInfo) {

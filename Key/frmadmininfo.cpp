@@ -23,6 +23,7 @@
 #include <QHostAddress>
 #include <QNetworkInterface>
 #include <QAbstractSocket>
+#include <QFileDialog>
 #include "lockset.h"
 #include "lockstate.h"
 #include "menupushbutton.h"
@@ -33,12 +34,25 @@
 #include "selectlockswidget.h"
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
+#include "reportcontrolwidget.h"
+#include "autogeneratecontrolwidget.h"
+#include "systemdisplaywidget.h"
+#include "frmnetworksettings.h"
+#include "kcbsystem.h"
+#include "frmtest.h"
 
+#define ADMIN_TAB_INDEX (0)
+#define REPORT_TAB_INDEX (2)
+#define CODES_TAB_INDEX (4)
+#define CODE_HISTORY_TAB_INDEX (5)
 
 static const char CMD_REMOVE_ALL_FP_FILES[] = "sudo rm -rf /home/pi/run/prints/*";
 static const char CMD_LIST_SYSTEM_FLAGS[] = "ls /home/pi/run/* | grep 'flag'";
 static const char CMD_READ_TIME_ZONE[] = "readlink /etc/localtime";
-static const char CMD_REMOVE_FP_FILE[] = "sudo rm -rf /home/pi/run/prints/\%1";
+static const QString CMD_REMOVE_FP_FILE = "sudo rm -rf /home/pi/run/prints/\%1";
+
+const QString DEFAULT_VNC_PASSWORD = "keycodebox";
+const QString DEFAULT_VNC_PORT = "5901";
 
 static const int DISPLAY_POWER_DOWN_TIMEOUT[] = {
      0,             // None
@@ -67,7 +81,11 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     _pworkingSet(0),
     // Explicit initialization needed to prevent spurious test emails
     _testEmail(false),
-    m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN))
+    m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
+    m_report(* new ReportControlWidget(this)),
+    m_autogen(* new AutoGenerateControlWidget(this)),
+    m_systemdisp(* new SystemDisplayWidget(this)),
+    m_network_settings(* new FrmNetworkSettings(this))
 
 {
     ui->setupUi(this);
@@ -75,6 +93,8 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
 
     CFrmAdminInfo::showFullScreen();
+
+    m_network_settings.hide();
 
     initialize();
 
@@ -143,8 +163,13 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(ui->chkDisplayFingerprintButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(ui->chkDisplayShowHideButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayShowHideButton(bool)));
+    connect(ui->cbDisplayTakeReturnButtons, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayTakeReturnButtons(bool)));
 
     connect(&m_select_locks, &SelectLocksWidget::NotifyRequestLockOpen, this, &CFrmAdminInfo::OnOpenLockRequest);
+
+    connect(&m_report, &ReportControlWidget::NotifyGenerateReport, this, &CFrmAdminInfo::OnNotifyGenerateReport);
+
+    connect(&m_network_settings, &FrmNetworkSettings::finished, this, &CFrmAdminInfo::OnNetworkSettingsFinished);
 
 }
 
@@ -174,10 +199,12 @@ void CFrmAdminInfo::show()
         ui->tabWidget->setTabEnabled(1, true);
         ui->gpAdminInfo->setVisible(true);
         ui->vloSelectLocks->addWidget(&m_select_locks);
+        ui->vloReportSettings->addWidget(&m_report);
+        ui->vloAutoGenerate->addWidget(&m_autogen);
+        ui->vloSystemDisplay->addWidget(&m_systemdisp);
         // Force tabwidget to show administrator tab
-        emit ui->tabWidget->currentChanged(0);
+        emit ui->tabWidget->currentChanged(ADMIN_TAB_INDEX);
     }
-
 }
 
 int CFrmAdminInfo::getDisplayPowerDownTimeout()
@@ -218,21 +245,17 @@ void CFrmAdminInfo::initialize()
     _pcopymodel = 0;
     _bClose = false;
     ui->widgetEdit->setVisible(false);
-    ui->widgetImmediateReport->setVisible(true);
 
     populateTimeZoneSelection(ui->cbTimeZone);
     startMediaTimer();
 
-    ui->dtStartCodeList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
-    ui->dtEndCodeList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
-    ui->dtStartCodeHistoryList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
-    ui->dtEndCodeHistoryList->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
-    ui->dtStartReport->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
-    ui->dtEndReport->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+    ui->dtStartCodeList->setDisplayFormat(DATETIME_FORMAT);
+    ui->dtEndCodeList->setDisplayFormat(DATETIME_FORMAT);
+    ui->dtStartCodeHistoryList->setDisplayFormat(DATETIME_FORMAT);
+    ui->dtEndCodeHistoryList->setDisplayFormat(DATETIME_FORMAT);
     
     ui->dtEndCodeList->setDateTime(QDateTime().currentDateTime());
     ui->dtEndCodeHistoryList->setDateTime(QDateTime().currentDateTime());
-    ui->dtEndReport->setDateTime(QDateTime().currentDateTime());
 
     setupCodeTableContextMenu();
 
@@ -257,12 +280,18 @@ int CFrmAdminInfo::nthSubstr(int n, const std::string& s, const std::string& p)
 
     int j;
     for (j = 1; j < n && i != std::string::npos; ++j)
+    {
         i = s.find(p, i+1); // Find the next occurrence
+    }
 
     if (j == n)
+    {
         return(i);
+    }
     else
+    {
         return(-1);
+    }
 }
 
 void CFrmAdminInfo::getSystemIPAddressAndStatus()
@@ -303,11 +332,14 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
                 QString ip = addresses[a].toString();
                 if ( ip.isEmpty() ) continue;
                 bool foundMatch = false;
-                for (int j=0; j < possibleMatches.size(); j++) 
+                for (int j=0; j < possibleMatches.size(); j++)
+                {
                     if ( ip == possibleMatches[j] ) 
                     { 
-                        foundMatch = true; break; 
+                        foundMatch = true; 
+                        break; 
                     }
+                }
 
                 if ( !foundMatch ) 
                 { 
@@ -320,7 +352,9 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
                     if((bool)(flags & QNetworkInterface::CanMulticast))
                     {
                         ui->lblIPAddress->setStyleSheet("QLabel { background-color : rgb(60,179,113); color : blue; }");
-                    } else {
+                    } 
+                    else 
+                    {
                         ui->lblIPAddress->setStyleSheet("QLabel { background-color : rgb(60,179,113): color : white; }");
                     }
 
@@ -331,22 +365,34 @@ void CFrmAdminInfo::getSystemIPAddressAndStatus()
                     {
                         pingAddress = ip.mid(0, findN);
                         if( pingAddress.at( pingAddress.length() - 1) != '.' )
+                        {
                             pingAddress += ".1";
+                        }
                         else
+                        {
                             pingAddress += "1";
+                        }
 
                         int exitCode = QProcess::execute("fping", QStringList() << parameter << pingAddress);
                         if( exitCode == 0 )
+                        {
                             checkSuccessful = true;
+                        }
                         else
+                        {
                             ui->lblIPAddress->setVisible(false);
+                        }
                     }
                 }
 
                 if( !checkSuccessful )
+                {
                     ui->lblIPAddress->setStyleSheet(red);
+                }
                 else
+                {
                     ui->lblIPAddress->setVisible(true);
+                }
             }
         }
     }
@@ -366,13 +412,6 @@ void CFrmAdminInfo::OnMediaCheckTimeout()
     getSystemIPAddressAndStatus();
 
     _timerMedia.start();
-}
-
-// trim from end
-std::string CFrmAdminInfo::rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(),
-                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-    return s;
 }
 
 void CFrmAdminInfo::populateTimeZoneSelection(QComboBox *cbox)
@@ -442,70 +481,9 @@ void CFrmAdminInfo::setTimeZone()
     std::system(link.toStdString().c_str());
 
     if(ui->cbInternetTime->isChecked())
+    {
         ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
-}
-
-void CFrmAdminInfo::populateBoxListSelection(QComboBox *cbox)
-{
-    // Change this to retrieve a list of values from the locknums field
-    // Rather than put all locks into a combo box, just put the entries that
-    // are available in the database.
-
-    cbox->clear();
-    cbox->addItem(QString(tr("All Locks")));
-}
-
-void CFrmAdminInfo::populateCodeLockSelection()
-{
-//    populateBoxListSelection(ui->cbLockNum);
-}
-
-void CFrmAdminInfo::populateCodeLockHistorySelection()
-{
-//    populateBoxListSelection(ui->cbLockNumHistory);
-}
-
-void CFrmAdminInfo::populateFileWidget(QString sDirectory, QString sFilter)
-{
-    Q_UNUSED(sFilter);
-    QString rp = "/media/pi";
-
-    if(_pmodel) {
-        delete _pmodel;
-        _pmodel = 0;
     }
-
-    if(!_pmodel)
-        _pmodel = new QFileSystemModel();
-
-    QStringList list;
-    list << sDirectory << "KeycodeboxReports";
-
-    _pmodel->setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-    _pmodel->setNameFilters(list);
-    _pmodel->setNameFilterDisables(false);
-    // Enable modifying file system
-    _pmodel->setReadOnly(true);
-
-    connect(_pmodel,
-            SIGNAL(directoryLoaded(QString)),
-            this,
-            SLOT(onModelDirectoryLoaded(QString)));
-    connect(_pmodel,
-            SIGNAL(rootPathChanged(QString)),
-            this,
-            SLOT(onRootPathChanged(QString)));
-
-    // Tie TreeView with DirModel
-    // QTreeView::setModel(QAbstractItemModel * model)
-    // Reimplemented from QAbstractItemView::setModel()
-    ui->treeViewCopy->collapseAll();
-    ui->treeView->setModel(_pmodel);
-
-    _pmodel->setRootPath(rp);
-    ui->treeView->setRootIndex(_pmodel->setRootPath(rp));
-    ui->treeView->expandAll();
-    resizeTreeViewColumns();
 }
 
 void CFrmAdminInfo::onRootPathChanged(QString path)
@@ -519,27 +497,21 @@ void CFrmAdminInfo::onModelDirectoryLoaded(QString path)
     _pmodel->sort(0, Qt::AscendingOrder);
 }
 
-void CFrmAdminInfo::on_treeView_clicked(const QModelIndex &index)
-{
-    //    qDebug() << "Save to File" << path;
-    _reportDirectory = _pmodel->rootPath() + "/" + index.data(Qt::DisplayRole).toString() + "/KeycodeboxReports";
-    _tmpAdminRec.setReportDirectory(_reportDirectory);
-    qDebug() << "Save to Directory" << _reportDirectory;
-    QMessageBox::information(this, tr("Save Directory Set"), _reportDirectory);
-}
-
 void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
 {
     Q_UNUSED(sFilter);
     QString rp = "/media/pi";
 
-    if(_pcopymodel) {
+    if(_pcopymodel)
+    {
         delete _pcopymodel;
         _pcopymodel = 0;
     }
 
     if(!_pcopymodel)
+    {
         _pcopymodel = new QFileSystemModel();
+    }
 
     QStringList list;
     list << sDirectory << "Alpha*" << "*.xml" << "*.jpg" << "*.jpeg";
@@ -560,9 +532,6 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
             this,
             SLOT(onCopyRootPathChanged(QString)));
 
-    // Tie TreeView with DirModel
-    // QTreeView::setModel(QAbstractItemModel * model)
-    // Reimplemented from QAbstractItemView::setModel()
     ui->treeViewCopy->setModel(_pcopymodel);
     ui->treeViewCopy->collapseAll();
 
@@ -570,7 +539,6 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
     ui->treeViewCopy->setRootIndex(_pcopymodel->setRootPath(rp));
 
     ui->treeViewCopy->expandAll();
-    resizeTreeViewColumns();
 }
 
 void CFrmAdminInfo::onCopyRootPathChanged(QString path)
@@ -600,10 +568,6 @@ void CFrmAdminInfo::on_btnCopyToggleSource_clicked(bool checked)
     }
 }
 
-void CFrmAdminInfo::resizeTreeViewColumns()
-{
-}
-
 void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
 {
     _copyDirectory = _pcopymodel->rootPath() + "/" + index.data(Qt::DisplayRole).toString();
@@ -615,7 +579,9 @@ void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
 
         ui->btnCopyFileLoadCodes->setEnabled(true);
         ui->btnCopyFile->setEnabled(true);
-    } else {
+    }
+    else
+    {
         ui->btnCopyFileBrandingImage->setEnabled(false);
         ui->btnCopyFileLoadCodes->setEnabled(false);
         ui->btnCopyFile->setEnabled(false);
@@ -623,8 +589,6 @@ void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
 
     //ui->treeViewCopy->setRootIndex(_pcopymodel->setRootPath(QString("/media/pi/")));
     qDebug() << "Copy from File" << _copyDirectory;
-
-    resizeTreeViewColumns();
 }
 
 void CFrmAdminInfo::on_btnCopyFile_clicked()
@@ -897,6 +861,7 @@ void CFrmAdminInfo::on_lblKey_clicked()
     ui->lblKey->setText(text);
 }
 
+<<<<<<< HEAD
 void CFrmAdminInfo::on_btnSaveSettings_clicked()
 {
     KCB_DEBUG_ENTRY;
@@ -973,61 +938,18 @@ void CFrmAdminInfo::on_btnDone_clicked()
     */
     system(qPrintable("vcgencmd display_power 1"));
 
-    QDateTime   freq;
-    bool    bNever = false;
-    QString sFreq = ui->cbReportFreq->currentText();
-    if(sFreq.compare(fNever) == 0)
-    {
-        freq = QDateTime(QDate(), QTime(0,0));
-        bNever = true;
-    }
-    else if(sFreq.compare(fEach) == 0)
-    {
-        freq = QDateTime(QDate(1,1,1), QTime(0,0));
-        bNever = false;
-    }
-    else if(sFreq.compare(fHourly) == 0)
-    {
-        freq = QDateTime(QDate(1,1,1), QTime(1,0));
-    }
-    else if(sFreq.compare(fEvery12Hours) == 0)
-    {
-        freq = QDateTime(QDate(1,1,1), QTime(12,0));
-    }
-    else if(sFreq.compare(fDaily) == 0)
-    {
-        freq = QDateTime(QDate(1,1,1), QTime(23,59));
-    }
-    else if(sFreq.compare(fWeekly) == 0)
-    {
-        freq = QDateTime(QDate(1,1,7), QTime(0,0));
-    }
-    else if(sFreq.compare(fMonthly) == 0)
-    {
-        freq = QDateTime(QDate(1,12,1), QTime(0,0));
-    }
     // Update the Admin Info and close the dialog - syscontroller needs to switch
     _tmpAdminRec.setAdminName(ui->lblName->text());
     _tmpAdminRec.setAdminEmail(ui->lblEmail->text());
     _tmpAdminRec.setAdminPhone(ui->lblPhone->text());
-    _tmpAdminRec.setDefaultReportFreq(freq);
-    _tmpAdminRec.setDefaultReportStart(ui->dtStart->dateTime());
-    _tmpAdminRec.setEmailReportActive(bNever);
     _tmpAdminRec.setPassword(ui->lblPassword->text());
     _tmpAdminRec.setAccessCode(ui->lblAccessCode->text());
     _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text());
     _tmpAdminRec.setAssistCode(ui->lblAssistCode->text());
     _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
     _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
-    _tmpAdminRec.setUsePredictiveAccessCode(ui->chkUsePredictive->isChecked());
-    _tmpAdminRec.setPredictiveKey(ui->lblKey->text());
-    _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
-
-    _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
-    _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
-    _tmpAdminRec.setReportDirectory(_reportDirectory);
-
     _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
+    _tmpAdminRec.setDisplayTakeReturnButtons(ui->cbDisplayTakeReturnButtons->isChecked());
 
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
@@ -1036,11 +958,6 @@ void CFrmAdminInfo::on_btnDone_clicked()
 void CFrmAdminInfo::hideKeyboard(bool bHide) 
 {
     ui->widgetEdit->setVisible(bHide);
-}
-
-void CFrmAdminInfo::onDelete()
-{
-    // Destructive - Not yet implemented
 }
 
 void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
@@ -1052,7 +969,6 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         qDebug() << "Admin Info received.";
         _tmpAdminRec = *adminInfo;
 
-        _reportDirectory = _tmpAdminRec.getReportDirectory();
         ui->lblName->setText(adminInfo->getAdminName());
         ui->lblEmail->setText(adminInfo->getAdminEmail());
         ui->lblPhone->setText(adminInfo->getAdminPhone());
@@ -1063,56 +979,15 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayFingerprintButton());
         ui->chkDisplayShowHideButton->setChecked(adminInfo->getDisplayShowHideButton());
         ui->cbDisplayPowerDownTimeout->setCurrentIndex(adminInfo->getDisplayPowerDownTimeout());
+        ui->cbDisplayTakeReturnButtons->setChecked(adminInfo->getDisplayTakeReturnButtons());
 
-        QString sFreq;
-        QDateTime dtFreq = adminInfo->getDefaultReportFreq();
-        qDebug() << "AdminInfo freq date:" << dtFreq.toString("yyyy-MM-dd HH:mm:ss");
-        if(dtFreq == QDateTime(QDate(), QTime(0,0))) {
-            sFreq = fNever;
-        }
-        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(0,0))) {
-            sFreq = fEach;
-        }
-        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(1,0))) {
-            sFreq = fHourly;
-        }
-        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(12,0))) {
-            sFreq = fEvery12Hours;
-        }
-        else if(dtFreq == QDateTime(QDate(1,1,1), QTime(23,59))) {
-            sFreq = fDaily;
-        }
-        else if(dtFreq == QDateTime(QDate(1,1,7), QTime(0,0))) {
-            sFreq = fWeekly;
-        }
-        else if(dtFreq == QDateTime(QDate(1,12,1), QTime(0,0)))
-        {
-            sFreq = fMonthly;
-        }
-        ui->cbReportFreq->setCurrentText(sFreq);
+        // Temporary to complete report widget funcationality
+        _tmpAdminRec.setDefaultReportDeleteFreq(MONTHLY);
 
-        QDateTime dtStart = adminInfo->getDefaultReportStart();
-        ui->dtStart->setDateTime(dtStart);
-        ui->chkUsePredictive->setChecked(adminInfo->getUsePredictiveAccessCode());
-        ui->lblKey->setText(adminInfo->getPredictiveKey());
-        ui->spinCodeGenResolution->setValue(adminInfo->getPredictiveResolution());
-        //ui->spinMaxLocks->setValue(adminInfo->getMaxLocks());
+        m_report.setValues(_tmpAdminRec);
 
-        qDebug() << "PRINT REPORT PRESSED";
-        qDebug() << adminInfo->getReportViaEmail();
-        qDebug() << adminInfo->getReportToFile();
-
-        if(adminInfo->getReportViaEmail())
-        {
-            ui->cbReportViaEmail->setChecked(true);
-        }
-        if(adminInfo->getReportToFile())
-        {
-            ui->cbReportToFile->setChecked(true);
-        }
-
-        ui->tabWidget->setCurrentIndex(0);
-        
+        // KCB_DEBUG_TRACE("Setting Current Index to 0");
+        // ui->tabWidget->setCurrentIndex(0);
     }
     else
     {
@@ -1137,7 +1012,9 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
             _testEmail = false;
         }
 
-    } else {
+    } 
+    else 
+    {
         qDebug() << "Failed to update Current Admin Info";
     }
 
@@ -1154,8 +1031,8 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
 
 void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
 {
+    KCB_DEBUG_ENTRY;
     _pcopymodel = 0;
-    qDebug() << "CFrmAdminInfo::OnFoundNewStorageDevice()";
     qDebug() << device0;
     qDebug() << device1;
     usbDevice0 = QString(device0);
@@ -1163,18 +1040,19 @@ void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
     qDebug() << usbDevice0;
     qDebug() << usbDevice1;
 
-    ui->btnCopyToggleSource->setText(tr("Source #1"));
+    QStringList list;
 
-    if( !ui->btnCopyToggleSource->text().compare(tr("Source #1")) )
+    if (!usbDevice0.isEmpty())
     {
-        populateFileCopyWidget(usbDevice0, usbDevice1);
-        populateFileWidget(usbDevice0, usbDevice1);
+        list << QString("/media/pi/%1").arg(usbDevice0);
     }
-    if( !ui->btnCopyToggleSource->text().compare(tr("Source #2")) )
+    else if (!usbDevice1.isEmpty())
     {
-        populateFileCopyWidget(usbDevice1, usbDevice0);
-        populateFileWidget(usbDevice1, usbDevice0);
+        list << QString("/media/pi/%1").arg(usbDevice1);
     }
+
+    KCB_DEBUG_TRACE("USBDevices" << list);
+    m_report.OnNotifyUsbDrive(list);
 }
 
 void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
@@ -1243,7 +1121,7 @@ void CFrmAdminInfo::OnCloseAdmin() {
 
 void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
 {
-    qDebug() << "CFrmAdminInfo::OnLockStatusUpdate()";
+    KCB_DEBUG_ENTRY;
     _pLocksStatus = locksStatus;
 }
 
@@ -1265,19 +1143,6 @@ void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
     displayInHistoryTable(pSet);
     
     pSet = nullptr;
-}
-
-void CFrmAdminInfo::codeTableCellSelected(int nRow, int nCol)
-{
-    Q_UNUSED(nRow);
-    Q_UNUSED(nCol);
-
-}
-
-void CFrmAdminInfo::codeHistoryTableCellSelected(int nRow, int nCol)
-{
-    Q_UNUSED(nRow);
-    Q_UNUSED(nCol);
 }
 
 void CFrmAdminInfo::displayInTable(CLockSet *pSet)
@@ -1326,7 +1191,6 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
-        // qDebug() << "Adding row of Lock State - Codes. Lock Nums:" << QVariant(pState->getLockNums());
 
         // Locks can be single or comma-separated.
         QString locks = pState->getLockNums();
@@ -1600,13 +1464,6 @@ void CFrmAdminInfo::codeCellSelected( int row, int col)
 }
 
 
-void CFrmAdminInfo::on_dialBright_valueChanged(int value)
-{
-    if( value < 20 ) value = 20;
-    if( value > 255) value = 255;
-    emit __OnBrightnessChanged(value);
-}
-
 void CFrmAdminInfo::on_btnReadCodes_clicked()
 {
     KCB_DEBUG_ENTRY;
@@ -1659,12 +1516,12 @@ void CFrmAdminInfo::onSMTPDialogComplete(CDlgSMTP *dlg)
 
 void CFrmAdminInfo::onVNCDialogComplete(CDlgVNC *dlg)
 {
-    // Save
-    _bClose = false;
-    qDebug() << "onVNCDialogComplete";
+    KCB_DEBUG_ENTRY;
 
-    QString vncpassword = "KEYCODEBOXDEFAULT";
-    int vncport = 5900;
+    _bClose = false;
+
+    QString vncpassword = "keycodebox";
+    int vncport = 5901;
 
     qDebug() << "Getting VNC Values to save";
     dlg->getValues(vncport, vncpassword);
@@ -1719,33 +1576,14 @@ void CFrmAdminInfo::on_btnSetupVNC_clicked()
     this->setEnabled(true);
 }
 
-void CFrmAdminInfo::on_btnPrintReport_clicked()
+void CFrmAdminInfo::OnNotifyGenerateReport()
 {
-    // Print report
-    QDateTime   dtStart, dtEnd;
-    dtStart = ui->dtStartReport->dateTime();
-    dtEnd = ui->dtEndReport->dateTime();
-
-    _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
-    _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
+    QDateTime start;
+    QDateTime end;
+    m_report.getValues(_tmpAdminRec, start, end);
     _bClose = false;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
-
-    emit __OnImmediateReportRequest(dtStart, dtEnd);
-}
-
-void CFrmAdminInfo::on_btnToggleSource_clicked(bool checked)
-{
-    if(checked) 
-    {
-        populateFileWidget(usbDevice1, usbDevice0);
-        ui->btnToggleSource->setText(tr("Source #2"));
-    } 
-    else 
-    {
-        populateFileWidget(usbDevice0, usbDevice1);
-        ui->btnToggleSource->setText(tr("Source #1"));
-    }
+    emit __OnImmediateReportRequest(start, end);
 }
 
 void CFrmAdminInfo::setTime()
@@ -1759,23 +1597,6 @@ void CFrmAdminInfo::setTime()
     qDebug() << "system time: ";
     qDebug() << sDate;
     std::system("sudo hwclock --systohc");    // Set the hardware clock
-}
-
-void CFrmAdminInfo::on_tblCodesList_doubleClicked(const QModelIndex &index)
-{
-    Q_UNUSED(index);
-}
-
-void CFrmAdminInfo::on_tblCodesList_cellDoubleClicked(int row, int column)
-{
-    Q_UNUSED(row);
-    Q_UNUSED(column);
-}
-
-// Add a new code
-void CFrmAdminInfo::on_tblCodesList_clicked(const QModelIndex &index)
-{
-    Q_UNUSED(index);
 }
 
 void CFrmAdminInfo::OnCodeEditClose()
@@ -2197,12 +2018,6 @@ void CFrmAdminInfo::purgeCodes()
     std::system( CMD_REMOVE_ALL_FP_FILES );
 }
 
-void CFrmAdminInfo::on_tblCodesList_cellClicked(int row, int column)
-{
-    Q_UNUSED(row);
-    Q_UNUSED(column);
-}
-
 void CFrmAdminInfo::on_btnRebootSystem_clicked()
 {
     int nRC = QMessageBox::warning(this, tr("Verify System Reboot"),
@@ -2240,16 +2055,39 @@ void CFrmAdminInfo::on_btnPurgeCodes_clicked()
 
 void CFrmAdminInfo::OnTabSelected(int index)
 {
-    qDebug() << "CFrmAdminInfo::OnTabSelected" << index;
+    static int last_index = 0;
+    // Note: Index is new selected tab
 
-    QDateTime dt = QDateTime().currentDateTime();
-    ui->dtEndCodeHistoryList->setDateTime(dt);
-    ui->dtEndCodeList->setDateTime(dt);
+    KCB_DEBUG_TRACE(last_index << index);
 
-    // Force the codes to be read into the codes tab
-    emit ui->btnReadCodes->clicked();
-    emit ui->btnRead->clicked();
+    if (index == CODES_TAB_INDEX)
+    {
+        QDateTime dt = QDateTime().currentDateTime();
+        ui->dtEndCodeList->setDateTime(dt);
+        // Force the codes to be read into the codes tab
+        emit ui->btnReadCodes->clicked();
+    }
+    else if (index == CODE_HISTORY_TAB_INDEX)
+    {
+        QDateTime dt = QDateTime().currentDateTime();
+        ui->dtEndCodeHistoryList->setDateTime(dt);
+        // Force the codes to be read into the codes tab
+        emit ui->btnRead->clicked();
+    }
 
+    if (last_index != REPORT_TAB_INDEX && index == REPORT_TAB_INDEX)
+    {
+        // If we have selected the Report Tab, we want to populate with the latest information
+        m_report.setValues(_tmpAdminRec);
+    }
+
+    if (last_index == REPORT_TAB_INDEX && index != last_index)
+    {
+        // If we are changing away from the Report Tab then we want to update to the latest values
+        m_report.getValues(_tmpAdminRec);
+    }
+
+    last_index = index;
 }
 
 void CFrmAdminInfo::on_btnTestEmail_clicked()
@@ -2262,7 +2100,7 @@ void CFrmAdminInfo::on_btnTestUserEmail_clicked()
 {
     qDebug() << "Testing admin recv email";
     _testEmail = true;
-    on_btnSaveSettings_clicked();
+    // Need to force saving here
 }
 
 void CFrmAdminInfo::OnDisplayFingerprintButton(bool state)
@@ -2272,7 +2110,14 @@ void CFrmAdminInfo::OnDisplayFingerprintButton(bool state)
 
 void CFrmAdminInfo::OnDisplayShowHideButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     ui->chkDisplayShowHideButton->setChecked(state);
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::OnDisplayTakeReturnButtons(bool state)
+{
+    ui->cbDisplayTakeReturnButtons->setChecked(state);
 }
 
 void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
@@ -2282,4 +2127,106 @@ void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
     // Note: It should never be the case that we are not admin
     Q_ASSERT_X(is_user == false, Q_FUNC_INFO, "We are not admin");
     emit __OnOpenLockRequest(lock);
+}
+<<<<<<< HEAD
+=======
+
+void CFrmAdminInfo::updateVNCChanges(QString vncPort, QString vncPassword)
+{
+    _tmpAdminRec.setVNCPort(vncPort.toInt());
+    _tmpAdminRec.setVNCPassword(vncPassword);
+
+    kcb::SetVNCCredentials(vncPort, vncPassword);
+
+//    FILE *pF;
+//    std::string sOutput = "";
+//    QString createCmd = "echo '|";
+//    createCmd += QString::number(vncport);
+//    createCmd += " ";
+//    createCmd += vncpassword;
+//    createCmd +="|' > /home/pi/run/vnc_creds.txt";
+
+//    pF = popen(createCmd.toStdString().c_str(), "r");
+//    if(!pF)
+//    {
+//        qDebug() << "failed to create vnc file";
+//    }
+
+//    ExtractCommandOutput(pF, sOutput);
+//    fclose(pF);
+    
+}
+
+void CFrmAdminInfo::updateSMTPChanges(QString smtpServer, QString smtpPort, QString smtpUsername, QString smtpPasword, int smtpType)
+{
+    _tmpAdminRec.setSMTPServer(smtpServer);
+    _tmpAdminRec.setSMTPPort(smtpPort.toInt());
+    _tmpAdminRec.setSMTPUsername(smtpUsername);
+    _tmpAdminRec.setSMTPPassword(smtpPasword);
+    _tmpAdminRec.setSMTPType(smtpType);
+}
+
+void CFrmAdminInfo::on_pbNetworkSettings_clicked()
+{
+    KCB_DEBUG_ENTRY;
+
+    bool enableDhcp = true;
+    QString ipAddress = ui->lblIPAddress->text();
+    QString ipMask = "255.255.255.0";
+    QString ipGateway = "192.168.1.1";
+    QString ipDns = "8.8.8.8";
+    QString vncPort = QString::number(_tmpAdminRec.getVNCPort());
+    QString vncPassword = _tmpAdminRec.getVNCPassword();
+    QString smtpServer =_tmpAdminRec.getSMTPServer();
+    QString smtpPort = QString::number(_tmpAdminRec.getSMTPPort());
+    QString smtpUsername = _tmpAdminRec.getSMTPUsername();
+    QString smtpPassword = _tmpAdminRec.getSMTPPassword();
+    int smtpType = _tmpAdminRec.getSMTPType();
+
+//    vncPort = DEFAULT_VNC_PORT;
+//    vncPassword = DEFAULT_VNC_PASSWORD;
+    smtpServer = "smtpout.secureserver.net";
+    smtpPort = "465";
+    smtpUsername = "kcb@keycodebox.com";
+    smtpPassword = "keycodebox";
+    smtpType = 1;
+
+    m_network_settings.setValues(enableDhcp, ipAddress, ipMask, ipGateway, ipDns,
+                                 vncPort, vncPassword,
+                                 smtpServer, smtpPort,
+                                 smtpUsername, smtpPassword, smtpType);
+    m_network_settings.show();
+    m_network_settings.raise();
+
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::OnNetworkSettingsFinished(int)
+{
+    KCB_DEBUG_ENTRY;
+
+    bool enableDhcp;
+    QString ipAddress;
+    QString ipMask;
+    QString ipGateway;
+    QString ipDns;
+    QString vncPort;
+    QString vncPassword;
+    QString smtpServer;
+    QString smtpPort;
+    QString smtpUsername;
+    QString smtpPassword;
+    int smtpType;
+
+    m_network_settings.getValues(enableDhcp, ipAddress, ipMask, ipGateway, ipDns, vncPort, vncPassword, smtpServer, smtpPort, smtpUsername, smtpPassword, smtpType);
+
+    KCB_DEBUG_TRACE(vncPort << vncPassword);
+    KCB_DEBUG_TRACE(smtpServer << smtpPort << smtpUsername << smtpPassword << smtpType);
+
+    updateVNCChanges(vncPort, vncPassword);
+    //    updateSMTPChanges(smtp_server, smtp_port, smtp_username, smtp_password, smtp_type);
+
+    emit __UpdateCurrentAdmin(&_tmpAdminRec);
+
+    KCB_DEBUG_EXIT;
 }

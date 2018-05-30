@@ -25,13 +25,9 @@ CSystemController::CSystemController(QObject *parent) :
     _fingerprintReader(0),
     _systemState(ETimeoutScreen),
     _systemStateDisplay(ENone),
-    _pfUsercode(0),
     _pdFingerprintVerify(0),
     _ptimer(0)
 {
-    Q_UNUSED(parent);
-
-    //qRegisterMetaType<QVector<int> >("QVector<int>");
 }
 
 CSystemController::~CSystemController()
@@ -198,7 +194,6 @@ void CSystemController::initializeReaders()
         qDebug() << "No MagTekReader found";
     }
 
-    // Original HID Reader
     bool hid_reader_found = false;
     _phidReader = new CHWKeyboardReader();
     if( _phidReader->initHIDReader(0x04d8, 0x0055) )
@@ -215,7 +210,7 @@ void CSystemController::initializeReaders()
     {
         qDebug() << "No RF HID Reader found";
     }
-
+                
     if (hid_reader_found)
     {
         connect(_phidReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
@@ -388,8 +383,8 @@ void CSystemController::initializeSecurityConnections()
 
     connect(&_ReportController, SIGNAL(__RequestCodeHistoryForDateRange(QDateTime,QDateTime)),
             &_securityController, SLOT(OnRequestCodeHistoryForDateRange(QDateTime,QDateTime)));
-    connect(&_securityController, SIGNAL(__OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)),
-            &_ReportController, SLOT(OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)));
+    connect(&_securityController, SIGNAL(__OnCodeHistoryForDateRange(CLockHistorySet*)),
+            &_ReportController, SLOT(OnCodeHistoryForDateRange(CLockHistorySet*)));
 
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), &_securityController, SLOT(OnUpdateCodeState(CLockState*)));
     connect(&_securityController, SIGNAL(__OnUpdatedCodeState(bool)), this, SLOT(OnUpdatedCodeState(bool)));
@@ -478,6 +473,10 @@ void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
     qDebug() << "CSystemController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(adminInfo);
+
+    emit __DisplayButtonsUpdate(_padminInfo->getDisplayFingerprintButton(), 
+                                _padminInfo->getDisplayShowHideButton(), 
+                                _padminInfo->getDisplayTakeReturnButtons());
 }
 
 void CSystemController::OnAdminDialogClosed()
@@ -589,17 +588,18 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
     {
         KCB_DEBUG_TRACE("Multi Lock");
 
-        CFrmSelectLocks sl;
+        CFrmSelectLocks selectLocks;
 
-        sl.setLocks(locks);
-        if (sl.exec())
+        selectLocks.setLocks(locks);
+        if (selectLocks.exec())
         {
-            _locks = sl.getLocks();
+            _locks = selectLocks.getLocks();
 
             QStringList sl = _locks.split(",");
 
             foreach (auto s, sl)
             {
+                QCoreApplication::processEvents();
                 OnOpenLockRequest(s);
             }
 
@@ -679,20 +679,26 @@ void CSystemController::OnRequestCurrentAdmin()
 
 bool CSystemController::getDisplayFingerprintButton()
 {
-    return _padminInfo->getDisplayFingerprintButton();
+    KCB_DEBUG_ENTRY;
+    bool result = _padminInfo->getDisplayFingerprintButton();
+    KCB_DEBUG_EXIT;
+    return result;
 }
 
 bool CSystemController::getDisplayShowHideButton()
 {
-    return _padminInfo->getDisplayShowHideButton();
+    KCB_DEBUG_ENTRY;
+    bool result = _padminInfo->getDisplayShowHideButton();
+    KCB_DEBUG_EXIT;
+    return result;
 }
 
-CFrmUserCode* CSystemController::getUserCodeOne()
+bool CSystemController::getDisplayTakeReturnButtons()
 {
-    if(!_pfUsercode)
-    {
-    }
-    return (CFrmUserCode *)NULL;
+    KCB_DEBUG_ENTRY;
+    bool result = _padminInfo->getDisplayTakeReturnButtons();
+    KCB_DEBUG_EXIT;
+    return result;
 }
 
 void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
@@ -708,6 +714,7 @@ void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 
 int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mountedDeviceCount)
 {
+    static int lastFoundDeviceCount = 0;
     std::string listCmd = "ls /media/pi/";
     FILE *cmdF;
     std::string sOutput;
@@ -783,8 +790,17 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
         {
             strcpy(mountedDevices[i],foundDevices[i]);
             refreshAdminDeviceList = true;
+            lastFoundDeviceCount = foundDeviceCount;
         }
     }
+
+    // Handles the case when USB drives are removed and the device count is 0
+    if (foundDeviceCount == 0 && foundDeviceCount != lastFoundDeviceCount)
+    {
+        lastFoundDeviceCount = foundDeviceCount;
+        refreshAdminDeviceList = true;
+    }
+
     std::string dev0 = mountedDevices[0];
     std::string dev1 = mountedDevices[1];
 
@@ -813,7 +829,9 @@ void CSystemController::start()
         QCoreApplication::processEvents();
 
         if( _fingerprintReader )
+        {
             _fingerprintReader->handleEvents();
+        }
 
         // dirty hack for events that need to be triggered after the
         //   admin has been setup (signals need to be connected there before
@@ -935,7 +953,7 @@ void CSystemController::looprun()
             emit __OnNewMessage("");
 
             KCB_DEBUG_TRACE("EThankYou Timeout Active");
-            startTimeoutTimer(5000);
+            startTimeoutTimer(500);
         }
     }
     else if(_systemState == EAdminMain) 

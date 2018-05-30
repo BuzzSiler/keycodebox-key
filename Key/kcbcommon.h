@@ -3,6 +3,7 @@
 
 #include <QtGlobal>
 #include <QDateTime>
+#include <QDebug>
 
 
 #define KCB_FAILED (-1)
@@ -24,7 +25,14 @@ typedef enum {ACCESS_TYPE_ALWAYS=0, ACCESS_TYPE_TIMED=1, ACCESS_TYPE_LIMITED_USE
 #define FIELD_INDEX(query, fld_name) (query.record().indexOf(fld_name))
 #define QUERY_VALUE(q, fld_name)  q.value(FIELD_INDEX(q, fld_name))
 
-
-
+static const QDateTime NEVER = QDateTime(QDate(), QTime(0,0));
+static const QDateTime EACH_ACTIVITY = QDateTime(QDate(1,1,1), QTime(0,0));
+static const QDateTime HOURLY = QDateTime(QDate(1,1,1), QTime(1,0));
+static const QDateTime EVERY_12_HOURS = QDateTime(QDate(1,1,1), QTime(12,0));
+static const QDateTime DAILY = QDateTime(QDate(1,1,1), QTime(23,59));
+static const QDateTime WEEKLY = QDateTime(QDate(1,1,7), QTime(0,0));
+static const QDateTime BIWEEKLY = QDateTime(QDate(1,1,14), QTime(0,0));
+static const QDateTime MONTHLY = QDateTime(QDate(1,12,1), QTime(0,0));
+static const QDateTime DEFAULT_DATE_TIME = QDateTime(QDate(2016,6,1), QTime(12,00,00));
 
 #endif

@@ -24,6 +24,7 @@ class KcbKeyboardWidget : public QWidget
         QString getValue();
         void clear();
         void numbersOnly(bool state);
+        void ipAddress(bool state);
 
     signals:
         void NotifyClose();

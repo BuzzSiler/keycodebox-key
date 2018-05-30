@@ -43,7 +43,7 @@ QSqlQuery CTblCodes::createQuery(QStringList column_list,
                                  // planned.
                                  QString condition)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database is null");
     Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
@@ -65,12 +65,12 @@ QSqlQuery CTblCodes::createQuery(QStringList column_list,
 
     //qDebug() << "SQL:" << sql;
 
-    if( !query.prepare(sql) )
+    if ( !query.prepare(sql) )
     {
         KCB_WARNING_TRACE("prepare failed" << query.lastError());
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 
     return query;
 }
@@ -308,19 +308,20 @@ void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry,
     
     if (!qry.exec())
     {
-        qDebug() << qry.lastError().text() << qry.lastQuery();
+        KCB_DEBUG_TRACE("Exec Failed: " << qry.lastError().text() << qry.lastQuery());
+        return;
     }
 
-    Q_ASSERT_X(qry.isActive(), Q_FUNC_INFO, "Query is not active");
-    Q_ASSERT_X(qry.isSelect(), Q_FUNC_INFO, "Query is not selected");
     if (!qry.isActive() || !qry.isSelect())
     {
-        KCB_DEBUG_TRACE("SQL Query Failure" << "Active" << qry.isActive() << "Select" << qry.isSelect());
+        KCB_DEBUG_TRACE("SQL Query Failure: " << "Active" << qry.isActive() << "Select" << qry.isSelect());
+        return;
     }
 
     if (!qry.first())
     {
-        KCB_WARNING_TRACE(qry.lastError().text() << qry.lastQuery());
+        KCB_WARNING_TRACE("First Failed: " << qry.lastError().text() << qry.lastQuery());
+        return;
     }
 
     *pLockSet = new CLockSet();
@@ -1250,7 +1251,7 @@ bool CTblCodes::incrementAccessCount(int fids)
 
 void CTblCodes::getAllCodes1(QStringList& codes1)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     // Create a query to return all code1 entries
     QStringList column_list;
@@ -1278,7 +1279,7 @@ void CTblCodes::getAllCodes1(QStringList& codes1)
         codes1.append(CEncryption::decryptString(code1_enc));
     } while (qry.next());
 
-    KCB_DEBUG_TRACE(codes1);
+    // KCB_DEBUG_TRACE(codes1);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
