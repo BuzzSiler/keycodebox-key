@@ -350,9 +350,58 @@ void MainWindow::hideFormsExcept(QDialog * pfrm) {
     pfrm->setFocus();
 }
 
+bool MainWindow::isVncConnectionActive(int vncPort)
+{
+    FILE *pF;
+    std::string sOutput = "";
+    QString command = QString("ss sport = :%1").arg(QString::number(vncPort));
+
+    pF = popen(command.toStdString().c_str(), "r");
+    if(!pF)
+    {
+        qDebug() << "failed to get VNC connection";
+    }
+
+    ExtractCommandOutput(pF, sOutput);
+    fclose(pF);
+
+    /*
+    This is the output when VNC is not connected:
+    "Netid  State      Recv-Q Send-Q   Local Address:Port       Peer Address:Port
+    �"
+
+    This is the output when VNC is connected:
+    "Netid  State      Recv-Q Send-Q   Local Address:Port       Peer Address:Port
+    tcp    ESTAB      0      0        192.168.1.144:5901      192.168.1.123:5171
+    �"
+
+    No need to check the details, just split the string into lines and use the count.
+    If count > 1, then we have a VNC connection; otherwise, there is no VNC connection.
+    */
+    QStringList strList = QString::fromStdString(sOutput).trimmed().split("\n");
+    
+    qDebug() << strList;
+
+    return strList.count() > 2;
+}
+
 void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
 {
-    if(!_pfAdminPW) {
+    /* Detect if we are connected via VNC.  If so, then disable the display
+       so no one can see what the admin is doing
+
+       The following command wrapped in a function will return true if connected via VNC and false otherwise
+           ss sport = :5901
+       We will need to pass the VNC port as a parameter.
+    */
+    bool result = isVncConnectionActive(5901);
+    if (result)
+    {
+        system(qPrintable("vcgencmd display_power 0"));
+    }
+
+    if(!_pfAdminPW) 
+    {
         qDebug() << "MainWindow::OnDisplayUserCodeTwoDialog()";
         _pfAdminPW = new CFrmAdminPassword();
     }
@@ -399,9 +448,11 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
 
 void MainWindow::OnAdminPasswordCancel()
 {
-    qDebug() << "MainWindow::OnAdminPasswordCancel()";
+    KCB_DEBUG_ENTRY;
+    system(qPrintable("vcgencmd display_power 1"));    
     _pfAdminPW->hide();
     _pfAdminPW->OnEnableKeyboard(true);
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnUserCodeCancel()

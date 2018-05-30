@@ -53,6 +53,7 @@ public:
     static void OnImageClicked();
     void ExtractCommandOutput(FILE *pF, std::string &rtnStr);
     bool isInternetTime();
+    bool isVncConnectionActive(int vncPort);
     
     typedef enum {DISP_POWER_OFF, DISP_POWER_ON} DISP_POWER_STATE;
     static DISP_POWER_STATE display_power_state;
