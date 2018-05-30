@@ -900,6 +900,7 @@ void CFrmAdminInfo::on_lblKey_clicked()
 void CFrmAdminInfo::on_btnSaveSettings_clicked()
 {
     KCB_DEBUG_ENTRY;
+
     QDateTime   freq;
     bool    bNever = false;
     QString sFreq = ui->cbReportFreq->currentText();
@@ -965,6 +966,13 @@ void CFrmAdminInfo::on_btnSaveSettings_clicked()
 
 void CFrmAdminInfo::on_btnDone_clicked()
 {
+    /* This slot is called when we are leaving the admin interface.
+       It seems like the most obvious place to re-enable display power
+       It would be preferrable to have all power control in the same
+       module -- maybe one day :-)
+    */
+    system(qPrintable("vcgencmd display_power 1"));
+
     QDateTime   freq;
     bool    bNever = false;
     QString sFreq = ui->cbReportFreq->currentText();
