@@ -1090,58 +1090,6 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
             }
         }
 
-        // if( _padminInfo->getReportViaEmail()) 
-        // {
-        //     qDebug() << " Reporting via email";
-        //     qDebug() << " Freq: " << dtFreq.toString("yyyy-MM-dd HH:mm:ss");
-
-        //     if(dtFreq == QDateTime(QDate(1,1,1), QTime(0,0)))   // Represents admin wants each access sent
-        //     {
-        //         qDebug() << "Sending email";
-
-        //         /* Make kcb@keycodebox.com the default */
-        //         QString SMTPSvr = "smtpout.secureserver.net";
-        //         int SMTPPort = 465;
-        //         int SMTPType = 1;
-        //         QString SMTPUser = "kcb@keycodebox.com";
-        //         QString SMTPPW = "keycodebox";
-        //         QString from = "kcb@keycodebox.com";
-
-        //         if (_padminInfo->getSMTPServer().length() > 0 &&
-        //             _padminInfo->getSMTPPort() != 0 &&
-        //             (_padminInfo->getSMTPType() >= 0 && _padminInfo->getSMTPType() <= 2) &&
-        //             _padminInfo->getSMTPUsername().length() > 0)
-        //         {
-        //             SMTPSvr = _padminInfo->getSMTPServer();
-        //             SMTPPort = _padminInfo->getSMTPPort();
-        //             SMTPType = _padminInfo->getSMTPType();
-        //             SMTPUser = _padminInfo->getSMTPUsername();
-        //             SMTPPW = _padminInfo->getSMTPPassword();
-        //             from = _padminInfo->getSMTPUsername();
-        //         }
-        //         QString to = _padminInfo->getAdminEmail();
-        //         QString subject = tr("Lock Box Event");
-
-        //         QDateTime dtAccess = pLockHistory->getAccessTime();
-
-        //         QString sDesc = pLockHistory->getDescription();
-        //         QString LockNums = pLockHistory->getLockNums();
-
-        //         KCB_DEBUG_TRACE("Locks" << LockNums);
-
-        //         QString body = QString("%1 #%2").arg(tr("Lock")).arg(LockNums);
-
-        //         if( sDesc.size() > 0 )
-        //         {
-        //             body += QString(" [%1]").arg(sDesc);
-        //         }
-        //         //body += " " + tr("was accessed at") + " " + dtAccess.toString("MM/dd/yyyy HH:mm:ss");
-        //         body += QString(" %1 %2").arg(tr("was accessed at"), dtAccess.toString("MM/dd/yyyy HH:mm:ss"));
-
-        //         qDebug() << "Calling __OnSendEmail() from:" << from << endl << " to:" << to << endl << " subject:" << subject << endl << " body:" << body;
-        //         emit __OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, NULL );
-        //     }
-        // }
         delete pLockHistory;
     } 
     else 
