@@ -9,22 +9,6 @@
 #define REPORT_FILE "KeyCodeBox_%1.txt"
 #define REPORT_FILE_FORMAT "yyyy-MM-dd-HH_mm_ss"
 
-#define IS_HOURLY(dt) (dt == HOURLY)
-#define IS_DAILY(dt) (dt == DAILY)
-#define IS_WEEKLY(dt) (dt == WEEKLY)
-#define IS_EVERY_12_HOURS(dt) (dt == EVERY_12_HOURS)
-#define IS_BIWEEKLY(dt) (dt == BIWEEKLY)
-#define IS_MONTHLY(dt) (dt == MONTHLY)
-#define DAYS_IN_DAY (1)
-#define DAYS_IN_WEEK (7)
-#define DAYS_IN_TWOWEEKS (2*DAYS_IN_WEEK)
-#define DAYS_IN_MONTH(dt) (dt.daysInMonth())
-
-#define SECS_IN_HOUR (3600)
-#define SECS_IN_12_HOURS (12*SECS_IN_HOUR)
-#define SECS_IN_DAY (24*SECS_IN_HOUR)
-#define SECS_IN_WEEK (7*SECS_IN_DAY)
-
 CReportController::CReportController(QObject *parent) : QObject(parent)
 {
     _padminInfo = 0;
@@ -133,6 +117,15 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
         *ppFile = NULL;
     }
     KCB_DEBUG_ENTRY;
+}
+
+void CReportController::processEveryActivityReport(QDateTime dtFreq)
+{
+    if (IS_EVERY_ACTIVITY(dtFreq))
+    {
+        QDateTime now = QDateTime::currentDateTime();
+        processImmediateReport(now, now);
+    }
 }
 
 void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd)

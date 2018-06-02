@@ -94,6 +94,8 @@ private:
     void stopTimeoutTimer();
     void initializeReaders();
     QString getCodeToUse(QString code1, QString code2);
+    void sendEmailReport(QDateTime access, QString desc, QString lockNums);
+    
 
 signals:
     void __verifyUserAccess(QString sCode1);
