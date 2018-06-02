@@ -25,9 +25,13 @@ CSystemController::CSystemController(QObject *parent) :
     _fingerprintReader(0),
     _systemState(ETimeoutScreen),
     _systemStateDisplay(ENone),
+    _pfUsercode(0),
     _pdFingerprintVerify(0),
     _ptimer(0)
 {
+    Q_UNUSED(parent);
+
+    //qRegisterMetaType<QVector<int> >("QVector<int>");
 }
 
 CSystemController::~CSystemController()
@@ -473,10 +477,6 @@ void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
     qDebug() << "CSystemController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(adminInfo);
-
-    emit __DisplayButtonsUpdate(_padminInfo->getDisplayFingerprintButton(), 
-                                _padminInfo->getDisplayShowHideButton(), 
-                                _padminInfo->getDisplayTakeReturnButtons());
 }
 
 void CSystemController::OnAdminDialogClosed()
@@ -559,6 +559,8 @@ void CSystemController::reportActivity(QString locknums)
     {
         emit __RequestLastSuccessfulLogin(locknums);
     }
+    QDateTime now = QDateTime::currentDateTime();
+    _ReportController.processImmediateReport(now, now);
 
 }
 
@@ -588,18 +590,17 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
     {
         KCB_DEBUG_TRACE("Multi Lock");
 
-        CFrmSelectLocks selectLocks;
+        CFrmSelectLocks sl;
 
-        selectLocks.setLocks(locks);
-        if (selectLocks.exec())
+        sl.setLocks(locks);
+        if (sl.exec())
         {
-            _locks = selectLocks.getLocks();
+            _locks = sl.getLocks();
 
             QStringList sl = _locks.split(",");
 
             foreach (auto s, sl)
             {
-                QCoreApplication::processEvents();
                 OnOpenLockRequest(s);
             }
 
@@ -679,26 +680,20 @@ void CSystemController::OnRequestCurrentAdmin()
 
 bool CSystemController::getDisplayFingerprintButton()
 {
-    KCB_DEBUG_ENTRY;
-    bool result = _padminInfo->getDisplayFingerprintButton();
-    KCB_DEBUG_EXIT;
-    return result;
+    return _padminInfo->getDisplayFingerprintButton();
 }
 
 bool CSystemController::getDisplayShowHideButton()
 {
-    KCB_DEBUG_ENTRY;
-    bool result = _padminInfo->getDisplayShowHideButton();
-    KCB_DEBUG_EXIT;
-    return result;
+    return _padminInfo->getDisplayShowHideButton();
 }
 
-bool CSystemController::getDisplayTakeReturnButtons()
+CFrmUserCode* CSystemController::getUserCodeOne()
 {
-    KCB_DEBUG_ENTRY;
-    bool result = _padminInfo->getDisplayTakeReturnButtons();
-    KCB_DEBUG_EXIT;
-    return result;
+    if(!_pfUsercode)
+    {
+    }
+    return (CFrmUserCode *)NULL;
 }
 
 void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
@@ -953,7 +948,7 @@ void CSystemController::looprun()
             emit __OnNewMessage("");
 
             KCB_DEBUG_TRACE("EThankYou Timeout Active");
-            startTimeoutTimer(500);
+            startTimeoutTimer(5000);
         }
     }
     else if(_systemState == EAdminMain) 

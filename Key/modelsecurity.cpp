@@ -10,7 +10,6 @@
 #include <QIODevice>
 #include <QDateTime>
 #include "kcbcommon.h"
-#include "kcbapplication.h"
 
 void CModelSecurity::openDatabase()
 {
@@ -41,12 +40,11 @@ CModelSecurity::~CModelSecurity()
 
 void CModelSecurity::OnReadLockSet(QString LockNums, QDateTime start, QDateTime end)
 {
+    // KCB_DEBUG_ENTRY;
     CLockSet    *pLockSet;
-    // Build the lock set for this lock num
-    qDebug() << "CModelSecurity::OnReadLockSet";
 
     _ptblCodes->selectCodeSet(LockNums, start, end, &pLockSet);
-    qDebug() << "Selected locks:" << LockNums;
+    // qDebug() << "Selected locks:" << LockNums;
     emit __OnLockSet(pLockSet);
 }
 
@@ -74,8 +72,7 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
                                                  adminInfo->getDefaultReportFreq(),
                                                  adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
                                                  adminInfo->getAssistPassword(), adminInfo->getAssistCode(),
-                                                 adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(), adminInfo->getDisplayTakeReturnButtons(),
-                                                 adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
+                                                 adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(), adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
                                                  adminInfo->getMaxLocks(),
                                                  adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
                                                  adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
@@ -418,9 +415,6 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     QString question2 = "";
     QString question3 = "";
 
-    bool isReturn = kcb::Application::isReturnSelection();
-    (void) kcb::Application::getAccessSelection();
-
     _updateCodeLockboxState = false;
     if(_type == "Admin" || _type == "Assist") 
     {
@@ -478,8 +472,8 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
             }
 
             KCB_DEBUG_TRACE("Ask Questions" << bAskQuestions);
-            
-            if (isReturn && bAskQuestions)
+
+            if( bAskQuestions )
             {
                 qDebug() << "QUESTION1: " << question1;
                 qDebug() << "QUESTION2: " << question2;

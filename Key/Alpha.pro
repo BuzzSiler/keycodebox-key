@@ -82,13 +82,7 @@ SOURCES += main.cpp\
     kcbutils.cpp \
     checkablestringlistmodel.cpp \
     reportcontrolwidget.cpp \
-    dlgdownloadreports.cpp \
-    autogeneratecontrolwidget.cpp \
-    systemdisplaywidget.cpp \
-    kcbsystem.cpp \
-    datetimeworker.cpp \
-    kcbapplication.cpp \
-    frmnetworksettings.cpp
+    dlgdownloadreports.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -156,13 +150,7 @@ HEADERS  += keycodeboxmain.h \
     kcbutils.h \
     checkablestringlistmodel.h \
     reportcontrolwidget.h \
-    dlgdownloadreports.h \
-    autogeneratecontrolwidget.h \
-    systemdisplaywidget.h \
-    kcbsystem.h \
-    datetimeworker.h \
-    kcbapplication.h \
-    frmnetworksettings.h
+    dlgdownloadreports.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \
@@ -185,10 +173,7 @@ FORMS    += mainwindow.ui \
     kcbkeyboardwidget.ui \
     kcbkeyboarddialog.ui \
     reportcontrolwidget.ui \
-    dlgdownloadreports.ui \
-    autogeneratecontrolwidget.ui \
-    systemdisplaywidget.ui \
-    frmnetworksettings.ui
+    dlgdownloadreports.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/debug/ -lqsqlite
