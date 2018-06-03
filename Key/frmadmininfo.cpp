@@ -35,7 +35,6 @@
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
 #include "reportcontrolwidget.h"
-#include "systemdisplaywidget.h"
 #include "frmnetworksettings.h"
 #include "kcbsystem.h"
 
@@ -81,7 +80,6 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     _testEmail(false),
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
     m_report(* new ReportControlWidget(this)),
-    m_systemdisp(* new SystemDisplayWidget(this)),
     m_network_settings(* new FrmNetworkSettings(this))
 
 {
@@ -197,7 +195,6 @@ void CFrmAdminInfo::show()
         ui->gpAdminInfo->setVisible(true);
         ui->vloSelectLocks->addWidget(&m_select_locks);
         ui->vloReportSettings->addWidget(&m_report);
-        ui->vloSystemDisplay->addWidget(&m_systemdisp);
         // Force tabwidget to show administrator tab
         emit ui->tabWidget->currentChanged(ADMIN_TAB_INDEX);
     }

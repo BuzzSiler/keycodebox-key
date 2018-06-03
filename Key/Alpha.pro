@@ -83,9 +83,7 @@ SOURCES += main.cpp\
     checkablestringlistmodel.cpp \
     reportcontrolwidget.cpp \
     dlgdownloadreports.cpp \
-    systemdisplaywidget.cpp \
     kcbsystem.cpp \
-    datetimeworker.cpp \
     kcbapplication.cpp \
     frmnetworksettings.cpp
 
@@ -156,9 +154,7 @@ HEADERS  += keycodeboxmain.h \
     checkablestringlistmodel.h \
     reportcontrolwidget.h \
     dlgdownloadreports.h \
-    systemdisplaywidget.h \
     kcbsystem.h \
-    datetimeworker.h \
     kcbapplication.h \
     frmnetworksettings.h
 
@@ -184,7 +180,6 @@ FORMS    += mainwindow.ui \
     kcbkeyboarddialog.ui \
     reportcontrolwidget.ui \
     dlgdownloadreports.ui \
-    systemdisplaywidget.ui \
     frmnetworksettings.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
