@@ -24,6 +24,8 @@ void CDlgVNC::setValues(int nVNCPort, QString sPassword)
     _sVNCPort = QVariant(nVNCPort).toString();
     _sPassword = sPassword;
 
+    qDebug() << "VNCPassword" << _sPassword;
+
     ui->lblVNCPort->setText(QVariant(_sVNCPort).toString());
     ui->lblPassword->setText(_sPassword);
 }

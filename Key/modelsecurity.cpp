@@ -50,41 +50,36 @@ void CModelSecurity::OnReadLockSet(QString LockNums, QDateTime start, QDateTime 
 
 void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end)
 {
-    CLockHistorySet *pLockHistorySet;
-    CLockHistoryRec  *pState;
 
     // KCB_DEBUG_ENTRY;
 
     // KCB_DEBUG_TRACE("Locks" << LockNums);
+    CLockHistorySet *pLockHistorySet;
     _ptblCodeHistory->selectLockCodeHistorySet(LockNums, start, end, &pLockHistorySet);
     Q_ASSERT_X(pLockHistorySet != nullptr, Q_FUNC_INFO, "pLockHistorySet is null");
 
-    auto itor = pLockHistorySet->getIterator();
-
-    while (itor.hasNext())
+    if (pLockHistorySet)
     {
-        pState = itor.next();
-        KCB_DEBUG_TRACE(pState->getLockNums());
+        emit __OnLockHistorySet(pLockHistorySet);
     }
 
-    emit __OnLockHistorySet(pLockHistorySet);
     // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 {
     bool bSuccess = _ptblAdmin->updateAdminClear(adminInfo->getAdminName(), adminInfo->getAdminEmail(), adminInfo->getAdminPhone(),
-                                                 adminInfo->getEmailReportActive(), adminInfo->getDefaultReportFreq(),
+                                                 adminInfo->getDefaultReportFreq(),
                                                  adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
                                                  adminInfo->getAssistPassword(), adminInfo->getAssistCode(),
-                                                 adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(),
-                                                 adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
+                                                 adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(), adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
                                                  adminInfo->getMaxLocks(),
                                                  adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
                                                  adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
                                                  adminInfo->getVNCPort(), adminInfo->getVNCPassword(),
                                                  adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory(),
-                                                 adminInfo->getDisplayPowerDownTimeout());
+                                                 adminInfo->getDisplayPowerDownTimeout(),
+                                                 adminInfo->getDefaultReportDeleteFreq());
     emit __OnUpdatedCurrentAdmin(bSuccess);
 }
 
@@ -659,16 +654,6 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
 
         _ptblCodeHistory->selectLastLockCodeHistorySet(LockNums, time, now, &_pHistorySet);
 
-        // Predictive - so history rec
-        // CLockHistoryRec *plockHistoryRec;
-
-//        for(CLockHistorySet::Iterator itor = _pHistorySet->begin(); itor != _pHistorySet->end(); itor++)
-//        {
-//            plockHistoryRec = itor.value();
-//            //
-//            qDebug() << "  Found last successful login";
-//            emit __OnLastSuccessfulLogin(plockHistoryRec);
-//        }
     }
     else
     {
@@ -734,12 +719,14 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
 
 void CModelSecurity::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd)
 {
-    CLockHistorySet     *pLockHistorySet = new CLockHistorySet();
-    // Get the data
-    QString LockNums;
-    _ptblCodeHistory->selectLockCodeHistorySet(LockNums, dtStart, dtEnd, &pLockHistorySet);
-    // Send it back
-    emit __OnCodeHistoryForDateRange(dtStart, dtEnd, pLockHistorySet);
+    KCB_DEBUG_ENTRY;
+    CLockHistorySet *pLockHistorySet;
+    _ptblCodeHistory->selectLockCodeHistorySet(QString(""), dtStart, dtEnd, &pLockHistorySet);
+    if (pLockHistorySet)
+    {
+        emit __OnCodeHistoryForDateRange(pLockHistorySet);
+    }
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnVerifyAdminPassword(QString code)

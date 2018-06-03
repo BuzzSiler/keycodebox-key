@@ -24,6 +24,7 @@ class KcbKeyboardDialog : public QDialog
                       const QStringList codes_in_use);
         QString getValue();
         void numbersOnly(bool state);
+        void ipAddress(bool state);
 
     private:
         KcbKeyboardWidget& m_keyboard;
