@@ -20,6 +20,14 @@
 #include "frmselectlocks.h"
 #include "kcbcommon.h"
 
+
+static const QString DEFAULT_SMTP_SERVER = "smtpout.secureserver.net";
+static const int DEFAULT_SMTP_PORT = 465;
+static const int DEFAULT_SMTP_SECURITY = 1;
+static const QString DEFAULT_SMTP_USER = "kcb@keycodebox.com";
+static const QString DEFAULT_SMTP_PW = "keycodebox";
+static const QString DEFAULT_SMTP_FROM = "kcb@keycodebox.com";
+
 CSystemController::CSystemController(QObject *parent) :
     QObject(parent),
     _fingerprintReader(0),
@@ -198,7 +206,6 @@ void CSystemController::initializeReaders()
         qDebug() << "No MagTekReader found";
     }
 
-    // Original HID Reader
     bool hid_reader_found = false;
     _phidReader = new CHWKeyboardReader();
     if( _phidReader->initHIDReader(0x04d8, 0x0055) )
@@ -215,7 +222,7 @@ void CSystemController::initializeReaders()
     {
         qDebug() << "No RF HID Reader found";
     }
-
+                
     if (hid_reader_found)
     {
         connect(_phidReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
@@ -388,8 +395,8 @@ void CSystemController::initializeSecurityConnections()
 
     connect(&_ReportController, SIGNAL(__RequestCodeHistoryForDateRange(QDateTime,QDateTime)),
             &_securityController, SLOT(OnRequestCodeHistoryForDateRange(QDateTime,QDateTime)));
-    connect(&_securityController, SIGNAL(__OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)),
-            &_ReportController, SLOT(OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)));
+    connect(&_securityController, SIGNAL(__OnCodeHistoryForDateRange(CLockHistorySet*)),
+            &_ReportController, SLOT(OnCodeHistoryForDateRange(CLockHistorySet*)));
 
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), &_securityController, SLOT(OnUpdateCodeState(CLockState*)));
     connect(&_securityController, SIGNAL(__OnUpdatedCodeState(bool)), this, SLOT(OnUpdatedCodeState(bool)));
@@ -560,7 +567,6 @@ void CSystemController::reportActivity(QString locknums)
     {
         emit __RequestLastSuccessfulLogin(locknums);
     }
-
 }
 
 void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd)
@@ -708,6 +714,7 @@ void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 
 int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mountedDeviceCount)
 {
+    static int lastFoundDeviceCount = 0;
     std::string listCmd = "ls /media/pi/";
     FILE *cmdF;
     std::string sOutput;
@@ -783,8 +790,17 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
         {
             strcpy(mountedDevices[i],foundDevices[i]);
             refreshAdminDeviceList = true;
+            lastFoundDeviceCount = foundDeviceCount;
         }
     }
+
+    // Handles the case when USB drives are removed and the device count is 0
+    if (foundDeviceCount == 0 && foundDeviceCount != lastFoundDeviceCount)
+    {
+        lastFoundDeviceCount = foundDeviceCount;
+        refreshAdminDeviceList = true;
+    }
+
     std::string dev0 = mountedDevices[0];
     std::string dev1 = mountedDevices[1];
 
@@ -813,7 +829,9 @@ void CSystemController::start()
         QCoreApplication::processEvents();
 
         if( _fingerprintReader )
+        {
             _fingerprintReader->handleEvents();
+        }
 
         // dirty hack for events that need to be triggered after the
         //   admin has been setup (signals need to be connected there before
@@ -995,6 +1013,48 @@ void CSystemController::RequestLastSuccessfulLogin(QString locknums)
     emit __RequestLastSuccessfulLogin(locknums);
 }
 
+void CSystemController::sendEmailReport(QDateTime access, QString desc, QString lockNums)
+{
+    qDebug() << "Sending email";
+
+    QString SMTPSvr = DEFAULT_SMTP_SERVER;
+    int SMTPPort = DEFAULT_SMTP_PORT;
+    int SMTPType = DEFAULT_SMTP_SECURITY;
+    QString SMTPUser = DEFAULT_SMTP_USER;
+    QString SMTPPW = DEFAULT_SMTP_PW;
+    QString from = DEFAULT_SMTP_FROM;
+
+    bool valid_server = _padminInfo->getSMTPServer().length() > 0;
+    bool valid_port = _padminInfo->getSMTPPort() != 0;
+    bool valid_security = _padminInfo->getSMTPType() >= 0 && _padminInfo->getSMTPType() <= 2;
+    bool valid_user = _padminInfo->getSMTPUsername().length() > 0;
+
+    if (valid_server && valid_port && valid_security && valid_user)
+    {
+        SMTPSvr = _padminInfo->getSMTPServer();
+        SMTPPort = _padminInfo->getSMTPPort();
+        SMTPType = _padminInfo->getSMTPType();
+        SMTPUser = _padminInfo->getSMTPUsername();
+        SMTPPW = _padminInfo->getSMTPPassword();
+        from = _padminInfo->getSMTPUsername();
+    }
+
+    QString to = _padminInfo->getAdminEmail();
+    QString subject = tr("Lock Box Event");
+
+    QString body = QString("%1 #%2").arg(tr("Lock")).arg(lockNums);
+
+    if( desc.size() > 0 )
+    {
+        body += QString(" [%1]").arg(desc);
+    }
+
+    body += QString(" %1 %2").arg(tr("was accessed at")).arg(access.toString("MM/dd/yyyy HH:mm:ss"));
+
+    qDebug() << "Calling __OnSendEmail() from:" << from << endl << " to:" << to << endl << " subject:" << subject << endl << " body:" << body;
+    emit __OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, NULL );
+}
+
 void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
     KCB_DEBUG_ENTRY;
@@ -1013,58 +1073,23 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
 
         QDateTime dtFreq = _padminInfo->getDefaultReportFreq();
 
-        if( _padminInfo->getReportViaEmail()) 
+        if (IS_EVERY_ACTIVITY(dtFreq))
         {
-            qDebug() << " Reporting via email";
-            qDebug() << " Freq: " << dtFreq.toString("yyyy-MM-dd HH:mm:ss");
-
-            if(dtFreq == QDateTime(QDate(1,1,1), QTime(0,0)))   // Represents admin wants each access sent
+            if (_padminInfo->getReportViaEmail())
             {
-                qDebug() << "Sending email";
-
-                /* Make kcb@keycodebox.com the default */
-                QString SMTPSvr = "smtpout.secureserver.net";
-                int SMTPPort = 465;
-                int SMTPType = 1;
-                QString SMTPUser = "kcb@keycodebox.com";
-                QString SMTPPW = "keycodebox";
-                QString from = "kcb@keycodebox.com";
-
-                if (_padminInfo->getSMTPServer().length() > 0 &&
-                    _padminInfo->getSMTPPort() != 0 &&
-                    (_padminInfo->getSMTPType() >= 0 && _padminInfo->getSMTPType() <= 2) &&
-                    _padminInfo->getSMTPUsername().length() > 0)
-                {
-                    SMTPSvr = _padminInfo->getSMTPServer();
-                    SMTPPort = _padminInfo->getSMTPPort();
-                    SMTPType = _padminInfo->getSMTPType();
-                    SMTPUser = _padminInfo->getSMTPUsername();
-                    SMTPPW = _padminInfo->getSMTPPassword();
-                    from = _padminInfo->getSMTPUsername();
-                }
-                QString to = _padminInfo->getAdminEmail();
-                QString subject = tr("Lock Box Event");
-
                 QDateTime dtAccess = pLockHistory->getAccessTime();
-
                 QString sDesc = pLockHistory->getDescription();
                 QString LockNums = pLockHistory->getLockNums();
+                
+                sendEmailReport(dtAccess, sDesc, LockNums);
+            }
 
-                KCB_DEBUG_TRACE("Locks" << LockNums);
-
-                QString body = QString("%1 #%2").arg(tr("Lock")).arg(LockNums);
-
-                if( sDesc.size() > 0 )
-                {
-                    body += QString(" [%1]").arg(sDesc);
-                }
-                //body += " " + tr("was accessed at") + " " + dtAccess.toString("MM/dd/yyyy HH:mm:ss");
-                body += QString(" %1 %2").arg(tr("was accessed at"), dtAccess.toString("MM/dd/yyyy HH:mm:ss"));
-
-                qDebug() << "Calling __OnSendEmail() from:" << from << endl << " to:" << to << endl << " subject:" << subject << endl << " body:" << body;
-                emit __OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, NULL );
+            if (_padminInfo->getReportToFile())
+            {
+                _ReportController.processEveryActivityReport(dtFreq);
             }
         }
+
         delete pLockHistory;
     } 
     else 

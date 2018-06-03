@@ -50,3 +50,9 @@ void KcbKeyboardDialog::numbersOnly(bool state)
 {
     m_keyboard.numbersOnly(state);
 }
+
+void KcbKeyboardDialog::ipAddress(bool state)
+{
+    m_keyboard.ipAddress(state);
+}
+

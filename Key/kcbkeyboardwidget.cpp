@@ -107,6 +107,12 @@ void KcbKeyboardWidget::numbersOnly(bool state)
     ui->wgAlpha->setDisabled(state);
 }
 
+void KcbKeyboardWidget::ipAddress(bool state)
+{
+    Q_UNUSED(state);
+    KCB_DEBUG_TRACE("Not implemented");
+}
+
 void KcbKeyboardWidget::updateValue(QString value)
 {
     int curr_pos = ui->edText->cursorPosition();

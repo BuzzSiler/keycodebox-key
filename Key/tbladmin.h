@@ -32,14 +32,14 @@ public:
     QString getAdminPhone() { return admin_phone; } // text,
     void setAdminPhone(QString adminPhone) { admin_phone = adminPhone; }
 
-    bool getEmailReportActive() { return email_report_active; }
-    void setEmailReportActive(bool bActive) { email_report_active = bActive; }
-
     QDateTime getDefaultReportFreq() { return default_report_freq; } // DATETIME
     void  setDefaultReportFreq(QDateTime freq) { default_report_freq = freq; }
 
     QDateTime getDefaultReportStart() { return default_report_start; }    // DATETIME
     void setDefaultReportStart(QDateTime start) { default_report_start = start; }    // DATETIME
+
+    QDateTime getDefaultReportDeleteFreq() { return default_report_delete_freq; }
+    void setDefaultReportDeleteFreq(QDateTime deletion) { default_report_delete_freq = deletion; }
 
     QString getPassword() { return password; }   // text,
     void setPassword(QString pw) { password = pw; }
@@ -122,9 +122,9 @@ private:
     QString admin_name; // text,
     QString admin_email; // text,
     QString admin_phone; // text,
-    bool        email_report_active;  // bool - true = email report, false = no email report
     QDateTime&   default_report_freq; // DATETIME
     QDateTime&   default_report_start;    // DATETIME,
+    QDateTime&   default_report_delete_freq;
     QString password;    // text,
     QString access_code_old; // text
     QString access_code; // text
@@ -178,7 +178,7 @@ public:
 
     void addAdmin();
     bool updateAdmin(QString name, QString email, QString phone,
-                     bool activeReport, QDateTime repFreq, QDateTime startReport,
+                     QDateTime repFreq, QDateTime startReport,
                      QString passwordEnc, QString accessCdEnc,
                      QString assistPasswordEnc, QString assistCodeEnc,
                      bool showFingerprint, bool showPassword,
@@ -188,10 +188,11 @@ public:
                      QString smtpusername, QString smtppassword,
                      int vncport, QString vncpasword,
                      bool bEmailReport, bool bSaveReport, QString reportDirectory,
-                     int displayPowerDownTimeout);
+                     int displayPowerDownTimeout,
+                     QDateTime reportDeletion);
 
     bool updateAdminClear(QString name, QString email, QString phone,
-                     bool activeReport, QDateTime repFreq, QDateTime startReport,
+                     QDateTime repFreq, QDateTime startReport,
                      QString passwordClear, QString accessCdClear,
                      QString assistPasswordClear, QString assistCodeClear,
                      bool showFingerprint, bool showPassword,
@@ -201,7 +202,8 @@ public:
                      QString smtpusername, QString smtppassword,
                      int vncport, QString vncpassword,
                      bool bEmailReport, bool bSaveReport, QString reportDirectory,
-                     int displayPowerDownTimeout);
+                     int displayPowerDownTimeout,
+                     QDateTime reportDeletion);
     bool updateAdmin(CAdminRec &rec);
     bool updateAdmin(QJsonObject adminObj);
 

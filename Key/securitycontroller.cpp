@@ -64,8 +64,8 @@ void CSecurityController::initializeSignals()
     connect(&_modelSecurity, SIGNAL(__OnLastSuccessfulLogin(CLockHistoryRec*)), this, SLOT(OnLastSuccessfulLoginRequest(CLockHistoryRec*)));
     connect(this, SIGNAL( __RequestLastSuccessfulLogin(QString, QString, QString, QString)), &_modelSecurity, SLOT(RequestLastSuccessfulLogin(QString, QString, QString, QString)));
 
-    connect(&_modelSecurity, SIGNAL(__OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)),
-            this, SLOT(OnCodeHistoryForDateRange(QDateTime,QDateTime,CLockHistorySet*)));
+    connect(&_modelSecurity, SIGNAL(__OnCodeHistoryForDateRange(CLockHistorySet*)),
+            this, SLOT(OnCodeHistoryForDateRange(CLockHistorySet*)));
     connect(this, SIGNAL( __RequestCodeHistoryForDateRange(QDateTime,QDateTime)), &_modelSecurity, SLOT(OnRequestCodeHistoryForDateRange(QDateTime,QDateTime)));
 
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), &_modelSecurity, SLOT(OnUpdateCodeState(CLockState*)));
@@ -101,14 +101,14 @@ void CSecurityController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHis
 
 void CSecurityController::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd)
 {
-    //
     emit __RequestCodeHistoryForDateRange(dtStart, dtEnd);
 }
 
-void CSecurityController::OnCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd, CLockHistorySet *pLockHistorySet)
+void CSecurityController::OnCodeHistoryForDateRange(CLockHistorySet *pLockHistorySet)
 {
-    //
-    emit __OnCodeHistoryForDateRange(dtStart, dtEnd, pLockHistorySet);
+    KCB_DEBUG_ENTRY;
+    emit __OnCodeHistoryForDateRange(pLockHistorySet);
+    KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::OnUpdateCodeState(CLockState *rec)
