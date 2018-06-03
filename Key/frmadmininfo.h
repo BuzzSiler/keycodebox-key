@@ -35,10 +35,8 @@ class CFrmAdminInfo;
 
 class SelectLocksWidget;
 class ReportControlWidget;
-class AutoGenerateControlWidget;
 class SystemDisplayWidget;
 class FrmNetworkSettings;
-//class FrmTest;
 
 
 class CFrmAdminInfo : public QDialog
@@ -214,7 +212,6 @@ class CFrmAdminInfo : public QDialog
         SelectLocksWidget&  m_select_locks;
         QStringList         _codesInUse;
         ReportControlWidget& m_report;
-        AutoGenerateControlWidget& m_autogen;
         SystemDisplayWidget& m_systemdisp;
         FrmNetworkSettings& m_network_settings;
 

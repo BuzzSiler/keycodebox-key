@@ -83,7 +83,6 @@ SOURCES += main.cpp\
     checkablestringlistmodel.cpp \
     reportcontrolwidget.cpp \
     dlgdownloadreports.cpp \
-    autogeneratecontrolwidget.cpp \
     systemdisplaywidget.cpp \
     kcbsystem.cpp \
     datetimeworker.cpp \
@@ -157,7 +156,6 @@ HEADERS  += keycodeboxmain.h \
     checkablestringlistmodel.h \
     reportcontrolwidget.h \
     dlgdownloadreports.h \
-    autogeneratecontrolwidget.h \
     systemdisplaywidget.h \
     kcbsystem.h \
     datetimeworker.h \
@@ -186,7 +184,6 @@ FORMS    += mainwindow.ui \
     kcbkeyboarddialog.ui \
     reportcontrolwidget.ui \
     dlgdownloadreports.ui \
-    autogeneratecontrolwidget.ui \
     systemdisplaywidget.ui \
     frmnetworksettings.ui
     

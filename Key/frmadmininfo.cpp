@@ -35,11 +35,9 @@
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
 #include "reportcontrolwidget.h"
-#include "autogeneratecontrolwidget.h"
 #include "systemdisplaywidget.h"
 #include "frmnetworksettings.h"
 #include "kcbsystem.h"
-#include "frmtest.h"
 
 #define ADMIN_TAB_INDEX (0)
 #define REPORT_TAB_INDEX (2)
@@ -83,7 +81,6 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     _testEmail(false),
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
     m_report(* new ReportControlWidget(this)),
-    m_autogen(* new AutoGenerateControlWidget(this)),
     m_systemdisp(* new SystemDisplayWidget(this)),
     m_network_settings(* new FrmNetworkSettings(this))
 
@@ -200,7 +197,6 @@ void CFrmAdminInfo::show()
         ui->gpAdminInfo->setVisible(true);
         ui->vloSelectLocks->addWidget(&m_select_locks);
         ui->vloReportSettings->addWidget(&m_report);
-        ui->vloAutoGenerate->addWidget(&m_autogen);
         ui->vloSystemDisplay->addWidget(&m_systemdisp);
         // Force tabwidget to show administrator tab
         emit ui->tabWidget->currentChanged(ADMIN_TAB_INDEX);
