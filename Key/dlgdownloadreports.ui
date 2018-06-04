@@ -41,7 +41,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>0</y>
      <width>381</width>
      <height>41</height>
     </rect>
@@ -65,7 +65,7 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>110</y>
+     <y>100</y>
      <width>231</width>
      <height>17</height>
     </rect>
@@ -99,7 +99,7 @@
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>170</y>
+     <y>180</y>
      <width>81</width>
      <height>31</height>
     </rect>
@@ -108,17 +108,17 @@
     <string>Start</string>
    </property>
   </widget>
-  <widget class="QLabel" name="lblPressStart">
+  <widget class="QLabel" name="lblSelectUsbDrive">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>140</y>
+     <y>130</y>
      <width>381</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Press Start to begin downloading report files.</string>
+    <string>1. Select the USB drive</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignHCenter|Qt::AlignTop</set>
@@ -128,7 +128,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>50</y>
+     <y>40</y>
      <width>381</width>
      <height>51</height>
     </rect>
@@ -137,6 +137,22 @@
     <font>
      <pointsize>12</pointsize>
     </font>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>381</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>2.Press Start to begin downloading report files</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>

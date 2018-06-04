@@ -22,6 +22,7 @@ class CReportController : public QObject
         QString createNewFileName();
         void processLockCodeHistoryReport(QFile *pFile, QDateTime dtReportStart, QDateTime dtReportEnd);    
         void processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd);
+        void processEveryActivityReport(QDateTime dtFreq);
 
     signals:
         void __EmailFailed();

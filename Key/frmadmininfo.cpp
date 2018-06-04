@@ -32,7 +32,6 @@
 #include "linux/reboot.h"
 #include <unistd.h>
 #include "selectlockswidget.h"
-#include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
 #include "reportcontrolwidget.h"
 #include "frmnetworksettings.h"
@@ -47,9 +46,6 @@ static const char CMD_REMOVE_ALL_FP_FILES[] = "sudo rm -rf /home/pi/run/prints/*
 static const char CMD_LIST_SYSTEM_FLAGS[] = "ls /home/pi/run/* | grep 'flag'";
 static const char CMD_READ_TIME_ZONE[] = "readlink /etc/localtime";
 static const QString CMD_REMOVE_FP_FILE = "sudo rm -rf /home/pi/run/prints/\%1";
-
-const QString DEFAULT_VNC_PASSWORD = "keycodebox";
-const QString DEFAULT_VNC_PORT = "5901";
 
 static const int DISPLAY_POWER_DOWN_TIMEOUT[] = {
      0,             // None
@@ -88,8 +84,6 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
 
     CFrmAdminInfo::showFullScreen();
-
-    m_network_settings.hide();
 
     initialize();
 
@@ -158,13 +152,11 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(ui->chkDisplayFingerprintButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(ui->chkDisplayShowHideButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayShowHideButton(bool)));
-    connect(ui->cbDisplayTakeReturnButtons, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayTakeReturnButtons(bool)));
 
     connect(&m_select_locks, &SelectLocksWidget::NotifyRequestLockOpen, this, &CFrmAdminInfo::OnOpenLockRequest);
 
     connect(&m_report, &ReportControlWidget::NotifyGenerateReport, this, &CFrmAdminInfo::OnNotifyGenerateReport);
 
-    connect(&m_network_settings, &FrmNetworkSettings::finished, this, &CFrmAdminInfo::OnNetworkSettingsFinished);
 
 }
 
@@ -854,74 +846,6 @@ void CFrmAdminInfo::on_lblKey_clicked()
     ui->lblKey->setText(text);
 }
 
-<<<<<<< HEAD
-void CFrmAdminInfo::on_btnSaveSettings_clicked()
-{
-    KCB_DEBUG_ENTRY;
-
-    QDateTime   freq;
-    bool    bNever = false;
-    QString sFreq = ui->cbReportFreq->currentText();
-
-    if(sFreq.compare(fNever) == 0)
-    {
-        freq = QDateTime(QDate(), QTime(0,0));
-        bNever = true;
-    }
-    else if(sFreq.compare(fEach) == 0)
-    {
-        freq = QDateTime(QDate(1,1,1), QTime(0,0));
-        bNever = false;
-    }
-    else if(sFreq.compare(fHourly) == 0)
-    {
-        freq = QDateTime(QDate(1,1,1), QTime(1,0));
-    }
-    else if(sFreq.compare(fEvery12Hours) == 0)
-    {
-        freq = QDateTime(QDate(1,1,1), QTime(12,0));
-    }
-    else if(sFreq.compare(fDaily) == 0)
-    {
-        freq = QDateTime(QDate(1,1,1), QTime(23,59));
-    }
-    else if(sFreq.compare(fWeekly) == 0)
-    {
-        freq = QDateTime(QDate(1,1,7), QTime(0,0));
-    }
-    else if(sFreq.compare(fMonthly) == 0)
-    {
-        freq = QDateTime(QDate(1,12,1), QTime(0,0));
-    }
-    // Update the Admin Info and close the dialog - syscontroller needs to switch
-    _tmpAdminRec.setAdminName(ui->lblName->text());
-    _tmpAdminRec.setAdminEmail(ui->lblEmail->text());
-    _tmpAdminRec.setAdminPhone(ui->lblPhone->text());
-    _tmpAdminRec.setDefaultReportFreq(freq);
-    _tmpAdminRec.setDefaultReportStart(ui->dtStart->dateTime());
-    _tmpAdminRec.setEmailReportActive(bNever);
-    _tmpAdminRec.setPassword(ui->lblPassword->text());
-    _tmpAdminRec.setAccessCode(ui->lblAccessCode->text());
-    _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text());
-    _tmpAdminRec.setAssistCode(ui->lblAssistCode->text());
-    _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
-    _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
-    _tmpAdminRec.setUsePredictiveAccessCode(ui->chkUsePredictive->isChecked());
-    _tmpAdminRec.setPredictiveKey(ui->lblKey->text());
-    _tmpAdminRec.setPredictiveResolution(ui->spinCodeGenResolution->value());
-
-    //_tmpAdminRec.setMaxLocks(ui->spinMaxLocks->value());
-
-    _tmpAdminRec.setReportViaEmail(ui->cbReportViaEmail->isChecked());
-    _tmpAdminRec.setReportToFile(ui->cbReportToFile->isChecked());
-    _tmpAdminRec.setReportDirectory(_reportDirectory);
-    _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
-
-    _bClose = false;
-    emit __UpdateCurrentAdmin(&_tmpAdminRec);
-    KCB_DEBUG_EXIT;
-}
-
 void CFrmAdminInfo::on_btnDone_clicked()
 {
     /* This slot is called when we are leaving the admin interface.
@@ -942,7 +866,6 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
     _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
     _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
-    _tmpAdminRec.setDisplayTakeReturnButtons(ui->cbDisplayTakeReturnButtons->isChecked());
 
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
@@ -972,7 +895,6 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayFingerprintButton());
         ui->chkDisplayShowHideButton->setChecked(adminInfo->getDisplayShowHideButton());
         ui->cbDisplayPowerDownTimeout->setCurrentIndex(adminInfo->getDisplayPowerDownTimeout());
-        ui->cbDisplayTakeReturnButtons->setChecked(adminInfo->getDisplayTakeReturnButtons());
 
         // Temporary to complete report widget funcationality
         _tmpAdminRec.setDefaultReportDeleteFreq(MONTHLY);
@@ -1120,32 +1042,35 @@ void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
 
 void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
 {
-    KCB_DEBUG_TRACE("Count" << pSet->getLockMap()->size());
+    Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
+    if (pSet != nullptr)
+    {
+        KCB_DEBUG_TRACE("Count" << pSet->getLockMap()->size());
+    }
 
     displayInTable(pSet);
-
+    
     pSet = nullptr;
 }
 
 void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
 {
     KCB_DEBUG_ENTRY;
-    Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
 
+    Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
 
     displayInHistoryTable(pSet);
     
     pSet = nullptr;
 }
 
-void CFrmAdminInfo::displayInTable(CLockSet *pSet)
+void CFrmAdminInfo::createCodeTableHeader()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
 
     QTableWidget *table = ui->tblCodesList;
 
     table->clear();
-    table->setRowCount(pSet->getLockMap()->size());
     table->setColumnCount(7);
 
     table->setColumnWidth(0, 40);
@@ -1169,10 +1094,24 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    connect( table, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT( codeTableCellSelected( int, int ) ) );
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::displayInTable(CLockSet *pSet)
+{
+    KCB_DEBUG_ENTRY;
+
+    createCodeTableHeader();
 
     ui->cbLockNum->clear();
     ui->cbLockNum->addItem(QString(tr("All Locks")));
+
+    Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
+    if (pSet == nullptr)
+    {
+        KCB_DEBUG_TRACE("pSet is null so there are no codes to display");
+        return;
+    }
 
     CLockSet::Iterator itor;
     CLockState  *pState;
@@ -1180,6 +1119,9 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     int nRow = 0;
     int nCol = 0;
     QSet<int> lock_items;
+    QTableWidget *table = ui->tblCodesList;
+
+    table->setRowCount(pSet->getLockMap()->size());
 
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
@@ -1248,7 +1190,7 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
 void CFrmAdminInfo::setupCodeTableContextMenu() 
 {
-    QTableWidget    *table = ui->tblCodesList;
+    QTableWidget *table = ui->tblCodesList;
 
     /* Create a menu for adding, editing, and deleting codes */
     _pTableMenu = new QMenu(table);
@@ -1260,9 +1202,8 @@ void CFrmAdminInfo::setupCodeTableContextMenu()
            already selected.  User can choose the locks to be associated with 
            this 'code' or authorization.
 
-           Note: this implies that duplicate codes should no longer be allowed.
+           Note: Duplicate codes are not allowed.
     */
-
 
     _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
     _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
@@ -2103,14 +2044,7 @@ void CFrmAdminInfo::OnDisplayFingerprintButton(bool state)
 
 void CFrmAdminInfo::OnDisplayShowHideButton(bool state)
 {
-    KCB_DEBUG_ENTRY;
     ui->chkDisplayShowHideButton->setChecked(state);
-    KCB_DEBUG_EXIT;
-}
-
-void CFrmAdminInfo::OnDisplayTakeReturnButtons(bool state)
-{
-    ui->cbDisplayTakeReturnButtons->setChecked(state);
 }
 
 void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
@@ -2121,9 +2055,7 @@ void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
     Q_ASSERT_X(is_user == false, Q_FUNC_INFO, "We are not admin");
     emit __OnOpenLockRequest(lock);
 }
-<<<<<<< HEAD
-=======
-
+#ifdef NETWORKING
 void CFrmAdminInfo::updateVNCChanges(QString vncPort, QString vncPassword)
 {
     _tmpAdminRec.setVNCPort(vncPort.toInt());
@@ -2223,3 +2155,4 @@ void CFrmAdminInfo::OnNetworkSettingsFinished(int)
 
     KCB_DEBUG_EXIT;
 }
+#endif

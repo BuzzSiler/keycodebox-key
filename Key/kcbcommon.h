@@ -25,6 +25,11 @@ typedef enum {ACCESS_TYPE_ALWAYS=0, ACCESS_TYPE_TIMED=1, ACCESS_TYPE_LIMITED_USE
 #define FIELD_INDEX(query, fld_name) (query.record().indexOf(fld_name))
 #define QUERY_VALUE(q, fld_name)  q.value(FIELD_INDEX(q, fld_name))
 
+#define SECS_IN_HOUR (60*60)
+#define SECS_IN_12_HOURS (12*SECS_IN_HOUR)
+#define SECS_IN_DAY (24*SECS_IN_HOUR)
+#define SECS_IN_WEEK (7*SECS_IN_DAY)
+
 static const QDateTime NEVER = QDateTime(QDate(), QTime(0,0));
 static const QDateTime EACH_ACTIVITY = QDateTime(QDate(1,1,1), QTime(0,0));
 static const QDateTime HOURLY = QDateTime(QDate(1,1,1), QTime(1,0));
@@ -34,5 +39,18 @@ static const QDateTime WEEKLY = QDateTime(QDate(1,1,7), QTime(0,0));
 static const QDateTime BIWEEKLY = QDateTime(QDate(1,1,14), QTime(0,0));
 static const QDateTime MONTHLY = QDateTime(QDate(1,12,1), QTime(0,0));
 static const QDateTime DEFAULT_DATE_TIME = QDateTime(QDate(2016,6,1), QTime(12,00,00));
+
+#define IS_EVERY_ACTIVITY(dt) (dt == EACH_ACTIVITY)
+#define IS_HOURLY(dt) (dt == HOURLY)
+#define IS_DAILY(dt) (dt == DAILY)
+#define IS_WEEKLY(dt) (dt == WEEKLY)
+#define IS_EVERY_12_HOURS(dt) (dt == EVERY_12_HOURS)
+#define IS_BIWEEKLY(dt) (dt == BIWEEKLY)
+#define IS_MONTHLY(dt) (dt == MONTHLY)
+#define DAYS_IN_DAY (1)
+#define DAYS_IN_WEEK (7)
+#define DAYS_IN_TWOWEEKS (2*DAYS_IN_WEEK)
+#define DAYS_IN_MONTH(dt) (dt.daysInMonth())
+
 
 #endif
