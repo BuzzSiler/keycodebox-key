@@ -34,7 +34,6 @@
 #include "selectlockswidget.h"
 #include "kcbkeyboarddialog.h"
 #include "reportcontrolwidget.h"
-#include "frmnetworksettings.h"
 #include "kcbsystem.h"
 
 #define ADMIN_TAB_INDEX (0)
@@ -75,8 +74,7 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     // Explicit initialization needed to prevent spurious test emails
     _testEmail(false),
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
-    m_report(* new ReportControlWidget(this)),
-    m_network_settings(* new FrmNetworkSettings(this))
+    m_report(* new ReportControlWidget(this))
 
 {
     ui->setupUi(this);

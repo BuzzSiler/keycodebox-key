@@ -85,7 +85,6 @@ SOURCES += main.cpp\
     dlgdownloadreports.cpp \
     kcbsystem.cpp \
     kcbapplication.cpp \
-    frmnetworksettings.cpp
     dlgdownloadreports.cpp
 
 HEADERS  += keycodeboxmain.h \
@@ -157,7 +156,6 @@ HEADERS  += keycodeboxmain.h \
     dlgdownloadreports.h \
     kcbsystem.h \
     kcbapplication.h \
-    frmnetworksettings.h
     dlgdownloadreports.h
 
 FORMS    += mainwindow.ui \
@@ -182,7 +180,6 @@ FORMS    += mainwindow.ui \
     kcbkeyboarddialog.ui \
     reportcontrolwidget.ui \
     dlgdownloadreports.ui \
-    frmnetworksettings.ui
     dlgdownloadreports.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite

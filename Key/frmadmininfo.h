@@ -34,7 +34,6 @@ class CFrmAdminInfo;
 
 class SelectLocksWidget;
 class ReportControlWidget;
-class FrmNetworkSettings;
 
 
 class CFrmAdminInfo : public QDialog
@@ -205,7 +204,6 @@ class CFrmAdminInfo : public QDialog
         SelectLocksWidget&  m_select_locks;
         QStringList         _codesInUse;
         ReportControlWidget& m_report;
-        FrmNetworkSettings& m_network_settings;
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
 
