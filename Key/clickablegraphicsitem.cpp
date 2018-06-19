@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include "kcbcommon.h"
 
 void CClickableGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -11,7 +12,8 @@ void CClickableGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CClickableGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "Custom view clicked.";
+    KCB_DEBUG_ENTRY;
     QGraphicsView::mousePressEvent(event);
     clickedFunc();
+    KCB_DEBUG_EXIT;
 }

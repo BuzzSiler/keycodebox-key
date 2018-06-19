@@ -19,6 +19,7 @@
 #include "usbprovider.h"
 #include "frmselectlocks.h"
 #include "kcbcommon.h"
+#include "kcbapplication.h"
 
 
 static const QString DEFAULT_SMTP_SERVER = "smtpout.secureserver.net";
@@ -38,8 +39,6 @@ CSystemController::CSystemController(QObject *parent) :
     _ptimer(0)
 {
     Q_UNUSED(parent);
-
-    //qRegisterMetaType<QVector<int> >("QVector<int>");
 }
 
 CSystemController::~CSystemController()
@@ -507,7 +506,15 @@ void CSystemController::OnRequireCodeTwo()
 
 void CSystemController::OnAdminSecurityCheckOk(QString type)
 {
-    qDebug() << "SystemController.OnAdminSecuritCheckOk()";
+    KCB_DEBUG_ENTRY;
+
+    // Note: If take/return is enabled, then we have to select either take or return
+    // to get access to enter the admin code in order to access the admin features.
+    // Selecting take or return, sets the application state to 'take' or 'return',
+    // respectively.  So, if we end of here, we know we can safely reset the application
+    // state.
+    kcb::Application::clearAccessSelection();
+
     if(type == "Assist")
     {
         _systemState = EAssistMain;
@@ -517,6 +524,7 @@ void CSystemController::OnAdminSecurityCheckOk(QString type)
         _systemState = EAdminMain;
     }
     emit __OnClearEntry();
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnAdminSecurityCheckFailed()
@@ -528,24 +536,31 @@ void CSystemController::OnAdminSecurityCheckFailed()
 
 void CSystemController::OnAdminPasswordCancel()
 {
-    qDebug() << "CSystemController::OnAdminPasswordCancel()";
-
+    KCB_DEBUG_ENTRY;
     _systemState = EUserCodeOne;
     emit __OnClearEntry();
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnUserCodeCancel()
 {
-    qDebug() << "CSystemController::OnUserCodeCancel()";
-    _systemState = EUserCodeOne;
-    emit __OnClearEntry();
+    KCB_DEBUG_ENTRY;
+
+    emit __OnCodeMessage(tr("Cancelling ..."));
+    stopTimeoutTimer();
+    // emit __OnClearEntry();
+
+    _systemState = EPasswordTimeout;
+    _systemStateDisplay = ENone;
+
+    startTimeoutTimer(1000);
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnOpenLockRequest(QString lockNum)
 {
     KCB_DEBUG_TRACE(lockNum);
     _LockController.openLocks(lockNum);
-    emit __OnCodeMessage(tr("Lock Open"));
 }
 
 void CSystemController::reportActivity(QString locknums)
@@ -591,6 +606,8 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
         _pdFingerprintVerify->hide();
     }
 
+    emit __OnCodeMessage(tr("Opening Locks ..."));
+
     if (locks.contains(','))
     {
         KCB_DEBUG_TRACE("Multi Lock");
@@ -608,7 +625,6 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
             {
                 OnOpenLockRequest(s);
             }
-
         }
         else
         {
@@ -640,6 +656,7 @@ void CSystemController::OnSecurityCheckedFailed()
 
 void CSystemController::resetCodeMessage()
 {
+    KCB_DEBUG_ENTRY;
     if(_systemState == EUserCodeOne) 
     {
         emit __OnCodeMessage(QString("<%1 #1>").arg(tr("Please Enter Code")));
@@ -648,6 +665,7 @@ void CSystemController::resetCodeMessage()
     {
         emit __OnCodeMessage(QString("<%1>").arg(tr("Please Enter Second Code")));
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnSecurityCheckTimedOut()
@@ -659,7 +677,7 @@ void CSystemController::OnSecurityCheckTimedOut()
 
 void CSystemController::resetToTimeoutScreen()
 {
-    qDebug() << "CSystemController::resetToTimeoutScreen()";
+    KCB_DEBUG_ENTRY;
     stopTimeoutTimer();
     _systemState = ETimeoutScreen;
 
@@ -675,6 +693,7 @@ void CSystemController::resetToTimeoutScreen()
     {
         _pdFingerprintVerify->hide();
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequestCurrentAdmin()
@@ -691,6 +710,11 @@ bool CSystemController::getDisplayFingerprintButton()
 bool CSystemController::getDisplayShowHideButton()
 {
     return _padminInfo->getDisplayShowHideButton();
+}
+
+bool CSystemController::getDisplayTakeReturnButtons()
+{
+    return _padminInfo->getDisplayTakeReturnButtons();
 }
 
 CFrmUserCode* CSystemController::getUserCodeOne()
@@ -885,10 +909,8 @@ void CSystemController::looprun()
                 _pdFingerprintVerify->hide();
             }            
 
-            emit __OnCodeMessage(QString("<%1 #1>").arg(tr("Please Enter Code")));
+            emit __OnCodeMessage("Code 1");
             emit __OnDisplayCodeDialog(this);
-            emit __OnNewMessage(QString("%1 #1").arg(tr("Enter Code")));
-            emit __OnEnableKeypad(true);
 
             KCB_DEBUG_TRACE("EUserCodeOne Timeout Active");
             startTimeoutTimer(30000);
@@ -905,8 +927,8 @@ void CSystemController::looprun()
             emit __OnClearEntry();
             emit __OnDisplayUserCodeTwoDialog(this);
             QThread::msleep(200);
-            emit __OnCodeMessage(QString("<%1>").arg(tr("Please Enter Second Code")));
-            emit __OnNewMessage(tr("Enter Second Code"));
+            QString str = QString("<%1>").arg(tr("Please Enter Second Code"));
+            emit __OnCodeMessage(str);
 
             KCB_DEBUG_TRACE("EUserCodeTwo Timeout Active");
             startTimeoutTimer(20000);
@@ -918,12 +940,11 @@ void CSystemController::looprun()
         {
             _systemStateDisplay = EAdminPassword;
             stopTimeoutTimer();
-            emit __OnCodeMessage(QString("<%1>").arg(tr("Enter Admin Password")));
-            emit __OnNewMessage(tr("Enter Admin Password"));
+            QString str = QString("<%1>").arg(tr("Enter Admin Password"));
+            emit __OnCodeMessage(str);
             emit __OnClearEntry();
             emit __OnDisplayAdminPasswordDialog(this);
 
-            KCB_DEBUG_TRACE("EAdminPassword Timeout Active");
             startTimeoutTimer(30000);
         }
     }
@@ -947,13 +968,11 @@ void CSystemController::looprun()
             }
             _locks.clear();
 
-            QString str = QString("%1 %2 %3.").arg(tr("Thank you!"), locks_str, tr("open"));
+            QString str = QString("%1 %2 %3.").arg(tr("Thank You!"), locks_str, tr("open"));
             emit __OnClearEntry();
             emit __OnCodeMessage(str);
-            emit __OnNewMessage("");
 
-            KCB_DEBUG_TRACE("EThankYou Timeout Active");
-            startTimeoutTimer(5000);
+            startTimeoutTimer(2000);
         }
     }
     else if(_systemState == EAdminMain) 

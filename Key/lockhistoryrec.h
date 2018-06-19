@@ -25,6 +25,7 @@ class CLockHistoryRec : public CLockState
         QString     _userNotificationEmail;
         bool        _userNotificationSent;
         QString     _lockNums;
+        QString     _access_selection;
 
     public:
         QDateTime getAccessTime() { return _access_time; }
@@ -52,6 +53,9 @@ class CLockHistoryRec : public CLockState
         void setFromLockState(CLockState &lockState);
         void setLockNums(QString locknums) { _lockNums = locknums; };
         QString getLockNums() { return _lockNums; };
+
+        void setAccessSelection(QString accessSelection) { _access_selection = accessSelection; }
+        QString getAccessSelection() { return _access_selection; }
 
 
 };

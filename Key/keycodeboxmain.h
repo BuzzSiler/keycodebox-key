@@ -101,6 +101,8 @@ private slots:
 private:
     void initialize();
     void hideFormsExcept(QDialog *pfrm);
+    void SetupAdmin(QObject *psysController);
+
 
 protected:
     void keyPressEvent(QKeyEvent *e);

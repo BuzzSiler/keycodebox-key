@@ -60,7 +60,7 @@ ReportControlWidget::~ReportControlWidget()
 
 void ReportControlWidget::setValues(CAdminRec& adminInfo)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_report_freq = adminInfo.getDefaultReportFreq();
     m_auto_report_enabled = m_report_freq != NEVER;
     ui->gbAutoReport->setChecked(m_auto_report_enabled);
@@ -102,25 +102,25 @@ void ReportControlWidget::setValues(CAdminRec& adminInfo)
 
     ui->dtReportEnd->setDateTime(QDateTime().currentDateTime());
 
-    KCB_DEBUG_TRACE("m_report_freq" << m_report_freq);
-    KCB_DEBUG_TRACE("m_start" << m_start);
-    KCB_DEBUG_TRACE("m_auto_report_enabled" << m_auto_report_enabled);
-    KCB_DEBUG_TRACE("m_send_via_email" << m_send_via_email);
-    KCB_DEBUG_TRACE("m_report_directory" << m_report_directory);
-    KCB_DEBUG_TRACE("m_delete_freq" << m_delete_freq);
+    // KCB_DEBUG_TRACE("m_report_freq" << m_report_freq);
+    // KCB_DEBUG_TRACE("m_start" << m_start);
+    // KCB_DEBUG_TRACE("m_auto_report_enabled" << m_auto_report_enabled);
+    // KCB_DEBUG_TRACE("m_send_via_email" << m_send_via_email);
+    // KCB_DEBUG_TRACE("m_report_directory" << m_report_directory);
+    // KCB_DEBUG_TRACE("m_delete_freq" << m_delete_freq);
     
 
     updateUi();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::getValues(CAdminRec& adminInfo)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     if (!isModified())
     {
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return;
     }
 
@@ -147,45 +147,45 @@ void ReportControlWidget::getValues(CAdminRec& adminInfo)
     KCB_DEBUG_TRACE(m_delete_freq.toString());
     adminInfo.setDefaultReportDeleteFreq(deleteFreq);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::getValues(CAdminRec& adminInfo, QDateTime& start, QDateTime& end)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     getValues(adminInfo);
     start = ui->dtReportStart->dateTime();
     end = ui->dtReportEnd->dateTime();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::OnNotifyUsbDrive(QStringList drives)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_usb_drives = drives;
     updateUi();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::on_cbFrequency_currentIndexChanged(int index)
 {
     Q_UNUSED(index);
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     updateUi();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::on_dtStartDateTime_dateTimeChanged(const QDateTime &dateTime)
 {
     Q_UNUSED(dateTime);
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     updateUi();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::on_gbAutoReport_toggled(bool state)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     // Restore is true any time we are returning to the 'setValues' state, e.g. for both enable and disable of report frequency
     bool restored = m_auto_report_enabled == state;
@@ -229,7 +229,7 @@ void ReportControlWidget::on_gbAutoReport_toggled(bool state)
     ui->dtStartDateTime->setDateTime(dt);
 
     updateUi();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::checkInvalidReportStorage()
@@ -306,7 +306,7 @@ void ReportControlWidget::on_cbSaveToFile_clicked()
 
 void ReportControlWidget::on_cbStoreToUsbDrive_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (ui->cbStoreToUsbDrive->checkState() == Qt::Checked)
     {
         ui->cbUsbDrives->clear();
@@ -341,12 +341,12 @@ void ReportControlWidget::on_cbStoreToUsbDrive_clicked()
         }
     }
     updateUi();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::on_lvAvailableReports_clicked(const QModelIndex &index)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     bool enable = false;
     auto state = Qt::CheckState(m_lv_model.data(index, Qt::CheckStateRole).toInt());
     KCB_DEBUG_TRACE(state);
@@ -375,12 +375,12 @@ void ReportControlWidget::on_lvAvailableReports_clicked(const QModelIndex &index
 
     ui->lvAvailableReports->setFocus();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::on_pbSelectAllReports_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     ClearSelectAllReports(Qt::Checked);
     ui->pbSelectAllReports->setDisabled(true);
@@ -390,12 +390,12 @@ void ReportControlWidget::on_pbSelectAllReports_clicked()
 
     ui->lvAvailableReports->setFocus();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::on_pbClearAllReports_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     ClearSelectAllReports(Qt::Unchecked);
     ui->pbSelectAllReports->setEnabled(true);
@@ -405,12 +405,12 @@ void ReportControlWidget::on_pbClearAllReports_clicked()
 
     ui->lvAvailableReports->setFocus();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::on_pbDeleteSelectedReports_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QStringList list;
     GetSelectedReports(list);
@@ -424,7 +424,7 @@ void ReportControlWidget::on_pbDeleteSelectedReports_clicked()
     }
 
     updateUi();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::on_pbDownloadSelectedReports_clicked()
@@ -491,19 +491,19 @@ void ReportControlWidget::updateAvailableReports()
 
 void ReportControlWidget::ClearSelectAllReports(Qt::CheckState state)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     int count = m_lv_model.rowCount();
     for(int row = 0; row < count; row++)
     {
         QModelIndex index = m_lv_model.index(row,0);
         m_lv_model.setData(index, state, Qt::CheckStateRole);
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void ReportControlWidget::GetSelectedReports(QStringList& list)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     int count = m_lv_model.rowCount();
     for(int row = 0; row < count; row++)
     {
@@ -515,12 +515,12 @@ void ReportControlWidget::GetSelectedReports(QStringList& list)
             list.append(entry);
         }
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 bool ReportControlWidget::OneOrMoreReportsSelected()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     int count = m_lv_model.rowCount();
     for(int row = 0; row < count; row++)
     {
@@ -528,20 +528,20 @@ bool ReportControlWidget::OneOrMoreReportsSelected()
         auto state = Qt::CheckState(m_lv_model.data(index, Qt::CheckStateRole).toInt());
         if (state == Qt::Checked)
         {
-            KCB_DEBUG_EXIT;
+            // KCB_DEBUG_EXIT;
             return true;
         }
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return false;
 }
 
 bool ReportControlWidget::isModified()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     int index = ui->cbFrequency->currentIndex();
-    KCB_DEBUG_TRACE(index);
+    //KCB_DEBUG_TRACE(index);
     Q_ASSERT_X(index >= 0 && index <= m_report_frequencies.count(), Q_FUNC_INFO, "report frequency index out of range");
 
     // Changed from disabled to enabled OR
@@ -560,22 +560,22 @@ bool ReportControlWidget::isModified()
     Q_ASSERT_X(index >= 0 && index <= m_delete_frequencies.count(), Q_FUNC_INFO, "delete frequency index out of range");
     bool delete_freq_changed = m_delete_frequencies[index] != m_delete_freq;
 
-    KCB_DEBUG_TRACE("auto_gen_changed" << auto_gen_changed);
-    KCB_DEBUG_TRACE("\tchanged_enablement" << changed_enablement);
-    KCB_DEBUG_TRACE("\tchanged_freq" << changed_freq);
-    KCB_DEBUG_TRACE("\tchanged_start_datetime" << changed_start_datetime);
-    KCB_DEBUG_TRACE("send_via_email_changed" << send_via_email_changed);
-    KCB_DEBUG_TRACE("save_to_file_changed" << save_to_file_changed);
-    KCB_DEBUG_TRACE("delete_freq_changed" << delete_freq_changed);
+    // KCB_DEBUG_TRACE("auto_gen_changed" << auto_gen_changed);
+    // KCB_DEBUG_TRACE("\tchanged_enablement" << changed_enablement);
+    // KCB_DEBUG_TRACE("\tchanged_freq" << changed_freq);
+    // KCB_DEBUG_TRACE("\tchanged_start_datetime" << changed_start_datetime);
+    // KCB_DEBUG_TRACE("send_via_email_changed" << send_via_email_changed);
+    // KCB_DEBUG_TRACE("save_to_file_changed" << save_to_file_changed);
+    // KCB_DEBUG_TRACE("delete_freq_changed" << delete_freq_changed);
     bool is_modified = auto_gen_changed || send_via_email_changed || save_to_file_changed || delete_freq_changed;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 
     return is_modified;
 }
 
 void ReportControlWidget::updateUi()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     bool send_email_enabled = ui->cbSendViaEmail->isChecked();
     bool store_file_enabled = ui->cbSaveToFile->isChecked();
     bool store_usb_enabled = store_file_enabled && m_usb_drives.count() > 0;
@@ -589,7 +589,7 @@ void ReportControlWidget::updateUi()
     ui->cbStoreToUsbDrive->setEnabled(store_usb_enabled);
     ui->cbUsbDrives->setEnabled(store_usb_enabled && ui->cbStoreToUsbDrive->isChecked());
 
-    KCB_DEBUG_TRACE(m_curr_report_directory);
+    // KCB_DEBUG_TRACE(m_curr_report_directory);
     bool dir_empty = m_curr_report_directory.isEmpty();
     bool dir_default = m_curr_report_directory == DEFAULT_REPORT_DIRECTORY;
     bool on_usb_drive = !dir_empty && !dir_default && m_usb_drives.count() > 0;
@@ -614,5 +614,5 @@ void ReportControlWidget::updateUi()
     ui->pbDeleteSelectedReports->setEnabled(one_or_more_selected);
     ui->pbDownloadSelectedReports->setEnabled(!ui->cbStoreToUsbDrive->isChecked() && one_or_more_selected);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }

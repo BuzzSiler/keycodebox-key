@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _pscene->addItem(_pPixmapItem);
     ui->graphicsView->show();
 
-    ui->graphicsView->setClickedFunc(&(this->OnImageClicked) );
+    ui->graphicsView->setClickedFunc(&(OnImageClicked) );
 
     _pdisplayPowerDown = new QTimer();
    
@@ -111,7 +111,27 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "MainWindow: moveToThread.";
     _psystemController->moveToThread(&_sysControlThread);
 
+    SetupAdmin(_psystemController);
+
     _sysControlThread.start();
+}
+
+void MainWindow::SetupAdmin(QObject *psysController)
+{
+    KCB_DEBUG_ENTRY;
+    if (!_pfAdminInfo)
+    {
+        _pfAdminInfo = new CFrmAdminInfo();
+        _pfAdminInfo->hide();
+        _pfAdminInfo->setSystemController((CSystemController*)psysController);
+    }
+    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(QString)), _psystemController, SLOT(OnOpenLockRequest(QString)));
+    connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
+    connect(_pfAdminInfo, SIGNAL(__OnSendTestEmail(int)), _psystemController, SLOT(OnSendTestEmail(int)));
+    connect(_psystemController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfAdminInfo, SLOT(OnDisplayFingerprintButton(bool)));
+    connect(_psystemController, SIGNAL(__OnDisplayShowHideButton(bool)), _pfAdminInfo, SLOT(OnDisplayShowHideButton(bool)));
+    connect(_psystemController, SIGNAL(__OnDisplayTakeReturnButtons(bool)), _pfAdminInfo, SLOT(OnDisplayTakeReturnButtons(bool)));
+    KCB_DEBUG_EXIT;
 }
 
 bool MainWindow::isInternetTime()
@@ -192,6 +212,7 @@ void MainWindow::OnDisplayPoweredOn()
 
 void MainWindow::OnImageClicked()
 {
+    KCB_DEBUG_ENTRY;
     if (display_power_state == MainWindow::DISP_POWER_ON)
     {
         emit gpmainWindow->__TouchScreenTouched();
@@ -204,6 +225,7 @@ void MainWindow::OnImageClicked()
 
         emit gpmainWindow->__DisplayPoweredOn();
     }
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayTimeoutScreen()
@@ -213,6 +235,7 @@ void MainWindow::OnDisplayTimeoutScreen()
     // hide any open screens to show the touch screen to start
     if(_pfUsercode) 
     {
+        _pfUsercode->OnClearCodeDisplay();
         _pfUsercode->hide();
     }
     if(_pfAdminPW) 
@@ -239,17 +262,16 @@ void MainWindow::OnDisplayTimeoutScreen()
 
 void MainWindow::OnDisplayCodeDialog(QObject *psysController)
 {
+    KCB_DEBUG_ENTRY;
     if(!_pfUsercode)
     {
         qDebug() << "MainWindow::OnDisplayCodeDialog(): new CFrmUserCode";
         _pfUsercode = new CFrmUserCode();
-        connect(psysController, SIGNAL(__OnNewMessage(QString)), _pfUsercode, SLOT(OnNewMessage(QString)));
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
-        connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
 
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
-        connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
+        //connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
         connect(this, SIGNAL(__onCode(QString)), _pfUsercode, SLOT(OnSwipeCode(QString)));
         connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
 
@@ -260,6 +282,9 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(_pfUsercode, SIGNAL(__onVerifyFingerprintDialog()), psysController, SLOT(OnVerifyFingerprintDialog()));
         connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
 
+        connect(_pfAdminInfo, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SIGNAL(__OnDisplayFingerprintButton(bool)));
+        connect(_pfAdminInfo, SIGNAL(__OnDisplayShowHideButton(bool)), _pfUsercode, SIGNAL(__OnDisplayShowHideButton(bool)));
+        connect(_pfAdminInfo, SIGNAL(__OnDisplayTakeReturnButtons(bool)), _pfUsercode, SIGNAL(__OnDisplayTakeReturnButtons(bool)));    
 
         if( !_pdFingerprint )
         {
@@ -280,8 +305,6 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
             connect(_pQuestions, SIGNAL(__OnQuestionsClose()), this, SLOT(OnQuestionUserDialogClose()));
         }
 
-        _pfUsercode->SetDisplayFingerprintButton(_psystemController->getDisplayFingerprintButton());
-        _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());
     }
     else
     {
@@ -295,27 +318,28 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
 
         qDebug() << "MainWindow::OnDisplayCodeDialog()";
 
-        _pfUsercode->OnEnableKeyboard(true);
-        _pfUsercode->SetDisplayFingerprintButton(_psystemController->getDisplayFingerprintButton());
-        _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());
-        _pfUsercode->show();
     }
+    _pfUsercode->SetDisplayFingerprintButton(_psystemController->getDisplayFingerprintButton());
+    _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());
+    _pfUsercode->SetDisplayTakeReturnButtons(_psystemController->getDisplayTakeReturnButtons());
+    _pfUsercode->show();
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 {
-    if(!_pfUsercode) {
+    if(!_pfUsercode) 
+    {
         qDebug() << "MainWindow::OnDisplayUserCodeTwoDialog()";
         _pfUsercode = new CFrmUserCode();
-        connect(psysController, SIGNAL(__OnNewMessage(QString)), _pfUsercode, SLOT(OnNewMessage(QString)));
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
-        connect(psysController, SIGNAL(__OnEnableKeypad(bool)), _pfUsercode, SLOT(OnEnableKeyboard(bool)));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
         connect(psysController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SLOT(OnDisplayFingerprintButton(bool)));
         connect(psysController, SIGNAL(__OnDisplayShowHideButton(bool)), _pfUsercode, SLOT(OnDisplayShowHideButton(bool)));
+        connect(psysController, SIGNAL(__OnDisplayTakeReturnButtons(bool)), _pfUsercode, SLOT(OnDisplayTakeReturnButtons(bool)));
 
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
-        connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
+        //connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
         connect(this, SIGNAL(__onCode(QString)), _pfUsercode, SLOT(OnSwipeCode(QString)));
         connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEnteredTwo(QString)));
     }
@@ -330,6 +354,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
     _pfUsercode->OnEnableKeyboard(true);
     _pfUsercode->SetDisplayFingerprintButton(_psystemController->getDisplayFingerprintButton());
     _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());    
+    _pfUsercode->SetDisplayTakeReturnButtons(_psystemController->getDisplayTakeReturnButtons());  
     _pfUsercode->show();
 }
 
@@ -338,13 +363,17 @@ void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
     Q_UNUSED(psysController);
 }
 
-void MainWindow::hideFormsExcept(QDialog * pfrm) {
+void MainWindow::hideFormsExcept(QDialog * pfrm) 
+{
     if(_pfAdminPW && _pfAdminPW != pfrm)
     {
         _pfAdminPW->hide();
     }
     if(_pfUsercode && _pfUsercode != pfrm)
+    {
+        _pfUsercode->SetDisplayCodeEntryControls(false);        
         _pfUsercode->hide();
+    }
     pfrm->activateWindow();
     pfrm->raise();
     pfrm->setFocus();
@@ -430,16 +459,8 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
 {
     if(!_pfAdminInfo)
     {
-        _pfAdminInfo = new CFrmAdminInfo();
-        _pfAdminInfo->setSystemController((CSystemController*)psysController);
+        SetupAdmin((CSystemController *)psysController);
     }
-    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(QString)), _psystemController, SLOT(OnOpenLockRequest(QString)));
-    connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
-    connect(_pfAdminInfo, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SIGNAL(__OnDisplayFingerprintButton(bool)));
-    connect(_pfAdminInfo, SIGNAL(__OnDisplayShowHideButton(bool)), _pfUsercode, SIGNAL(__OnDisplayShowHideButton(bool)));
-    connect(_pfAdminInfo, SIGNAL(__OnSendTestEmail(int)), _psystemController, SLOT(OnSendTestEmail(int)));
-    connect(_psystemController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfAdminInfo, SLOT(OnDisplayFingerprintButton(bool)));
-    connect(_psystemController, SIGNAL(__OnDisplayShowHideButton(bool)), _pfAdminInfo, SLOT(OnDisplayShowHideButton(bool)));
 
     hideFormsExcept(_pfAdminInfo);
 
@@ -457,8 +478,8 @@ void MainWindow::OnAdminPasswordCancel()
 
 void MainWindow::OnUserCodeCancel()
 {
-    qDebug() << "MainWindow::OnAdminPasswordCancel()";
-
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnUserCodeOne(QString sCode1)
