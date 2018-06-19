@@ -79,9 +79,13 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
-
+    // For some reason, the admin form does not show full screen without the following
+    // flags being set.  Maybe this should be don't at in the main so it gets
+    // inherited?  Not sure.  Until this is resolved, just set these flags.
+    CFrmAdminInfo::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     CFrmAdminInfo::showFullScreen();
+
+    ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
 
     initialize();
 
@@ -150,6 +154,7 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(ui->chkDisplayFingerprintButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(ui->chkDisplayShowHideButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayShowHideButton(bool)));
+    connect(ui->chkDisplayTakeReturnButtons, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayTakeReturnButtons(bool)));
 
     connect(&m_select_locks, &SelectLocksWidget::NotifyRequestLockOpen, this, &CFrmAdminInfo::OnOpenLockRequest);
 
@@ -864,6 +869,7 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
     _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
     _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
+    _tmpAdminRec.setDisplayTakeReturnButtons(ui->chkDisplayTakeReturnButtons->isChecked());
 
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
@@ -893,6 +899,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayFingerprintButton());
         ui->chkDisplayShowHideButton->setChecked(adminInfo->getDisplayShowHideButton());
         ui->cbDisplayPowerDownTimeout->setCurrentIndex(adminInfo->getDisplayPowerDownTimeout());
+        ui->chkDisplayTakeReturnButtons->setChecked(adminInfo->getDisplayTakeReturnButtons());
 
         // Temporary to complete report widget funcationality
         _tmpAdminRec.setDefaultReportDeleteFreq(MONTHLY);
@@ -2045,6 +2052,11 @@ void CFrmAdminInfo::OnDisplayShowHideButton(bool state)
     ui->chkDisplayShowHideButton->setChecked(state);
 }
 
+void CFrmAdminInfo::OnDisplayTakeReturnButtons(bool state)
+{
+    ui->chkDisplayTakeReturnButtons->setChecked(state);
+}
+
 void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
 {
     Q_UNUSED(is_user);
@@ -2053,104 +2065,3 @@ void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
     Q_ASSERT_X(is_user == false, Q_FUNC_INFO, "We are not admin");
     emit __OnOpenLockRequest(lock);
 }
-#ifdef NETWORKING
-void CFrmAdminInfo::updateVNCChanges(QString vncPort, QString vncPassword)
-{
-    _tmpAdminRec.setVNCPort(vncPort.toInt());
-    _tmpAdminRec.setVNCPassword(vncPassword);
-
-    kcb::SetVNCCredentials(vncPort, vncPassword);
-
-//    FILE *pF;
-//    std::string sOutput = "";
-//    QString createCmd = "echo '|";
-//    createCmd += QString::number(vncport);
-//    createCmd += " ";
-//    createCmd += vncpassword;
-//    createCmd +="|' > /home/pi/run/vnc_creds.txt";
-
-//    pF = popen(createCmd.toStdString().c_str(), "r");
-//    if(!pF)
-//    {
-//        qDebug() << "failed to create vnc file";
-//    }
-
-//    ExtractCommandOutput(pF, sOutput);
-//    fclose(pF);
-    
-}
-
-void CFrmAdminInfo::updateSMTPChanges(QString smtpServer, QString smtpPort, QString smtpUsername, QString smtpPasword, int smtpType)
-{
-    _tmpAdminRec.setSMTPServer(smtpServer);
-    _tmpAdminRec.setSMTPPort(smtpPort.toInt());
-    _tmpAdminRec.setSMTPUsername(smtpUsername);
-    _tmpAdminRec.setSMTPPassword(smtpPasword);
-    _tmpAdminRec.setSMTPType(smtpType);
-}
-
-void CFrmAdminInfo::on_pbNetworkSettings_clicked()
-{
-    KCB_DEBUG_ENTRY;
-
-    bool enableDhcp = true;
-    QString ipAddress = ui->lblIPAddress->text();
-    QString ipMask = "255.255.255.0";
-    QString ipGateway = "192.168.1.1";
-    QString ipDns = "8.8.8.8";
-    QString vncPort = QString::number(_tmpAdminRec.getVNCPort());
-    QString vncPassword = _tmpAdminRec.getVNCPassword();
-    QString smtpServer =_tmpAdminRec.getSMTPServer();
-    QString smtpPort = QString::number(_tmpAdminRec.getSMTPPort());
-    QString smtpUsername = _tmpAdminRec.getSMTPUsername();
-    QString smtpPassword = _tmpAdminRec.getSMTPPassword();
-    int smtpType = _tmpAdminRec.getSMTPType();
-
-//    vncPort = DEFAULT_VNC_PORT;
-//    vncPassword = DEFAULT_VNC_PASSWORD;
-    smtpServer = "smtpout.secureserver.net";
-    smtpPort = "465";
-    smtpUsername = "kcb@keycodebox.com";
-    smtpPassword = "keycodebox";
-    smtpType = 1;
-
-    m_network_settings.setValues(enableDhcp, ipAddress, ipMask, ipGateway, ipDns,
-                                 vncPort, vncPassword,
-                                 smtpServer, smtpPort,
-                                 smtpUsername, smtpPassword, smtpType);
-    m_network_settings.show();
-    m_network_settings.raise();
-
-    KCB_DEBUG_EXIT;
-}
-
-void CFrmAdminInfo::OnNetworkSettingsFinished(int)
-{
-    KCB_DEBUG_ENTRY;
-
-    bool enableDhcp;
-    QString ipAddress;
-    QString ipMask;
-    QString ipGateway;
-    QString ipDns;
-    QString vncPort;
-    QString vncPassword;
-    QString smtpServer;
-    QString smtpPort;
-    QString smtpUsername;
-    QString smtpPassword;
-    int smtpType;
-
-    m_network_settings.getValues(enableDhcp, ipAddress, ipMask, ipGateway, ipDns, vncPort, vncPassword, smtpServer, smtpPort, smtpUsername, smtpPassword, smtpType);
-
-    KCB_DEBUG_TRACE(vncPort << vncPassword);
-    KCB_DEBUG_TRACE(smtpServer << smtpPort << smtpUsername << smtpPassword << smtpType);
-
-    updateVNCChanges(vncPort, vncPassword);
-    //    updateSMTPChanges(smtp_server, smtp_port, smtp_username, smtp_password, smtp_type);
-
-    emit __UpdateCurrentAdmin(&_tmpAdminRec);
-
-    KCB_DEBUG_EXIT;
-}
-#endif

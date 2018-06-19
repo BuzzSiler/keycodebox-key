@@ -1,21 +1,23 @@
 #ifndef KCBAPPLICATION_H
 #define KCBAPPLICATION_H
 
+#include <QString>
+
 namespace kcb
 {
-    typedef enum {ACCESS_NONE=-1, ACCESS_TAKE, ACCESS_RETURN} ACCESS_SELECTION;
-
-
     class Application
     {
+        
         public:
-            static void setAccessSelection(ACCESS_SELECTION selection);
-            static ACCESS_SELECTION getAccessSelection();
+            static void setTakeAccessSelection();
+            static void setReturnAccessSelection();
+            static QString getAccessSelection();
             static void clearAccessSelection();
             static bool isTakeSelection();
             static bool isReturnSelection();
 
         private:
+            typedef enum {ACCESS_NONE=-1, ACCESS_TAKE, ACCESS_RETURN} ACCESS_SELECTION;
             static ACCESS_SELECTION m_selection;
     };
 

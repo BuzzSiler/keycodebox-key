@@ -22,7 +22,7 @@
   <widget class="QLabel" name="lVersion">
    <property name="geometry">
     <rect>
-     <x>760</x>
+     <x>10</x>
      <y>460</y>
      <width>60</width>
      <height>20</height>
@@ -43,10 +43,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>120</y>
+     <x>430</x>
+     <y>130</y>
      <width>401</width>
-     <height>351</height>
+     <height>341</height>
     </rect>
    </property>
    <property name="title">
@@ -56,7 +56,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>257</y>
+      <y>250</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -83,7 +83,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>174</y>
+      <y>170</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -109,8 +109,8 @@
    <widget class="QPushButton" name="btn_9">
     <property name="geometry">
      <rect>
-      <x>174</x>
-      <y>174</y>
+      <x>170</x>
+      <y>170</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -136,8 +136,8 @@
    <widget class="QPushButton" name="btn_5">
     <property name="geometry">
      <rect>
-      <x>93</x>
-      <y>92</y>
+      <x>90</x>
+      <y>90</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -190,7 +190,7 @@
    <widget class="QPushButton" name="btn_3">
     <property name="geometry">
      <rect>
-      <x>176</x>
+      <x>170</x>
       <y>10</y>
       <width>75</width>
       <height>75</height>
@@ -217,8 +217,8 @@
    <widget class="QPushButton" name="btn_6">
     <property name="geometry">
      <rect>
-      <x>175</x>
-      <y>92</y>
+      <x>170</x>
+      <y>90</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -242,11 +242,14 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btn_Return">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>254</y>
-      <width>180</width>
+      <x>219</x>
+      <y>250</y>
+      <width>171</width>
       <height>75</height>
      </rect>
     </property>
@@ -265,8 +268,8 @@
    <widget class="QPushButton" name="btn_8">
     <property name="geometry">
      <rect>
-      <x>92</x>
-      <y>174</y>
+      <x>90</x>
+      <y>170</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -292,7 +295,7 @@
    <widget class="QPushButton" name="btn_2">
     <property name="geometry">
      <rect>
-      <x>92</x>
+      <x>90</x>
       <y>10</y>
       <width>75</width>
       <height>75</height>
@@ -319,9 +322,9 @@
    <widget class="QPushButton" name="btn_Del">
     <property name="geometry">
      <rect>
-      <x>279</x>
-      <y>173</y>
-      <width>111</width>
+      <x>269</x>
+      <y>170</y>
+      <width>121</width>
       <height>75</height>
      </rect>
     </property>
@@ -341,7 +344,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>92</y>
+      <y>90</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -367,9 +370,9 @@
    <widget class="QPushButton" name="btn_Clear">
     <property name="geometry">
      <rect>
-      <x>279</x>
-      <y>92</y>
-      <width>111</width>
+      <x>269</x>
+      <y>90</y>
+      <width>121</width>
       <height>75</height>
      </rect>
     </property>
@@ -388,9 +391,9 @@
    <widget class="QPushButton" name="btn_Cancel">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>270</x>
       <y>10</y>
-      <width>111</width>
+      <width>121</width>
       <height>75</height>
      </rect>
     </property>
@@ -412,7 +415,7 @@
     <rect>
      <x>18</x>
      <y>9</y>
-     <width>761</width>
+     <width>811</width>
      <height>111</height>
     </rect>
    </property>
@@ -433,7 +436,7 @@
      <rect>
       <x>4</x>
       <y>4</y>
-      <width>752</width>
+      <width>801</width>
       <height>101</height>
      </rect>
     </property>
@@ -475,10 +478,10 @@
   <widget class="QPushButton" name="btnShowHideCode">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>374</y>
+     <x>80</x>
+     <y>370</y>
      <width>97</width>
-     <height>75</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -502,10 +505,10 @@
   <widget class="QPushButton" name="btnIdentifyFingerPrint">
    <property name="geometry">
     <rect>
-     <x>585</x>
-     <y>374</y>
-     <width>194</width>
-     <height>75</height>
+     <x>198</x>
+     <y>368</y>
+     <width>151</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="font">
@@ -531,14 +534,17 @@
    <property name="autoDefault">
     <bool>false</bool>
    </property>
+   <property name="default">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QLabel" name="lblDateTime">
    <property name="geometry">
     <rect>
-     <x>455</x>
-     <y>120</y>
-     <width>321</width>
-     <height>51</height>
+     <x>20</x>
+     <y>130</y>
+     <width>401</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="palette">
@@ -968,6 +974,45 @@
    <property name="textFormat">
     <enum>Qt::PlainText</enum>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbTake">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>190</y>
+     <width>150</width>
+     <height>150</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Take</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbReturn">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>190</y>
+     <width>150</width>
+     <height>150</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Return</string>
+   </property>
   </widget>
   <zorder>lVersion</zorder>
   <zorder>btnIdentifyFingerPrint</zorder>
@@ -975,6 +1020,8 @@
   <zorder>grpKeypad</zorder>
   <zorder>btnShowHideCode</zorder>
   <zorder>lblDateTime</zorder>
+  <zorder>pbTake</zorder>
+  <zorder>pbReturn</zorder>
  </widget>
  <resources/>
  <connections/>

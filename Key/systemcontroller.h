@@ -37,6 +37,7 @@ public:
     SystemState getSystemStateDisplay() { return _systemStateDisplay; }
     bool getDisplayFingerprintButton();
     bool getDisplayShowHideButton();
+    bool getDisplayTakeReturnButtons();
     QString getAdminType() { return _adminType; }
 
     void setMainWindow(QMainWindow *mw) { _pmainWindow = mw; }
@@ -106,7 +107,6 @@ signals:
 
     // For Entry dialogs
     void __OnDisplayTimeoutScreen();
-    void __OnNewMessage(QString sMsg);
     void __OnCodeMessage(QString sMsg);
     void __OnClearEntry();
     void __OnEnableKeypad(bool bEnable);
@@ -133,6 +133,7 @@ signals:
     void __OnDisplayFingerprintButton(bool);
     void __OnDisplayShowHideButton(bool);
     void __OnHideShowPassword(bool);
+    void __OnDisplayTakeReturnButtons(bool);
 
     void __onUserCodeOne(QString sCode1);
     void __onUserCodeTwo(QString sCode2);

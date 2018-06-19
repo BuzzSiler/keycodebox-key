@@ -1,22 +1,46 @@
 #include "kcbapplication.h"
+#include <QString>
+#include <QDebug>
 
 namespace kcb
 {
-    ACCESS_SELECTION Application::m_selection = ACCESS_NONE;
+    Application::ACCESS_SELECTION Application::m_selection = ACCESS_NONE;
 
-    void Application::setAccessSelection(ACCESS_SELECTION selection)
+    void Application::setTakeAccessSelection()
     {
-        m_selection = selection;
+        m_selection = ACCESS_TAKE;
     }
 
-    ACCESS_SELECTION Application::getAccessSelection()
+    void Application::setReturnAccessSelection()
     {
-        ACCESS_SELECTION temp;
+        m_selection = ACCESS_RETURN;
+    }
 
-        temp = m_selection;
+    QString Application::getAccessSelection()
+    {
+        QString selection = "";
+
+        switch (m_selection)
+        {
+            case ACCESS_TAKE:
+                selection = "Take";
+                break;
+
+            case ACCESS_RETURN:
+                selection = "Return";
+                break;
+
+            case ACCESS_NONE:
+            default:
+                selection = "None";
+                break;
+        }
+
         clearAccessSelection();
 
-        return temp;
+        qDebug() << "Getting Access Selection" << selection;
+
+        return selection;
     }
 
     void Application::clearAccessSelection()

@@ -17,6 +17,7 @@ class CTblCodeHistory
         bool addLockCodeHistory(CLockHistoryRec &lockHistoryRec);
 
         bool addLockCodeHistory(QString locknums, QString code1, QString code2,
+                        QString accessSelection,
                         QDateTime starttime, QDateTime endtime, int maxAccess,
                         QString status, QString desc, QString sequence, int sequenceNum,
                         int maxRetry, QDateTime accesstime,
@@ -26,6 +27,7 @@ class CTblCodeHistory
         bool addLockCodeHistoryWithAnswers(CLockHistoryRec &lockHistoryRec, QString answer1, QString answer2, QString answer3);
 
         bool addLockCodeHistoryWithAnswers(QString locknums, QString code1, QString code2,
+                        QString accessSelection,
                         QDateTime starttime, QDateTime endtime, int maxAccess,
                         QString status, QString desc, QString sequence, int sequenceNum,
                         int maxRetry, QDateTime accesstime,

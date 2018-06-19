@@ -8,11 +8,16 @@
 #include "dlgfingerprint.h"
 #include "version.h"
 #include "kcbcommon.h"
+#include "kcbapplication.h"
 
 
 CFrmUserCode::CFrmUserCode(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::CFrmUserCode)
+    ui(new Ui::CFrmUserCode),
+    m_fp_state(false),
+    m_showhide_state(false),
+    m_takereturn_state(false)
+
 {
     ui->setupUi(this);
     CFrmUserCode::showFullScreen();
@@ -30,6 +35,9 @@ void CFrmUserCode::initialize()
     _dtTimer.connect(&_dtTimer, SIGNAL(timeout()), this, SLOT(OnDateTimeTimerTimeout()));
     _dtTimer.start();
     ui->lVersion->setText(VERSION);
+    QDateTime   dt = QDateTime::currentDateTime();
+    ui->lblDateTime->setText(dt.toString("MM/dd/yyyy HH:mm:ss"));
+    SetDisplayCodeEntryControls(false);
 }
 
 void CFrmUserCode::OnDateTimeTimerTimeout()
@@ -40,37 +48,36 @@ void CFrmUserCode::OnDateTimeTimerTimeout()
 
 void CFrmUserCode::onButtonClick(char key)
 {
-    //KCB_DEBUG_ENTRY;
-
     QString qkey(key);
     QString sCurrKey;
-    // Central button handling.
-    // Process local
-    switch(key) {
-    case 0x00:  // This is clear
-        OnClearCodeDisplay();
-        break;
-    case 0x0D:  // Enter pressed
-        onCodeEntered();
-        break;
-    case 0x08:  // Del (destructive backspace) pressed
-        onBackSpace();
-        break;
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-        sCurrKey = ui->edCode->text() + qkey;
-        ui->edCode->setText(sCurrKey);
-        break;
-    default:    // Any
-        break;
+
+    switch(key)
+    {
+        case 0x00:  // This is clear
+            OnClearCodeDisplay();
+            break;
+        case 0x0D:  // Enter pressed
+            onCodeEntered();
+            break;
+        case 0x08:  // Del (destructive backspace) pressed
+            onBackSpace();
+            break;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            sCurrKey = ui->edCode->text() + qkey;
+            ui->edCode->setText(sCurrKey);
+            ui->btn_Return->setEnabled(sCurrKey.length() > 0);
+            break;
+        default:    // Any
+            break;
     }
 
     // Process through controller
@@ -80,6 +87,7 @@ void CFrmUserCode::onButtonClick(char key)
 void CFrmUserCode::onCodeEntered()
 {
     KCB_DEBUG_ENTRY;
+
 
     QString sCode = ui->edCode->text();
     KCB_DEBUG_TRACE("Code Entered:" << sCode);
@@ -93,8 +101,10 @@ void CFrmUserCode::onCodeEntered()
     QApplication::processEvents();    
     if(sCode.length() > 0 )
     {
-        this->enableKeypad(false);     // disable the keypad (momentarily)
-        emit __CodeEntered(sCode);     // Signal that the code was entered.
+        SetDisplayCodeEntryControls(false);
+        enableKeypad(false);
+
+        emit __CodeEntered(sCode);
     }
     KCB_DEBUG_EXIT;
 }
@@ -104,9 +114,11 @@ void CFrmUserCode::onBackSpace()
     // Destructive Backspace
     QString sCode = ui->edCode->text();
     int nLen = sCode.length();
-    if( nLen > 0 ) {
+    if( nLen > 0 )
+    {
         sCode = sCode.left(nLen - 1);
-        this->ui->edCode->setText(sCode);
+        ui->edCode->setText(sCode);        
+        ui->btn_Return->setEnabled(sCode.length() > 0);
     }
 }
 
@@ -121,18 +133,13 @@ void CFrmUserCode::OnEnableKeyboard(bool bEnable)
     enableKeypad(bEnable);
 }
 
-void CFrmUserCode::OnNewMessage(QString sMsg)
-{
-    Q_UNUSED(sMsg);
-    // TODO: Disabled for now. The lblMessage has been removed but this SLOT is still called.
-}
-
 void CFrmUserCode::OnClearCodeDisplay()
 {
-    qDebug() << "Pre CFrmUserCode::OnClearCodeDisplay()";
+    KCB_DEBUG_ENTRY;
+    ui->btn_Return->setDisabled(true);
     ui->edCode->clear();
     ui->edCode->setText("");
-    qDebug() << "Post CFrmUserCode::OnClearCodeDisplay()";
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnSwipeCode(QString sCode)
@@ -149,15 +156,38 @@ void CFrmUserCode::OnSwipeCode(QString sCode)
 
 void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
 {
-    ui->edCode->setPlaceholderText(sCodeMsg);
-    OnClearCodeDisplay();
-    // Start a timer for 4 seconds default
-    QTimer::singleShot(4000, this, SLOT(ResetPlaceholderText()));
-}
+    KCB_DEBUG_ENTRY;
 
-void CFrmUserCode::ResetPlaceholderText()
-{
-    this->OnEnableKeyboard(true);
+    KCB_DEBUG_TRACE(sCodeMsg);
+
+    if (sCodeMsg == "Code 1")
+    {
+        if (m_takereturn_state)
+        {
+            SetDisplayTakeReturnButtons(true);
+            SetDisplayCodeEntryControls(false);  
+            ui->edCode->setPlaceholderText(QString("<%1>").arg(tr("Select Take or Return")));
+        }
+        else
+        {
+            SetDisplayCodeEntryControls(true);
+            ui->edCode->setPlaceholderText(QString("%1 #1").arg(tr("Please Enter Code")));
+        }
+    }
+    else
+    {
+        bool is_thankyou = sCodeMsg.startsWith("Thank You!");
+        bool is_openinglocks = sCodeMsg.startsWith("Opening Locks");
+        bool is_cleared = sCodeMsg == "";
+        bool is_cancelling = sCodeMsg.startsWith("Cancelling");
+
+        bool enable_controls = (is_thankyou || is_openinglocks || is_cleared || is_cancelling) ? false : true;
+        SetDisplayCodeEntryControls(enable_controls); 
+        SetDisplayTakeReturnButtons(false);
+        OnClearCodeDisplay();
+        ui->edCode->setPlaceholderText(sCodeMsg);
+    }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::on_btn_1_clicked()
@@ -227,10 +257,13 @@ void CFrmUserCode::on_btn_Clear_clicked()
 
 void CFrmUserCode::on_btnShowHideCode_clicked(bool checked)
 {
-    if(checked) {
+    if(checked)
+    {
         ui->edCode->setEchoMode(QLineEdit::Normal);
         ui->btnShowHideCode->setText(tr("Hide"));
-    } else {
+    }
+    else
+    {
         ui->edCode->setEchoMode(QLineEdit::Password);
         ui->btnShowHideCode->setText(tr("Show"));
     }
@@ -249,6 +282,7 @@ void CFrmUserCode::on_btnIdentifyFingerPrint_clicked()
 
 void CFrmUserCode::SetDisplayFingerprintButton(bool state)
 {
+    m_fp_state = state;
     ui->btnIdentifyFingerPrint->setVisible(state);
 }
 
@@ -270,15 +304,85 @@ void CFrmUserCode::SetDisplayShowHideButton(bool state)
         emit ui->btnShowHideCode->click();
     }
 
+    m_showhide_state = state;
     ui->btnShowHideCode->setVisible(state);
+}
+
+void CFrmUserCode::show()
+{
+    KCB_DEBUG_ENTRY;
+    QDialog::show();
+
+    SetDisplayTakeReturnButtons(m_takereturn_state);
+    SetDisplayCodeEntryControls(!m_takereturn_state);
+    SetDisplayFingerprintButton(m_fp_state);
+    SetDisplayShowHideButton(m_showhide_state);
+
+    if (m_takereturn_state)
+    {
+        ui->edCode->setPlaceholderText("Select Take or Return");
+    }
+    else
+    {
+        OnEnableKeyboard(true);
+    }
+    
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmUserCode::SetDisplayTakeReturnButtons(bool state)
+{
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE("TakeReturn state" << state);
+    m_takereturn_state = state;
+    ui->pbTake->setEnabled(state);
+    ui->pbReturn->setEnabled(state);
+    ui->pbTake->setVisible(state);
+    ui->pbReturn->setVisible(state);
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmUserCode::SetDisplayCodeEntryControls(bool state)
+{
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE("CodeEntryControls state" << state);
+    ui->grpKeypad->setEnabled(state);
+    ui->btnShowHideCode->setEnabled(state);
+    ui->btnIdentifyFingerPrint->setEnabled(state);
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayFingerprintButton(bool state)
 {
-    SetDisplayFingerprintButton(state);
+    m_fp_state = state;
 }
 
 void CFrmUserCode::OnDisplayShowHideButton(bool state)
 {
-    SetDisplayShowHideButton(state);
+    m_showhide_state = state;
+}
+
+void CFrmUserCode::OnDisplayTakeReturnButtons(bool state)
+{
+    KCB_DEBUG_ENTRY;
+    m_takereturn_state = state;
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmUserCode::on_pbTake_clicked()
+{
+    KCB_DEBUG_ENTRY;
+    SetDisplayCodeEntryControls(true);
+    kcb::Application::setTakeAccessSelection();
+    ui->edCode->setPlaceholderText(QString("<%1 #1>").arg(tr("Please Enter Code")));
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmUserCode::on_pbReturn_clicked()
+{
+    KCB_DEBUG_ENTRY;
+    SetDisplayCodeEntryControls(true);
+    kcb::Application::setReturnAccessSelection();
+    ui->edCode->setPlaceholderText(QString("<%1 #1>").arg(tr("Please Enter Code")));
+    KCB_DEBUG_EXIT;
 }
