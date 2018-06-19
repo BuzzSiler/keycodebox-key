@@ -10,6 +10,8 @@
 #include <QIODevice>
 #include <QDateTime>
 #include "kcbcommon.h"
+#include "kcbapplication.h"
+
 
 void CModelSecurity::openDatabase()
 {
@@ -79,7 +81,8 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
                                                  adminInfo->getVNCPort(), adminInfo->getVNCPassword(),
                                                  adminInfo->getReportViaEmail(), adminInfo->getReportToFile(), adminInfo->getReportDirectory(),
                                                  adminInfo->getDisplayPowerDownTimeout(),
-                                                 adminInfo->getDefaultReportDeleteFreq());
+                                                 adminInfo->getDefaultReportDeleteFreq(),
+                                                 adminInfo->getDisplayTakeReturnButtons());
     emit __OnUpdatedCurrentAdmin(bSuccess);
 }
 
@@ -471,9 +474,7 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                 return;
             }
 
-            KCB_DEBUG_TRACE("Ask Questions" << bAskQuestions);
-
-            if( bAskQuestions )
+            if ( bAskQuestions && kcb::Application::isReturnSelection() )
             {
                 qDebug() << "QUESTION1: " << question1;
                 qDebug() << "QUESTION2: " << question2;
@@ -511,7 +512,6 @@ void CModelSecurity::OnQuestionUserCancelled()
 
 void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
 {
-    //    _timer.stop();
     bool bFingerprintRequired = false;
     QString codeOne;
     bool bAskQuestions = false;
@@ -591,6 +591,7 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
             pState = itor.value();
             lockHistoryRec.setFromLockState(*pState);
             lockHistoryRec.setLockNums(pState->getLockNums());
+            lockHistoryRec.setAccessSelection(kcb::Application::getAccessSelection());
             _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
         }
         if(nVal > 1) 
@@ -624,6 +625,7 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QSt
             pState = itor.value();
             lockHistoryRec.setFromLockState(*pState);
             lockHistoryRec.setLockNums(pState->getLockNums());
+            lockHistoryRec.setAccessSelection(kcb::Application::getAccessSelection());
             _ptblCodeHistory->addLockCodeHistoryWithAnswers(lockHistoryRec, answer1, answer2, answer3);
         }
         if(nVal > 1) 

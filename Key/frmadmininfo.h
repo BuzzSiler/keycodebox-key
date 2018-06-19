@@ -76,6 +76,7 @@ class CFrmAdminInfo : public QDialog
         void __OnSendTestEmail(int test_type);
         void __OnDisplayFingerprintButton(bool state);
         void __OnDisplayShowHideButton(bool state);
+        void __OnDisplayTakeReturnButtons(bool state);
 
     
     public slots:
@@ -100,6 +101,7 @@ class CFrmAdminInfo : public QDialog
         void OnDisplayShowHideButton(bool);
         void OnOpenLockRequest(QString lock, bool is_user);
         void OnNotifyGenerateReport();    
+        void OnDisplayTakeReturnButtons(bool);
 
     private slots:
         void OnCodes(QString code1, QString code2);

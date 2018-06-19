@@ -79,9 +79,13 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
-
+    // For some reason, the admin form does not show full screen without the following
+    // flags being set.  Maybe this should be don't at in the main so it gets
+    // inherited?  Not sure.  Until this is resolved, just set these flags.
+    CFrmAdminInfo::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     CFrmAdminInfo::showFullScreen();
+
+    ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
 
     initialize();
 
@@ -150,6 +154,7 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(ui->chkDisplayFingerprintButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayFingerprintButton(bool)));
     connect(ui->chkDisplayShowHideButton, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayShowHideButton(bool)));
+    connect(ui->chkDisplayTakeReturnButtons, SIGNAL(toggled(bool)), this, SIGNAL(__OnDisplayTakeReturnButtons(bool)));
 
     connect(&m_select_locks, &SelectLocksWidget::NotifyRequestLockOpen, this, &CFrmAdminInfo::OnOpenLockRequest);
 
@@ -864,6 +869,7 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
     _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
     _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
+    _tmpAdminRec.setDisplayTakeReturnButtons(ui->chkDisplayTakeReturnButtons->isChecked());
 
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
@@ -893,6 +899,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayFingerprintButton());
         ui->chkDisplayShowHideButton->setChecked(adminInfo->getDisplayShowHideButton());
         ui->cbDisplayPowerDownTimeout->setCurrentIndex(adminInfo->getDisplayPowerDownTimeout());
+        ui->chkDisplayTakeReturnButtons->setChecked(adminInfo->getDisplayTakeReturnButtons());
 
         // Temporary to complete report widget funcationality
         _tmpAdminRec.setDefaultReportDeleteFreq(MONTHLY);
@@ -2043,6 +2050,11 @@ void CFrmAdminInfo::OnDisplayFingerprintButton(bool state)
 void CFrmAdminInfo::OnDisplayShowHideButton(bool state)
 {
     ui->chkDisplayShowHideButton->setChecked(state);
+}
+
+void CFrmAdminInfo::OnDisplayTakeReturnButtons(bool state)
+{
+    ui->chkDisplayTakeReturnButtons->setChecked(state);
 }
 
 void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)

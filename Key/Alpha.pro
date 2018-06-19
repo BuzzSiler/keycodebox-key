@@ -82,7 +82,9 @@ SOURCES += main.cpp\
     kcbutils.cpp \
     checkablestringlistmodel.cpp \
     reportcontrolwidget.cpp \
-    dlgdownloadreports.cpp
+    dlgdownloadreports.cpp \
+    kcbsystem.cpp \
+    kcbapplication.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -150,7 +152,9 @@ HEADERS  += keycodeboxmain.h \
     kcbutils.h \
     checkablestringlistmodel.h \
     reportcontrolwidget.h \
-    dlgdownloadreports.h
+    dlgdownloadreports.h \
+    kcbsystem.h \
+    kcbapplication.h \
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

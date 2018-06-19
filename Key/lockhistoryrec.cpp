@@ -40,6 +40,7 @@ void CLockHistoryRec::setFromLockState(CLockState &newLockState)
     _description = newLockState.getDescription();
     _code1 = newLockState.getCode1();
     _code2 = newLockState.getCode2();
+    _access_selection = "None";
     _starttime = newLockState.getStartTime();
     _endtime = newLockState.getEndTime();
     _status = newLockState.getStatus();

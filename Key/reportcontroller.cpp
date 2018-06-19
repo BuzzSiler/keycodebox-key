@@ -96,12 +96,14 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
 
             QString code_one = plockHistoryRec->getCode1();
             QString code_two = plockHistoryRec->getCode2();
+            QString access = plockHistoryRec->getAccessSelection();
             QString question1 = plockHistoryRec->getQuestion1();
             QString question2 = plockHistoryRec->getQuestion2();
             QString question3 = plockHistoryRec->getQuestion3();
 
             body += QString(" %1 #1:%2").arg(tr("code")).arg(code_one);
             body += QString(" %1 #2:%2").arg(tr("code")).arg(code_two);
+            body += QString(" %1 :%2").arg(tr("access")).arg(access);
             body += QString(" %1 #1:%2").arg(tr("question")).arg(question1);
             body += QString(" %1 #2:%2").arg(tr("question")).arg(question2);
             body += QString(" %1 #3:%2").arg(tr("question")).arg(question3);
