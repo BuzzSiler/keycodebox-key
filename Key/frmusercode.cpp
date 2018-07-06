@@ -1,6 +1,8 @@
 #include <QDebug>
 #include <QLineEdit>
 #include <QDateTime>
+#include <QMessageBox>
+#include <QCheckBox>
 #include "frmusercode.h"
 #include "ui_frmusercode.h"
 #include "hidreader.h"
@@ -385,4 +387,39 @@ void CFrmUserCode::on_pbReturn_clicked()
     kcb::Application::setReturnAccessSelection();
     ui->edCode->setPlaceholderText(QString("<%1 #1>").arg(tr("Please Enter Code")));
     KCB_DEBUG_EXIT;
+}
+
+static QString mode = "Admin";
+
+void CFrmUserCode::on_pushButton_clicked()
+{
+    KCB_DEBUG_TRACE("Admin Button Pressed");
+
+    QMessageBox msgbox;
+
+    msgbox.setWindowTitle("Administrator");
+    msgbox.setText("You are accessing administrative features");
+    msgbox.addButton(QMessageBox::Ok);
+    msgbox.addButton(QMessageBox::Cancel);
+    msgbox.setDefaultButton(QMessageBox::Cancel);
+
+    QCheckBox* cb = new QCheckBox("Check for Assistant Login");
+    QObject::connect(cb, &QCheckBox::stateChanged, [this](int state){
+            if (static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked) {
+                mode = "Assist";
+            }
+            else
+            {
+                mode = "Admin";
+            }
+        });
+    cb->setChecked(false);
+    msgbox.setCheckBox(cb);
+
+    int result = msgbox.exec();
+    if (result == QMessageBox::Ok)
+    {
+        KCB_DEBUG_TRACE("Setting mode to " << mode);
+        emit __CodeEntered(mode);
+    }
 }

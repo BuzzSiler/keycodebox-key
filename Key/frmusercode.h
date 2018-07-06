@@ -91,6 +91,7 @@ class CFrmUserCode : public QDialog
         void OnDateTimeTimerTimeout();
         void on_pbTake_clicked();
         void on_pbReturn_clicked();
+        void on_pushButton_clicked();
 };
 
 #endif // FRMUSERCODE_H
