@@ -214,7 +214,7 @@ void CSecurityController::CheckFingerprintAccessCodeOne(QString code1)
     _sCode2 = "";       // clear code2
     qDebug() << "CSecurityController::CheckFingerprintAccessCodeOne:" << code1;
 
-    emit(__VerifyFingerprintCodeOne(code1));       // This should cross thread to the _modelSecurity object
+    emit __VerifyFingerprintCodeOne(code1);       // This should cross thread to the _modelSecurity object
 }
 
 void CSecurityController::CheckFingerprintAccessCodeTwo(QString code2)
@@ -225,19 +225,17 @@ void CSecurityController::CheckFingerprintAccessCodeTwo(QString code2)
     qDebug() << "CSecurityController::CheckFingerprintAccessCodeTwo\n";
     QString sCodeEnc(CEncryption::encryptString(code2));
 
-    emit(__VerifyFingerprintCodeTwo(sCodeEnc));       // This should cross thread to the _modelSecurity object
+    emit __VerifyFingerprintCodeTwo(sCodeEnc);       // This should cross thread to the _modelSecurity object
 }
 
 
 void CSecurityController::CheckAdminPassword(QString sPW)
 {
-    // Use the CModelSecurity class
-    _sAdminPW = sPW;
-
     qDebug() << "CSecurityController::CheckAdminPassword";
-    QString sCodeEnc(CEncryption::encryptString(_sAdminPW));
 
-    emit(__VerifyAdminPassword(sCodeEnc));       // This should cross thread to the _modelSecurity object
+    _sAdminPW = sPW;
+    QString sCodeEnc(CEncryption::encryptString(_sAdminPW));
+    emit __VerifyAdminPassword(sCodeEnc);       // This should cross thread to the _modelSecurity object
 }
 
 void CSecurityController::OnRequireAdminPassword()

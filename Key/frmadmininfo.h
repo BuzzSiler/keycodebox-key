@@ -118,11 +118,8 @@ class CFrmAdminInfo : public QDialog
         void on_lblName_clicked();
         void on_lblEmail_clicked();
         void on_lblPhone_clicked();
-        void on_lblAccessCode_clicked();
         void on_lblPassword_clicked();
-        void on_lblAssistCode_clicked();
         void on_lblAssistPassword_clicked();
-        void on_lblKey_clicked();
 
         void setTime();
         void setTimeZone();

@@ -44,15 +44,6 @@ public:
     QString getPassword() { return password; }   // text,
     void setPassword(QString pw) { password = pw; }
 
-    QString getAccessCodeOld() { return access_code_old; } // text
-    void setAccessCodeOld(QString accessCode) { access_code_old = accessCode; }
-
-    QString getAccessCode() { return access_code; } // text
-    void setAccessCode(QString accessCode) { access_code = accessCode; }
-
-    QString getAssistCode() { return assist_code; } //text
-    void setAssistCode(QString assistCode) { assist_code = assistCode; }
-
     QString getAssistPassword() { return assist_password; } //text
     void setAssistPassword(QString assistPassword) { assist_password = assistPassword; }
 
@@ -183,8 +174,8 @@ public:
     void addAdmin();
     bool updateAdmin(QString name, QString email, QString phone,
                      QDateTime repFreq, QDateTime startReport,
-                     QString passwordEnc, QString accessCdEnc,
-                     QString assistPasswordEnc, QString assistCodeEnc,
+                     QString passwordEnc,
+                     QString assistPasswordEnc,
                      bool showFingerprint, bool showPassword,
                      bool usePredictive, QString predKey, int predRes,
                      uint32_t nMaxLocks,
@@ -197,8 +188,8 @@ public:
 
     bool updateAdminClear(QString name, QString email, QString phone,
                      QDateTime repFreq, QDateTime startReport,
-                     QString passwordClear, QString accessCdClear,
-                     QString assistPasswordClear, QString assistCodeClear,
+                     QString passwordClear,
+                     QString assistPasswordClear,
                      bool showFingerprint, bool showPassword,
                      bool usePredictive, QString predKey, int predRes,
                      uint32_t nMaxLocks,
