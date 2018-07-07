@@ -426,13 +426,6 @@ void CSystemController::OnCodeEntered(QString sCode)
 {
     KCB_DEBUG_TRACE(sCode);
 
-    // Check for admin entry
-    if (sCode == "Admin" || sCode == "Assist")
-    {
-        OnRequireAdminPassword();
-        return;
-    }
-
     //force enrollment step count reset
     EnrollFingerprintResetStageCount();
 

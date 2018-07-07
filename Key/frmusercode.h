@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QTimer>
 #include <QString>
+#include <QMouseEvent>
 
 #include "hidreader.h"
 #include "magtekcardreader.h"
@@ -48,6 +49,9 @@ class CFrmUserCode : public QDialog
 
         void initialize();
 
+        void mousePressEvent(QMouseEvent* event);
+        void EnterAdminControl();
+
     signals:
         void __KeyPressed(char key);
         void __CodeEntered(QString sCode);
@@ -91,7 +95,6 @@ class CFrmUserCode : public QDialog
         void OnDateTimeTimerTimeout();
         void on_pbTake_clicked();
         void on_pbReturn_clicked();
-        void on_pushButton_clicked();
 };
 
 #endif // FRMUSERCODE_H

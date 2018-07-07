@@ -19,7 +19,6 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     m_fp_state(false),
     m_showhide_state(false),
     m_takereturn_state(false)
-
 {
     ui->setupUi(this);
     CFrmUserCode::showFullScreen();
@@ -40,6 +39,16 @@ void CFrmUserCode::initialize()
     QDateTime   dt = QDateTime::currentDateTime();
     ui->lblDateTime->setText(dt.toString("MM/dd/yyyy HH:mm:ss"));
     SetDisplayCodeEntryControls(false);
+}
+
+void CFrmUserCode::mousePressEvent(QMouseEvent* event)
+{
+    KCB_DEBUG_TRACE(event->x() << event->y());
+
+    if (event->x() >= 830 && event->y() <= 20)
+    {
+        EnterAdminControl();
+    }
 }
 
 void CFrmUserCode::OnDateTimeTimerTimeout()
@@ -389,36 +398,30 @@ void CFrmUserCode::on_pbReturn_clicked()
     KCB_DEBUG_EXIT;
 }
 
-static QString mode = "Admin";
-
-void CFrmUserCode::on_pushButton_clicked()
+void CFrmUserCode::EnterAdminControl()
 {
     KCB_DEBUG_TRACE("Admin Button Pressed");
 
     QMessageBox msgbox;
 
     msgbox.setWindowTitle("Administrator");
-    msgbox.setText("You are accessing administrative features");
+    msgbox.setText("You are accessing administrative features.");
     msgbox.addButton(QMessageBox::Ok);
     msgbox.addButton(QMessageBox::Cancel);
     msgbox.setDefaultButton(QMessageBox::Cancel);
 
     QCheckBox* cb = new QCheckBox("Check for Assistant Login");
-    QObject::connect(cb, &QCheckBox::stateChanged, [this](int state){
-            if (static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked) {
-                mode = "Assist";
-            }
-            else
-            {
-                mode = "Admin";
-            }
-        });
     cb->setChecked(false);
     msgbox.setCheckBox(cb);
 
     int result = msgbox.exec();
     if (result == QMessageBox::Ok)
     {
+        QString mode = "Admin";
+        if (cb->isChecked())
+        {
+            mode = "Assist";
+        }
         KCB_DEBUG_TRACE("Setting mode to " << mode);
         emit __CodeEntered(mode);
     }

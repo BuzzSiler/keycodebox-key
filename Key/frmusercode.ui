@@ -1014,19 +1014,6 @@
     <string>Return</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>790</x>
-     <y>0</y>
-     <width>61</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Admin</string>
-   </property>
-  </widget>
   <zorder>lVersion</zorder>
   <zorder>btnIdentifyFingerPrint</zorder>
   <zorder>frame</zorder>
@@ -1035,7 +1022,6 @@
   <zorder>lblDateTime</zorder>
   <zorder>pbTake</zorder>
   <zorder>pbReturn</zorder>
-  <zorder>pushButton</zorder>
  </widget>
  <resources/>
  <connections/>
