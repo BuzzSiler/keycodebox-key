@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QTimer>
 #include <QString>
+#include <QMouseEvent>
 
 #include "hidreader.h"
 #include "magtekcardreader.h"
@@ -47,6 +48,9 @@ class CFrmUserCode : public QDialog
         void enableKeypad(bool bEnable);
 
         void initialize();
+
+        void mousePressEvent(QMouseEvent* event);
+        void EnterAdminControl();
 
     signals:
         void __KeyPressed(char key);

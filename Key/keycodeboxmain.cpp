@@ -416,6 +416,7 @@ bool MainWindow::isVncConnectionActive(int vncPort)
 
 void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
 {
+    KCB_DEBUG_ENTRY;
     /* Detect if we are connected via VNC.  If so, then disable the display
        so no one can see what the admin is doing
 
@@ -443,6 +444,7 @@ void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
     connect(_pfAdminPW, SIGNAL(__OnAdminPasswordCancel()), _psystemController, SLOT(OnAdminPasswordCancel()));
     _pfAdminPW->OnEnableKeyboard(true);
     _pfAdminPW->show();
+    KCB_DEBUG_EXIT;
 }
 
 /**
