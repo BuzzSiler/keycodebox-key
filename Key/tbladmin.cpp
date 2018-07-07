@@ -53,9 +53,6 @@ CAdminRec::CAdminRec() :
     admin_phone = "";
 
     password = "";
-    access_code_old = "";
-    access_code = "";
-    assist_code = "";
     assist_password = "";
     use_predictive_access_code = false;
     pred_key = "KEYCODEBOXTEST";
@@ -92,9 +89,6 @@ CAdminRec &CAdminRec::operator=(CAdminRec &newRec)
     default_report_freq = newRec.default_report_freq;
     default_report_start = newRec.default_report_start;
     password = newRec.password;
-    access_code_old = newRec.access_code_old;
-    access_code = newRec.access_code;
-    assist_code = newRec.assist_code;
     assist_password = newRec.assist_password;
     use_predictive_access_code = newRec.use_predictive_access_code;
     pred_key = newRec.pred_key;
@@ -359,8 +353,7 @@ bool CTblAdmin::createTable()
                 " admin_email text, admin_phone text, "
                 " default_report_freq DATETIME,"
                 " default_report_start DATETIME, password text, "
-                " access_code text,"
-                " assist_password text, assist_code text, show_fingerprint bool, show_password bool, show_takereturn bool, "
+                " assist_password text, show_fingerprint bool, show_password bool, show_takereturn bool, "
                 " use_predictive_access_code bool, "
                 " predictive_key text, predictive_resolution integer,"
                 " max_locks text,"
@@ -479,8 +472,8 @@ bool CTblAdmin::readAdmin()
     QSqlQuery query(*_pDB);
     QString sql = "SELECT admin_name, admin_email, admin_phone, "
                   "default_report_freq,"
-                  "default_report_start, password, access_code, "
-                  "assist_password, assist_code, show_fingerprint, show_password, show_takereturn, "
+                  "default_report_start, password, "
+                  "assist_password, show_fingerprint, show_password, show_takereturn, "
                   "use_predictive_access_code, "
                   "predictive_key, predictive_resolution, max_locks, "
                   "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
