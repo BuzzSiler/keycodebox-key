@@ -814,13 +814,6 @@ void CFrmAdminInfo::on_lblPhone_clicked()
     ui->lblPhone->setText(text);
 }
 
-void CFrmAdminInfo::on_lblAccessCode_clicked()
-{
-    QString text = ui->lblAccessCode->text();
-    RunKeyboard(text);
-    ui->lblAccessCode->setText(text);
-}
-
 void CFrmAdminInfo::on_lblPassword_clicked()
 {
     QString text = ui->lblPassword->text();
@@ -828,25 +821,11 @@ void CFrmAdminInfo::on_lblPassword_clicked()
     ui->lblPassword->setText(text);
 }
 
-void CFrmAdminInfo::on_lblAssistCode_clicked()
-{
-    QString text = ui->lblAssistCode->text();
-    RunKeyboard(text);
-    ui->lblAssistCode->setText(text);
-}
-
 void CFrmAdminInfo::on_lblAssistPassword_clicked()
 {
     QString text = ui->lblAssistPassword->text();
     RunKeyboard(text);
     ui->lblAssistPassword->setText(text);
-}
-
-void CFrmAdminInfo::on_lblKey_clicked()
-{
-    QString text = ui->lblKey->text();
-    RunKeyboard(text);
-    ui->lblKey->setText(text);
 }
 
 void CFrmAdminInfo::on_btnDone_clicked()
@@ -863,9 +842,7 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _tmpAdminRec.setAdminEmail(ui->lblEmail->text());
     _tmpAdminRec.setAdminPhone(ui->lblPhone->text());
     _tmpAdminRec.setPassword(ui->lblPassword->text());
-    _tmpAdminRec.setAccessCode(ui->lblAccessCode->text());
     _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text());
-    _tmpAdminRec.setAssistCode(ui->lblAssistCode->text());
     _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
     _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
     _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
@@ -892,9 +869,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
         ui->lblName->setText(adminInfo->getAdminName());
         ui->lblEmail->setText(adminInfo->getAdminEmail());
         ui->lblPhone->setText(adminInfo->getAdminPhone());
-        ui->lblAccessCode->setText(adminInfo->getAccessCode());
         ui->lblPassword->setText(adminInfo->getPassword());
-        ui->lblAssistCode->setText(adminInfo->getAssistCode());
         ui->lblAssistPassword->setText(adminInfo->getAssistPassword());
         ui->chkDisplayFingerprintButton->setChecked(adminInfo->getDisplayFingerprintButton());
         ui->chkDisplayShowHideButton->setChecked(adminInfo->getDisplayShowHideButton());

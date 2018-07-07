@@ -488,20 +488,23 @@ void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
 void CSystemController::OnAdminDialogClosed()
 {
-    qDebug() << "CSystemController::OnAdminDialogClosed()";
+    KCB_DEBUG_ENTRY;
     _systemState = EUserCodeOne;
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequireAdminPassword()
 {
-    qDebug() << "SystemController::OnRequireAdminPassword";
+    KCB_DEBUG_ENTRY;
     _systemState = EAdminPassword;
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequireCodeTwo()
 {
-    qDebug() << "SystemController::OnRequireCodeTwo()";
+    KCB_DEBUG_ENTRY;
     _systemState = EUserCodeTwo;
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnAdminSecurityCheckOk(QString type)

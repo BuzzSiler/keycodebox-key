@@ -72,8 +72,8 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 {
     bool bSuccess = _ptblAdmin->updateAdminClear(adminInfo->getAdminName(), adminInfo->getAdminEmail(), adminInfo->getAdminPhone(),
                                                  adminInfo->getDefaultReportFreq(),
-                                                 adminInfo->getDefaultReportStart(), adminInfo->getPassword(), adminInfo->getAccessCode(),
-                                                 adminInfo->getAssistPassword(), adminInfo->getAssistCode(),
+                                                 adminInfo->getDefaultReportStart(), adminInfo->getPassword(),
+                                                 adminInfo->getAssistPassword(),
                                                  adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(), adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
                                                  adminInfo->getMaxLocks(),
                                                  adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
