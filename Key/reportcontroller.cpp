@@ -518,20 +518,24 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
         }
         // Now we can send the mail
 
-        qDebug() << "<<<<<<<<<< Email: connectToHost";
         if( !smtp.connectToHost() )
         {
-            qDebug() << "<<<<<<<<<<<< Email:: failed to connect to host";
+            qDebug() << "Email connect to host failure";
         } 
         else 
         {
-            qDebug() << "<<<<<<<<<< Email: login";
-            smtp.login();
+            if (!smtp.login())
+            {
+                qDebug() << "Email login failure";
+                return;
+            }
 
-            qDebug() << "<<<<<<<<<< Sending Email";
-            smtp.sendMail(message);
+            if (!smtp.sendMail(message))
+            {
+                qDebug() << "Email send failure";
+                return;
+            }
 
-            qDebug() << "<<<<<<<<<< Quit Email";
             smtp.quit();
         }
     } 
