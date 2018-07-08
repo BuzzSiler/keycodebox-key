@@ -13,15 +13,13 @@ static bool isValidLock(QString lock)
     KCB_DEBUG_TRACE(lockNumTest);
     if (result)
     {
-        if (lockNumTest < 1 || lockNumTest > 32)
+        if (lockNumTest >= 1 && lockNumTest <= 32)
         {
-            return false;
+            return true;
         }
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 namespace kcb
@@ -256,10 +254,9 @@ namespace kcb
             return result;
         }
 
-        lockNum = stdOut;
+        KCB_DEBUG_TRACE("Received lock" << stdOut);
 
-        KCB_DEBUG_TRACE("Received lock" << lockNum);
-        return true;
+        return lockNum == stdOut;
     }
 
 
