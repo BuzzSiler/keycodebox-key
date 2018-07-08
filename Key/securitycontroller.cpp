@@ -177,10 +177,6 @@ void CSecurityController::CheckPredictiveAccessCode(QString code)
     OnSecurityCheckedFailed();
 }
 
-/**
- * @brief CSecurityController::CheckAccessCodeOne
- * @param code1 - encrypted
- */
 void CSecurityController::CheckAccessCodeOne(QString code1)
 {
     KCB_DEBUG_TRACE(code1);
@@ -189,7 +185,7 @@ void CSecurityController::CheckAccessCodeOne(QString code1)
     _sCode1 = code1;
     _sCode2 = "";       // clear code2
 
-    emit(__VerifyCodeOne(code1));       // This should cross thread to the _modelSecurity object
+    emit __VerifyCodeOne(code1);       // This should cross thread to the _modelSecurity object
 }
 
 void CSecurityController::CheckAccessCodeTwo(QString code2)
@@ -200,7 +196,7 @@ void CSecurityController::CheckAccessCodeTwo(QString code2)
 
     QString sCodeEnc(CEncryption::encryptString(code2));
 
-    emit(__VerifyCodeTwo(sCodeEnc));       // This should cross thread to the _modelSecurity object
+    emit __VerifyCodeTwo(sCodeEnc);       // This should cross thread to the _modelSecurity object
 }
 
 /**
@@ -264,7 +260,6 @@ void CSecurityController::OnAdminSecurityCheckFailed()
 
 void CSecurityController::OnSecurityCheckSuccess(QString locks)
 {
-    // KCB_DEBUG_TRACE("locks:" << locks);
     emit __OnSecurityCheckSuccess(locks);
     //emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
 }

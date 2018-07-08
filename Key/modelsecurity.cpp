@@ -11,6 +11,7 @@
 #include <QDateTime>
 #include "kcbcommon.h"
 #include "kcbapplication.h"
+#include "kcbsystem.h"
 
 
 void CModelSecurity::openDatabase()
@@ -204,131 +205,63 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
     }
     else
     {
-        bool bSecondCodeRequired;
-        bool bFingerprintRequired = false;
-        int nDoorNum;
-
-        if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
+        // We have received a code.  We need to send it to Chevin and get authorization
+        if ( kcb::Application::isTakeSelection() )
         {
-            qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
-
-            if( CheckPredictiveAccessCode(code, nDoorNum) )
+            QString lockNum;
+            KCB_DEBUG_TRACE("(CHEVIN) Received Take Code request" << code);
+            KCB_DEBUG_TRACE("(CHEVIN) Requesting authorization ...");
+            bool success = kcb::SendChevinTakeRequest(code, lockNum);
+            if (success)
             {
-                // Check again to see if we match a second code existing in the codes table
-                QString sCodeEnc = CEncryption::encryptString(code);
-                QString lockNums;
+                emit __OnSecurityCheckSuccess(lockNum);
 
-                int result = _ptblCodes->checkCodeOne(sCodeEnc,
-                                                      bSecondCodeRequired,
-                                                      bFingerprintRequired,
-                                                      lockNums);
-                if( result == KCB_SUCCESS && lockNums != "" )
+                KCB_DEBUG_TRACE("(CHEVIN) Lock opened ... Sending Confirmation to Chevin");
+                bool success = kcb::SendChevinTakeComplete(code, lockNum);
+                if (success)
                 {
-                    // need to check if fingerprint security is enabled
-                    // if so, check for existence of existing fingerprints
-                    // if fingerprints do not exist, open up enroll dialog
-                    // (otherwise let user know fingerprints are enrolled?
-                    //  or emit __OnSecurityCheckFailed()
-
-                    // this is probably a good time to mention,
-                    // fingerprints for a second code are stored like:
-                    //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-                    // single code are of course stored like:
-                    //   /home/pi/run/prints/<codeOne>/<codeOne>
-
-                    // need to do check again for code 2
-
-                    if( bSecondCodeRequired )
-                    {
-                        emit __OnRequireCodeTwo();
-                    }
-                    else
-                    {
-                        if( bFingerprintRequired == true)
-                        {
-                            //we need to check if a fingerprint directory already exists,
-                            // if they do, do not attempt enrollment
-                            if( !QDir("/home/pi/run/prints/" + code).exists() )
-                            {
-                                emit __EnrollFingerprintDialog(code);
-                                emit __EnrollFingerprint(code);
-                            }
-                            else
-                            {
-                                emit __OnSecurityCheckedFailed();
-                            }
-                            return;
-                        }
-
-                        emit __OnSecurityCheckSuccess(lockNums);
-                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(lockNums, code);
-                    }
+                    KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Take Complete");
                 }
                 else
                 {
-                    emit __OnSecurityCheckedFailed();
-                }
-            }
-        }
-        else
-        {
-            
-            QString sCodeEnc = CEncryption::encryptString(code);
-            QString lockNums;
-
-            KCB_DEBUG_TRACE("Encrypted Code" << sCodeEnc);
-
-            int result = _ptblCodes->checkCodeOne(sCodeEnc,
-                                                  bSecondCodeRequired,
-                                                  bFingerprintRequired,
-                                                  lockNums);
-            KCB_DEBUG_TRACE("Locks" << lockNums);
-            if( result == KCB_SUCCESS && lockNums != "" )
-            {
-                // need to check if fingerprint security is enabled
-                // if so, check for existence of existing fingerprints
-                // if fingerprints do not exist, open up enroll dialog
-                // (otherwise let user know fingerprints are enrolled?
-                //  or emit __OnSecurityCheckFailed()
-
-                // this is probably a good time to mention,
-                // fingerprints for a second code are stored like:
-                //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-                // single code are of course stored like:
-                //   /home/pi/run/prints/<codeOne>/<codeOne>
-
-                // need to do check again for code 2
-
-                if( bSecondCodeRequired ) 
-                {
-                    emit __OnRequireCodeTwo();
-                } 
-                else 
-                {
-                    if( bFingerprintRequired == true)
-                    {
-                        //we need to check if a fingerprint directory already exists,
-                        // if they do, do not attempt enrollment
-                        if( !QDir("/home/pi/run/prints/" + code).exists() )
-                        {
-                            emit __EnrollFingerprintDialog(code);
-                            emit __EnrollFingerprint(code);
-                        }
-                        else
-                        {
-                            emit __OnSecurityCheckedFailed();
-                        }
-                        KCB_DEBUG_TRACE("fingerprint required");
-                        return;
-                    }
-
-                    emit __OnSecurityCheckSuccess(lockNums);
+                    KCB_DEBUG_TRACE("(CHEVIN) Take Complete failed");
                 }
             }
             else
             {
+                KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
                 emit __OnSecurityCheckedFailed();
             }
+        }
+        else if ( kcb::Application::isReturnSelection() )
+        {
+            QString lockNum;
+            QString question1;
+            QString question2;
+            QString question3;
+
+            KCB_DEBUG_TRACE("(CHEVIN) Received Return Code Request" << code);
+            KCB_DEBUG_TRACE("(CHEVIN) Requesting Chevin to authorize ...");
+            bool success = kcb::SendChevinReturnRequest(code, lockNum, question1, question2, question3);
+            if (success)
+            {
+                KCB_DEBUG_TRACE("(CHEVIN) Success send Return Request");
+                emit __QuestionUserDialog(lockNum,
+                                          question1,
+                                          question2,
+                                          question3);
+                KCB_DEBUG_TRACE("(CHEVIN) Return from __QuestionUserDialog");
+            }
+            else
+            {
+                KCB_DEBUG_TRACE("(CHEVIN) Return Request Failed");
+                emit __OnSecurityCheckedFailed();
+            }
+        }
+        else
+        {
+            KCB_DEBUG_TRACE("(CHEVIN) Unknown code" << code);
+            emit __OnAdminSecurityCheckFailed();
         }
     }
 
@@ -501,7 +434,19 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
 void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
     KCB_DEBUG_ENTRY;
+    
     emit __OnSecurityCheckSuccessWithAnswers(lockNums, answer1, answer2, answer3);
+
+    bool success = kcb::SendChevinReturnComplete(lockNums, answer1, answer2, answer3);
+    if (success)
+    {
+        KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Return Complete");
+    }
+    else
+    {
+        KCB_DEBUG_TRACE("(CHEVIN) Return Complete failed");
+    }
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnQuestionUserCancelled()
