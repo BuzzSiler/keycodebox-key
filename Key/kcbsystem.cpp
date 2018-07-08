@@ -234,10 +234,11 @@ namespace kcb
         arguments << QString(CHEVIN_SCRIPT);
         arguments << QString("return");
         arguments << QString("complete");
-        arguments << QString("%1").arg(lockNum);
-        arguments << QString("\"%1\"").arg(answer1);
-        arguments << QString("\"%1\"").arg(answer2);
-        arguments << QString("\"%1\"").arg(answer3);
+
+        arguments << QString("%1,%2,%3,%4").arg(lockNum).arg(answer1).arg(answer2).arg(answer3);
+        //arguments << QString("\"%1\"").arg(answer1);
+        //arguments << QString("\"%1\"").arg(answer2);
+        //arguments << QString("\"%1\"").arg(answer3);
         QString stdOut;
         QString stdErr;
         bool result;

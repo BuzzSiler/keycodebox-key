@@ -3,21 +3,49 @@
 #include <QDebug>
 #include "kcbkeyboarddialog.h"
 #include "kcbutils.h"
+#include "kcbcommon.h"
 
 static const QString css_warn = "color: black; background-color: red";
 static const QString css_none = "";
 
 CDlgQuestions::CDlgQuestions(QWidget *parent) :
     QDialog(parent),
+    ui(new Ui::CDlgQuestions),
     _lockNum(""),
-    ui(new Ui::CDlgQuestions)
+    _answer1("0"),
+    _answer2("0"),
+    _answer3("0"),
+    _chevin_enabled(true)
+
 {
     ui->setupUi(this);
 
     CDlgQuestions::showFullScreen();
 
-    ui->bbOkCancel->button(QDialogButtonBox::Ok)->setDisabled(true);
-    ui->bbOkCancel->button(QDialogButtonBox::Cancel)->setEnabled(true);
+    ui->rbAnswer1No->setVisible(_chevin_enabled);
+    ui->rbAnswer1Yes->setVisible(_chevin_enabled);
+    ui->rbAnswer2No->setVisible(_chevin_enabled);
+    ui->rbAnswer2Yes->setVisible(_chevin_enabled);
+    ui->rbAnswer3No->setVisible(_chevin_enabled);
+    ui->rbAnswer3Yes->setVisible(_chevin_enabled);
+
+    ui->edtAnswer1->setVisible(!_chevin_enabled);
+    ui->edtAnswer2->setVisible(!_chevin_enabled);
+    ui->edtAnswer3->setVisible(!_chevin_enabled);
+    ui->clrAnswer1->setVisible(!_chevin_enabled);
+    ui->clrAnswer2->setVisible(!_chevin_enabled);
+    ui->clrAnswer3->setVisible(!_chevin_enabled);
+
+    ui->rbAnswer1No->setChecked(_chevin_enabled);
+    ui->rbAnswer2No->setChecked(_chevin_enabled);
+    ui->rbAnswer3No->setChecked(_chevin_enabled);
+
+    on_rbAnswer1No_clicked();
+    on_rbAnswer2No_clicked();
+    on_rbAnswer3No_clicked();
+
+    ui->bbOkCancel->button(QDialogButtonBox::Ok)->setDisabled(!_chevin_enabled);
+    ui->bbOkCancel->button(QDialogButtonBox::Cancel)->setEnabled(!_chevin_enabled);
 }
 
 CDlgQuestions::~CDlgQuestions()
@@ -28,32 +56,54 @@ CDlgQuestions::~CDlgQuestions()
 
 void CDlgQuestions::getValues(QString& question1, QString& question2, QString& question3)
 {
-  question1 = ui->edtAnswer1->text();
-  question2 = ui->edtAnswer2->text();
-  question3 = ui->edtAnswer3->text();
+    if (_chevin_enabled)
+    {
+        question1 = _answer1;
+        question2 = _answer2;
+        question3 = _answer3;
+    }
+    else
+    {
+        question1 = ui->edtAnswer1->text();
+        question2 = ui->edtAnswer2->text();
+        question3 = ui->edtAnswer3->text();
+    }
 }
 
 void CDlgQuestions::setValues(QString lockNum, QString question1, QString question2, QString question3)
 {
     _lockNum = lockNum;
 
-    if (!question1.isEmpty())
+    if (_chevin_enabled)
     {
-      ui->label_question1->setText(question1);
-      ui->edtAnswer1->setEnabled(true);
-      ui->edtAnswer1->setText("");
+        ui->rbAnswer1No->setChecked(_chevin_enabled);
+        ui->rbAnswer2No->setChecked(_chevin_enabled);
+        ui->rbAnswer3No->setChecked(_chevin_enabled);
+
+        on_rbAnswer1No_clicked();
+        on_rbAnswer2No_clicked();
+        on_rbAnswer3No_clicked();
     }
-    if (!question2.isEmpty())
+    else
     {
-      ui->label_question2->setText(question2);
-      ui->edtAnswer2->setEnabled(true);
-      ui->edtAnswer2->setText("");
-    }
-    if (!question3.isEmpty())
-    {
-      ui->label_question3->setText(question3);
-      ui->edtAnswer3->setEnabled(true);
-      ui->edtAnswer3->setText("");
+        if (!question1.isEmpty())
+        {
+          ui->label_question1->setText(question1);
+          ui->edtAnswer1->setEnabled(true);
+          ui->edtAnswer1->setText("");
+        }
+        if (!question2.isEmpty())
+        {
+          ui->label_question2->setText(question2);
+          ui->edtAnswer2->setEnabled(true);
+          ui->edtAnswer2->setText("");
+        }
+        if (!question3.isEmpty())
+        {
+          ui->label_question3->setText(question3);
+          ui->edtAnswer3->setEnabled(true);
+          ui->edtAnswer3->setText("");
+        }
     }
 
     enableOk();
@@ -126,8 +176,32 @@ void CDlgQuestions::on_clrAnswer3_clicked()
 
 void CDlgQuestions::on_bbOkCancel_accepted()
 {
-    emit __OnQuestionsSave(_lockNum, ui->edtAnswer1->text(), ui->edtAnswer2->text(), ui->edtAnswer3->text());
+    QString answer1;
+    QString answer2;
+    QString answer3;
+
+    if (_chevin_enabled)
+    {
+        answer1 = _answer1;
+        answer2 = _answer2;
+        answer3 = _answer3;
+    }
+    else
+    {
+        answer1 = ui->edtAnswer1->text();
+        answer2 = ui->edtAnswer2->text();
+        answer3 = ui->edtAnswer3->text();
+    }
+    emit __OnQuestionsSave(_lockNum, answer1, answer2, answer3);
     emit __OnQuestionsClose();
+
+    ui->rbAnswer1No->setChecked(_chevin_enabled);
+    ui->rbAnswer2No->setChecked(_chevin_enabled);
+    ui->rbAnswer3No->setChecked(_chevin_enabled);
+
+    on_rbAnswer1No_clicked();
+    on_rbAnswer2No_clicked();
+    on_rbAnswer3No_clicked();
 }
 
 void CDlgQuestions::on_bbOkCancel_rejected()
@@ -150,14 +224,46 @@ void CDlgQuestions::enableOk()
     bool q2_valid = !q2_required || (q2_required && q2_specified);
     bool q3_valid = !q3_required || (q3_required && q3_specified);
 
-    ui->edtAnswer1->setStyleSheet(q1_valid ? css_none : css_warn);
-    ui->edtAnswer2->setStyleSheet(q2_valid ? css_none : css_warn);
-    ui->edtAnswer3->setStyleSheet(q3_valid ? css_none : css_warn);
+    if (!_chevin_enabled)
+    {
+        ui->edtAnswer1->setStyleSheet(q1_valid ? css_none : css_warn);
+        ui->edtAnswer2->setStyleSheet(q2_valid ? css_none : css_warn);
+        ui->edtAnswer3->setStyleSheet(q3_valid ? css_none : css_warn);
 
-    ui->clrAnswer1->setEnabled(q1_specified);
-    ui->clrAnswer2->setEnabled(q2_specified);
-    ui->clrAnswer3->setEnabled(q3_specified);
+        ui->clrAnswer1->setEnabled(q1_specified);
+        ui->clrAnswer2->setEnabled(q2_specified);
+        ui->clrAnswer3->setEnabled(q3_specified);
 
-    ui->bbOkCancel->button(QDialogButtonBox::Ok)->setEnabled(q1_valid && q2_valid && q3_valid);
+        ui->bbOkCancel->button(QDialogButtonBox::Ok)->setEnabled(q1_valid && q2_valid && q3_valid);
+    }
+}
 
+void CDlgQuestions::on_rbAnswer1Yes_clicked()
+{
+    _answer1 = "1";
+}
+
+void CDlgQuestions::on_rbAnswer1No_clicked()
+{
+    _answer1 = "0";
+}
+
+void CDlgQuestions::on_rbAnswer2Yes_clicked()
+{
+    _answer2 = "1";
+}
+
+void CDlgQuestions::on_rbAnswer2No_clicked()
+{
+    _answer2 = "0";
+}
+
+void CDlgQuestions::on_rbAnswer3Yes_clicked()
+{
+    _answer3 = "1";
+}
+
+void CDlgQuestions::on_rbAnswer3No_clicked()
+{
+    _answer3 = "0";
 }

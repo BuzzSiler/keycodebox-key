@@ -1508,9 +1508,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>75</x>
+      <x>76</x>
       <y>110</y>
-      <width>580</width>
+      <width>591</width>
       <height>41</height>
      </rect>
     </property>
@@ -1553,9 +1553,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>75</x>
+      <x>76</x>
       <y>220</y>
-      <width>580</width>
+      <width>591</width>
       <height>41</height>
      </rect>
     </property>
@@ -1592,9 +1592,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>75</x>
-      <y>327</y>
-      <width>580</width>
+      <x>76</x>
+      <y>330</y>
+      <width>591</width>
       <height>41</height>
      </rect>
     </property>
@@ -1620,7 +1620,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>327</y>
+      <y>330</y>
       <width>75</width>
       <height>41</height>
      </rect>
@@ -1657,6 +1657,114 @@
     <property name="standardButtons">
      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
     </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>220</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="hloChevinAnswer2">
+     <item>
+      <widget class="QRadioButton" name="rbAnswer2Yes">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Yes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbAnswer2No">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>No</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>330</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="hloChevinAnswer3">
+     <item>
+      <widget class="QRadioButton" name="rbAnswer3Yes">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Yes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbAnswer3No">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>No</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>110</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="hloChevinAnswer1">
+     <item>
+      <widget class="QRadioButton" name="rbAnswer1Yes">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Yes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbAnswer1No">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>No</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>

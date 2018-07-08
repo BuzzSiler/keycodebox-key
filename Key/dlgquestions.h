@@ -30,9 +30,6 @@ class CDlgQuestions : public QDialog
         void on_edtAnswer2_clicked();
         void on_edtAnswer3_clicked();
 
-//        void on_bbOkCancel_accepted();
-//        void on_bbOkCancel_rejected();
-
         void on_clrAnswer1_clicked();
         void on_clrAnswer2_clicked();
         void on_clrAnswer3_clicked();
@@ -41,12 +38,23 @@ class CDlgQuestions : public QDialog
 
         void on_bbOkCancel_rejected();
 
+        void on_rbAnswer1Yes_clicked();
+        void on_rbAnswer1No_clicked();
+        void on_rbAnswer2Yes_clicked();
+        void on_rbAnswer2No_clicked();
+        void on_rbAnswer3Yes_clicked();
+        void on_rbAnswer3No_clicked();
+
     private:
-        QString _lockNum;
         Ui::CDlgQuestions *ui;
+        QString _lockNum;
+        QString _answer1;
+        QString _answer2;
+        QString _answer3;
+        bool _chevin_enabled;
+
         void RunKeyboard(QString& text);
         void enableOk();
-
 
 };
 
