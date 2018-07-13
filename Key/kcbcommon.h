@@ -4,6 +4,7 @@
 #include <QtGlobal>
 #include <QDateTime>
 #include <QDebug>
+#include <QObject>
 
 
 #define KCB_FAILED (-1)
@@ -52,12 +53,14 @@ static const QDateTime DEFAULT_DATE_TIME = QDateTime(QDate(2016,6,1), QTime(12,0
 #define DAYS_IN_TWOWEEKS (2*DAYS_IN_WEEK)
 #define DAYS_IN_MONTH(dt) (dt.daysInMonth())
 
-const QString USER_CODE_TAKE_RETURN_PROMPT = QString("<%1>").arg(tr("Select Take or Return"));
+
+
+const QString USER_CODE_TAKE_RETURN_PROMPT = QString("<%1>").arg(QObject::tr("Select Take or Return"));
 #ifdef ENABLE_FLEETWAVE_INTERFACE
-const QString USER_CODE_PROMPT = QString("<%1>").arg(tr("Please Present Your Card"));
+const QString USER_CODE_PROMPT = QString("<%1>").arg(QObject::tr("Please Present Your Card"));
 #else
-const QString USER_CODE_PROMPT = QString("<%1 #1>").arg(tr("Please Enter Code"));
-const QString USER_CODE_CODE2_PROMPT = QString("<%1>").arg(tr("Please Enter Second Code"))
+const QString USER_CODE_PROMPT = QString("<%1 #1>").arg(QObject::tr("Please Enter Code"));
 #endif
+const QString USER_CODE_CODE2_PROMPT = QString("<%1>").arg(QObject::tr("Please Enter Second Code"));
 
 #endif
