@@ -12,7 +12,9 @@
 #include "kcbcommon.h"
 #include "kcbapplication.h"
 #include "kcbsystem.h"
-
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+#include "fleetwave.h"
+#endif
 
 void CModelSecurity::openDatabase()
 {
@@ -205,32 +207,43 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
     }
     else
     {
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+
         // We have received a code.  We need to send it to Chevin and get authorization
         if ( kcb::Application::isTakeSelection() )
         {
             QString lockNum;
             KCB_DEBUG_TRACE("(CHEVIN) Received Take Code request" << code);
             KCB_DEBUG_TRACE("(CHEVIN) Requesting authorization ...");
-            bool success = kcb::SendChevinTakeRequest(code, lockNum);
-            if (success)
+            fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendTakeRequest(code, lockNum);
+            if (result == fleetwave::FLEETWAVE_OK)
             {
                 emit __OnSecurityCheckSuccess(lockNum);
 
                 KCB_DEBUG_TRACE("(CHEVIN) Lock opened ... Sending Confirmation to Chevin");
-                bool success = kcb::SendChevinTakeComplete(code, lockNum);
-                if (success)
+                result = fleetwave::SendTakeComplete(code, lockNum);
+                if (result == fleetwave::FLEETWAVE_OK)
                 {
                     KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Take Complete");
                 }
-                else
-                {
-                    KCB_DEBUG_TRACE("(CHEVIN) Take Complete failed");
-                }
+            }
+
+            if (result == fleetwave::FLEETWAVE_ERROR)
+            {
+                // Error means we communicated but got the wrong results.
+                // The best we can say is that the code was wrong
+                KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
+                emit __OnSecurityCheckedFailed();
+            }
+            else if (result == fleetwave::FLEETWAVE_FAILED)
+            {
+                KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
+                // We don't have a path for handling this
+                emit __OnSecurityCheckedFailed();
             }
             else
             {
-                KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
-                emit __OnSecurityCheckedFailed();
+                KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
             }
         }
         else if ( kcb::Application::isReturnSelection() )
@@ -242,8 +255,8 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 
             KCB_DEBUG_TRACE("(CHEVIN) Received Return Code Request" << code);
             KCB_DEBUG_TRACE("(CHEVIN) Requesting Chevin to authorize ...");
-            bool success = kcb::SendChevinReturnRequest(code, lockNum, question1, question2, question3);
-            if (success)
+            fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendReturnRequest(code, lockNum, question1, question2, question3);
+            if (result == fleetwave::FLEETWAVE_OK)
             {
                 KCB_DEBUG_TRACE("(CHEVIN) Success send Return Request");
                 emit __QuestionUserDialog(lockNum,
@@ -252,17 +265,156 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                                           question3);
                 KCB_DEBUG_TRACE("(CHEVIN) Return from __QuestionUserDialog");
             }
+            else if (result == fleetwave::FLEETWAVE_ERROR)
+            {
+                // Error means we communicated but got the wrong results.
+                // The best we can say is that the code was wrong
+                KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
+                emit __OnSecurityCheckedFailed();
+            }
+            else if (result == fleetwave::FLEETWAVE_FAILED)
+            {
+                KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
+                // We don't have a path for handling this
+                emit __OnSecurityCheckedFailed();
+            }
             else
             {
-                KCB_DEBUG_TRACE("(CHEVIN) Return Request Failed");
-                emit __OnSecurityCheckedFailed();
+                KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
             }
         }
         else
         {
-            KCB_DEBUG_TRACE("(CHEVIN) Unknown code" << code);
-            emit __OnAdminSecurityCheckFailed();
+            KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
         }
+#else
+        bool bSecondCodeRequired;
+        bool bFingerprintRequired = false;
+        int nDoorNum;
+
+        if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
+        {
+            qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
+
+            if( CheckPredictiveAccessCode(code, nDoorNum) )
+            {
+                // Check again to see if we match a second code existing in the codes table
+                QString sCodeEnc = CEncryption::encryptString(code);
+                QString lockNums;
+
+                int result = _ptblCodes->checkCodeOne(sCodeEnc,
+                                                      bSecondCodeRequired,
+                                                      bFingerprintRequired,
+                                                      lockNums);
+                if( result == KCB_SUCCESS && lockNums != "" )
+                {
+                    // need to check if fingerprint security is enabled
+                    // if so, check for existence of existing fingerprints
+                    // if fingerprints do not exist, open up enroll dialog
+                    // (otherwise let user know fingerprints are enrolled?
+                    //  or emit __OnSecurityCheckFailed()
+
+                    // this is probably a good time to mention,
+                    // fingerprints for a second code are stored like:
+                    //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
+                    // single code are of course stored like:
+                    //   /home/pi/run/prints/<codeOne>/<codeOne>
+
+                    // need to do check again for code 2
+
+                    if( bSecondCodeRequired )
+                    {
+                        emit __OnRequireCodeTwo();
+                    }
+                    else
+                    {
+                        if( bFingerprintRequired == true)
+                        {
+                            //we need to check if a fingerprint directory already exists,
+                            // if they do, do not attempt enrollment
+                            if( !QDir("/home/pi/run/prints/" + code).exists() )
+                            {
+                                emit __EnrollFingerprintDialog(code);
+                                emit __EnrollFingerprint(code);
+                            }
+                            else
+                            {
+                                emit __OnSecurityCheckedFailed();
+                            }
+                            return;
+                        }
+
+                        emit __OnSecurityCheckSuccess(lockNums);
+                        emit __OnCreateHistoryRecordFromLastPredictiveLogin(lockNums, code);
+                    }
+                }
+                else
+                {
+                    emit __OnSecurityCheckedFailed();
+                }
+             }
+        }
+        else
+        {
+
+            QString sCodeEnc = CEncryption::encryptString(code);
+            QString lockNums;
+
+            KCB_DEBUG_TRACE("Encrypted Code" << sCodeEnc);
+
+            int result = _ptblCodes->checkCodeOne(sCodeEnc,
+                                                  bSecondCodeRequired,
+                                                  bFingerprintRequired,
+                                                  lockNums);
+            KCB_DEBUG_TRACE("Locks" << lockNums);
+            if( result == KCB_SUCCESS && lockNums != "" )
+            {
+                // need to check if fingerprint security is enabled
+                // if so, check for existence of existing fingerprints
+                // if fingerprints do not exist, open up enroll dialog
+                // (otherwise let user know fingerprints are enrolled?
+                //  or emit __OnSecurityCheckFailed()
+
+                // this is probably a good time to mention,
+                // fingerprints for a second code are stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
+                // single code are of course stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>
+
+                // need to do check again for code 2
+
+                if( bSecondCodeRequired )
+                {
+                    emit __OnRequireCodeTwo();
+                }
+                else
+                {
+                    if( bFingerprintRequired == true
+                    {
+                        //we need to check if a fingerprint directory already exists,
+                        // if they do, do not attempt enrollment
+                        if( !QDir("/home/pi/run/prints/" + code).exists() )
+                        {
+                            emit __EnrollFingerprintDialog(code);
+                            emit __EnrollFingerprint(code);
+                        }
+                        else
+                        {
+                            emit __OnSecurityCheckedFailed();
+                        }
+                        KCB_DEBUG_TRACE("fingerprint required");
+                        return;
+                    }
+
+                    emit __OnSecurityCheckSuccess(lockNums);
+                }
+            }
+            else
+            {
+                emit __OnSecurityCheckedFailed();
+            }
+
+#endif
     }
 
     KCB_DEBUG_EXIT;
@@ -437,15 +589,28 @@ void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString 
     
     emit __OnSecurityCheckSuccessWithAnswers(lockNums, answer1, answer2, answer3);
 
-    bool success = kcb::SendChevinReturnComplete(lockNums, answer1, answer2, answer3);
-    if (success)
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+    fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendReturnComplete(lockNums, answer1, answer2, answer3);
+    if (result == fleetwave::FLEETWAVE_OK)
     {
         KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Return Complete");
     }
+    else if (result == fleetwave::FLEETWAVE_ERROR)
+    {
+        // Error means we communicated but got the wrong results.
+        // The best we can say is that the code was wrong
+        KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
+    }
+    else if (result == fleetwave::FLEETWAVE_FAILED)
+    {
+        KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
+        // We don't have a path for handling this
+    }
     else
     {
-        KCB_DEBUG_TRACE("(CHEVIN) Return Complete failed");
+        KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
     }
+#endif    
     KCB_DEBUG_EXIT;
 }
 

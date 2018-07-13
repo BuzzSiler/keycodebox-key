@@ -3,28 +3,9 @@
 #include <QProcess>
 #include "kcbcommon.h"
 
-static const QString CHEVIN_SCRIPT = QString("/home/pi/kcb-config/scripts/chevin.py");
-
-static bool isValidLock(QString lock)
-{
-    bool result;
-
-    int lockNumTest = lock.toInt(&result, 10);
-    KCB_DEBUG_TRACE(lockNumTest);
-    if (result)
-    {
-        if (lockNumTest >= 1 && lockNumTest <= 32)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 namespace kcb
 {
-    void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr)
+    void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status)
     {
         QProcess proc;
 
@@ -39,6 +20,7 @@ namespace kcb
 
         stdOut = proc.readAllStandardOutput();
         stdErr = proc.readAllStandardError();
+        status = proc.exitStatus();
     }
 
     void GetRpiSerialNumber(QString& serial_number)
@@ -48,10 +30,11 @@ namespace kcb
         arguments << "/proc/cpuinfo";
         QString stdOut;
         QString stdErr;
+        int status;
 
         serial_number = "Unknown";
 
-        ExecuteCommand(program, arguments, stdOut, stdErr);
+        ExecuteCommand(program, arguments, stdOut, stdErr, status);
 
         /*
             pi@raspberrypi:~$ cat /proc/cpuinfo
@@ -96,8 +79,9 @@ namespace kcb
 //        arguments << QString("/home/pi/kcb-config/config/vnc_creds.txt");
         QString stdOut;
         QString stdErr;
+        int status;
 
-        ExecuteCommand(program, arguments, stdOut, stdErr);
+        ExecuteCommand(program, arguments, stdOut, stdErr, status);
 
         qDebug() << stdOut;
         qDebug() << stdErr;
@@ -119,147 +103,6 @@ namespace kcb
         // ExtractCommandOutput(pF, sOutput);
         // fclose(pF);
     }
-
-    bool SendChevinTakeRequest(QString code, QString& lockNum)
-    {
-        KCB_DEBUG_TRACE("Requesting code" << code);
-
-        QString program("python");
-        QStringList arguments;
-        arguments << QString(CHEVIN_SCRIPT);
-        arguments << QString("take");
-        arguments << QString("request");
-        arguments << QString("%1").arg(code);
-        QString stdOut;
-        QString stdErr;
-        bool result;
-
-        ExecuteCommand(program, arguments, stdOut, stdErr);
-        if (stdOut == "failed")
-        {
-            return false;
-        }
-
-        result = isValidLock(stdOut);
-        if (!result)
-        {
-            return result;
-        }
-
-        lockNum = stdOut;
-        KCB_DEBUG_TRACE("Received lock" << lockNum);
-        
-        return true;
-    }
-
-    bool SendChevinTakeComplete(QString code, QString lockNum)
-    {
-        KCB_DEBUG_TRACE("Completing code" << code << "Lock" << lockNum);
-
-        QString program("python");
-        QStringList arguments;
-        arguments << QString(CHEVIN_SCRIPT);
-        arguments << QString("take");
-        arguments << QString("complete");
-        arguments << QString("%1").arg(lockNum);
-        QString stdOut;
-        QString stdErr;
-        bool result;
-
-        ExecuteCommand(program, arguments, stdOut, stdErr);
-        if (stdOut == "failed")
-        {
-            return false;
-        }
-
-        result = isValidLock(stdOut);
-        if (!result)
-        {
-            return result;
-        }
-
-        KCB_DEBUG_TRACE("Received lock" << stdOut);
-
-        return lockNum == stdOut;
-    }
-
-    bool SendChevinReturnRequest(QString code, QString& lockNum, QString& question1, QString& question2, QString& question3)
-    {
-        KCB_DEBUG_TRACE("Requesting code" << code);
-
-        QString program("python");
-        QStringList arguments;
-        arguments << QString(CHEVIN_SCRIPT);
-        arguments << QString("return");
-        arguments << QString("request");
-        arguments << QString("%1").arg(code);
-        QString stdOut;
-        QString stdErr;
-        bool result;
-
-        ExecuteCommand(program, arguments, stdOut, stdErr);
-        if (stdOut == "failed")
-        {
-            return false;
-        }
-
-        QStringList response = stdOut.split(',');        
-        if (response.count() != 4)
-        {
-            KCB_DEBUG_TRACE("Incorrect number of response parameters: " << response.count() << stdOut);
-            return false;
-        }
-
-        result = isValidLock(response[0]);
-        if (!result)
-        {
-            return result;
-        }
-
-        lockNum = response[0];
-        question1 = response[1];
-        question2 = response[2];
-        question3 = response[3];
-
-        KCB_DEBUG_TRACE("Received lock" << lockNum << "Questions" << question1 << question2 << question3);
-        return true;
-    }
-
-    bool SendChevinReturnComplete(QString lockNum, QString answer1, QString answer2, QString answer3)
-    {
-        KCB_DEBUG_TRACE("Completing lock" << lockNum << answer1 << answer2 << answer3);
-
-        QString program("python");
-        QStringList arguments;
-        arguments << QString(CHEVIN_SCRIPT);
-        arguments << QString("return");
-        arguments << QString("complete");
-
-        arguments << QString("%1,%2,%3,%4").arg(lockNum).arg(answer1).arg(answer2).arg(answer3);
-        //arguments << QString("\"%1\"").arg(answer1);
-        //arguments << QString("\"%1\"").arg(answer2);
-        //arguments << QString("\"%1\"").arg(answer3);
-        QString stdOut;
-        QString stdErr;
-        bool result;
-
-        ExecuteCommand(program, arguments, stdOut, stdErr);
-        if (stdOut == "failed")
-        {
-            return false;
-        }
-
-        result = isValidLock(stdOut);
-        if (!result)
-        {
-            return result;
-        }
-
-        KCB_DEBUG_TRACE("Received lock" << stdOut);
-
-        return lockNum == stdOut;
-    }
-
 
 
 }

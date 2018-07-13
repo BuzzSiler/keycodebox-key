@@ -14,12 +14,15 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
     _lockNum(""),
     _answer1("0"),
     _answer2("0"),
-    _answer3("0"),
-    _chevin_enabled(true)
+    _answer3("0")
 
 {
     ui->setupUi(this);
 
+    // For some reason, the admin form does not show full screen without the following
+    // flags being set.  Maybe this should be don't at in the main so it gets
+    // inherited?  Not sure.  Until this is resolved, just set these flags.
+    CDlgQuestions::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     CDlgQuestions::showFullScreen();
 
     ui->rbAnswer1No->setVisible(_chevin_enabled);
@@ -74,35 +77,46 @@ void CDlgQuestions::setValues(QString lockNum, QString question1, QString questi
 {
     _lockNum = lockNum;
 
-    if (_chevin_enabled)
+    if (!question1.isEmpty())
     {
-        ui->rbAnswer1No->setChecked(_chevin_enabled);
-        ui->rbAnswer2No->setChecked(_chevin_enabled);
-        ui->rbAnswer3No->setChecked(_chevin_enabled);
-
-        on_rbAnswer1No_clicked();
-        on_rbAnswer2No_clicked();
-        on_rbAnswer3No_clicked();
-    }
-    else
-    {
-        if (!question1.isEmpty())
+        ui->label_question1->setText(question1);
+        if (_chevin_enabled)
         {
-          ui->label_question1->setText(question1);
-          ui->edtAnswer1->setEnabled(true);
-          ui->edtAnswer1->setText("");
+            ui->rbAnswer1No->setChecked(_chevin_enabled);
+            on_rbAnswer1No_clicked();
         }
-        if (!question2.isEmpty())
+        else
         {
-          ui->label_question2->setText(question2);
+            ui->edtAnswer1->setEnabled(true);
+            ui->edtAnswer1->setText("");
+        }
+    }
+    if (!question2.isEmpty())
+    {
+        ui->label_question2->setText(question2);
+        if (_chevin_enabled)
+        {
+            ui->rbAnswer2No->setChecked(_chevin_enabled);
+            on_rbAnswer2No_clicked();
+        }
+        else
+        {
           ui->edtAnswer2->setEnabled(true);
           ui->edtAnswer2->setText("");
         }
-        if (!question3.isEmpty())
+    }
+    if (!question3.isEmpty())
+    {
+        ui->label_question3->setText(question3);
+        if (_chevin_enabled)
         {
-          ui->label_question3->setText(question3);
-          ui->edtAnswer3->setEnabled(true);
-          ui->edtAnswer3->setText("");
+            ui->rbAnswer3No->setChecked(_chevin_enabled);
+            on_rbAnswer3No_clicked();
+        }
+        else
+        {
+            ui->edtAnswer3->setEnabled(true);
+            ui->edtAnswer3->setText("");
         }
     }
 

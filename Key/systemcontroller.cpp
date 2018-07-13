@@ -20,6 +20,9 @@
 #include "frmselectlocks.h"
 #include "kcbcommon.h"
 #include "kcbapplication.h"
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+#include "omnikey5427ckreader.h"
+#endif
 
 
 static const QString DEFAULT_SMTP_SERVER = "smtpout.secureserver.net";
@@ -255,7 +258,11 @@ void CSystemController::initializeReaders()
         _pdFingerprintVerify->hide();
     }
     
-
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+    _omnikey5427CKReader = new Omnikey5427CKReader();
+    _omnikey5427CKReader->Start();
+    connect(_omnikey5427CKReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
+#endif
     connect(&_securityController, SIGNAL(__TrigQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
     connect(&_securityController, SIGNAL(__TrigQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUser(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
@@ -336,10 +343,13 @@ void CSystemController::OnHIDCard(QString sCode1, QString sCode2)
 {
     qDebug() << "CSystemController::OnHIDCard(" << sCode1 << ", " << sCode2 << ")";
 
-    if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) {
+    if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
+    {
         qDebug() << "...ETimeoutScreen || EUserCodeOne:" << sCode1;
         emit __onUserCodeOne(sCode1);
-    } else if( _systemState == EUserCodeTwo) {
+    } 
+    else if( _systemState == EUserCodeTwo) 
+    {
         qDebug() << "... EUserCodeTwo: " << sCode2;
         emit __onUserCodeTwo(sCode2);
     }
@@ -662,11 +672,11 @@ void CSystemController::resetCodeMessage()
     KCB_DEBUG_ENTRY;
     if(_systemState == EUserCodeOne) 
     {
-        emit __OnCodeMessage(QString("<%1 #1>").arg(tr("Please Enter Code")));
+        emit __OnCodeMessage(USER_CODE_PROMPT);
     } 
     else if(_systemState == EUserCodeTwo) 
     {
-        emit __OnCodeMessage(QString("<%1>").arg(tr("Please Enter Second Code")));
+        emit __OnCodeMessage(USER_CODE_CODE2_PROMPT);
     }
     KCB_DEBUG_EXIT;
 }

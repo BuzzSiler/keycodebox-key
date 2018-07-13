@@ -99,7 +99,6 @@ void CFrmUserCode::onCodeEntered()
 {
     KCB_DEBUG_ENTRY;
 
-
     QString sCode = ui->edCode->text();
     KCB_DEBUG_TRACE("Code Entered:" << sCode);
 
@@ -109,6 +108,7 @@ void CFrmUserCode::onCodeEntered()
         KCB_DEBUG_TRACE("shutting down!");
         std::exit(1);
     }
+
     QApplication::processEvents();    
     if(sCode.length() > 0 )
     {
@@ -155,7 +155,14 @@ void CFrmUserCode::OnClearCodeDisplay()
 
 void CFrmUserCode::OnSwipeCode(QString sCode)
 {
-    qDebug() << "CFrmUserCode::OnSwipeCode" << sCode;
+    KCB_DEBUG_TRACE(sCode);
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+    if (!kcb::Application::isTakeSelection() && !kcb::Application::isReturnSelection())
+    {
+        KCB_DEBUG_TRACE("Neither Take nor Return have been selected, returning");
+        return;
+    }
+#endif
     ui->edCode->setText(sCode);
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
@@ -174,15 +181,15 @@ void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
     if (sCodeMsg == "Code 1")
     {
         if (m_takereturn_state)
-        {
+        {            
             SetDisplayTakeReturnButtons(true);
             SetDisplayCodeEntryControls(false);  
-            ui->edCode->setPlaceholderText(QString("<%1>").arg(tr("Select Take or Return")));
+            ui->edCode->setPlaceholderText(USER_CODE_TAKE_RETURN_PROMPT);
         }
         else
         {
             SetDisplayCodeEntryControls(true);
-            ui->edCode->setPlaceholderText(QString("%1 #1").arg(tr("Please Enter Code")));
+            ui->edCode->setPlaceholderText(USER_CODE_PROMPT);
         }
     }
     else
@@ -357,7 +364,11 @@ void CFrmUserCode::SetDisplayCodeEntryControls(bool state)
 {
     KCB_DEBUG_ENTRY;
     KCB_DEBUG_TRACE("CodeEntryControls state" << state);
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+    ui->grpKeypad->setEnabled(false);
+#else
     ui->grpKeypad->setEnabled(state);
+#endif    
     ui->btnShowHideCode->setEnabled(state);
     ui->btnIdentifyFingerPrint->setEnabled(state);
     KCB_DEBUG_EXIT;
@@ -384,8 +395,12 @@ void CFrmUserCode::on_pbTake_clicked()
 {
     KCB_DEBUG_ENTRY;
     SetDisplayCodeEntryControls(true);
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+    ui->pbTake->setDisabled(true);
+    ui->pbReturn->setDisabled(true);
+#endif    
     kcb::Application::setTakeAccessSelection();
-    ui->edCode->setPlaceholderText(QString("<%1 #1>").arg(tr("Please Enter Code")));
+    ui->edCode->setPlaceholderText(USER_CODE_PROMPT);
     KCB_DEBUG_EXIT;
 }
 
@@ -393,8 +408,12 @@ void CFrmUserCode::on_pbReturn_clicked()
 {
     KCB_DEBUG_ENTRY;
     SetDisplayCodeEntryControls(true);
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+    ui->pbTake->setDisabled(true);
+    ui->pbReturn->setDisabled(true);
+#endif    
     kcb::Application::setReturnAccessSelection();
-    ui->edCode->setPlaceholderText(QString("<%1 #1>").arg(tr("Please Enter Code")));
+    ui->edCode->setPlaceholderText(USER_CODE_PROMPT);
     KCB_DEBUG_EXIT;
 }
 

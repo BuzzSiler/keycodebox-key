@@ -51,7 +51,11 @@ class CDlgQuestions : public QDialog
         QString _answer1;
         QString _answer2;
         QString _answer3;
-        bool _chevin_enabled;
+#ifdef ENABLE_FLEETWAVE_INTERFACE
+        bool _chevin_enabled{true};
+#else
+        bool _chevin_enabled{false};
+#endif
 
         void RunKeyboard(QString& text);
         void enableOk();
