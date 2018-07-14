@@ -10,5 +10,8 @@ namespace kcb
     void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status);
     void GetRpiSerialNumber(QString& serial_number);
     void SetVNCCredentials(QString vnc_port, QString vnc_password);
+    QString GetGatewayAddress();
+    bool FPingAddress(QString address);
+    
 }
 #endif // KCBSYSTEM_H

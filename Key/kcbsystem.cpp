@@ -104,5 +104,53 @@ namespace kcb
         // fclose(pF);
     }
 
+    QString GetGatewayAddress()
+    {
+        /*
+            Command:
+                ip route show
+
+            Outputs:
+                default via 192.168.1.1 dev eth0  metric 202
+                192.168.1.0/24 dev eth0  proto kernel  scope link  src 192.168.1.144  metric 202
+                192.168.63.0/24 dev usb0  proto kernel  scope link  src 192.168.63.100  metric 204
+        */
+        QString stdOut;
+        QString stdErr;
+        int status;
+        ExecuteCommand(QString("ip"), QStringList() << QString("route") << QString("show"), stdOut, stdErr, status);
+
+        QString result("");
+        if (!stdOut.isEmpty())
+        {
+            /* Take the 3rd field of the first line */
+
+            QStringList lines = stdOut.split('\n');
+
+            if (lines.count() >= 1)
+            {
+                QString line = lines[0];
+
+                if (line.contains("default via"))
+                {
+                    QStringList fields = line.split(' ');
+                    
+                    if (fields.count() >= 3)
+                    {
+                        result = fields[2];
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    bool FPingAddress(QString address)
+    {
+        int exitCode = QProcess::execute("fping", QStringList() << QString("-r 0 -t 50") << address);
+
+        return (exitCode == 0) ? true : false;
+    }
 
 }
