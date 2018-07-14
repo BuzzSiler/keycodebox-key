@@ -46,6 +46,15 @@ static const char CMD_LIST_SYSTEM_FLAGS[] = "ls /home/pi/run/* | grep 'flag'";
 static const char CMD_READ_TIME_ZONE[] = "readlink /etc/localtime";
 static const QString CMD_REMOVE_FP_FILE = "sudo rm -rf /home/pi/run/prints/\%1";
 
+static const QString red("color: rgb(255, 0, 0);");
+static const QString blue("color: rgb(0, 0, 255);");
+static const QString med_sea_green("color: rgb(60,179,113);");
+static const QString white("color: rgb(255, 255, 255);");
+
+static const QString CAN_MULTICAST_STYLESHEET = QString("QLabel { background-color : rgb(60,179,113); color : blue; }");
+static const QString CANNOT_MULTICAST_STYLESHEET = QString("QLabel { background-color : rgb(60,179,113): color : white; }");
+static const QString IP_ADDRESS_ERROR = red;
+
 static const int DISPLAY_POWER_DOWN_TIMEOUT[] = {
      0,             // None
     10 * 1000,      // 10 seconds
@@ -284,105 +293,105 @@ int CFrmAdminInfo::nthSubstr(int n, const std::string& s, const std::string& p)
 
 void CFrmAdminInfo::getSystemIPAddressAndStatus()
 {
-    QList<QString> possibleMatches;
+    QList< QPair<QString, unsigned int> > possibleMatches;
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
 
-    static const QString red("color: rgb(255, 0, 0);");
-    static const QString blue("color: rgb(0, 0, 255);");
-    static const QString med_sea_green("color: rgb(60,179,113);");
-    static const QString white("color: rgb(255, 255, 255);");
-
-    if (!ifaces.isEmpty())
+    if (ifaces.isEmpty())
     {
-        for(int i=0; i < ifaces.size(); i++)
+        return;
+    }
+
+    QList<QNetworkInterface> qualified_ifaces;
+
+    for (int i=0; i < ifaces.size(); i++)
+    {
+        unsigned int flags = ifaces[i].flags();
+        bool isLoopback = (bool)(flags & QNetworkInterface::IsLoopBack);
+        bool isP2P = (bool)(flags & QNetworkInterface::IsPointToPoint);
+        bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
+        QString name = ifaces[i].name();
+
+        /* The Omnikey5427 HID reader shows up on a USB network when plugged in
+           I'm not sure if that is the reader or the pcscd application that is
+           doing it.  Either way we aren't interested in USB networks
+         */
+        if ( name.contains("usb") )
         {
-            unsigned int flags = ifaces[i].flags();
-            bool isLoopback = (bool)(flags & QNetworkInterface::IsLoopBack);
-            bool isP2P = (bool)(flags & QNetworkInterface::IsPointToPoint);
-            bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
-            bool checkSuccessful = false;
-            QString pingAddress = "";
-            QString parameter = "-r 0 -t 50";
-
-            // If this interface isn't running, we don't care about it
-            if ( !isRunning ) continue;
-            // We only want valid interfaces that aren't loopback/virtual and not point to point
-            if ( !ifaces[i].isValid() || isLoopback || isP2P ) continue;
-            QList<QHostAddress> addresses = ifaces[i].allAddresses();
-            for(int a=0; a < addresses.size(); a++)
-            {
-                // Ignore local host
-                if ( addresses[a] == QHostAddress::LocalHost ) continue;
-
-                // Ignore non-ipv4 addresses
-                if ( !addresses[a].toIPv4Address() ) continue;
-
-                QString ip = addresses[a].toString();
-                if ( ip.isEmpty() ) continue;
-                bool foundMatch = false;
-                for (int j=0; j < possibleMatches.size(); j++)
-                {
-                    if ( ip == possibleMatches[j] ) 
-                    { 
-                        foundMatch = true; 
-                        break; 
-                    }
-                }
-
-                if ( !foundMatch ) 
-                { 
-                    possibleMatches.push_back( ip );
-                    //qDebug() << "possible address: " << ifaces[i].humanReadableName() << "->" << ip; 
-                }
-                ui->lblIPAddress->setText(ip);
-                if((bool)(flags & QNetworkInterface::IsUp))
-                {
-                    if((bool)(flags & QNetworkInterface::CanMulticast))
-                    {
-                        ui->lblIPAddress->setStyleSheet("QLabel { background-color : rgb(60,179,113); color : blue; }");
-                    } 
-                    else 
-                    {
-                        ui->lblIPAddress->setStyleSheet("QLabel { background-color : rgb(60,179,113): color : white; }");
-                    }
-
-                    QString period = ".";
-                    uint findN = nthSubstr(3, ip.toStdString(), period.toStdString());
-                    //qDebug() << "CFrmAdminInfo::getSystemIPAddressAndState(), findN: " << QString::number(findN);
-                    if(findN != std::string::npos)
-                    {
-                        pingAddress = ip.mid(0, findN);
-                        if( pingAddress.at( pingAddress.length() - 1) != '.' )
-                        {
-                            pingAddress += ".1";
-                        }
-                        else
-                        {
-                            pingAddress += "1";
-                        }
-
-                        int exitCode = QProcess::execute("fping", QStringList() << parameter << pingAddress);
-                        if( exitCode == 0 )
-                        {
-                            checkSuccessful = true;
-                        }
-                        else
-                        {
-                            ui->lblIPAddress->setVisible(false);
-                        }
-                    }
-                }
-
-                if( !checkSuccessful )
-                {
-                    ui->lblIPAddress->setStyleSheet(red);
-                }
-                else
-                {
-                    ui->lblIPAddress->setVisible(true);
-                }
-            }
+            continue;
         }
+
+        // If this interface isn't running, we don't care about it
+        if ( !isRunning ) 
+        {
+            continue;
+        }
+
+        // We only want valid interfaces that aren't loopback/virtual and not point to point
+        if ( !ifaces[i].isValid() || isLoopback || isP2P ) 
+        {
+            continue;
+        }
+
+        qualified_ifaces.append(ifaces[i]);
+    }
+
+    foreach (auto iface, qualified_ifaces)
+    {
+        QList<QNetworkAddressEntry> addresses = iface.addressEntries();
+
+        foreach (auto addrEntry, addresses)
+        {
+            QHostAddress addr = addrEntry.ip();
+
+            // Ignore local host
+            if ( addr == QHostAddress::LocalHost ) 
+            {
+                continue;
+            }
+
+            // Ignore non-ipv4 addresses
+            if ( !addr.toIPv4Address() ) 
+            {
+                continue;
+            }
+
+            QString ip = addr.toString();
+            if ( ip.isEmpty() ) 
+            {
+                continue;
+            }
+
+            possibleMatches.append(QPair<QString, unsigned int>(ip, iface.flags()));
+        }
+    }
+
+    QPair<QString,unsigned int> ip_display(QString(tr("No Valid Address")), 0);
+
+    if (possibleMatches.length() == 1)
+    {
+        bool checkSuccessful = false;
+        QPair<QString, unsigned int>ip_display(possibleMatches[0]);
+    
+        if (ip_display.second & QNetworkInterface::IsUp)
+        {
+            QString stylesheet = (ip_display.second & QNetworkInterface::CanMulticast) ? CAN_MULTICAST_STYLESHEET : CANNOT_MULTICAST_STYLESHEET;
+            ui->lblIPAddress->setStyleSheet(stylesheet);
+
+            QString gateway = kcb::GetGatewayAddress();
+            checkSuccessful = kcb::FPingAddress(gateway);
+        }
+
+        ui->lblIPAddress->setText(ip_display.first);
+        ui->lblIPAddress->setVisible(checkSuccessful);
+        if( !checkSuccessful )
+        {
+            ui->lblIPAddress->setStyleSheet(IP_ADDRESS_ERROR);
+        }
+    }
+    else
+    {
+        ui->lblIPAddress->setText(ip_display.first);
+        ui->lblIPAddress->setStyleSheet(IP_ADDRESS_ERROR);
     }
 }
 
