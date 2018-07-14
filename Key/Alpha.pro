@@ -85,6 +85,10 @@ SOURCES += main.cpp\
     dlgdownloadreports.cpp \
     kcbsystem.cpp \
     kcbapplication.cpp \
+    fleetwave.cpp \
+    omnikey5427ckreader.cpp \
+    scanner.cpp \
+    keycodeboxsettings.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -155,6 +159,10 @@ HEADERS  += keycodeboxmain.h \
     dlgdownloadreports.h \
     kcbsystem.h \
     kcbapplication.h \
+    fleetwave.h \
+    omnikey5427ckreader.h \
+    scanner.h \
+    keycodeboxsettings.h \
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

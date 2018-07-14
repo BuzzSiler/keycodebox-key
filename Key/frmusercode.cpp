@@ -11,7 +11,9 @@
 #include "version.h"
 #include "kcbcommon.h"
 #include "kcbapplication.h"
+#include "keycodeboxsettings.h"
 
+static bool fleetwave_enabled;
 
 CFrmUserCode::CFrmUserCode(QWidget *parent) :
     QDialog(parent),
@@ -23,6 +25,9 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     ui->setupUi(this);
     CFrmUserCode::showFullScreen();
     initialize();
+
+    KeyCodeBoxSettings kcb_settings(this);
+    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
 }
 
 CFrmUserCode::~CFrmUserCode()
@@ -99,7 +104,6 @@ void CFrmUserCode::onCodeEntered()
 {
     KCB_DEBUG_ENTRY;
 
-
     QString sCode = ui->edCode->text();
     KCB_DEBUG_TRACE("Code Entered:" << sCode);
 
@@ -109,6 +113,7 @@ void CFrmUserCode::onCodeEntered()
         KCB_DEBUG_TRACE("shutting down!");
         std::exit(1);
     }
+
     QApplication::processEvents();    
     if(sCode.length() > 0 )
     {
@@ -155,7 +160,16 @@ void CFrmUserCode::OnClearCodeDisplay()
 
 void CFrmUserCode::OnSwipeCode(QString sCode)
 {
-    qDebug() << "CFrmUserCode::OnSwipeCode" << sCode;
+    KCB_DEBUG_TRACE(sCode);
+    if (fleetwave_enabled)
+    {
+        if (!kcb::Application::isTakeSelection() && !kcb::Application::isReturnSelection())
+        {
+            KCB_DEBUG_TRACE("Neither Take nor Return have been selected, returning");
+            return;
+        }
+    }
+
     ui->edCode->setText(sCode);
     QApplication::processEvents();
     qDebug() << "Code Entered:" << sCode;
@@ -174,15 +188,16 @@ void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
     if (sCodeMsg == "Code 1")
     {
         if (m_takereturn_state)
-        {
+        {            
             SetDisplayTakeReturnButtons(true);
             SetDisplayCodeEntryControls(false);  
-            ui->edCode->setPlaceholderText(QString("<%1>").arg(tr("Select Take or Return")));
+            ui->edCode->setPlaceholderText(USER_CODE_TAKE_RETURN_PROMPT);
         }
         else
         {
             SetDisplayCodeEntryControls(true);
-            ui->edCode->setPlaceholderText(QString("%1 #1").arg(tr("Please Enter Code")));
+            QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
+            ui->edCode->setPlaceholderText(prompt);
         }
     }
     else
@@ -357,7 +372,10 @@ void CFrmUserCode::SetDisplayCodeEntryControls(bool state)
 {
     KCB_DEBUG_ENTRY;
     KCB_DEBUG_TRACE("CodeEntryControls state" << state);
-    ui->grpKeypad->setEnabled(state);
+
+    bool keypad_state = fleetwave_enabled ? false : state;
+    ui->grpKeypad->setEnabled(keypad_state);
+    
     ui->btnShowHideCode->setEnabled(state);
     ui->btnIdentifyFingerPrint->setEnabled(state);
     KCB_DEBUG_EXIT;
@@ -384,8 +402,11 @@ void CFrmUserCode::on_pbTake_clicked()
 {
     KCB_DEBUG_ENTRY;
     SetDisplayCodeEntryControls(true);
+    ui->pbTake->setDisabled(fleetwave_enabled);
+    ui->pbReturn->setDisabled(fleetwave_enabled);
     kcb::Application::setTakeAccessSelection();
-    ui->edCode->setPlaceholderText(QString("<%1 #1>").arg(tr("Please Enter Code")));
+    QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
+    ui->edCode->setPlaceholderText(prompt);
     KCB_DEBUG_EXIT;
 }
 
@@ -393,8 +414,11 @@ void CFrmUserCode::on_pbReturn_clicked()
 {
     KCB_DEBUG_ENTRY;
     SetDisplayCodeEntryControls(true);
+    ui->pbTake->setDisabled(fleetwave_enabled);
+    ui->pbReturn->setDisabled(fleetwave_enabled);    
     kcb::Application::setReturnAccessSelection();
-    ui->edCode->setPlaceholderText(QString("<%1 #1>").arg(tr("Please Enter Code")));
+    QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
+    ui->edCode->setPlaceholderText(prompt);
     KCB_DEBUG_EXIT;
 }
 

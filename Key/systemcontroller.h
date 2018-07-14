@@ -17,6 +17,8 @@
 #include "frmselectlocks.h"
 
 
+class Omnikey5427CKReader;
+
 class CSystemController : public QObject
 {
     Q_OBJECT
@@ -74,7 +76,8 @@ private:
     CAdminRec       *_padminInfo;
 
     CFrmUserCode *_pfUsercode;
-    CDlgFingerprintVerify *_pdFingerprintVerify;    
+    CDlgFingerprintVerify *_pdFingerprintVerify;
+    Omnikey5427CKReader* _omnikey5427CKReader;
 
 
     QTimer      *_ptimer;

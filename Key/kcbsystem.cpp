@@ -5,7 +5,7 @@
 
 namespace kcb
 {
-    void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr)
+    void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status)
     {
         QProcess proc;
 
@@ -20,6 +20,7 @@ namespace kcb
 
         stdOut = proc.readAllStandardOutput();
         stdErr = proc.readAllStandardError();
+        status = proc.exitStatus();
     }
 
     void GetRpiSerialNumber(QString& serial_number)
@@ -29,10 +30,11 @@ namespace kcb
         arguments << "/proc/cpuinfo";
         QString stdOut;
         QString stdErr;
+        int status;
 
         serial_number = "Unknown";
 
-        ExecuteCommand(program, arguments, stdOut, stdErr);
+        ExecuteCommand(program, arguments, stdOut, stdErr, status);
 
         /*
             pi@raspberrypi:~$ cat /proc/cpuinfo
@@ -77,8 +79,9 @@ namespace kcb
 //        arguments << QString("/home/pi/kcb-config/config/vnc_creds.txt");
         QString stdOut;
         QString stdErr;
+        int status;
 
-        ExecuteCommand(program, arguments, stdOut, stdErr);
+        ExecuteCommand(program, arguments, stdOut, stdErr, status);
 
         qDebug() << stdOut;
         qDebug() << stdErr;
@@ -100,5 +103,6 @@ namespace kcb
         // ExtractCommandOutput(pF, sOutput);
         // fclose(pF);
     }
+
 
 }
