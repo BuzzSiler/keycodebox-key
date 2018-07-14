@@ -87,7 +87,8 @@ SOURCES += main.cpp\
     kcbapplication.cpp \
     fleetwave.cpp \
     omnikey5427ckreader.cpp \
-    scanner.cpp
+    scanner.cpp \
+    keycodeboxsettings.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -160,7 +161,8 @@ HEADERS  += keycodeboxmain.h \
     kcbapplication.h \
     fleetwave.h \
     omnikey5427ckreader.h \
-    scanner.h
+    scanner.h \
+    keycodeboxsettings.h \
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \
@@ -197,7 +199,7 @@ unix:!macx: LIBS += -L/usr/lib/arm-linux-gnueabihf/ -lusb-1.0
 
 INCLUDEPATH += /usr/lib/arm-linux-gnueabihf
 DEPENDPATH += /usr/lib/arm-linux-gnueabihf
-DEFINES += SQLITE_CORE ENABLE_FLEETWAVE_INTERFACE
+DEFINES += SQLITE_CORE
 
 CONFIG += c++11
 TRANSLATIONS = trans_fr.ts trans_sp.ts

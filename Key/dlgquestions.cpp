@@ -4,9 +4,12 @@
 #include "kcbkeyboarddialog.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
+#include "keycodeboxsettings.h"
 
 static const QString css_warn = "color: black; background-color: red";
 static const QString css_none = "";
+
+static bool fleetwave_enabled;
 
 CDlgQuestions::CDlgQuestions(QWidget *parent) :
     QDialog(parent),
@@ -25,30 +28,33 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
     CDlgQuestions::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     CDlgQuestions::showFullScreen();
 
-    ui->rbAnswer1No->setVisible(_chevin_enabled);
-    ui->rbAnswer1Yes->setVisible(_chevin_enabled);
-    ui->rbAnswer2No->setVisible(_chevin_enabled);
-    ui->rbAnswer2Yes->setVisible(_chevin_enabled);
-    ui->rbAnswer3No->setVisible(_chevin_enabled);
-    ui->rbAnswer3Yes->setVisible(_chevin_enabled);
+    KeyCodeBoxSettings kcb_settings(this);
+    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
 
-    ui->edtAnswer1->setVisible(!_chevin_enabled);
-    ui->edtAnswer2->setVisible(!_chevin_enabled);
-    ui->edtAnswer3->setVisible(!_chevin_enabled);
-    ui->clrAnswer1->setVisible(!_chevin_enabled);
-    ui->clrAnswer2->setVisible(!_chevin_enabled);
-    ui->clrAnswer3->setVisible(!_chevin_enabled);
+    ui->rbAnswer1No->setVisible(fleetwave_enabled);
+    ui->rbAnswer1Yes->setVisible(fleetwave_enabled);
+    ui->rbAnswer2No->setVisible(fleetwave_enabled);
+    ui->rbAnswer2Yes->setVisible(fleetwave_enabled);
+    ui->rbAnswer3No->setVisible(fleetwave_enabled);
+    ui->rbAnswer3Yes->setVisible(fleetwave_enabled);
 
-    ui->rbAnswer1No->setChecked(_chevin_enabled);
-    ui->rbAnswer2No->setChecked(_chevin_enabled);
-    ui->rbAnswer3No->setChecked(_chevin_enabled);
+    ui->edtAnswer1->setVisible(!fleetwave_enabled);
+    ui->edtAnswer2->setVisible(!fleetwave_enabled);
+    ui->edtAnswer3->setVisible(!fleetwave_enabled);
+    ui->clrAnswer1->setVisible(!fleetwave_enabled);
+    ui->clrAnswer2->setVisible(!fleetwave_enabled);
+    ui->clrAnswer3->setVisible(!fleetwave_enabled);
+
+    ui->rbAnswer1No->setChecked(fleetwave_enabled);
+    ui->rbAnswer2No->setChecked(fleetwave_enabled);
+    ui->rbAnswer3No->setChecked(fleetwave_enabled);
 
     on_rbAnswer1No_clicked();
     on_rbAnswer2No_clicked();
     on_rbAnswer3No_clicked();
 
-    ui->bbOkCancel->button(QDialogButtonBox::Ok)->setDisabled(!_chevin_enabled);
-    ui->bbOkCancel->button(QDialogButtonBox::Cancel)->setEnabled(!_chevin_enabled);
+    ui->bbOkCancel->button(QDialogButtonBox::Ok)->setDisabled(!fleetwave_enabled);
+    ui->bbOkCancel->button(QDialogButtonBox::Cancel)->setEnabled(!fleetwave_enabled);
 }
 
 CDlgQuestions::~CDlgQuestions()
@@ -59,7 +65,7 @@ CDlgQuestions::~CDlgQuestions()
 
 void CDlgQuestions::getValues(QString& question1, QString& question2, QString& question3)
 {
-    if (_chevin_enabled)
+    if (fleetwave_enabled)
     {
         question1 = _answer1;
         question2 = _answer2;
@@ -80,9 +86,9 @@ void CDlgQuestions::setValues(QString lockNum, QString question1, QString questi
     if (!question1.isEmpty())
     {
         ui->label_question1->setText(question1);
-        if (_chevin_enabled)
+        if (fleetwave_enabled)
         {
-            ui->rbAnswer1No->setChecked(_chevin_enabled);
+            ui->rbAnswer1No->setChecked(fleetwave_enabled);
             on_rbAnswer1No_clicked();
         }
         else
@@ -94,9 +100,9 @@ void CDlgQuestions::setValues(QString lockNum, QString question1, QString questi
     if (!question2.isEmpty())
     {
         ui->label_question2->setText(question2);
-        if (_chevin_enabled)
+        if (fleetwave_enabled)
         {
-            ui->rbAnswer2No->setChecked(_chevin_enabled);
+            ui->rbAnswer2No->setChecked(fleetwave_enabled);
             on_rbAnswer2No_clicked();
         }
         else
@@ -108,9 +114,9 @@ void CDlgQuestions::setValues(QString lockNum, QString question1, QString questi
     if (!question3.isEmpty())
     {
         ui->label_question3->setText(question3);
-        if (_chevin_enabled)
+        if (fleetwave_enabled)
         {
-            ui->rbAnswer3No->setChecked(_chevin_enabled);
+            ui->rbAnswer3No->setChecked(fleetwave_enabled);
             on_rbAnswer3No_clicked();
         }
         else
@@ -194,7 +200,7 @@ void CDlgQuestions::on_bbOkCancel_accepted()
     QString answer2;
     QString answer3;
 
-    if (_chevin_enabled)
+    if (fleetwave_enabled)
     {
         answer1 = _answer1;
         answer2 = _answer2;
@@ -209,9 +215,9 @@ void CDlgQuestions::on_bbOkCancel_accepted()
     emit __OnQuestionsSave(_lockNum, answer1, answer2, answer3);
     emit __OnQuestionsClose();
 
-    ui->rbAnswer1No->setChecked(_chevin_enabled);
-    ui->rbAnswer2No->setChecked(_chevin_enabled);
-    ui->rbAnswer3No->setChecked(_chevin_enabled);
+    ui->rbAnswer1No->setChecked(fleetwave_enabled);
+    ui->rbAnswer2No->setChecked(fleetwave_enabled);
+    ui->rbAnswer3No->setChecked(fleetwave_enabled);
 
     on_rbAnswer1No_clicked();
     on_rbAnswer2No_clicked();
@@ -238,7 +244,7 @@ void CDlgQuestions::enableOk()
     bool q2_valid = !q2_required || (q2_required && q2_specified);
     bool q3_valid = !q3_required || (q3_required && q3_specified);
 
-    if (!_chevin_enabled)
+    if (!fleetwave_enabled)
     {
         ui->edtAnswer1->setStyleSheet(q1_valid ? css_none : css_warn);
         ui->edtAnswer2->setStyleSheet(q2_valid ? css_none : css_warn);

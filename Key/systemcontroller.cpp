@@ -20,10 +20,10 @@
 #include "frmselectlocks.h"
 #include "kcbcommon.h"
 #include "kcbapplication.h"
-#ifdef ENABLE_FLEETWAVE_INTERFACE
 #include "omnikey5427ckreader.h"
-#endif
+#include "keycodeboxsettings.h"
 
+static bool fleetwave_enabled;
 
 static const QString DEFAULT_SMTP_SERVER = "smtpout.secureserver.net";
 static const int DEFAULT_SMTP_PORT = 465;
@@ -42,6 +42,9 @@ CSystemController::CSystemController(QObject *parent) :
     _ptimer(0)
 {
     Q_UNUSED(parent);
+
+    KeyCodeBoxSettings kcb_settings(this);
+    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
 }
 
 CSystemController::~CSystemController()
@@ -258,11 +261,13 @@ void CSystemController::initializeReaders()
         _pdFingerprintVerify->hide();
     }
     
-#ifdef ENABLE_FLEETWAVE_INTERFACE
-    _omnikey5427CKReader = new Omnikey5427CKReader();
-    _omnikey5427CKReader->Start();
-    connect(_omnikey5427CKReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
-#endif
+    if (fleetwave_enabled)
+    {
+        _omnikey5427CKReader = new Omnikey5427CKReader();
+        _omnikey5427CKReader->Start();
+        connect(_omnikey5427CKReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
+    }
+
     connect(&_securityController, SIGNAL(__TrigQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
     connect(&_securityController, SIGNAL(__TrigQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUser(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
@@ -672,7 +677,8 @@ void CSystemController::resetCodeMessage()
     KCB_DEBUG_ENTRY;
     if(_systemState == EUserCodeOne) 
     {
-        emit __OnCodeMessage(USER_CODE_PROMPT);
+        QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
+        emit __OnCodeMessage(prompt);
     } 
     else if(_systemState == EUserCodeTwo) 
     {

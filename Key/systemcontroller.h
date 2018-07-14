@@ -17,9 +17,7 @@
 #include "frmselectlocks.h"
 
 
-#ifdef ENABLE_FLEETWAVE_INTERFACE
 class Omnikey5427CKReader;
-#endif
 
 class CSystemController : public QObject
 {
@@ -79,9 +77,7 @@ private:
 
     CFrmUserCode *_pfUsercode;
     CDlgFingerprintVerify *_pdFingerprintVerify;
-#ifdef ENABLE_FLEETWAVE_INTERFACE
     Omnikey5427CKReader* _omnikey5427CKReader;
-#endif
 
 
     QTimer      *_ptimer;
