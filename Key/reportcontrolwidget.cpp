@@ -251,11 +251,11 @@ bool ReportControlWidget::ConfirmDisableSafeToFile()
     QStringList strList = dir.entryList(QStringList() << "KeyCodeBox*.txt", QDir::Files, QDir::Time);
     if (!strList.isEmpty())
     {
-        QString title = "Disable Store Report to File";
-        QString message = "You are disabling 'Store Report to File'\n"
-                            "Continung will delete all report files in the default location.\n"
-                            "To save the report files, select 'No', insert a USB drive and download the reports.\n"
-                            "Do you want to continue?";
+        QString title = tr("Disable Store Report to File");
+        QString message = tr("You are disabling 'Store Report to File'\n"
+                             "Continung will delete all report files in the default location.\n"
+                             "To save the report files, select 'No', insert a USB drive and download the reports.\n"
+                             "Do you want to continue?");
         auto btn = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
         if (btn == QMessageBox::No)
         {
@@ -320,11 +320,11 @@ void ReportControlWidget::on_cbStoreToUsbDrive_clicked()
         QStringList strList = dir.entryList(QStringList() << "KeyCodeBox*.txt", QDir::Files, QDir::Time);
         if (!strList.isEmpty())
         {
-            QString title = "Disable Store to USB Drive";
-            QString message = "You are disabling 'Store to USB Drive'\n"
-                              "Continung will set report storage to the default location.\n"
-                              "All reports on the USB drive will remain.\n"
-                              "Do you want to continue?";
+            QString title = tr("Disable Store to USB Drive");
+            QString message = tr("You are disabling 'Store to USB Drive'\n"
+                                 "Continung will set report storage to the default location.\n"
+                                 "All reports on the USB drive will remain.\n"
+                                 "Do you want to continue?");
             auto btn = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
             if (btn == QMessageBox::No)
             {
@@ -336,7 +336,7 @@ void ReportControlWidget::on_cbStoreToUsbDrive_clicked()
         if (set_to_default)
         {
             ui->cbUsbDrives->clear();
-            ui->cbUsbDrives->addItem("DEFAULT");
+            ui->cbUsbDrives->addItem(tr("DEFAULT"));
             ui->cbUsbDrives->setCurrentIndex(0);
         }
     }
@@ -432,9 +432,9 @@ void ReportControlWidget::on_pbDownloadSelectedReports_clicked()
 
     if (m_usb_drives.count() == 0)
     {
-        QMessageBox::warning(this, "Downloading Reports",
-                             "You have selected to download reports but there is no USB drive inserted.\n"
-                             "You must insert a USB drive before downloading reports.",
+        QMessageBox::warning(this, tr("Downloading Reports"),
+                             tr("You have selected to download reports but there is no USB drive inserted.\n"
+                                "You must insert a USB drive before downloading reports."),
                              QMessageBox::Close);
         ClearSelectAllReports(Qt::Unchecked);
     }

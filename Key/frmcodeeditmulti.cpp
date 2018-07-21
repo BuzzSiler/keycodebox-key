@@ -263,10 +263,10 @@ void FrmCodeEditMulti::on_cbEnableQuestions_stateChanged(int state)
     {
         if (m_questions[0] != "" || m_questions[1] != "" || m_questions[2] != "")
         {
-            QString title = "Warning! Disabling Questions";
-            QString message = "You have selected to disable questions.\n"
-                              "This will clear ALL existing questions.\n"
-                              "Do you want to continue?";
+            QString title = tr("Warning! Disabling Questions");
+            QString message = tr("You have selected to disable questions.\n"
+                                 "This will clear ALL existing questions.\n"
+                                 "Do you want to continue?");
             int result = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
             if (result == QMessageBox::Yes)
             {
@@ -367,10 +367,10 @@ void FrmCodeEditMulti::on_cbEnableCode2_stateChanged(int state)
 
     if (state == Qt::Unchecked)
     {
-        QString title = "Warning! Disabling Code 2";
-        QString message = "You have selected to disable Code 2.\n"
-                          "Continuing will clear Code 2 and ALL existing questions.\n"
-                          "Do you want to continue?";
+        QString title = tr("Warning! Disabling Code 2");
+        QString message = tr("You have selected to disable Code 2.\n"
+                             "Continuing will clear Code 2 and ALL existing questions.\n"
+                             "Do you want to continue?");
         int result = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
         if (result == QMessageBox::Yes)
         {

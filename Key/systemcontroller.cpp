@@ -547,7 +547,7 @@ void CSystemController::OnAdminSecurityCheckOk(QString type)
 
 void CSystemController::OnAdminSecurityCheckFailed()
 {
-    emit __OnCodeMessage("Incorrect Password");
+    emit __OnCodeMessage(tr("Incorrect Password"));
     emit __OnClearEntry();
     emit __AdminSecurityCheckFailed();
 }
