@@ -545,8 +545,11 @@ void CFrmAdminInfo::onCopyRootPathChanged(QString path)
 
 void CFrmAdminInfo::onCopyModelDirectoryLoaded(QString path)
 {
-    qDebug() << "loaded" << path;
-    _pcopymodel->sort(0, Qt::AscendingOrder);
+    KCB_DEBUG_TRACE("loaded" << path);
+    if (_pcopymodel)
+    {
+        _pcopymodel->sort(0, Qt::AscendingOrder);
+    }
 }
 
 void CFrmAdminInfo::on_btnCopyToggleSource_clicked(bool checked)
@@ -584,19 +587,23 @@ void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
         ui->btnCopyFile->setEnabled(false);
     }
 
-    //ui->treeViewCopy->setRootIndex(_pcopymodel->setRootPath(QString("/media/pi/")));
     qDebug() << "Copy from File" << _copyDirectory;
 }
 
 void CFrmAdminInfo::on_btnCopyFile_clicked()
 {
-    qDebug() << "Copy:" << _copyDirectory;
-    QString cmd = "sudo cp '" + _copyDirectory + "' " + "/home/pi/kcb-config/bin/alpha_NEW";
-    qDebug() << "CMD: " << cmd;
-    std::system(cmd.toStdString().c_str());
-    std::system("sudo chmod +x /home/pi/kcb-config/bin/alpha_NEW");
+    KCB_DEBUG_TRACE(_copyDirectory);
 
-    QMessageBox::information(this, tr("File Copied"), tr("New KeyCodeBox application copied.\nSystem requires reboot to run."));
+    bool result = kcb::UpdateAppFile(_copyDirectory);
+
+    if (result)
+    {
+        QMessageBox::information(this, tr("File Copied"), tr("New KeyCodeBox application copied.\nSystem requires reboot to run."));
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Invalid File"), tr("The file selected is not a valid KeyCodeBox application.\nNo changes have been made."));
+    }
 }
 
 
@@ -1948,8 +1955,16 @@ void CFrmAdminInfo::on_btnRebootSystem_clicked()
                                    QMessageBox::Yes, QMessageBox::Cancel);
     if(nRC == QMessageBox::Yes)
     {
-        sync();
-        std::system("sudo shutdown -r now");
+        if(_pcopymodel)
+        {
+            _pcopymodel->disconnect();
+            delete _pcopymodel;
+            _pcopymodel = 0;
+        }
+        QFileInfo fi(_copyDirectory);
+        QString path = fi.absolutePath();
+        kcb::UnmountUsb(path);        
+        kcb::Reboot();
     }
 }
 

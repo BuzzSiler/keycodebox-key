@@ -1,10 +1,19 @@
 #include "kcbsystem.h"
 
+#include <unistd.h>
+
 #include <QProcess>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QFileInfo>
 #include "kcbcommon.h"
 
 namespace kcb
 {
+    static const QString NEW_APP_COPY_COMMAND = "sudo cp %1 %2";
+    static const QString APP_DIR = "/home/pi/kcb-config/bin";
+    static const QString NEW_APP_TARGET = "%1/%2_NEW";
+
     void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status)
     {
         QProcess proc;
@@ -12,7 +21,7 @@ namespace kcb
         stdOut = "";
         stdErr = "";
 
-        KCB_DEBUG_TRACE(program << arguments);
+        //KCB_DEBUG_TRACE(program << arguments);
 
         proc.start(program, arguments);
         (void) proc.waitForStarted();
@@ -151,6 +160,39 @@ namespace kcb
         int exitCode = QProcess::execute("fping", QStringList() << QString("-r 0 -t 50") << address);
 
         return (exitCode == 0) ? true : false;
+    }
+
+    bool UpdateAppFile(QString filename_fq)
+    {
+        // filename_fq is the fully qualified filename
+        // we want to preserve the filename because it has version information
+        QFileInfo fi(filename_fq);
+        QString filename = fi.fileName();
+        KCB_DEBUG_TRACE(filename);
+        QRegularExpression validator("^alpha-v\\d+\\.\\d+\\.\\d+$");
+        QRegularExpressionMatch match = validator.match(filename);
+        bool result = match.hasMatch();
+        if (result)
+        {
+            QString target = NEW_APP_TARGET.arg(APP_DIR).arg(filename);
+            KCB_DEBUG_TRACE("App target" << target);
+            QString cmd = NEW_APP_COPY_COMMAND.arg(filename_fq).arg(target);
+            KCB_DEBUG_TRACE("CMD" << cmd);
+            std::system(cmd.toStdString().c_str());
+        }
+
+        return result;
+    }
+
+    void UnmountUsb(QString path)
+    {
+        std::system(QString("umount %1").arg(path).toStdString().c_str());
+    }
+
+    void Reboot()
+    {
+        sync();
+        std::system("sudo shutdown -r now");
     }
 
 }
