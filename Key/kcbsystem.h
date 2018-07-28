@@ -12,6 +12,8 @@ namespace kcb
     void SetVNCCredentials(QString vnc_port, QString vnc_password);
     QString GetGatewayAddress();
     bool FPingAddress(QString address);
-    
+    bool UpdateAppFile(QString filename_fq);
+    void UnmountUsb(QString path);
+    void Reboot();
 }
 #endif // KCBSYSTEM_H
