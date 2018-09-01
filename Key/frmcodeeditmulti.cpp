@@ -12,6 +12,7 @@
 #include "dlgeditquestions.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
+#include "keycodeboxsettings.h"
 
 static const QString FP_HOME_DIR = "/home/pi/run/prints/";
 static const QString css_warn = "color: black; background-color: red";

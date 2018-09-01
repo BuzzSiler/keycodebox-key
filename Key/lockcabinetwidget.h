@@ -2,6 +2,7 @@
 #define LOCKCABINETWIDGET_H
 
 #include <QWidget>
+#include "keycodeboxsettings.h"
 
 namespace Ui {
     class LockCabinetWidget;
@@ -25,7 +26,7 @@ class LockCabinetWidget : public QWidget
         void setEnabledLocks(QString locks);
         void enableAllLocks();
         void disableAllLocks();
-        void setSelectedCabinet(const QString& cab);
+        void setSelectedCabinet(const QString& cab, const QString& lock);
         void clrSelectedLocks(const QString& lock);
         void setWarning();
         void clrWarning();
@@ -42,16 +43,15 @@ class LockCabinetWidget : public QWidget
     private:
         typedef struct _tag_cab_state
         {
-            int number;
-            int start;
             QVector<bool> states;
             QVector<bool> enabled;
         } CAB_STATE;
 
+        CABINET_VECTOR m_cabinet_info;
         quint8 m_num_cabs;
         quint8 m_locks_per_cab;
         QVector<QString> m_selected_locks;
-        QVector<CAB_STATE> m_cabs;
+        QVector<CAB_STATE> m_cabs;        
         quint8 m_current_cab;
         quint16 m_max_locks;
         QList<QPushButton *> m_lock_buttons;

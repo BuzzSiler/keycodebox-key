@@ -26,8 +26,7 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     CFrmUserCode::showFullScreen();
     initialize();
 
-    KeyCodeBoxSettings kcb_settings(this);
-    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
+    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 }
 
 CFrmUserCode::~CFrmUserCode()
