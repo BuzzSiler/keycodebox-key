@@ -16,7 +16,7 @@ class LockCabinetWidget : public QWidget
         Q_OBJECT
 
     public:
-        explicit LockCabinetWidget(QWidget *parent=0, quint8 num_cabs=1, quint8 locks_per_cab=32);
+        explicit LockCabinetWidget(QWidget *parent=0);
         ~LockCabinetWidget();
 
         QString getSelectedLocks();
@@ -49,11 +49,9 @@ class LockCabinetWidget : public QWidget
 
         CABINET_VECTOR m_cabinet_info;
         quint8 m_num_cabs;
-        quint8 m_locks_per_cab;
         QVector<QString> m_selected_locks;
         QVector<CAB_STATE> m_cabs;        
         quint8 m_current_cab;
-        quint16 m_max_locks;
         QList<QPushButton *> m_lock_buttons;
 
         QSignalMapper& m_mapper;
@@ -68,7 +66,7 @@ class LockCabinetWidget : public QWidget
         void VectorToString(QVector<QString> vtr, QString& str);
         void AddLockToSelected(const QString lock);
         void RemoveLockFromSelected(const QString lock);
-        void CalcLockCabIndecies(const QString lock, quint8& cab_index, quint16& lock_index);
+        void CalcLockCabIndecies(const QString lock, int& cab_index, int& lock_index);
 };
 
 #endif // LOCKCABINETWIDGET_H
