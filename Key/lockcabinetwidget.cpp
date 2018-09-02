@@ -155,7 +155,7 @@ void LockCabinetWidget::clrSelectedLocks(const QString& lock)
     int lock_index;
 
     CalcLockCabIndecies(lock, cab_index, lock_index);
-    if (cab_index > 0 && lock_index > 0)
+    if (cab_index >= 0 && lock_index >= 0)
     {
         m_cabs[m_current_cab].states[lock_index] = false;
         RemoveLockFromSelected(lock);
@@ -187,7 +187,7 @@ void LockCabinetWidget::setEnabledLocks(QString locks)
     foreach (auto lock, locks_vtr)
     {
         CalcLockCabIndecies(lock, cab_index, lock_index);
-        if (cab_index > 0 && lock_index > 0)
+        if (cab_index >= 0 && lock_index >= 0)
         {
             m_cabs[cab_index].enabled[lock_index] = true;
         }

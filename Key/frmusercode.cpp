@@ -382,12 +382,16 @@ void CFrmUserCode::SetDisplayCodeEntryControls(bool state)
 
 void CFrmUserCode::OnDisplayFingerprintButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     m_fp_state = state;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayShowHideButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     m_showhide_state = state;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayTakeReturnButtons(bool state)
