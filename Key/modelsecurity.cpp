@@ -38,8 +38,7 @@ CModelSecurity::CModelSecurity(QObject *parent) : QObject(parent)
 
     qDebug( "Connected!" );
 
-    KeyCodeBoxSettings kcb_settings(this);
-    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
+    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 }
 
 CModelSecurity::~CModelSecurity()

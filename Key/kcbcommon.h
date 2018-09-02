@@ -7,6 +7,9 @@
 #include <QObject>
 
 
+#define MAX_NUM_LOCKS_PER_CABINET 32
+
+
 #define KCB_FAILED (-1)
 #define KCB_SUCCESS (0)
 

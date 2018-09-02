@@ -1,6 +1,7 @@
 #include "kcbapplication.h"
 #include <QString>
 #include <QDebug>
+#include <QObject>
 
 namespace kcb
 {
@@ -23,16 +24,16 @@ namespace kcb
         switch (m_selection)
         {
             case ACCESS_TAKE:
-                selection = "Take";
+                selection = QObject::tr("Take");
                 break;
 
             case ACCESS_RETURN:
-                selection = "Return";
+                selection = QObject::tr("Return");
                 break;
 
             case ACCESS_NONE:
             default:
-                selection = "None";
+                selection = QObject::tr("None");
                 break;
         }
 

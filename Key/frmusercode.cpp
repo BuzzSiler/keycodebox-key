@@ -26,8 +26,7 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     CFrmUserCode::showFullScreen();
     initialize();
 
-    KeyCodeBoxSettings kcb_settings(this);
-    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
+    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 }
 
 CFrmUserCode::~CFrmUserCode()
@@ -202,10 +201,10 @@ void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
     }
     else
     {
-        bool is_thankyou = sCodeMsg.startsWith("Thank You!");
-        bool is_openinglocks = sCodeMsg.startsWith("Opening Locks");
+        bool is_thankyou = sCodeMsg.startsWith(tr("Thank You!"));
+        bool is_openinglocks = sCodeMsg.startsWith(tr("Opening Locks"));
         bool is_cleared = sCodeMsg == "";
-        bool is_cancelling = sCodeMsg.startsWith("Cancelling");
+        bool is_cancelling = sCodeMsg.startsWith(tr("Cancelling"));
 
         bool enable_controls = (is_thankyou || is_openinglocks || is_cleared || is_cancelling) ? false : true;
         SetDisplayCodeEntryControls(enable_controls); 
@@ -346,7 +345,7 @@ void CFrmUserCode::show()
 
     if (m_takereturn_state)
     {
-        ui->edCode->setPlaceholderText("Select Take or Return");
+        ui->edCode->setPlaceholderText(tr("Select Take or Return"));
     }
     else
     {
@@ -383,12 +382,16 @@ void CFrmUserCode::SetDisplayCodeEntryControls(bool state)
 
 void CFrmUserCode::OnDisplayFingerprintButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     m_fp_state = state;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayShowHideButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     m_showhide_state = state;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayTakeReturnButtons(bool state)
@@ -428,13 +431,13 @@ void CFrmUserCode::EnterAdminControl()
 
     QMessageBox msgbox;
 
-    msgbox.setWindowTitle("Administrator");
-    msgbox.setText("You are accessing administrative features.");
+    msgbox.setWindowTitle(tr("Administrator"));
+    msgbox.setText(tr("You are accessing administrative features."));
     msgbox.addButton(QMessageBox::Ok);
     msgbox.addButton(QMessageBox::Cancel);
     msgbox.setDefaultButton(QMessageBox::Cancel);
 
-    QCheckBox* cb = new QCheckBox("Check for Assistant Login");
+    QCheckBox* cb = new QCheckBox(tr("Check for Assistant Login"));
     cb->setChecked(false);
     msgbox.setCheckBox(cb);
 

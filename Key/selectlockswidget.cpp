@@ -9,11 +9,12 @@
 #include "kcbutils.h"
 #include "kcbcommon.h"
 
-SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role, int num_cabs) :
+SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
     QWidget(parent),
     m_role(role),
     m_cancel_open(false),
-    m_lock_cab(* new LockCabinetWidget(this, num_cabs)),
+    m_lock_cab(* new LockCabinetWidget(this)),
+    m_lock_list{},
     ui(new Ui::SelectLocksWidget)
 {
     ui->setupUi(this);
@@ -69,7 +70,7 @@ QString SelectLocksWidget::getLocks()
 
 void SelectLocksWidget::createLockListStr(QString cab, QString lock, QString& str)
 {
-    str = QString(tr("Cabinet %1 - Lock %2")).arg(cab, 3, '0').arg(lock, 3, '0');
+    str = QString(tr("%1 - Lock %2")).arg(cab, 3, '0').arg(lock, 3, '0');
 }
 
 void SelectLocksWidget::addLockToList(QString lock)
@@ -78,8 +79,14 @@ void SelectLocksWidget::addLockToList(QString lock)
 
     createLockListStr(m_lock_cab.getSelectedCabinet(), lock, item_str);
 
-    ui->lstSelectedLocks->addItem(item_str);
-    ui->lstSelectedLocks->sortItems();
+    m_lock_list.append(item_str);
+    m_lock_list.removeDuplicates();
+    m_lock_list.sort();
+
+    qDebug() << m_lock_list;
+
+    ui->lstSelectedLocks->clear();
+    ui->lstSelectedLocks->addItems(m_lock_list);
 }
 
 void SelectLocksWidget::addLocksToList(QString locks)
@@ -102,17 +109,17 @@ void SelectLocksWidget::addLocksToList(QString locks)
 void SelectLocksWidget::removeLockFromList(QString lock)
 {
     QString item_str;
-    QList<QListWidgetItem *> items;
-    int row;
 
     createLockListStr(m_lock_cab.getSelectedCabinet(), lock, item_str);
 
-    items = ui->lstSelectedLocks->findItems(item_str, Qt::MatchExactly);
-    Q_ASSERT(items.length() > 0);
-    if (items.length() > 0)
+    int index = m_lock_list.indexOf(item_str);
+    if (index >= 0)
     {
-        row = ui->lstSelectedLocks->row(items[0]);
-        delete ui->lstSelectedLocks->item(row);
+        m_lock_list.removeAt(index);
+        m_lock_list.sort();
+
+        ui->lstSelectedLocks->clear();
+        ui->lstSelectedLocks->addItems(m_lock_list);
     }
 }
 
@@ -132,12 +139,14 @@ void SelectLocksWidget::OnNotifyLockSelected(QString lock, bool is_selected)
 
 void SelectLocksWidget::getCabinetLockFromStr(QString& str, QString& cab, QString& lock)
 {
-    // Cabinet xxx - Lock yyy
-    //    0     1  2  3    4
+    // mmmm - Lock yyy
+    //  0   1  2    3
     QStringList cab_lock = str.split(' ', QString::SkipEmptyParts);
+    KCB_DEBUG_TRACE("CabLockList" << cab_lock);
     QVector<QString> cab_lock_vtr = cab_lock.toVector();
-    cab = cab_lock_vtr[1];
-    lock = cab_lock_vtr[4];
+    KCB_DEBUG_TRACE("CabLockVtr" << cab_lock_vtr);
+    cab = cab_lock_vtr[0];
+    lock = cab_lock_vtr[3];
 }
 
 void SelectLocksWidget::openDoorTimer()
@@ -148,9 +157,10 @@ void SelectLocksWidget::openDoorTimer()
 
     str = ui->lstSelectedLocks->item(0)->text();
     delete ui->lstSelectedLocks->item(0);
+    KCB_DEBUG_TRACE("LockStr:" << str);
     getCabinetLockFromStr(str, cab, lock);
 
-    m_lock_cab.setSelectedCabinet(cab);
+    m_lock_cab.setSelectedCabinet(cab, lock);
     m_lock_cab.clrSelectedLocks(lock);
     emit NotifyRequestLockOpen(QString::number(lock.toInt()), false);
 

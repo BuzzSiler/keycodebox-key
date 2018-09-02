@@ -28,8 +28,7 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
     CDlgQuestions::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     CDlgQuestions::showFullScreen();
 
-    KeyCodeBoxSettings kcb_settings(this);
-    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
+    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 
     ui->rbAnswer1No->setVisible(fleetwave_enabled);
     ui->rbAnswer1Yes->setVisible(fleetwave_enabled);

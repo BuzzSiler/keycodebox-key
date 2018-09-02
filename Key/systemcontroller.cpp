@@ -43,8 +43,7 @@ CSystemController::CSystemController(QObject *parent) :
 {
     Q_UNUSED(parent);
 
-    KeyCodeBoxSettings kcb_settings(this);
-    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
+    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 }
 
 CSystemController::~CSystemController()
@@ -547,7 +546,7 @@ void CSystemController::OnAdminSecurityCheckOk(QString type)
 
 void CSystemController::OnAdminSecurityCheckFailed()
 {
-    emit __OnCodeMessage("Incorrect Password");
+    emit __OnCodeMessage(tr("Incorrect Password"));
     emit __OnClearEntry();
     emit __AdminSecurityCheckFailed();
 }

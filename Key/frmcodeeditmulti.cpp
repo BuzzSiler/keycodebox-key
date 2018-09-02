@@ -12,6 +12,7 @@
 #include "dlgeditquestions.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
+#include "keycodeboxsettings.h"
 
 static const QString FP_HOME_DIR = "/home/pi/run/prints/";
 static const QString css_warn = "color: black; background-color: red";
@@ -19,7 +20,7 @@ static const QString css_none = "";
 
 FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     QDialog(parent),
-    m_lock_cab(* new LockCabinetWidget(this, 1)),
+    m_lock_cab(* new LockCabinetWidget(this)),
     m_initialized(false),
     ui(new Ui::FrmCodeEditMulti)
 {
@@ -79,8 +80,6 @@ void FrmCodeEditMulti::setValues(CLockState * const state, const QStringList cod
 {
     KCB_DEBUG_ENTRY;
     
-    state->show();
-
     resetQuestions();
     m_codes_in_use = codes_in_use;
 
@@ -132,7 +131,6 @@ void FrmCodeEditMulti::setValues(CLockState * const state, const QStringList cod
     ui->dtEndAccess->setDateTime(m_code_state.end_datetime);
 
     m_lock_cab.enableAllLocks();
-    m_lock_cab.clrAllLocks();
     m_lock_cab.setSelectedLocks(m_code_state.locks);
 
     updateUi();
@@ -159,7 +157,6 @@ void FrmCodeEditMulti::getValues(CLockState * const state)
     state->setMaxAccess(ui->cbAccessType->currentIndex() == ACCESS_TYPE_LIMITED_USE ? 2 : -1);
     state->setAccessType(ui->cbAccessType->currentIndex());
     state->setLockNums(m_lock_cab.getSelectedLocks());
-    //state->show();
 
     ui->bbSaveCancel->button(QDialogButtonBox::Save)->setDisabled(true);
     ui->bbSaveCancel->button(QDialogButtonBox::Cancel)->setEnabled(true);
@@ -263,10 +260,10 @@ void FrmCodeEditMulti::on_cbEnableQuestions_stateChanged(int state)
     {
         if (m_questions[0] != "" || m_questions[1] != "" || m_questions[2] != "")
         {
-            QString title = "Warning! Disabling Questions";
-            QString message = "You have selected to disable questions.\n"
-                              "This will clear ALL existing questions.\n"
-                              "Do you want to continue?";
+            QString title = tr("Warning! Disabling Questions");
+            QString message = tr("You have selected to disable questions.\n"
+                                 "This will clear ALL existing questions.\n"
+                                 "Do you want to continue?");
             int result = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
             if (result == QMessageBox::Yes)
             {
@@ -367,10 +364,10 @@ void FrmCodeEditMulti::on_cbEnableCode2_stateChanged(int state)
 
     if (state == Qt::Unchecked)
     {
-        QString title = "Warning! Disabling Code 2";
-        QString message = "You have selected to disable Code 2.\n"
-                          "Continuing will clear Code 2 and ALL existing questions.\n"
-                          "Do you want to continue?";
+        QString title = tr("Warning! Disabling Code 2");
+        QString message = tr("You have selected to disable Code 2.\n"
+                             "Continuing will clear Code 2 and ALL existing questions.\n"
+                             "Do you want to continue?");
         int result = QMessageBox::warning(this, title, message, QMessageBox::Yes, QMessageBox::No);
         if (result == QMessageBox::Yes)
         {

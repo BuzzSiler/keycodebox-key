@@ -11,6 +11,7 @@ namespace Ui {
 class QSignalMapper;
 class QPushButton;
 class LockCabinetWidget;
+class QStringList;
 
 class SelectLocksWidget : public QWidget
 {
@@ -20,7 +21,7 @@ class SelectLocksWidget : public QWidget
     public:
         typedef enum {ADMIN=1, USER=2} Role;
 
-        explicit SelectLocksWidget(QWidget *parent, Role is_admin, int num_cabs = 1);
+        explicit SelectLocksWidget(QWidget *parent, Role is_admin);
         ~SelectLocksWidget();
 
         void setLocks(QString locks);
@@ -94,6 +95,7 @@ class SelectLocksWidget : public QWidget
         Role m_role;
         bool m_cancel_open;
         LockCabinetWidget& m_lock_cab;
+        QStringList m_lock_list;
         Ui::SelectLocksWidget *ui;
 
         void getCabinetLockFromStr(QString& str, QString& cab, QString& lock);
