@@ -5,26 +5,40 @@
 #include <QTime>
 #include <QString>
 #include <QJsonObject>
+#include <QVector>
+#include <QPair>
 
 class QJsonParseError;
 
 
 typedef std::pair<QJsonObject, QJsonParseError> JsonObjErrPair;
 
+typedef struct 
+{
+    QString model;
+    int   num_locks;
+    int   start;
+    int   stop;
+} CABINET_INFO;
+
+typedef QVector<CABINET_INFO> CABINET_VECTOR;
+
 class KeyCodeBoxSettings : public QObject
 {
         Q_OBJECT
     public:
-        explicit KeyCodeBoxSettings(QObject *parent, const QString& filename="");
-
-        bool isFleetwaveEnabled();
+        static bool isFleetwaveEnabled();
+        static int getNumCabinets();
+        static int getLocksPerCabinet(int cab_index);
+        static CABINET_VECTOR getCabinetsInfo();
 
     private:
-        QJsonObject m_json_obj;
-        QString m_filename;
+        static QJsonObject m_json_obj;
+        static QString m_filename;
+        static CABINET_VECTOR m_cabinet_info;
 
-        void JsonFromFile();
-        void JsonToFile();
+        static void JsonFromFile();
+        static void JsonToFile();
 };
 
 #endif // KEYCODEBOXSETTINGS_H

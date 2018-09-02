@@ -26,8 +26,7 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     CFrmUserCode::showFullScreen();
     initialize();
 
-    KeyCodeBoxSettings kcb_settings(this);
-    fleetwave_enabled = kcb_settings.isFleetwaveEnabled();
+    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 }
 
 CFrmUserCode::~CFrmUserCode()
@@ -383,12 +382,16 @@ void CFrmUserCode::SetDisplayCodeEntryControls(bool state)
 
 void CFrmUserCode::OnDisplayFingerprintButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     m_fp_state = state;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayShowHideButton(bool state)
 {
+    KCB_DEBUG_ENTRY;
     m_showhide_state = state;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayTakeReturnButtons(bool state)
