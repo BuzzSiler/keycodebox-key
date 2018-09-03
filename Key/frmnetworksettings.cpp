@@ -3,6 +3,7 @@
 
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
+#include "kcbsystem.h"
 
 FrmNetworkSettings::FrmNetworkSettings(QWidget *parent) :
     QDialog(parent),
@@ -10,6 +11,12 @@ FrmNetworkSettings::FrmNetworkSettings(QWidget *parent) :
 {
     ui->setupUi(this);
     FrmNetworkSettings::showFullScreen();
+
+    ui->lblIpAddressValue->setText(kcb::GetHostAddress());
+    ui->lblIpBroadcastValue->setText(kcb::GetBcastAddress());
+    ui->lblIpMaskValue->setText(kcb::GetNetworkMask());
+    ui->lblMacAddressValue->setText(kcb::GetMacAddress());
+    ui->lblIpGatewayValue->setText(kcb::GetGatewayAddress());
 }
 
 FrmNetworkSettings::~FrmNetworkSettings()

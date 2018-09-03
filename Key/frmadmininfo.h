@@ -17,8 +17,6 @@
 #include <QPointF>
 #include "systemcontroller.h"
 #include "clickablelabel.h"
-#include "dlgsmtp.h"
-#include "dlgvnc.h"
 #include "frmcodeeditmulti.h"
 
 namespace Ui {
