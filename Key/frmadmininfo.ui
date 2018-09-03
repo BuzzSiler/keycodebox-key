@@ -465,50 +465,12 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="btnSetupSMTP">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>10</y>
-       <width>141</width>
-       <height>50</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Cantarell</family>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Email Settings</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btnSetupVNC">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>70</y>
-       <width>251</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Cantarell</family>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Remote Desktop Settings</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="lblIpAddress">
      <property name="geometry">
       <rect>
        <x>310</x>
-       <y>130</y>
-       <width>101</width>
+       <y>120</y>
+       <width>91</width>
        <height>28</height>
       </rect>
      </property>
@@ -526,8 +488,8 @@
      <property name="geometry">
       <rect>
        <x>410</x>
-       <y>130</y>
-       <width>161</width>
+       <y>120</y>
+       <width>151</width>
        <height>28</height>
       </rect>
      </property>
@@ -832,24 +794,6 @@
       <string>Display Show/Hide Button?</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btnTestEmail">
-     <property name="geometry">
-      <rect>
-       <x>470</x>
-       <y>10</y>
-       <width>91</width>
-       <height>50</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Test Email</string>
-     </property>
-    </widget>
     <widget class="Line" name="line_5">
      <property name="geometry">
       <rect>
@@ -960,6 +904,42 @@
      </property>
      <property name="text">
       <string>Display Take/Return Buttons?</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbNetworkSettings">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>10</y>
+       <width>251</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Network Settings</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnTestEmail">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>60</y>
+       <width>251</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Test Email</string>
      </property>
     </widget>
    </widget>
