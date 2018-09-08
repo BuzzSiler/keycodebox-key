@@ -120,7 +120,6 @@ void LockCabinetWidget::setSelectedLocks(QString locks)
     int  cab_index;
     int lock_index;
 
-    m_selected_locks.clear();
     clrAllLocks();
     StringToVector(locks, locks_vtr);
 
@@ -143,6 +142,8 @@ void LockCabinetWidget::clrAllLocks()
     {
         clrLocksInCabinet(ii);
     }
+
+    m_selected_locks.clear();
 
     updateUi();
 }
