@@ -83,8 +83,6 @@ void SelectLocksWidget::addLockToList(QString lock)
     m_lock_list.removeDuplicates();
     m_lock_list.sort();
 
-    qDebug() << m_lock_list;
-
     ui->lstSelectedLocks->clear();
     ui->lstSelectedLocks->addItems(m_lock_list);
 }
@@ -142,11 +140,9 @@ void SelectLocksWidget::getCabinetLockFromStr(QString& str, QString& cab, QStrin
     // mmmm - Lock yyy
     //  0   1  2    3
     QStringList cab_lock = str.split(' ', QString::SkipEmptyParts);
-    KCB_DEBUG_TRACE("CabLockList" << cab_lock);
     QVector<QString> cab_lock_vtr = cab_lock.toVector();
-    KCB_DEBUG_TRACE("CabLockVtr" << cab_lock_vtr);
     cab = cab_lock_vtr[0];
-    lock = cab_lock_vtr[3];
+    lock = QString::number(cab_lock_vtr[3].toInt());
 }
 
 void SelectLocksWidget::openDoorTimer()
@@ -157,12 +153,17 @@ void SelectLocksWidget::openDoorTimer()
 
     str = ui->lstSelectedLocks->item(0)->text();
     delete ui->lstSelectedLocks->item(0);
-    KCB_DEBUG_TRACE("LockStr:" << str);
     getCabinetLockFromStr(str, cab, lock);
 
     m_lock_cab.setSelectedCabinet(cab, lock);
     m_lock_cab.clrSelectedLocks(lock);
     emit NotifyRequestLockOpen(QString::number(lock.toInt()), false);
+
+    int lock_index = m_lock_list.indexOf(str);
+    if (lock_index > -1)
+    {
+        m_lock_list.removeAt(lock_index);
+    }  
 
     if (m_cancel_open || ui->lstSelectedLocks->count() == 0)
     {
