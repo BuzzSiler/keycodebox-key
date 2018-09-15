@@ -17,8 +17,6 @@
 #include <QPointF>
 #include "systemcontroller.h"
 #include "clickablelabel.h"
-#include "dlgsmtp.h"
-#include "dlgvnc.h"
 #include "frmcodeeditmulti.h"
 
 namespace Ui {
@@ -129,12 +127,6 @@ class CFrmAdminInfo : public QDialog
         void on_btnReadCodes_clicked();
 
         void codeCellSelected(int row, int col);
-        void on_btnSetupSMTP_clicked();
-        void onSMTPDialogComplete(CDlgSMTP *dlg);
-
-        //remote desktop server settings
-        void on_btnSetupVNC_clicked();
-        void onVNCDialogComplete(CDlgVNC *dlg);
 
         //timezone info
         void populateTimeZoneSelection(QComboBox *cbox);
@@ -166,6 +158,8 @@ class CFrmAdminInfo : public QDialog
 
         void OnCodeEditReject();
         void OnCodeEditAccept();
+
+        void on_pbNetworkSettings_clicked();
 
     private:
         Ui::CFrmAdminInfo   *ui;

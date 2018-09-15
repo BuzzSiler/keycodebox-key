@@ -35,6 +35,7 @@
 #include "kcbkeyboarddialog.h"
 #include "reportcontrolwidget.h"
 #include "kcbsystem.h"
+#include "frmnetworksettings.h"
 
 #define ADMIN_TAB_INDEX (0)
 #define REPORT_TAB_INDEX (2)
@@ -1425,87 +1426,6 @@ void CFrmAdminInfo::on_btnRead_clicked()
     emit __OnReadLockHistorySet(locks, dtStart, dtEnd);
 }
 
-void CFrmAdminInfo::onSMTPDialogComplete(CDlgSMTP *dlg)
-{
-    _bClose = false;
-    // Save
-    QString smtpserver, smtpusername, smtppassword;
-    int smtpport, smtptype;
-
-    qDebug() << "Getting SMTP Values to save";
-    dlg->getValues(smtpserver, smtpport, smtptype, smtpusername, smtppassword);
-    delete dlg;
-    qDebug() << "SMTP:" << smtpserver << ":" << smtpport << " user:" << smtpusername << " pw:" << smtppassword;
-    _tmpAdminRec.setSMTPServer(smtpserver);
-    _tmpAdminRec.setSMTPPort(smtpport);
-    _tmpAdminRec.setSMTPType(smtptype);
-    _tmpAdminRec.setSMTPUsername(smtpusername);
-    _tmpAdminRec.setSMTPPassword(smtppassword);
-    emit __UpdateCurrentAdmin(&_tmpAdminRec);
-}
-
-void CFrmAdminInfo::onVNCDialogComplete(CDlgVNC *dlg)
-{
-    KCB_DEBUG_ENTRY;
-
-    _bClose = false;
-
-    QString vncpassword = "keycodebox";
-    int vncport = 5901;
-
-    qDebug() << "Getting VNC Values to save";
-    dlg->getValues(vncport, vncpassword);
-    delete dlg;
-    qDebug() << "VNC:" << QString::number(vncport) << " pw:" << vncpassword;
-    _tmpAdminRec.setVNCPassword(vncpassword);
-    _tmpAdminRec.setVNCPort(vncport);
-    emit __UpdateCurrentAdmin(&_tmpAdminRec);
-
-    FILE *pF;
-    std::string sOutput = "";
-    QString createCmd = "echo '|";
-    createCmd += QString::number(vncport);
-    createCmd += " ";
-    createCmd += vncpassword;
-    createCmd +="|' > /home/pi/run/vnc_creds.txt";
-
-    pF = popen(createCmd.toStdString().c_str(), "r");
-    if(!pF)
-    {
-        qDebug() << "failed to create vnc file";
-    }
-
-    ExtractCommandOutput(pF, sOutput);
-    fclose(pF);
-}
-
-void CFrmAdminInfo::on_btnSetupSMTP_clicked()
-{
-    // Display Email Dialog for SMTP server settings
-    CDlgSMTP    *dlgSMTP = new CDlgSMTP();
-
-    this->setEnabled(false);
-    qDebug() << "SMTP:" << _tmpAdminRec.getSMTPServer() << ":" << _tmpAdminRec.getSMTPPort();
-    dlgSMTP->setValues(_tmpAdminRec.getSMTPServer(), _tmpAdminRec.getSMTPPort(), _tmpAdminRec.getSMTPType(),
-                       _tmpAdminRec.getSMTPUsername(), _tmpAdminRec.getSMTPPassword() );
-    connect(dlgSMTP, SIGNAL(__onSMTPDialogComplete(CDlgSMTP *)), this, SLOT(onSMTPDialogComplete(CDlgSMTP *)));
-    dlgSMTP->show();
-    this->setEnabled(true);
-}
-
-void CFrmAdminInfo::on_btnSetupVNC_clicked()
-{
-    // Display Email Dialog for VNC remote desktop  server settings
-    CDlgVNC    *dlgVNC = new CDlgVNC();
-
-    this->setEnabled(false);
-    qDebug() << "VNC:" << _tmpAdminRec.getVNCServer() << ":" << QString::number(_tmpAdminRec.getVNCPort());
-    dlgVNC->setValues(_tmpAdminRec.getVNCPort(), _tmpAdminRec.getVNCPassword() );
-    connect(dlgVNC, SIGNAL(__onVNCDialogComplete(CDlgVNC *)), this, SLOT(onVNCDialogComplete(CDlgVNC *)));
-    dlgVNC->show();
-    this->setEnabled(true);
-}
-
 void CFrmAdminInfo::OnNotifyGenerateReport()
 {
     QDateTime start;
@@ -2063,4 +1983,56 @@ void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
     // Note: It should never be the case that we are not admin
     Q_ASSERT_X(is_user == false, Q_FUNC_INFO, "We are not admin");
     emit __OnOpenLockRequest(lock);
+}
+
+void CFrmAdminInfo::on_pbNetworkSettings_clicked()
+{
+    FrmNetworkSettings ns;
+
+    ns.setValues(_tmpAdminRec.getVNCPort(), _tmpAdminRec.getVNCPassword(),
+                 _tmpAdminRec.getSMTPServer(), _tmpAdminRec.getSMTPPort(), _tmpAdminRec.getSMTPType(), _tmpAdminRec.getSMTPUsername(), _tmpAdminRec.getSMTPPassword()
+                 );
+    if (ns.exec())
+    {
+        int vncPort;
+        QString vncPassword;
+        QString smtpServer;
+        int smtpPort;
+        int smtpType;
+        QString smtpUsername;
+        QString smtpPassword;
+
+        ns.getValues(vncPort, vncPassword,
+                     smtpServer, smtpPort, smtpType, smtpUsername, smtpPassword);
+
+        _tmpAdminRec.setVNCPort(vncPort);
+        _tmpAdminRec.setVNCPassword(vncPassword);
+        _tmpAdminRec.setSMTPServer(smtpServer);
+        _tmpAdminRec.setSMTPPort(smtpPort);
+        _tmpAdminRec.setSMTPType(smtpType);
+        _tmpAdminRec.setSMTPUsername(smtpUsername);
+        _tmpAdminRec.setSMTPPassword(smtpPassword);
+
+        // Notify the world about the changes
+        emit __UpdateCurrentAdmin(&_tmpAdminRec);
+
+        // Write VNC credentials to file
+        FILE *pF;
+        std::string sOutput = "";
+        QString createCmd = "echo '|";
+        createCmd += QString::number(vncPort);
+        createCmd += " ";
+        createCmd += vncPassword;
+        createCmd +="|' > /home/pi/run/vnc_creds.txt";
+
+        pF = popen(createCmd.toStdString().c_str(), "r");
+        if(!pF)
+        {
+            qDebug() << "failed to create vnc file";
+        }
+
+        ExtractCommandOutput(pF, sOutput);
+        fclose(pF);
+
+    }
 }

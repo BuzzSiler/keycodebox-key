@@ -47,15 +47,6 @@ public:
     QString getAssistPassword() { return assist_password; } //text
     void setAssistPassword(QString assistPassword) { assist_password = assistPassword; }
 
-    bool getUsePredictiveAccessCode() { return use_predictive_access_code; }
-    void setUsePredictiveAccessCode(bool bSet) { use_predictive_access_code = bSet; }
-
-    QString getPredictiveKey() { return pred_key; }
-    void setPredictiveKey(QString key) { pred_key = key; }
-
-    int getPredictiveResolution() { return pred_resolution; }
-    void setPredictiveResolution(int nValue) { pred_resolution = nValue; }
-
     uint32_t getMaxLocks() { return max_locks; }
     void setMaxLocks(uint32_t nLocks) { max_locks = nLocks; }
 
@@ -124,9 +115,6 @@ private:
     QString access_code; // text
     QString assist_code; //text
     QString assist_password; //text
-    bool        use_predictive_access_code;
-    QString pred_key;
-    int         pred_resolution;
     uint32_t    max_locks;
 
     bool        show_fingerprint; // bool: true = display button
@@ -177,7 +165,6 @@ public:
                      QString passwordEnc,
                      QString assistPasswordEnc,
                      bool showFingerprint, bool showPassword,
-                     bool usePredictive, QString predKey, int predRes,
                      uint32_t nMaxLocks,
                      QString smtpserver, int smptport, int smtptype,
                      QString smtpusername, QString smtppassword,
@@ -191,7 +178,6 @@ public:
                      QString passwordClear,
                      QString assistPasswordClear,
                      bool showFingerprint, bool showPassword,
-                     bool usePredictive, QString predKey, int predRes,
                      uint32_t nMaxLocks,
                      QString smtpserver, int smptport, int smtptype,
                      QString smtpusername, QString smtppassword,

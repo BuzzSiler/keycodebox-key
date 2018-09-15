@@ -11,6 +11,10 @@ namespace kcb
     void GetRpiSerialNumber(QString& serial_number);
     void SetVNCCredentials(QString vnc_port, QString vnc_password);
     QString GetGatewayAddress();
+    QString GetHostAddress();
+    QString GetBcastAddress();
+    QString GetMacAddress();
+    QString GetNetworkMask();              
     bool FPingAddress(QString address);
     bool UpdateAppFile(QString filename_fq);
     void UnmountUsb(QString path);
