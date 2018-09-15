@@ -60,7 +60,6 @@ void CSecurityController::initializeSignals()
     connect(this, SIGNAL(__OnCreateHistoryRecordFromLastSuccessfulLogin()), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastSuccessfulLogin()));
     connect(this, SIGNAL(__OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString,QString,QString)), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString,QString,QString)));
     
-    connect(&_modelSecurity, SIGNAL(__OnCreateHistoryRecordFromLastPredictiveLogin(QString, QString)), &_modelSecurity, SLOT(OnCreateHistoryRecordFromLastPredictiveLogin(QString, QString)));
     connect(&_modelSecurity, SIGNAL(__OnLastSuccessfulLogin(CLockHistoryRec*)), this, SLOT(OnLastSuccessfulLoginRequest(CLockHistoryRec*)));
     connect(this, SIGNAL( __RequestLastSuccessfulLogin(QString, QString, QString, QString)), &_modelSecurity, SLOT(RequestLastSuccessfulLogin(QString, QString, QString, QString)));
 
@@ -116,65 +115,6 @@ void CSecurityController::OnUpdateCodeState(CLockState *rec)
     KCB_DEBUG_TRACE("emitting __OnUpdateCodeState");
 
     emit __OnUpdateCodeState(rec);
-}
-
-std::string CSecurityController::GetPredictiveAccessCode(QString code, int nLockNum)
-{
-    QDateTime datetime = QDateTime::currentDateTime();
-    QString skey;
-    std::string outEncrypt = "";
-    QString  sTmp;
-
-    Q_UNUSED(code);
-
-    if(_pAdminRec) 
-    {
-        // Round the current date up to the resolution specified
-        datetime = CEncryption::roundDateTime(_pAdminRec->getPredictiveResolution(), datetime);
-        skey = _pAdminRec->getPredictiveKey();
-
-        CEncryption::calculatePredictiveCodeOld(nLockNum, skey.toStdString().c_str(), datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
-
-        sTmp += QString(" trunc outEncrypt:") + outEncrypt.c_str();
-        qDebug() << sTmp;
-        return outEncrypt;
-    }
-
-    return outEncrypt;
-}
-
-
-void CSecurityController::CheckPredictiveAccessCode(QString code)
-{
-    uint32_t nLockNum;
-    QDateTime datetime = QDateTime::currentDateTime();
-    QString skey;
-    std::string outEncrypt = "";
-    QString sTmp;
-
-    if(_pAdminRec) {
-        datetime = CEncryption::roundDateTime(_pAdminRec->getPredictiveResolution(), datetime);
-        sTmp = " Date:" + datetime.toString("yyyy-MM-dd HH:mm");
-
-        skey = _pAdminRec->getPredictiveKey();
-
-        for(nLockNum=1; nLockNum<256; nLockNum++) 
-        {
-            // Round the current date up to the resolution specified
-
-            CEncryption::calculatePredictiveCodeOld(nLockNum, skey.toStdString().c_str(), datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
-
-            sTmp += QString(" trunc outEncrypt:") + outEncrypt.c_str();
-            qDebug() << sTmp;
-
-            if( outEncrypt == code.toStdString()) 
-            {
-                OnSecurityCheckSuccess(QString::number(nLockNum));
-                return;
-            }
-        }
-    }
-    OnSecurityCheckedFailed();
 }
 
 void CSecurityController::CheckAccessCodeOne(QString code1)

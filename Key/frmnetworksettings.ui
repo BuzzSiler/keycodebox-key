@@ -18,7 +18,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
+  <widget class="QDialogButtonBox" name="bbNetworkingOkCancel">
    <property name="geometry">
     <rect>
      <x>334</x>
@@ -56,7 +56,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <layout class="QHBoxLayout" name="hloVncPort">
       <item>
        <widget class="QLabel" name="lblVncPort">
         <property name="text">
@@ -85,7 +85,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <layout class="QHBoxLayout" name="hloVncPassword">
       <item>
        <widget class="QLabel" name="lblVncPassword">
         <property name="text">
@@ -132,7 +132,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="hloSmtpServer">
       <item>
        <widget class="QLabel" name="lblSmtpServer">
         <property name="text">
@@ -161,7 +161,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="hloSmtpPort">
       <item>
        <widget class="QLabel" name="lblSmtpPort">
         <property name="text">
@@ -190,7 +190,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QHBoxLayout" name="hloSmtpUsername">
       <item>
        <widget class="QLabel" name="lblSmtpUsername">
         <property name="text">
@@ -219,7 +219,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QHBoxLayout" name="hloSmtpPassword">
       <item>
        <widget class="QLabel" name="lblSmtpPassword">
         <property name="text">
@@ -251,7 +251,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <layout class="QHBoxLayout" name="hloSmtpSecurity">
       <item>
        <widget class="QLabel" name="lblSmtpSecurity">
         <property name="text">
@@ -299,11 +299,14 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <layout class="QHBoxLayout" name="hloIpAddress">
       <item>
        <widget class="QLabel" name="lblIpAddress">
         <property name="text">
          <string>Address:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -312,16 +315,22 @@
         <property name="text">
          <string>No Value</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <layout class="QHBoxLayout" name="hloIpMask">
       <item>
        <widget class="QLabel" name="lblIpMask">
         <property name="text">
          <string>Mask:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -329,6 +338,9 @@
        <widget class="QLabel" name="lblIpMaskValue">
         <property name="text">
          <string>No Value</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -341,6 +353,9 @@
         <property name="text">
          <string>Broadcast:</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
        </widget>
       </item>
       <item>
@@ -348,16 +363,22 @@
         <property name="text">
          <string>No Value</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_11">
+     <layout class="QHBoxLayout" name="hloIpGateway">
       <item>
        <widget class="QLabel" name="lblIpGateway">
         <property name="text">
          <string>Gateway:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -366,16 +387,22 @@
         <property name="text">
          <string>No Value</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_12">
+     <layout class="QHBoxLayout" name="hloMacAddress">
       <item>
        <widget class="QLabel" name="lblMacAddress">
         <property name="text">
          <string>MAC:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -383,6 +410,9 @@
        <widget class="QLabel" name="lblMacAddressValue">
         <property name="text">
          <string>No Value</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -401,7 +431,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>bbNetworkingOkCancel</sender>
    <signal>accepted()</signal>
    <receiver>FrmNetworkSettings</receiver>
    <slot>accept()</slot>
@@ -417,7 +447,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>bbNetworkingOkCancel</sender>
    <signal>rejected()</signal>
    <receiver>FrmNetworkSettings</receiver>
    <slot>reject()</slot>

@@ -168,10 +168,6 @@ public slots:
     void OnRequestCurrentAdmin();
     void OnRequestedCurrentAdmin(CAdminRec*);
 
-    void CheckPredictiveAccessCode(QString code);
-
-    std::string GetPredictiveAccessCode(QString code, int nLockNum);
-
 private slots:
 };
 

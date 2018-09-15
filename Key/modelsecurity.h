@@ -41,7 +41,6 @@ class CModelSecurity : public QObject
         void __OnSecurityCheckTimedOut();
 
         void __OnRequestedCurrentAdmin(CAdminRec *adminInfo);
-        void __OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code);
     signals:
         void __OnUpdatedCurrentAdmin(bool bSuccess);
         void __OnUpdatedCodeState(bool bSuccess);
@@ -79,7 +78,6 @@ class CModelSecurity : public QObject
 
         void OnCreateHistoryRecordFromLastSuccessfulLogin();
         void OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString answer1, QString answer2, QString answer3);
-        void OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code);
 
     public slots:
         void OnVerifyCodeOne(QString code);
@@ -105,15 +103,12 @@ class CModelSecurity : public QObject
         QString         _type;
         QTime           _time;
 
-        bool            _wasLastSecurityCheckPredictive;
-
         void setupTables();
         void setupTimer();
         void initialize();
         void openDatabase();
 
         void removeCreatedObjects();
-        bool CheckPredictiveAccessCode(QString code, int &nLockNum);
         QDateTime &roundDateTime(int res, QDateTime &datetime);
 
         bool _updateCodeLockboxState = false;

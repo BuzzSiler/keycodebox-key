@@ -80,7 +80,7 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
                                                  adminInfo->getDefaultReportFreq(),
                                                  adminInfo->getDefaultReportStart(), adminInfo->getPassword(),
                                                  adminInfo->getAssistPassword(),
-                                                 adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(), adminInfo->getUsePredictiveAccessCode(), adminInfo->getPredictiveKey(), adminInfo->getPredictiveResolution(),
+                                                 adminInfo->getDisplayFingerprintButton(), adminInfo->getDisplayShowHideButton(),
                                                  adminInfo->getMaxLocks(),
                                                  adminInfo->getSMTPServer(), adminInfo->getSMTPPort(), adminInfo->getSMTPType(),
                                                  adminInfo->getSMTPUsername(), adminInfo->getSMTPPassword(),
@@ -158,43 +158,6 @@ void CModelSecurity::setupTables()
         _ptblCodeHistory = new CTblCodeHistory(&_DB);
         _ptblAdmin = new CTblAdmin(&_DB);
     }
-}
-
-bool CModelSecurity::CheckPredictiveAccessCode(QString code, int &nLockNum)
-{
-    nLockNum = 0;
-    QDateTime datetime = QDateTime::currentDateTime();
-    QString skey;
-    std::string outEncrypt = "";
-    QString sTmp;
-    QString filename="Data.txt";
-    QFile file( filename );
-    if ( file.open(QIODevice::ReadWrite) )
-    {
-        QTextStream stream( &file );
-
-        datetime = CEncryption::roundDateTime(_ptblAdmin->getCurrentAdmin().getPredictiveResolution(), datetime);
-        skey = _ptblAdmin->getCurrentAdmin().getPredictiveKey();
-
-        for (nLockNum=1; nLockNum<256; nLockNum++) 
-        {
-            // Round the current date up to the resolution specified
-            sTmp = "Predictive Matching:" + QVariant(nLockNum).toString();
-            CEncryption::calculatePredictiveCodeOld(nLockNum, skey.toStdString().c_str(), datetime, &outEncrypt, 5 /*max results length*/, &sTmp);
-
-            stream << sTmp << endl;
-
-            if( outEncrypt == code.toStdString()) 
-            {
-                stream << "MATCH: Predict for Lock# " << QVariant(nLockNum).toString() << " calculated:" << outEncrypt.c_str() << " code to match:" << code << endl;
-                return true;
-            }
-        }
-        stream << "NO MATCH: Predict calculated: " << outEncrypt.c_str() << " code to match:" << code << endl;
-    }
-
-    emit __OnSecurityCheckedFailed();
-    return false;
 }
 
 void CModelSecurity::OnVerifyCodeOne(QString code)
@@ -296,129 +259,62 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
 
             bool bSecondCodeRequired;
             bool bFingerprintRequired = false;
-            int nDoorNum;
 
-            if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
+            QString sCodeEnc = CEncryption::encryptString(code);
+            QString lockNums;
+
+            KCB_DEBUG_TRACE("Encrypted Code" << sCodeEnc);
+
+            int result = _ptblCodes->checkCodeOne(sCodeEnc,
+                                                bSecondCodeRequired,
+                                                bFingerprintRequired,
+                                                lockNums);
+            KCB_DEBUG_TRACE("Locks" << lockNums);
+            if( result == KCB_SUCCESS && lockNums != "" )
             {
-                qDebug() << "CModelSecurity::OnVerifyCode() Predictive. Code:" << code;
+                // need to check if fingerprint security is enabled
+                // if so, check for existence of existing fingerprints
+                // if fingerprints do not exist, open up enroll dialog
+                // (otherwise let user know fingerprints are enrolled?
+                //  or emit __OnSecurityCheckFailed()
 
-                if( CheckPredictiveAccessCode(code, nDoorNum) )
+                // this is probably a good time to mention,
+                // fingerprints for a second code are stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
+                // single code are of course stored like:
+                //   /home/pi/run/prints/<codeOne>/<codeOne>
+
+                // need to do check again for code 2
+
+                if( bSecondCodeRequired )
                 {
-                    // Check again to see if we match a second code existing in the codes table
-                    QString sCodeEnc = CEncryption::encryptString(code);
-                    QString lockNums;
-
-                    int result = _ptblCodes->checkCodeOne(sCodeEnc,
-                                                        bSecondCodeRequired,
-                                                        bFingerprintRequired,
-                                                        lockNums);
-                    if( result == KCB_SUCCESS && lockNums != "" )
+                    emit __OnRequireCodeTwo();
+                }
+                else
+                {
+                    if( bFingerprintRequired == true )
                     {
-                        // need to check if fingerprint security is enabled
-                        // if so, check for existence of existing fingerprints
-                        // if fingerprints do not exist, open up enroll dialog
-                        // (otherwise let user know fingerprints are enrolled?
-                        //  or emit __OnSecurityCheckFailed()
-
-                        // this is probably a good time to mention,
-                        // fingerprints for a second code are stored like:
-                        //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-                        // single code are of course stored like:
-                        //   /home/pi/run/prints/<codeOne>/<codeOne>
-
-                        // need to do check again for code 2
-
-                        if( bSecondCodeRequired )
+                        //we need to check if a fingerprint directory already exists,
+                        // if they do, do not attempt enrollment
+                        if( !QDir("/home/pi/run/prints/" + code).exists() )
                         {
-                            emit __OnRequireCodeTwo();
+                            emit __EnrollFingerprintDialog(code);
+                            emit __EnrollFingerprint(code);
                         }
                         else
                         {
-                            if( bFingerprintRequired == true)
-                            {
-                                //we need to check if a fingerprint directory already exists,
-                                // if they do, do not attempt enrollment
-                                if( !QDir("/home/pi/run/prints/" + code).exists() )
-                                {
-                                    emit __EnrollFingerprintDialog(code);
-                                    emit __EnrollFingerprint(code);
-                                }
-                                else
-                                {
-                                    emit __OnSecurityCheckedFailed();
-                                }
-                                return;
-                            }
-
-                            emit __OnSecurityCheckSuccess(lockNums);
-                            emit __OnCreateHistoryRecordFromLastPredictiveLogin(lockNums, code);
+                            emit __OnSecurityCheckedFailed();
                         }
+                        KCB_DEBUG_TRACE("fingerprint required");
+                        return;
                     }
-                    else
-                    {
-                        emit __OnSecurityCheckedFailed();
-                    }
+
+                    emit __OnSecurityCheckSuccess(lockNums);
                 }
             }
             else
             {
-
-                QString sCodeEnc = CEncryption::encryptString(code);
-                QString lockNums;
-
-                KCB_DEBUG_TRACE("Encrypted Code" << sCodeEnc);
-
-                int result = _ptblCodes->checkCodeOne(sCodeEnc,
-                                                    bSecondCodeRequired,
-                                                    bFingerprintRequired,
-                                                    lockNums);
-                KCB_DEBUG_TRACE("Locks" << lockNums);
-                if( result == KCB_SUCCESS && lockNums != "" )
-                {
-                    // need to check if fingerprint security is enabled
-                    // if so, check for existence of existing fingerprints
-                    // if fingerprints do not exist, open up enroll dialog
-                    // (otherwise let user know fingerprints are enrolled?
-                    //  or emit __OnSecurityCheckFailed()
-
-                    // this is probably a good time to mention,
-                    // fingerprints for a second code are stored like:
-                    //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-                    // single code are of course stored like:
-                    //   /home/pi/run/prints/<codeOne>/<codeOne>
-
-                    // need to do check again for code 2
-
-                    if( bSecondCodeRequired )
-                    {
-                        emit __OnRequireCodeTwo();
-                    }
-                    else
-                    {
-                        if( bFingerprintRequired == true )
-                        {
-                            //we need to check if a fingerprint directory already exists,
-                            // if they do, do not attempt enrollment
-                            if( !QDir("/home/pi/run/prints/" + code).exists() )
-                            {
-                                emit __EnrollFingerprintDialog(code);
-                                emit __EnrollFingerprint(code);
-                            }
-                            else
-                            {
-                                emit __OnSecurityCheckedFailed();
-                            }
-                            KCB_DEBUG_TRACE("fingerprint required");
-                            return;
-                        }
-
-                        emit __OnSecurityCheckSuccess(lockNums);
-                    }
-                }
-                else
-                {
-                    emit __OnSecurityCheckedFailed();
-                }
+                emit __OnSecurityCheckedFailed();
             }
         }
     }
@@ -442,58 +338,43 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
     {
         bool bSecondCodeRequired;
         bool bFingerprintRequired = false;
-        int nDoorNum;
 
-        if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
-        {
-            KCB_DEBUG_TRACE("Predictive Code:" << code);
-            CheckPredictiveAccessCode(code, nDoorNum);
+        QString sCodeEnc = CEncryption::encryptString(code);
+        QString lockNums = "";
 
-        } 
-        else if( 0 /*TBD - _ptblAdmin->getCurrentAdmin().getUseAnyAccessCode() */ )
+        int result = _ptblCodes->checkCodeOne(sCodeEnc,
+                                                bSecondCodeRequired,
+                                                bFingerprintRequired,
+                                                lockNums);
+        if( result == KCB_SUCCESS && lockNums != "" )
         {
-            // Store AnyAccessCode = code
-            // Enter Secondary code - Verify against DB (second access code?)
-        }
-        else
-        {
-            QString sCodeEnc = CEncryption::encryptString(code);
-            QString lockNums = "";
+            // need to check if fingerprint security is enabled
+            // if so, check for existence of existing fingerprints
+            // if fingerprints do not exist, open up enroll dialog
+            // (otherwise let user know fingerprints are enrolled?
+            //  or emit __OnSecurityCheckFailed()
 
-            int result = _ptblCodes->checkCodeOne(sCodeEnc,
-                                                  bSecondCodeRequired,
-                                                  bFingerprintRequired,
-                                                  lockNums);
-            if( result == KCB_SUCCESS && lockNums != "" )
+            // this is probably a good time to mention,
+            // fingerprints for a second code are stored like:
+            //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
+            // single code are of course stored like:
+            //   /home/pi/run/prints/<codeOne>/<codeOne>
+
+            // need to do check again for code 2
+
+            if( bSecondCodeRequired ) 
             {
-                // need to check if fingerprint security is enabled
-                // if so, check for existence of existing fingerprints
-                // if fingerprints do not exist, open up enroll dialog
-                // (otherwise let user know fingerprints are enrolled?
-                //  or emit __OnSecurityCheckFailed()
-
-                // this is probably a good time to mention,
-                // fingerprints for a second code are stored like:
-                //   /home/pi/run/prints/<codeOne>/<codeOne>.<codeTwo>
-                // single code are of course stored like:
-                //   /home/pi/run/prints/<codeOne>/<codeOne>
-
-                // need to do check again for code 2
-
-                if( bSecondCodeRequired ) 
-                {
-                    emit __OnRequireCodeTwo();
-                } 
-                else 
-                {
-
-                    emit __OnSecurityCheckSuccess(lockNums);
-                }
+                emit __OnRequireCodeTwo();
             } 
             else 
             {
-                emit __OnSecurityCheckedFailed();
+
+                emit __OnSecurityCheckSuccess(lockNums);
             }
+        } 
+        else 
+        {
+            emit __OnSecurityCheckedFailed();
         }
     }
 }
@@ -671,21 +552,6 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
     // Might have timed out and cleared the _type
 }
 
-void CModelSecurity::OnCreateHistoryRecordFromLastPredictiveLogin(QString LockNums, QString code)
-{
-    KCB_DEBUG_ENTRY;
-
-    CLockHistoryRec lockHistoryRec;
-    CLockState  lockState;
-
-    // Build the lock state for this lock num
-    lockState.setLockNums(LockNums);
-    lockState.setCode1(code);
-    lockHistoryRec.setFromLockState(lockState);
-    _ptblCodeHistory->addLockCodeHistory(lockHistoryRec);
-    KCB_DEBUG_EXIT;
-}
-
 void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
 {
     KCB_DEBUG_ENTRY;
@@ -760,77 +626,56 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
     KCB_DEBUG_ENTRY;
     
     KCB_DEBUG_TRACE(locknums);
-    if( _ptblAdmin->getCurrentAdmin().getUsePredictiveAccessCode() )
-    {
-        qDebug() << "RequestLastSuccessfulLogin( Predictive )";
-        CLockHistorySet *_pHistorySet = NULL;
-
-        QDateTime   time, now;
-        time = time.currentDateTime().addSecs(-5);  // 5 Seconds ago
-        now = now.currentDateTime();
-        QString LockNums;
-
-        qDebug() << ">>SENDING >>> Start:" << time.toString(DATETIME_FORMAT) << "  End:" << now.toString(DATETIME_FORMAT);
-
-        _ptblCodeHistory->selectLastLockCodeHistorySet(LockNums, time, now, &_pHistorySet);
-
-    }
-    else
-    {
         
-        int ids = _ptblCodes->getLastSuccessfulIDS();
-        KCB_DEBUG_TRACE("Ids" << ids);
-        if(ids != -1)
+    int ids = _ptblCodes->getLastSuccessfulIDS();
+    KCB_DEBUG_TRACE("Ids" << ids);
+    if(ids != -1)
+    {
+        qDebug() << "lastSuccessfulIDS ids" << ids << "locks" << locknums;
+        int         nVal;
+        CLockSet    *pLockSet;
+        // Build the lock set for this lock num
+        _ptblCodes->selectCodeSet(ids, &pLockSet);
+
+        CLockHistoryRec *plockHistoryRec;
+        CLockState      *pState;
+        nVal = 0;
+        for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) 
         {
-            qDebug() << "lastSuccessfulIDS ids" << ids << "locks" << locknums;
-            int         nVal;
-            CLockSet    *pLockSet;
-            // Build the lock set for this lock num
-            _ptblCodes->selectCodeSet(ids, &pLockSet);
+            nVal++;
+            qDebug() << "count" << nVal;
+            pState = itor.value();
+            plockHistoryRec = new CLockHistoryRec();
+            plockHistoryRec->setFromLockState(*pState);
+            // Note: What we get back from the database is the code entry.  We want to 
+            // enter into the history the locks that were actually opened not the locks
+            // assigned to the code.  So, we initialize the history record with the default
+            // for the code and then override the locks value.
+            plockHistoryRec->setLockNums(locknums);
 
-            CLockHistoryRec *plockHistoryRec;
-            CLockState      *pState;
-            nVal = 0;
-            for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) 
+            // Despite the fact that we are in a loop, there is only ever one response from
+            // the code table query, i.e., ids is single value associated with a single code
+            // So, since we're here, we will add an entry to the lock history for this lock
+            // More desirable to know exactly what locks were opened as opposed to the 
+            // 'possible' locks that can be opened which is what selectCodeSet gives us.
+
+
+            // Set the answers if they exist, i.e., not empty
+            if (!answer1.isEmpty() || !answer2.isEmpty() || !answer3.isEmpty())
             {
-                nVal++;
-                qDebug() << "count" << nVal;
-                pState = itor.value();
-                plockHistoryRec = new CLockHistoryRec();
-                plockHistoryRec->setFromLockState(*pState);
-                // Note: What we get back from the database is the code entry.  We want to 
-                // enter into the history the locks that were actually opened not the locks
-                // assigned to the code.  So, we initialize the history record with the default
-                // for the code and then override the locks value.
-                plockHistoryRec->setLockNums(locknums);
-
-                // Despite the fact that we are in a loop, there is only ever one response from
-                // the code table query, i.e., ids is single value associated with a single code
-                // So, since we're here, we will add an entry to the lock history for this lock
-                // More desirable to know exactly what locks were opened as opposed to the 
-                // 'possible' locks that can be opened which is what selectCodeSet gives us.
-
-
-                // Set the answers if they exist, i.e., not empty
-                if (!answer1.isEmpty() || !answer2.isEmpty() || !answer3.isEmpty())
-                {
-                    _ptblCodeHistory->addLockCodeHistoryWithAnswers(*plockHistoryRec, answer1, answer2, answer3);
-                }
-                else
-                {
-                    _ptblCodeHistory->addLockCodeHistory(*plockHistoryRec);
-                }
-
-                emit __OnLastSuccessfulLogin(plockHistoryRec);
+                _ptblCodeHistory->addLockCodeHistoryWithAnswers(*plockHistoryRec, answer1, answer2, answer3);
             }
-            if(nVal > 1) 
+            else
             {
-                KCB_DEBUG_TRACE("Error has more than 1 record");
+                _ptblCodeHistory->addLockCodeHistory(*plockHistoryRec);
             }
-        } 
-        else 
+
+            emit __OnLastSuccessfulLogin(plockHistoryRec);
+        }
+
+        if(nVal > 1) 
         {
-            qDebug() << "ids == -1)";
+            KCB_DEBUG_TRACE("Error has more than 1 record");
         }
     }
 
