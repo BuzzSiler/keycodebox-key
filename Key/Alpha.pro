@@ -85,9 +85,9 @@ SOURCES += main.cpp\
     kcbapplication.cpp \
     fleetwave.cpp \
     omnikey5427ckreader.cpp \
-    scanner.cpp \
     keycodeboxsettings.cpp \
-    frmnetworksettings.cpp
+    frmnetworksettings.cpp \
+    cardreader.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -158,9 +158,9 @@ HEADERS  += keycodeboxmain.h \
     kcbapplication.h \
     fleetwave.h \
     omnikey5427ckreader.h \
-    scanner.h \
     keycodeboxsettings.h \
-    frmnetworksettings.h
+    frmnetworksettings.h \
+    cardreader.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

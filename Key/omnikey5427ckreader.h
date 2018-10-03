@@ -5,7 +5,7 @@
 #include <QString>
 
 class QThread;
-class Scanner;
+class CardReader;
 
 
 class Omnikey5427CKReader : public QObject
@@ -19,8 +19,8 @@ class Omnikey5427CKReader : public QObject
     public slots:
         void OnDigitsReceived(QString);
     private:
-        QThread& m_scanThread;
-        Scanner& m_scanner;
+        QThread& m_cardReaderThread;
+        CardReader& m_cardReader;
 };
 
 #endif // OMNIKEY5427CKREADER_H

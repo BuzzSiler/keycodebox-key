@@ -69,7 +69,7 @@ private:
     CFingerprintReader      *_fingerprintReader = 0;
 
     int             _lockNum;
-    QString    _locks;
+    QString         _locks;
     SystemState     _systemState;
     SystemState     _systemStateDisplay;
     bool            _bCurrentAdminRetrieved;
@@ -77,7 +77,9 @@ private:
 
     CFrmUserCode *_pfUsercode;
     CDlgFingerprintVerify *_pdFingerprintVerify;
+
     Omnikey5427CKReader* _omnikey5427CKReader;
+    
 
 
     QTimer      *_ptimer;
@@ -237,8 +239,8 @@ private slots:
     void resetCodeMessage();
     void OnCardSwipe(QString sCode1, QString sCode2);
     void OnFingerSwipe(QString sCode1, QString sCode2);
-    void OnHIDCard(QString sCode1, QString sCode2);
 public slots:
+    void OnHIDCard(QString sCode1, QString sCode2);
     void DisplayUserCodeDialog()
     {
     }
