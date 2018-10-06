@@ -14,6 +14,9 @@ namespace kcb
     static const QString APP_DIR = "/home/pi/kcb-config/bin";
     static const QString NEW_APP_TARGET = "%1/%2_NEW";
 
+    typedef enum { HOST_ADDRESS, BCAST_ADDRESS, NETWORK_MASK, MAC_ADDRESS } NETWORK_INFO_TYPE;
+
+
     void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status)
     {
         QProcess proc;
@@ -111,6 +114,111 @@ namespace kcb
 
         // ExtractCommandOutput(pF, sOutput);
         // fclose(pF);
+    }
+
+    static QString GetNetworkInfo(NETWORK_INFO_TYPE type)
+    {
+        /*
+        eth0      Link encap:Ethernet  HWaddr b8:27:eb:1e:67:9a
+                inet addr:192.168.1.144  Bcast:192.168.1.255  Mask:255.255.255.0
+                inet6 addr: fe80::18a0:bf0:1832:49e6/64 Scope:Link
+                UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+                RX packets:1136880 errors:0 dropped:8 overruns:0 frame:0
+                TX packets:1141978 errors:0 dropped:0 overruns:0 carrier:0
+                collisions:0 txqueuelen:1000
+                RX bytes:112912688 (107.6 MiB)  TX bytes:332918432 (317.4 MiB)
+        */    
+        QString stdOut;
+        QString stdErr;
+        int status;
+
+        ExecuteCommand(QString("ifconfig"), QStringList() << QString("eth0"), stdOut, stdErr, status);
+
+        if (!stdOut.isEmpty())
+        {
+            QStringList strList = stdOut.split("\n");
+            
+            switch (type)
+            {
+                case HOST_ADDRESS:
+                case BCAST_ADDRESS:
+                case NETWORK_MASK:
+                {
+                    QRegularExpression regex("^inet addr:(.*)  Bcast:(.*)  Mask:(.*)$");
+                    // Inverted greediness allows .* to be minimal
+                    regex.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
+                    QRegularExpressionMatch match = regex.match(strList[1].trimmed());
+                    if (match.hasMatch()) 
+                    {
+                        int index = 0;
+                        switch (type)
+                        {
+                            case BCAST_ADDRESS:
+                                index = 2;
+                                break;
+
+                            case NETWORK_MASK:
+                                index = 3;
+                                break;
+
+                            case HOST_ADDRESS:
+                            default:
+                                index = 1;
+                                break;
+
+                        }
+
+                        return match.captured(index).trimmed();
+                    }
+                }
+                break;
+
+                case MAC_ADDRESS:
+                {
+                    QRegularExpression regex("^.*HWaddr (.*)$");
+                    // Inverted greediness allows .* to be minimal
+                    regex.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
+                    QRegularExpressionMatch match = regex.match(strList[0].trimmed());
+                    if (match.hasMatch()) 
+                    {
+                        return match.captured(1).trimmed();
+                    }
+                }
+                break;
+                    
+                default:
+                    return QString("");
+                    break;
+
+            };
+        }
+
+        return QString("");
+    }
+
+    QString GetHostAddress()
+    {
+        QString result = GetNetworkInfo(HOST_ADDRESS);
+        return result;
+    }
+
+    QString GetBcastAddress()
+    {
+        QString result = GetNetworkInfo(BCAST_ADDRESS);
+        return result;
+    }
+
+    QString GetMacAddress()
+    {
+        QString result = GetNetworkInfo(MAC_ADDRESS);
+        return result;
+    }
+
+    QString GetNetworkMask()
+    {
+        QString result = GetNetworkInfo(NETWORK_MASK);
+        KCB_DEBUG_TRACE("network mask" << result);
+        return result;
     }
 
     QString GetGatewayAddress()

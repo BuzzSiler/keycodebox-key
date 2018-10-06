@@ -61,8 +61,6 @@ SOURCES += main.cpp\
     smtp/mimetext.cpp \
     smtp/quotedprintable.cpp \
     smtp/smtpclient.cpp \
-    dlgsmtp.cpp \
-    dlgvnc.cpp \
     dlgfingerprint.cpp \
     dlgfingerprintverify.cpp \
     dlgeditquestions.cpp \
@@ -87,8 +85,9 @@ SOURCES += main.cpp\
     kcbapplication.cpp \
     fleetwave.cpp \
     omnikey5427ckreader.cpp \
-    scanner.cpp \
     keycodeboxsettings.cpp \
+    frmnetworksettings.cpp \
+    cardreader.cpp
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -133,8 +132,6 @@ HEADERS  += keycodeboxmain.h \
     smtp/quotedprintable.h \
     smtp/smtpclient.h \
     smtp/smtpexports.h \
-    dlgsmtp.h \
-    dlgvnc.h \
     dlgfingerprint.h \
     dlgfingerprintverify.h \
     dlgeditquestions.h \
@@ -161,8 +158,9 @@ HEADERS  += keycodeboxmain.h \
     kcbapplication.h \
     fleetwave.h \
     omnikey5427ckreader.h \
-    scanner.h \
     keycodeboxsettings.h \
+    frmnetworksettings.h \
+    cardreader.h
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \
@@ -172,8 +170,6 @@ FORMS    += mainwindow.ui \
     frmadmininfo.ui \
     frmadminpassword.ui \
     dlgfullkeyboard.ui \
-    dlgsmtp.ui \
-    dlgvnc.ui \
     dlgfingerprint.ui\
     dlgfingerprintverify.ui \
     dlgeditquestions.ui \
@@ -185,7 +181,8 @@ FORMS    += mainwindow.ui \
     kcbkeyboardwidget.ui \
     kcbkeyboarddialog.ui \
     reportcontrolwidget.ui \
-    dlgdownloadreports.ui
+    dlgdownloadreports.ui \
+    frmnetworksettings.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/debug/ -lqsqlite

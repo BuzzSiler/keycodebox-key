@@ -2,13 +2,13 @@
 
 #include <QThread>
 #include <QDebug>
-#include "scanner.h"
+#include "cardreader.h"
 #include "kcbcommon.h"
 
 Omnikey5427CKReader::Omnikey5427CKReader(QObject *parent) :
     QObject(parent),
-    m_scanThread(*new QThread()),
-    m_scanner(*new Scanner())
+    m_cardReaderThread(*new QThread()),
+    m_cardReader(*new CardReader())
 {
 
 }
@@ -16,12 +16,16 @@ Omnikey5427CKReader::Omnikey5427CKReader(QObject *parent) :
 void Omnikey5427CKReader::Start()
 {
     KCB_DEBUG_ENTRY;
-    connect(&m_scanner, SIGNAL(DigitsReceived(QString)), this, SLOT(OnDigitsReceived(QString)));
 
-    m_scanner.Connect(m_scanThread);
-    m_scanner.moveToThread(&m_scanThread);
+    // Start the card reader thread to detect card insertion and securely read the card number
 
-    m_scanThread.start();
+    connect(&m_cardReader, SIGNAL(DigitsReceived(QString)), this, SLOT(OnDigitsReceived(QString)));
+
+    KCB_DEBUG_TRACE("Starting card reader");
+    m_cardReader.Connect(m_cardReaderThread);
+    m_cardReader.moveToThread(&m_cardReaderThread);    
+    m_cardReaderThread.start();
+
     KCB_DEBUG_EXIT;
 }
 
@@ -31,7 +35,7 @@ void Omnikey5427CKReader::OnDigitsReceived(QString digits)
 
     KCB_DEBUG_TRACE(digits);
     bool isOk;
-    qulonglong value = digits.toULongLong(&isOk, 16);
+    qulonglong value = digits.toInt(&isOk, 10);
 
     emit __onHIDSwipeCodes(QString::number(value),"");
     KCB_DEBUG_EXIT;

@@ -195,6 +195,7 @@ void CSystemController::QuestionUserCancel()
 
 void CSystemController::initializeReaders()
 {
+
     // MagTek Reader
     _pmagTekReader = new CMagTekCardReader();
     if(_pmagTekReader->initMagTekCardReader()) // hardcoded VID & PID
@@ -206,7 +207,8 @@ void CSystemController::initializeReaders()
         _threadCardReader.start();
         qDebug() << "MagTekReader found and started";
     }
-    else {
+    else 
+    {
         qDebug() << "No MagTekReader found";
     }
 
@@ -263,8 +265,8 @@ void CSystemController::initializeReaders()
     if (fleetwave_enabled)
     {
         _omnikey5427CKReader = new Omnikey5427CKReader();
-        _omnikey5427CKReader->Start();
         connect(_omnikey5427CKReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
+        _omnikey5427CKReader->Start();
     }
 
     connect(&_securityController, SIGNAL(__TrigQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
