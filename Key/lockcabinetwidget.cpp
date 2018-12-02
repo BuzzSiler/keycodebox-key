@@ -291,7 +291,7 @@ void LockCabinetWidget::selectClearAllLocks(bool select_clear)
     {
         if (start + ii <= stop)
         {
-            KCB_DEBUG_TRACE("Lock" << ii << "Enabled" << p_cab->enabled[ii] << "SelectClear" << select_clear);
+            //KCB_DEBUG_TRACE("Lock" << ii << "Enabled" << p_cab->enabled[ii] << "SelectClear" << select_clear);
             if (p_cab->enabled[ii])
             {
                 p_cab->states[ii] = select_clear;

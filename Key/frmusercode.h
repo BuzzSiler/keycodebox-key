@@ -4,11 +4,8 @@
 #include <QDialog>
 #include <QTimer>
 #include <QString>
-#include <QMouseEvent>
 
-#include "hidreader.h"
-#include "magtekcardreader.h"
-#include "dlgfingerprint.h"
+class QMouseEvent;
 
 namespace Ui {
 class CFrmUserCode;

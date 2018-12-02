@@ -126,6 +126,7 @@ void CSecurityController::CheckAccessCodeOne(QString code1)
     _sCode2 = "";       // clear code2
 
     emit __VerifyCodeOne(code1);       // This should cross thread to the _modelSecurity object
+    KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::CheckAccessCodeTwo(QString code2)
@@ -137,6 +138,7 @@ void CSecurityController::CheckAccessCodeTwo(QString code2)
     QString sCodeEnc(CEncryption::encryptString(code2));
 
     emit __VerifyCodeTwo(sCodeEnc);       // This should cross thread to the _modelSecurity object
+    KCB_DEBUG_EXIT;
 }
 
 /**

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QByteArray>
 #include "lockstate.h"
 
 
@@ -26,6 +27,7 @@ class CLockHistoryRec : public CLockState
         bool        _userNotificationSent;
         QString     _lockNums;
         QString     _access_selection;
+        QByteArray  _image;
 
     public:
         QDateTime getAccessTime() { return _access_time; }
@@ -56,6 +58,9 @@ class CLockHistoryRec : public CLockState
 
         void setAccessSelection(QString accessSelection) { _access_selection = accessSelection; }
         QString getAccessSelection() { return _access_selection; }
+
+        void setImage(QByteArray image) { _image = image; }
+        QByteArray getImage() { return _image; }
 
 
 };

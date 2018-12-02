@@ -7,7 +7,6 @@
 #include "kcbcommon.h"
 
 #define REPORT_FILE "KeyCodeBox_%1.txt"
-#define REPORT_FILE_FORMAT "yyyy-MM-dd-HH_mm_ss"
 
 CReportController::CReportController(QObject *parent) : QObject(parent)
 {
@@ -133,7 +132,7 @@ void CReportController::processEveryActivityReport(QDateTime dtFreq)
 void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd)
 {
     KCB_DEBUG_ENTRY;
-    
+
     requestCurrentAdminRecord();
 
     int nCount = 0;

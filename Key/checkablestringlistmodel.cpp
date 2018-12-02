@@ -4,12 +4,13 @@
 
 CheckableStringListModel::CheckableStringListModel(QObject* parent)
 {
-
+    Q_UNUSED(parent);
 }
 
 CheckableStringListModel::CheckableStringListModel(const QStringList & strings, QObject* parent)
 {
-
+    Q_UNUSED(strings);
+    Q_UNUSED(parent);
 }
 
 Qt::ItemFlags CheckableStringListModel::flags (const QModelIndex & index) const

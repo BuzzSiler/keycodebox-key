@@ -63,4 +63,8 @@ const QString USER_CODE_FLEETWAVE_PROMPT = QString("<%1>").arg(QObject::tr("Plea
 const QString USER_CODE_PROMPT = QString("<%1 #1>").arg(QObject::tr("Please Enter Code"));
 const QString USER_CODE_CODE2_PROMPT = QString("<%1>").arg(QObject::tr("Please Enter Second Code"));
 
+const QString KCB_IMAGE_PATH = QString("/home/pi/kcb-config/images");
+
+#define REPORT_FILE_FORMAT "yyyy-MM-dd-HH_mm_ss"
+
 #endif

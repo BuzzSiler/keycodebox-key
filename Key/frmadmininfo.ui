@@ -1522,7 +1522,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Read</string>
+         <string>Reset</string>
         </property>
        </widget>
       </item>

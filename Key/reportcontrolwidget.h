@@ -67,7 +67,7 @@ class ReportControlWidget : public QWidget
         bool OneOrMoreReportsSelected();
         void ClearSelectAllReports(Qt::CheckState state);
         void checkInvalidReportStorage();
-        bool ConfirmDisableSafeToFile();
+        bool ConfirmDisableSaveToFile();
 };
 
 #endif // REPORTCONTROLWIDGET_H
