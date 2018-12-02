@@ -78,7 +78,8 @@ void KcbKeyboardWidget::clear()
 
 void KcbKeyboardWidget::OnTextChanged(QString text)
 {
-    KCB_DEBUG_TRACE("Text" << text);
+    Q_UNUSED(text);
+    //KCB_DEBUG_TRACE("Text" << text);
     updateUi();
 }
 

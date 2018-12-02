@@ -3,7 +3,6 @@
 #include <QDateTime>
 #include <QDebug>
 #include "tblcodehistory.h"
-#include "encryption.h"
 #include "lockhistoryrec.h"
 #include "kcbcommon.h"
 #include "kcbapplication.h"
@@ -104,6 +103,7 @@ void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistory
         auto answer1 = QUERY_VALUE(qry, "answer1").toString();
         auto answer2 = QUERY_VALUE(qry, "answer2").toString();
         auto answer3 = QUERY_VALUE(qry, "answer3").toString();
+		auto image = QUERY_VALUE(qry, "image").toByteArray();
 
         CLockHistoryRec *pLockHistoryRec = new CLockHistoryRec();
 
@@ -132,6 +132,7 @@ void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistory
         pLockHistoryRec->setQuestion2(answer2);
         pLockHistoryRec->setQuestion3(answer3);
 
+		pLockHistoryRec->setImage(image);
         (*pLockHistorySet)->addToSet(*pLockHistoryRec);
         
     } while (qry.next());
@@ -152,6 +153,7 @@ void CTblCodeHistory::selectLockCodeHistorySet(QString lockNums, QDateTime start
     columns_list << "access_count" << "retry_count" << "max_access" << "max_retry" << "access_time";
     columns_list << "admin_notification_sent" << "user_notification_email" << "user_notification_sent";
     columns_list << "answer1" << "answer2" << "answer3";
+	columns_list << "image";
     QString condition = "";
     if(lockNums != "" && lockNums != "*")
     {
@@ -347,7 +349,9 @@ void CTblCodeHistory::createTable()
                " starttime DATETIME, endtime DATETIME, status text, access_count integer,"
                " retry_count integer, max_access integer, max_retry integer,"
                " access_time DATETIME, admin_notification_sent BOOL,"
-                " user_notification_email text, user_notification_sent BOOL)";
+                " user_notification_email text, user_notification_sent BOOL,"
+				"answer1 text, answer2 text, answer3 text,"
+				"image BLOB)";
 
         qry.prepare( sql );
 
@@ -376,7 +380,8 @@ bool CTblCodeHistory::addLockCodeHistory(CLockHistoryRec &lockHistoryRec)
                               lockHistoryRec.getSequence(), lockHistoryRec.getSequenceOrder(),
                               lockHistoryRec.getMaxRetry(), lockHistoryRec.getAccessTime(),
                               lockHistoryRec.getAdminNotificationSent(), lockHistoryRec.getUserNotificationEmail(),
-                              lockHistoryRec.getUserNotificationSent());
+                              lockHistoryRec.getUserNotificationSent(),
+                              lockHistoryRec.getImage());
 }
 
 bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QString code2,
@@ -385,14 +390,12 @@ bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QStrin
                                          QString status, QString desc, QString sequence, int sequenceNum,
                                          int maxRetry, QDateTime accesstime,
                                          bool adminNotificationSent, QString userNotificationEmail,
-                                         bool userNotificationSent)
+                                         bool userNotificationSent, QByteArray image)
 {
     KCB_DEBUG_ENTRY;
 
-    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
-
     KCB_DEBUG_TRACE("Adding Locks to History" << locknums);
-
+    KCB_DEBUG_TRACE("image size" << image.count());
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + TABLENAME +
                 QString(" (sequence, sequence_order, "
@@ -401,12 +404,14 @@ bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QStrin
                         "starttime, endtime, status, access_count,"
                         "retry_count, max_access, max_retry,"
                         "access_time, admin_notification_sent,"
-                        "user_notification_email, user_notification_sent)"
+                        "user_notification_email, user_notification_sent,"
+					    "image)"
                         " VALUES (:seqDesc, :seqOrder, :lockNums, :desc, :codeOne, "
                         " :codeTwo, :accessSelection, "
                         " :start, :end, :stat, 0, 0, :maxAccess, :maxRetry, "
                         " :accessTime, :adminNotificationSent, "
-                        " :userEmail, :userNotificationSent)" ));
+                        " :userEmail, :userNotificationSent,"
+						" :image)" ));
 
     qDebug() << "Query:" << qry.lastQuery();
 
@@ -426,6 +431,8 @@ bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QStrin
     qry.bindValue(":adminNotificationSent", QVariant(adminNotificationSent));
     qry.bindValue(":userEmail", userNotificationEmail);
     qry.bindValue(":userNotificationSent", QVariant(userNotificationSent));
+	
+    qry.bindValue(":image", QVariant(image));
 
     if( !qry.exec() ) 
     {
@@ -449,7 +456,7 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(CLockHistoryRec &lockHistory
                                          lockHistoryRec.getSequence(), lockHistoryRec.getSequenceOrder(),
                                          lockHistoryRec.getMaxRetry(), lockHistoryRec.getAccessTime(),
                                          lockHistoryRec.getAdminNotificationSent(), lockHistoryRec.getUserNotificationEmail(),
-                                         lockHistoryRec.getUserNotificationSent(), answer1, answer2, answer3);
+                                         lockHistoryRec.getUserNotificationSent(), answer1, answer2, answer3, lockHistoryRec.getImage());
 }
 
 bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString code1, QString code2,
@@ -458,7 +465,8 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString co
                                                     QString status, QString desc, QString sequence, int sequenceNum,
                                                     int maxRetry, QDateTime accesstime,
                                                     bool adminNotificationSent, QString userNotificationEmail,
-                                                    bool userNotificationSent, QString answer1, QString answer2, QString answer3)
+                                                    bool userNotificationSent, QString answer1, QString answer2, QString answer3,
+                                                    QByteArray image)
 {
     KCB_DEBUG_ENTRY;
 
@@ -481,7 +489,8 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString co
                         " :start, :end, :stat, 0, 0, :maxAccess, :maxRetry, "
                         " :accessTime, :adminNotificationSent, "
                         " :userEmail, :userNotificationSent, "
-                        " :answer1, :answer2, :answer3)" ));
+                        " :answer1, :answer2, :answer3,"
+						" :image)" ));
 
     qDebug() << "Query:" << qry.lastQuery();
 
@@ -504,6 +513,7 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString co
     qry.bindValue(":answer1", answer1);
     qry.bindValue(":answer2", answer2);
     qry.bindValue(":answer3", answer3);
+    qry.bindValue(":image", image);
 
     if( !qry.exec() ) 
     {
@@ -634,7 +644,8 @@ bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
                               "code2=:codeTwo, access_selection=:accessSelection, starttime=:start, endtime=:end, status=:stat, access_count=:accessCount,"
                               "retry_count=:retryCount, max_access=:maxAccess, max_retry=:maxRetry,"
                               "access_time=:accessTime, admin_notification_sent=:adminNotificationSent,"
-                              "user_notification_email=:userNotificationEmail, user_notification_sent=:userNotificationSent"
+                              "user_notification_email=:userNotificationEmail, user_notification_sent=:userNotificationSent,"
+							  "image=:image"
                               " WHERE ids=:fids");
 
     qry.prepare(sql);
@@ -655,6 +666,8 @@ bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
     qry.bindValue(":adminNotificationSent", rec.getAdminNotificationSent() );
     qry.bindValue(":userNotificationEmail", rec.getUserNotificationEmail());
     qry.bindValue(":userNotificationSent", rec.getUserNotificationSent() );
+
+    qry.bindValue(":image", rec.getImage() );
 
     qry.bindValue(":fids", rec.getID());
 
@@ -709,3 +722,6 @@ bool CTblCodeHistory::updateLockCodeHistorySet(QJsonObject &jsonObj)
     // Valid set
     return updateLockCodeHistorySet(lockHistorySet);
 }
+
+//-------------------------------------------------------------------------------------------------
+// EOF

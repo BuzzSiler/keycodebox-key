@@ -160,6 +160,7 @@ class CFrmAdminInfo : public QDialog
         void OnCodeEditAccept();
 
         void on_pbNetworkSettings_clicked();
+		void codeHistoryTableCellSelected( int row, int col);
 
     private:
         Ui::CFrmAdminInfo   *ui;
@@ -233,6 +234,7 @@ class CFrmAdminInfo : public QDialog
                             QString question3,
                             int access_type);
         void RunKeyboard(QString& text, bool numbersOnly = false);
+
                          
 
     protected:

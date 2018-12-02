@@ -87,7 +87,8 @@ SOURCES += main.cpp\
     omnikey5427ckreader.cpp \
     keycodeboxsettings.cpp \
     frmnetworksettings.cpp \
-    cardreader.cpp
+    cardreader.cpp \
+    adminrec.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -160,7 +161,8 @@ HEADERS  += keycodeboxmain.h \
     omnikey5427ckreader.h \
     keycodeboxsettings.h \
     frmnetworksettings.h \
-    cardreader.h
+    cardreader.h \
+    adminrec.h \
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

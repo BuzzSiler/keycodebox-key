@@ -22,6 +22,7 @@
 #include "kcbapplication.h"
 #include "omnikey5427ckreader.h"
 #include "keycodeboxsettings.h"
+#include "kcbsystem.h"
 
 static bool fleetwave_enabled;
 
@@ -476,7 +477,7 @@ void CSystemController::OnFingerprintCodeEntered(QString sCode)
 
 void CSystemController::OnFingerprintCodeEnteredTwo(QString sCode)
 {
-    qDebug() << "SystemController::OnFingerprintCodeEnteredTwo:" << sCode;
+    KCB_DEBUG_TRACE("code" << sCode);
 
     //if( _securityController.CheckAccessCodeTwoFingerprint() )
     //  check to see if the directory exists with fingerprintreader class
@@ -489,17 +490,20 @@ void CSystemController::OnFingerprintCodeEnteredTwo(QString sCode)
 
 void CSystemController::OnAdminPasswordEntered(QString sPW)
 {
-    qDebug() << "SystemController::OnAdminPasswordEntered";
+    KCB_DEBUG_ENTRY;
     _securityController.CheckAdminPassword(sPW);
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
+    KCB_DEBUG_ENTRY;
     _padminInfo = adminInfo;
     _bCurrentAdminRetrieved = true;
 
     qDebug() << "CSystemController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(adminInfo);
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnAdminDialogClosed()
@@ -579,6 +583,7 @@ void CSystemController::OnUserCodeCancel()
 void CSystemController::OnOpenLockRequest(QString lockNum)
 {
     KCB_DEBUG_TRACE(lockNum);
+    kcb::TakeAndStorePicture();
     _LockController.openLocks(lockNum);
 }
 
@@ -1054,7 +1059,7 @@ void CSystemController::RequestLastSuccessfulLogin(QString locknums)
 
 void CSystemController::sendEmailReport(QDateTime access, QString desc, QString lockNums)
 {
-    qDebug() << "Sending email";
+    KCB_DEBUG_TRACE("Sending email");
 
     QString SMTPSvr = DEFAULT_SMTP_SERVER;
     int SMTPPort = DEFAULT_SMTP_PORT;
@@ -1108,18 +1113,16 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
     }
     if(_bCurrentAdminRetrieved && pLockHistory)
     {
-        qDebug() << "OnLastSuccessfulLoginRequest()";
 
+        QDateTime dtAccess = pLockHistory->getAccessTime();
+        QString sDesc = pLockHistory->getDescription();
+        QString LockNums = pLockHistory->getLockNums();
         QDateTime dtFreq = _padminInfo->getDefaultReportFreq();
 
         if (IS_EVERY_ACTIVITY(dtFreq))
         {
             if (_padminInfo->getReportViaEmail())
-            {
-                QDateTime dtAccess = pLockHistory->getAccessTime();
-                QString sDesc = pLockHistory->getDescription();
-                QString LockNums = pLockHistory->getLockNums();
-                
+            {                
                 sendEmailReport(dtAccess, sDesc, LockNums);
             }
 
@@ -1148,7 +1151,7 @@ void CSystemController::OnBrightnessChanged(int nValue)
 
 void CSystemController::OnSendTestEmail(int test_type)
 {
-    qDebug() << "Sending Test Email (" << test_type << ")";
+    KCB_DEBUG_TRACE("Sending Test Email (" << test_type << ")");
 
     QString SMTPSvr;
     int SMTPPort;

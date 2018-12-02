@@ -94,7 +94,7 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 
 void CModelSecurity::OnUpdateCodeState(CLockState *rec)
 {
-    qDebug() << "CModelSecurity::OnUpdateCodeState";
+    KCB_DEBUG_ENTRY;
     bool bSuccess = _ptblCodes->updateCode(rec);
 
     emit __OnUpdatedCodeState(bSuccess);
@@ -269,7 +269,7 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                                                 bSecondCodeRequired,
                                                 bFingerprintRequired,
                                                 lockNums);
-            KCB_DEBUG_TRACE("Locks" << lockNums);
+            KCB_DEBUG_TRACE("Result" << result << "Locks" << lockNums);
             if( result == KCB_SUCCESS && lockNums != "" )
             {
                 // need to check if fingerprint security is enabled
@@ -659,6 +659,13 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
             // More desirable to know exactly what locks were opened as opposed to the 
             // 'possible' locks that can be opened which is what selectCodeSet gives us.
 
+            if (kcb::HasCamera())
+            {
+                QByteArray image_bytes = kcb::GetImageAsByteArray();
+                KCB_DEBUG_TRACE("Getting image bytes:" << image_bytes.count());
+                KCB_DEBUG_TRACE("Setting image");
+                plockHistoryRec->setImage(image_bytes);                
+            }
 
             // Set the answers if they exist, i.e., not empty
             if (!answer1.isEmpty() || !answer2.isEmpty() || !answer3.isEmpty())
@@ -712,9 +719,9 @@ void CModelSecurity::OnVerifyAdminPassword(QString code)
 
 void CModelSecurity::OnRequestCurrentAdmin()
 {
-    qDebug() << "CModelSecurity::OnRequestCurrentAdmin() : retrieved current admin -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
-
+    KCB_DEBUG_ENTRY;
     emit __OnRequestedCurrentAdmin(&_ptblAdmin->getCurrentAdmin());
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::getAllCodes1(QStringList& codes1)

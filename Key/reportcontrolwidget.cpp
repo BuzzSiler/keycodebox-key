@@ -72,7 +72,7 @@ void ReportControlWidget::setValues(CAdminRec& adminInfo)
 
     m_report_directory = m_curr_report_directory = adminInfo.getReportDirectory();
 
-    // If the report directory is empty, then we are no storing report to files
+    // If the report directory is empty, then we are not storing report to files
     // If the report directory is the default directory, then we are storing reports to the default directory
     // If the report directory is not empty and not the default directory then we are storing reports to a USB drive
     bool dir_empty = m_curr_report_directory.isEmpty();
@@ -243,7 +243,7 @@ void ReportControlWidget::checkInvalidReportStorage()
     }
 }
 
-bool ReportControlWidget::ConfirmDisableSafeToFile()
+bool ReportControlWidget::ConfirmDisableSaveToFile()
 {
     bool confirmed = true;
 
@@ -289,10 +289,10 @@ void ReportControlWidget::on_cbSaveToFile_clicked()
     }
     else
     {
-        bool confirmed = ConfirmDisableSafeToFile();
+        bool confirmed = ConfirmDisableSaveToFile();
         if (confirmed)
         {
-            m_curr_report_directory = "None";
+            m_curr_report_directory = "";
             checkInvalidReportStorage();
         }
         else

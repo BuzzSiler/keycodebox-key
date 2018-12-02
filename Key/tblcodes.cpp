@@ -710,7 +710,7 @@ int CTblCodes::addLockCodeClear(QString locknums, QString code1, QString code2,
                                 QString sequence, int sequenceNum,
                                 int maxAccess, int maxRetry, int accessType, int accessCount)
 {
-    qDebug() << "CTblCodes::addLockCodeClear()";
+    KCB_DEBUG_ENTRY;
     QString     encCode1, encCode2;
     if(code1.length() > 0)
     {
@@ -739,7 +739,8 @@ int CTblCodes::addLockCode(QString locknums, QString code1, QString code2,
                            QString sequence, int sequenceNum,
                            int maxAccess, int maxRetry, int accessType, int accessCount)
 {
-    qDebug() << "CTblCodes::addLockCode()";
+    KCB_DEBUG_ENTRY;
+
 
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + TABLENAME +
@@ -798,7 +799,7 @@ int CTblCodes::addLockCode(QString locknums, QString code1, QString code2,
 
 bool CTblCodes::createTestDefault()
 {
-    qDebug() << "CTblCodes::createTestDefault()";
+    KCB_DEBUG_ENTRY;
     QString s = CEncryption::encryptString("192837");
     QString     encCode1(s);
     s = CEncryption::encryptString("2837465");
@@ -854,7 +855,7 @@ void CTblCodes::currentTimeFormat(QString format, QString strBuffer, int nExpect
 
 bool CTblCodes::readTestDefault()
 {
-    qDebug( )<< "CTblCodes::readTestDefault()";
+    KCB_DEBUG_ENTRY;
 
     QSqlQuery query(*_pDB);
     QString sql = "SELECT sequence, sequence_order, "\
@@ -932,7 +933,7 @@ bool CTblCodes::deleteCode(CLockState &rec)
 
 bool CTblCodes::resetCodeLimitedUse(CLockState &rec)
 {
-    qDebug() << "CTblCodes::resetCodeLimitedUse(CLockState)";
+    KCB_DEBUG_ENTRY;
 
     if (rec.getID() == -1)
     {
@@ -1078,7 +1079,7 @@ bool CTblCodes::updateQuestion3(int fids, QString question)
 
 bool CTblCodes::updateRecord(CLockState &rec)
 {
-    qDebug() << "CTblAdmin::updateRecord()";
+    KCB_DEBUG_ENTRY;
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
@@ -1132,23 +1133,23 @@ bool CTblCodes::updateRecord(CLockState &rec)
 
 bool CTblCodes::updateCode(CLockState *prec)
 {
-    qDebug() << "CTblCodes::updateCode";
+    KCB_DEBUG_ENTRY;
     // update
     if(prec->isMarkedForDeletion()) 
     {
-        qDebug() << "CTblCodes::deleteCode";
+        KCB_DEBUG_TRACE("deleteCode");
         return deleteCode(*prec);
     } 
     else if (prec->isMarkedForReset())
     {        
-        qDebug() << "CTblCodes::resetCodeLimitedUse";
+        KCB_DEBUG_TRACE("resetCodeLimitedUse");
         return resetCodeLimitedUse(*prec);        
     }
     else 
     {
         if(prec->getID() == -1 ) 
         {
-            qDebug() << "CTblCodes::addLockCode";
+            KCB_DEBUG_TRACE("addLockCode");
             int nId = addLockCode(prec->getLockNums(),prec->getCode1(),prec->getCode2(),
                                   prec->getStartTime(), prec->getEndTime(),
                                   prec->getFingerprint1(), prec->getFingerprint2(),
@@ -1195,19 +1196,23 @@ bool CTblCodes::updateCodeSet(CLockSet &codeSet)
     for(itor = codeSet.begin(); itor != codeSet.end(); itor++)
     {
         int nRC = updateCode(itor.value());
-        if(nRC == -1) {
+        if(nRC == -1) 
+		{
             bRC = false;
         }
     }
 
-    if( !bRC ) {
-        qDebug() << "CTbleCodes::updateCodeSet() failed!";
+    if( !bRC ) 
+    {
+        KCB_DEBUG_TRACE("failed!");
         _pDB->rollback();
-    } else {
-        qDebug() << "CTbleCodes::updateCodeSet() succeeded. Committing...";
-        if( !_pDB->commit() )
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("succeeded. Committing...");
+        if ( !_pDB->commit() )
         {
-            qDebug() << "CTbleCodes::updateCodeSet() committed successfully.";
+            KCB_DEBUG_TRACE("committed successfully.");
         }
     }
     return bRC;
@@ -1218,7 +1223,7 @@ bool CTblCodes::updateCodes(QJsonObject &jsonObj)
     CLockSet    lockSet;
     if(!lockSet.setFromJsonObject(jsonObj))
     {
-        qDebug() << "CTblCodes::updateCodes(): invalid JSON Object Codeset";
+        KCB_DEBUG_TRACE("invalid JSON Object Codeset");
     }
     // Valid set
     return updateCodeSet(lockSet);
@@ -1226,8 +1231,7 @@ bool CTblCodes::updateCodes(QJsonObject &jsonObj)
 
 bool CTblCodes::incrementAccessCount(int fids)
 {
-    qDebug() << "CTblCodes::incrementAccessCount()";
-
+    KCB_DEBUG_ENTRY;
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("access_count = access_count + 1 "
@@ -1239,14 +1243,16 @@ bool CTblCodes::incrementAccessCount(int fids)
 
     qry.bindValue(":fids", fids);
 
-    if(qry.exec()) {
-        qDebug() << "CTblCodes::incrementAccessCount() succeeded";
-        return true;
-    } else {
-        qDebug() << "CTblCodes::incrementAccessCount() failed";
-        return false;
+	bool result = qry.exec();
+    if (result) 
+	{
+        KCB_DEBUG_TRACE("succeeded");
+    } else 
+	{
+        KCB_DEBUG_TRACE("failed");
     }
-    
+	
+	return result;
 }
 
 void CTblCodes::getAllCodes1(QStringList& codes1)
@@ -1283,3 +1289,6 @@ void CTblCodes::getAllCodes1(QStringList& codes1)
 
     // KCB_DEBUG_EXIT;
 }
+
+//-------------------------------------------------------------------------------------------------
+// EOF

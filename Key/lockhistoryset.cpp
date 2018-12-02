@@ -100,5 +100,3 @@ bool CLockHistorySet::setFromJsonString(QString strJson)
     }
     return true;
 }
-
-

@@ -170,6 +170,7 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(&m_report, &ReportControlWidget::NotifyGenerateReport, this, &CFrmAdminInfo::OnNotifyGenerateReport);
 
+    connect( ui->tblHistory, SIGNAL( cellClicked(int, int) ), this, SLOT( codeHistoryTableCellSelected( int, int ) ) );
 
 }
 
@@ -178,7 +179,7 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
     _psysController = psysController;
 
     initializeConnections();
-    qDebug() << "CFrmAdminInfo::setSystemController() -> emit __OnRequestCurrentAdmin()";
+    KCB_DEBUG_TRACE("emit __OnRequestCurrentAdmin");
     emit __OnRequestCurrentAdmin();
     emit __OnReadDoorLocksState();
 }
@@ -186,7 +187,7 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 void CFrmAdminInfo::show()
 {
     QDialog::show();
-    qDebug() << "Admin type is: " + _psysController->getAdminType();
+    KCB_DEBUG_TRACE("Admin type is: " << _psysController->getAdminType());
     if(_psysController->getAdminType() == "Assist")
     {
         ui->tabUtilities->setEnabled(false);
@@ -847,6 +848,7 @@ void CFrmAdminInfo::on_lblAssistPassword_clicked()
 
 void CFrmAdminInfo::on_btnDone_clicked()
 {
+    KCB_DEBUG_ENTRY;
     /* This slot is called when we are leaving the admin interface.
        It seems like the most obvious place to re-enable display power
        It would be preferrable to have all power control in the same
@@ -867,6 +869,7 @@ void CFrmAdminInfo::on_btnDone_clicked()
 
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::hideKeyboard(bool bHide) 
@@ -878,7 +881,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
     // New Admin info to display...
     // Display to the ui
-    if(adminInfo)
+    if (adminInfo)
     {
         qDebug() << "Admin Info received.";
         _tmpAdminRec = *adminInfo;
@@ -909,9 +912,10 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
 void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
 {
+    KCB_DEBUG_ENTRY;
     if( bSuccess )
     {
-        qDebug() << "Succeeded in updating Current Admin Info";
+        KCB_DEBUG_TRACE("Succeeded in updating Current Admin Info");
 
         /* Note: This is such an ugly hack.  I hate it. 
            I think the better way is to separate "Save and Close" so that
@@ -927,7 +931,7 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
     } 
     else 
     {
-        qDebug() << "Failed to update Current Admin Info";
+        KCB_DEBUG_TRACE("Failed to update Current Admin Info");
     }
 
     if(_bClose)
@@ -939,6 +943,7 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
     {
         emit __OnRequestCurrentAdmin();
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
@@ -1059,6 +1064,8 @@ void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
     displayInHistoryTable(pSet);
     
     pSet = nullptr;
+
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::createCodeTableHeader()
@@ -1229,28 +1236,29 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     // Setup the table display
 
     QTableWidget    *table = ui->tblHistory;
+    table->clearContents();
     table->setRowCount(pSet->getLockHistoryMap()->size());
-    table->setColumnCount(5);
+    table->setColumnCount(6);
 
     table->setColumnWidth(0, 80);
     table->setColumnWidth(1, 120);
     table->setColumnWidth(2, 100);
     table->setColumnWidth(3, 100);
     table->setColumnWidth(4, 350);
+    table->setColumnWidth(5, 50);
     
     table->verticalHeader()->hide();
     
     QStringList headers;
-    headers<<tr("Lock #")<<tr("Username")<<tr("Code#1")<<tr("Code#2")<<tr("Accessed");
+    headers<<tr("Lock #")<<tr("Username")<<tr("Code#1")<<tr("Code#2")<<tr("Accessed")<<tr("Image");
     table->setHorizontalHeaderLabels(headers);
-    table->verticalHeader()->setFixedWidth(60);
-    table->horizontalHeader()->setFixedHeight(50);    
+    table->verticalHeader()->setFixedWidth(50);
+    table->horizontalHeader()->setFixedHeight(50);   
     table->horizontalHeader()->setStretchLastSection(true);
 
     table->setStyleSheet("QTableView {selection-background-color: lightblue;}");
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    connect( table, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT( codeHistoryTableCellSelected( int, int ) ) );
 
     ui->cbLockNumHistory->clear();
     ui->cbLockNumHistory->addItem(QString(tr("All Locks")));
@@ -1265,10 +1273,8 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     while (itor.hasNext())
     {
         pState = itor.next();
-        // qDebug() << "Adding row of History Lock State - Codes. Lock Num:" << pState->getLockNums();
         
         QString locks = pState->getLockNums();
-        // KCB_DEBUG_TRACE("Locks" << locks);
         QStringList sl = locks.split(',');
         foreach (auto s, sl)
         {
@@ -1281,6 +1287,21 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode1()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getAccessTime().toString("yyyy-MM-dd HH:mm:ss AP")));
+		
+        QByteArray ba = pState->getImage();
+        if (ba.count() > 0)
+        {
+            QPixmap pm;
+            pm.loadFromData(ba);
+            QLabel *image_label = new QLabel();
+            image_label->setPixmap(pm.scaled(60, 60, Qt::KeepAspectRatio));
+            image_label->setAlignment(Qt::AlignHCenter);
+            table->setCellWidget(nRow, nCol, image_label);
+        }
+        else
+        {
+            table->setItem(nRow, nCol, new QTableWidgetItem("No Image"));
+        }
         nRow++;
     }
 
@@ -1425,6 +1446,7 @@ void CFrmAdminInfo::on_btnRead_clicked()
     
     emit __OnReadLockHistorySet(locks, dtStart, dtEnd);
 }
+
 
 void CFrmAdminInfo::OnNotifyGenerateReport()
 {
@@ -1950,15 +1972,16 @@ void CFrmAdminInfo::OnTabSelected(int index)
 
 void CFrmAdminInfo::on_btnTestEmail_clicked()
 {
-    qDebug() << "Testing admin send email";
+    KCB_DEBUG_TRACE("Testing admin send email");
     emit __OnSendTestEmail(1 /*ADMIN_SEND*/);
 }
 
 void CFrmAdminInfo::on_btnTestUserEmail_clicked()
 {
-    qDebug() << "Testing admin recv email";
+    KCB_DEBUG_TRACE("Testing admin recv email");
     _testEmail = true;
-    // Need to force saving here
+    emit __OnSendTestEmail(2 /*ADMIN_RECV*/);
+    _testEmail = false;
 }
 
 void CFrmAdminInfo::OnDisplayFingerprintButton(bool state)
@@ -2034,5 +2057,29 @@ void CFrmAdminInfo::on_pbNetworkSettings_clicked()
         ExtractCommandOutput(pF, sOutput);
         fclose(pF);
 
+    }
+}
+
+void CFrmAdminInfo::codeHistoryTableCellSelected(int row, int col)
+{
+    KCB_DEBUG_TRACE("row" << row << "col" << col);
+
+    if (col == 5)
+    {     
+        const QVector<CLockHistoryRec*>* set = _phistoryWorkingSet->getLockHistoryMap();
+
+        CLockHistoryRec* rec = (*set)[row];
+        QByteArray ba = rec->getImage();
+        QPixmap pm;
+        pm.loadFromData(ba);
+        KCB_DEBUG_TRACE("pm size" << pm.size());
+        if (pm.size() != QSize(0, 0))
+        {
+            QMessageBox mb;
+            mb.setWindowTitle("Access Image");
+            mb.setStandardButtons(QMessageBox::Ok);
+            mb.setIconPixmap(pm);
+            mb.exec();
+        }
     }
 }
