@@ -89,7 +89,6 @@ SOURCES += main.cpp\
     frmnetworksettings.cpp \
     cardreader.cpp \
     adminrec.cpp \
-    loggingcategories.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -164,7 +163,6 @@ HEADERS  += keycodeboxmain.h \
     frmnetworksettings.h \
     cardreader.h \
     adminrec.h \
-    loggingcategories.h \
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

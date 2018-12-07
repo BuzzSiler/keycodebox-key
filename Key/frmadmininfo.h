@@ -144,11 +144,9 @@ class CFrmAdminInfo : public QDialog
         void onCopyModelDirectoryLoaded(QString path);
         void on_btnCopyFile_clicked();
 
-        void on_btnCopyFileLoadCodes_clicked();
         void on_btnCopyFileBrandingImage_clicked();
         void on_btnCopyFileBrandingImageReset_clicked();
 
-        void on_btnCopyToggleSource_clicked(bool checked);
         void on_btnRebootSystem_clicked();
         void on_btnPurgeCodes_clicked();
         void on_btnRead_clicked();
@@ -161,6 +159,11 @@ class CFrmAdminInfo : public QDialog
 
         void on_pbNetworkSettings_clicked();
 		void codeHistoryTableCellSelected( int row, int col);
+
+        void on_cbActionsSelect_currentIndexChanged(int index);
+        void on_btnActionExecute_clicked();
+        void on_cbUsbDrives_currentIndexChanged(const QString &arg1);
+        void on_cbFileFormat_currentIndexChanged(const QString &arg1);
 
     private:
         Ui::CFrmAdminInfo   *ui;
@@ -198,6 +201,17 @@ class CFrmAdminInfo : public QDialog
         SelectLocksWidget&  m_select_locks;
         QStringList         _codesInUse;
         ReportControlWidget& m_report;
+        QStringList         m_file_filter;
+
+        typedef enum { 
+            UTIL_ACTION_INSTALL_APP,    
+            UTIL_ACTION_SET_BRANDING_IMAGE,
+            UTIL_ACTION_DEFAULT_BRANDING_IMAGE,
+            UTIL_ACTION_IMPORT_CODES,
+            UTIL_ACTION_EXPORT_CODES,
+            UTIL_ACTION_EXPORT_LOGS } UTIL_ACTION_TYPE;
+
+        UTIL_ACTION_TYPE    m_util_action;        
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
 
@@ -216,7 +230,7 @@ class CFrmAdminInfo : public QDialog
         void setTableMenuLocation(QMenu*);
         int nthSubstr(int n, const std::string& s, const std::string& p);
         void getSystemIPAddressAndStatus();
-        void populateFileCopyWidget(QString sDirectory, QString sFilter);
+        void populateFileCopyWidget(QString sDirectory, QStringList sFilter={});
         void purgeCodes();
 
         void HandleCodeUpdate();
@@ -234,8 +248,10 @@ class CFrmAdminInfo : public QDialog
                             QString question3,
                             int access_type);
         void RunKeyboard(QString& text, bool numbersOnly = false);
-
+        void OnNotifyUsbDrive(QStringList list);
+        void setFileFilterFromFormatSelection(const QString filter);
                          
+        void importAsXml();                         
 
     protected:
         void touchEvent(QTouchEvent *ev);

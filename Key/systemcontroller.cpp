@@ -764,6 +764,10 @@ void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mountedDeviceCount)
 {
     static int lastFoundDeviceCount = 0;
+    
+    // Consider moving the following code that lists folders in /media/pi 
+    // parses the output into kcbsystem.
+    // The function should return a list of folder strings
     std::string listCmd = "ls /media/pi/";
     FILE *cmdF;
     std::string sOutput;
@@ -822,6 +826,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
     {
         strcpy(mountedDevices[0], "");
     }
+
     if( !oldDeviceFound[1] )
     {
         strcpy(mountedDevices[1], "");
@@ -829,6 +834,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
 
     if( (existingDeviceCount > 1) )
     {
+        KCB_DEBUG_TRACE("Existing Device Count" << existingDeviceCount);
         return existingDeviceCount;
     }
 
@@ -839,7 +845,6 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
         {
             strcpy(mountedDevices[i],foundDevices[i]);
             refreshAdminDeviceList = true;
-            lastFoundDeviceCount = foundDeviceCount;
         }
     }
 
@@ -856,7 +861,24 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
     QString device0 = QString::fromStdString(dev0);
     QString device1 = QString::fromStdString(dev1);
 
-    if( refreshAdminDeviceList )
+    //KCB_DEBUG_TRACE("dev0" << device0 << "dev1" << device1);
+
+    // The purpose of this logic is to ensure clients are notified when there is a 
+    // change to the mounted USB drives, i.e., 
+    //  - If a drive is added
+    //  - If a drive is removed
+    bool device_added = foundDeviceCount > lastFoundDeviceCount;
+    bool device_removed = foundDeviceCount < lastFoundDeviceCount;
+    lastFoundDeviceCount = foundDeviceCount;
+
+    //KCB_DEBUG_TRACE("da" << device_added << "dr" << device_removed << "nd" << foundDeviceCount << "lfdc" << lastFoundDeviceCount);
+
+    if (device_added || device_removed)
+    {
+        refreshAdminDeviceList = true;
+    }
+
+    if ( refreshAdminDeviceList )
     {
         emit __OnFoundNewStorageDevice(device0, device1);
     }

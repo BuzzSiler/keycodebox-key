@@ -38,6 +38,7 @@ const char *freportdirectory = "report_directory";
 const char *fdisplaypowerdown = "display_power_down_timeout";
 const char *freportdeletion = "report_deletion";
 
+static const QString VERSION = "1.0";
 
 CTblAdmin::CTblAdmin(QSqlDatabase *db)
 {
@@ -98,7 +99,8 @@ bool CTblAdmin::createTable()
                 " smtp_server text, smtp_port text, smtp_type text, smtp_username text, smtp_password text,"
                 " vnc_port text, vnc_password text,"
                 " report_via_email text, report_to_file text, report_directory text, display_power_down_timeout integer,"
-                " report_deletion DATETIME)";
+                " report_deletion DATETIME,"
+                " version)";
 
         qry.prepare( sql );
 
@@ -131,7 +133,7 @@ void CTblAdmin::currentTimeFormat(QString format, QString strBuffer, int nExpect
 
 bool CTblAdmin::createAdminDefault()
 {
-    qDebug() << "CTblAdmin::createAdminDefault()";
+    KCB_DEBUG_ENTRY;
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("INSERT OR IGNORE INTO ") + TABLENAME +
@@ -143,7 +145,7 @@ bool CTblAdmin::createAdminDefault()
                             "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
                             "report_via_email, report_to_file, report_directory, "
                             "vnc_port, vnc_password, display_power_down_timeout, "
-                            "report_deletion)"
+                            "report_deletion, version)"
                   " VALUES ('admin', "
                             "'admin@email.com', '555.555.5555', :freq, "
                             ":start, :pw, "
@@ -151,7 +153,8 @@ bool CTblAdmin::createAdminDefault()
                             "32, "
                             ":smtp_server, :smtp_port, :smtp_type, :smtp_username, :smtp_password, "
                             "1, 0, '', "
-                            "5901, 'vnc_password', 0, :deletion)");
+                            "5901, ':vnc_password', 0, :deletion,"
+                            ":version)");
     qry.prepare(sql);
 
     qDebug() << "SQL:" << sql;
@@ -184,6 +187,7 @@ bool CTblAdmin::createAdminDefault()
     qry.bindValue(":smtp_username", "kcb@keycodebox.com");
     qry.bindValue(":smtp_password", encSMTPPW);
     qry.bindValue(":vnc_password", encVNCPW);
+    qry.bindValue(":version", VERSION);
 
     if( !qry.exec() ) 
     {
@@ -544,6 +548,91 @@ bool CTblAdmin::tableExists()
     return false;
 }
 
+bool CTblAdmin::columnExists(QString column)
+{
+    KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    
+    QStringList::iterator  itor;
+    QSqlQuery qry(*_pDB);
+    bool foundColumn = false;
+
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+
+    if( _pDB && _pDB->isOpen() )
+    {
+        QString sql("PRAGMA TABLE_INFO(admin);");
+
+        qry.prepare( sql );
+
+        if( qry.exec() )
+        {
+            while( qry.next() )
+            {
+                if( qry.value(1).toString().compare(column) == 0 )
+                {
+                    KCB_DEBUG_TRACE("found column: " << column);
+
+                    foundColumn = true;
+                    break;
+                }
+            }
+        }
+        else
+            qDebug() << qry.lastError();
+
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
+    }
+    return foundColumn;
+}
+
+void CTblAdmin::createColumn(QString column, QString fieldType, QString value)
+{
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+    
+    if( _pDB && _pDB->isOpen() ) 
+    {
+        KCB_DEBUG_TRACE("Creating table");
+        QSqlQuery qry(*_pDB);
+
+        QString sql("ALTER TABLE  ");
+        sql += TABLENAME;
+        sql += " ADD ";
+        sql += column;
+        sql += " ";
+        sql += fieldType;
+        sql += " ";
+        sql += QString("DEFAULT '%1' NOT NULL").arg(value);
+
+        qry.prepare( sql );
+
+        if( !qry.exec() )
+        {
+            qDebug() << qry.lastError();
+        }
+        else
+        {
+            qDebug() << "Table altered!";
+        }
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
+    }
+}
+
 void CTblAdmin::initialize()
 {
     if(!tableExists())
@@ -552,6 +641,11 @@ void CTblAdmin::initialize()
     }
     if(tableExists())
     {
+        if (!columnExists(QString("version")))
+        {            
+            createColumn(QString("version"), QString("text"), VERSION);
+        }
+
         if( !readAdmin() ) {
             if( createAdminDefault() ) {
                 readAdmin();

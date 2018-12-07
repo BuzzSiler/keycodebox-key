@@ -141,7 +141,7 @@ void ReportControlWidget::getValues(CAdminRec& adminInfo)
     if (ui->cbSaveToFile->isChecked())
     {
         int index = ui->cbDeleteOlderThan->currentIndex();
-        Q_ASSERT_X(index >= 0 && index <= m_delete_freq.count(), Q_FUNC_INFO, "delete frequency index out of range");
+        Q_ASSERT_X(index >= 0 && index <= m_delete_frequencies.count(), Q_FUNC_INFO, "delete frequency index out of range");
         deleteFreq = m_delete_frequencies[index];
     }
     KCB_DEBUG_TRACE(m_delete_freq.toString());
@@ -163,6 +163,14 @@ void ReportControlWidget::OnNotifyUsbDrive(QStringList drives)
 {
     // KCB_DEBUG_ENTRY;
     m_usb_drives = drives;
+    KCB_DEBUG_TRACE("drives" << m_usb_drives);
+    if (m_usb_drives.count() == 0)
+    {
+        ui->cbUsbDrives->clear();
+        ui->cbUsbDrives->addItem(tr("DEFAULT"));
+        ui->cbStoreToUsbDrive->setChecked(false);
+    }
+
     updateUi();
     // KCB_DEBUG_EXIT;
 }

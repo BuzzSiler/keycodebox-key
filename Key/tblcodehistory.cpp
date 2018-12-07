@@ -309,22 +309,12 @@ void CTblCodeHistory::initialize()
         qDebug() << "Failed to cretae CodeHistory table.";
     }
 
-    QString column1 = "answer1";
-    QString column2 = "answer2";
-    QString column3 = "answer3";
+    QString image_column = "image";
 
-    if(!columnExists(column1))
+    if(!columnExists(image_column))
     {
-        createColumn(column1, "text");
-    }
-    if(!columnExists(column2))
-    {
-        createColumn(column2, "text");
-    }
-    if(!columnExists(column3))
-    {
-        createColumn(column3, "text");
-    }
+        createColumn(image_column, "BLOB");
+    }            
 }
 
 void CTblCodeHistory::createTable()

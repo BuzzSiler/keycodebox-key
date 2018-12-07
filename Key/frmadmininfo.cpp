@@ -42,6 +42,21 @@
 #define CODES_TAB_INDEX (4)
 #define CODE_HISTORY_TAB_INDEX (5)
 
+#define ACTION_INDEX_INSTALL_APP (0)
+#define ACTION_INDEX_SET_BRANDING_IMAGE (1)
+#define ACTION_INDEX_DEFAULT_BRANDING_IMAGE (2)
+#define ACTION_INDEX_IMPORT_CODES (3)
+#define ACTION_INDEX_EXPORT_CODES (4)
+#define ACTION_INDEX_EXPORT_LOGS (5)
+
+static const QStringList INSTALL_APP_FILTER = {"Alpha*"};
+static const QStringList BRANDING_IMAGE_FILTER = {"*.jpg", "*.jpeg"};
+static const QStringList IMPORT_CODES_FILTER = {"*.xml", "*.json", "*.csv", "*.sql"};
+static const QStringList IMPORT_CODES_XML_FILTER = {"*.xml"};
+static const QStringList IMPORT_CODES_JSON_FILTER = {"*.json"};
+static const QStringList IMPORT_CODES_CSV_FILTER = {"*.csv"};
+static const QStringList IMPORT_CODES_SQL_FILTER = {"*.sql"};
+
 static const char CMD_REMOVE_ALL_FP_FILES[] = "sudo rm -rf /home/pi/run/prints/*";
 static const char CMD_LIST_SYSTEM_FLAGS[] = "ls /home/pi/run/* | grep 'flag'";
 static const char CMD_READ_TIME_ZONE[] = "readlink /etc/localtime";
@@ -100,6 +115,9 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     initialize();
 
     setAttribute(Qt::WA_AcceptTouchEvents, true);
+
+    ui->cbUsbDrives->addItem("No Drive Inserted");
+    m_file_filter = INSTALL_APP_FILTER;    
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -171,6 +189,7 @@ void CFrmAdminInfo::initializeConnections()
     connect(&m_report, &ReportControlWidget::NotifyGenerateReport, this, &CFrmAdminInfo::OnNotifyGenerateReport);
 
     connect( ui->tblHistory, SIGNAL( cellClicked(int, int) ), this, SLOT( codeHistoryTableCellSelected( int, int ) ) );
+    connect( ui->cbUsbDrives, SIGNAL(currentIndexChanged(QString) ), this, SLOT(on_cbUsbDrives_currentIndexChanged(QString) ) );
 
 }
 
@@ -265,12 +284,7 @@ void CFrmAdminInfo::initialize()
         ui->cbInternetTime->setChecked(true);
     }
 
-    ui->btnCopyToggleSource->setText(tr("Source #1"));
-
-
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabSelected(int)));
-
-    ui->btnCopyFileBrandingImageReset->setEnabled(true);
 }
 
 int CFrmAdminInfo::nthSubstr(int n, const std::string& s, const std::string& p)
@@ -496,11 +510,9 @@ void CFrmAdminInfo::onModelDirectoryLoaded(QString path)
     _pmodel->sort(0, Qt::AscendingOrder);
 }
 
-void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
+void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QStringList sFilter)
 {
-    Q_UNUSED(sFilter);
-    QString rp = "/media/pi";
-
+    //KCB_DEBUG_ENTRY;
     if(_pcopymodel)
     {
         delete _pcopymodel;
@@ -513,7 +525,17 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
     }
 
     QStringList list;
-    list << sDirectory << "Alpha*" << "*.xml" << "*.jpg" << "*.jpeg";
+    list << sDirectory;
+    if (sFilter.isEmpty())
+    {
+        list << m_file_filter;
+    }
+    else
+    {
+        list << sFilter;
+    }
+
+    //KCB_DEBUG_TRACE("dir" << sDirectory << "filter" << m_file_filter << "filter override" << sFilter << "list" << list);
 
     // Enable modifying file system
     _pcopymodel->setReadOnly(true);
@@ -531,13 +553,16 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QString sFilter)
             this,
             SLOT(onCopyRootPathChanged(QString)));
 
+    auto index = _pcopymodel->setRootPath(sDirectory);
     ui->treeViewCopy->setModel(_pcopymodel);
-    ui->treeViewCopy->collapseAll();
+    ui->treeViewCopy->setRootIndex(index);
+    ui->treeViewCopy->header()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->treeViewCopy->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->treeViewCopy->header()->resizeSection(1, 60);
+    ui->treeViewCopy->header()->resizeSection(2, 60);
+    ui->treeViewCopy->header()->setStretchLastSection(false);
 
-    _pcopymodel->setRootPath(rp);
-    ui->treeViewCopy->setRootIndex(_pcopymodel->setRootPath(rp));
-
-    ui->treeViewCopy->expandAll();
+    //KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::onCopyRootPathChanged(QString path)
@@ -554,42 +579,23 @@ void CFrmAdminInfo::onCopyModelDirectoryLoaded(QString path)
     }
 }
 
-void CFrmAdminInfo::on_btnCopyToggleSource_clicked(bool checked)
-{
-    if(checked)
-    {
-        qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, checked, " << usbDevice1 << ", " << usbDevice0;
-        populateFileCopyWidget(usbDevice1, usbDevice0);
-        ui->btnCopyToggleSource->setText(tr("Source #2"));
-    }
-    else
-    {
-        qDebug() << "CFrmAdminInfo::on_btnCopyToggleSource_clicked, unchecked, " << usbDevice0 << ", " << usbDevice1;
-        populateFileCopyWidget(usbDevice0, usbDevice1);
-        ui->btnCopyToggleSource->setText(tr("Source #1"));
-    }
-}
-
 void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
 {
+    //KCB_DEBUG_ENTRY;
     _copyDirectory = _pcopymodel->rootPath() + "/" + index.data(Qt::DisplayRole).toString();
     _copyDirectory = _pcopymodel->filePath ( index );
 
     if( QFileInfo(_copyDirectory).isFile())
     {
-        ui->btnCopyFileBrandingImage->setEnabled(true);
-
-        ui->btnCopyFileLoadCodes->setEnabled(true);
-        ui->btnCopyFile->setEnabled(true);
+        ui->btnActionExecute->setEnabled(true);
     }
     else
     {
-        ui->btnCopyFileBrandingImage->setEnabled(false);
-        ui->btnCopyFileLoadCodes->setEnabled(false);
-        ui->btnCopyFile->setEnabled(false);
+       ui->btnActionExecute->setEnabled(false);        
     }
 
-    qDebug() << "Copy from File" << _copyDirectory;
+    //KCB_DEBUG_TRACE("Copy from File" << _copyDirectory);
+    //KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_btnCopyFile_clicked()
@@ -671,9 +677,9 @@ void parseCode (xmlNodePtr cur,
     }
 }
 
-void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
+void CFrmAdminInfo::importAsXml()
 {
-    qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()";
+    KCB_DEBUG_ENTRY;
 
     xmlDocPtr doc = NULL;
 
@@ -762,11 +768,12 @@ void CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked()
     (void) QMessageBox::warning(this, tr("Bulk Code Upload Complete"),
                                    tr("Please check the 'Codes' tab to see that your codes were added successfully."),
                                    QMessageBox::Ok);
+    //KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
 {
-    qDebug() << "CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()";
+    KCB_DEBUG_ENTRY;
 
     QString createCmd = " cp '";
     int nRC = QMessageBox::warning(this, tr("Set New Branding Image"),
@@ -778,11 +785,12 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
         createCmd += "' /home/pi/kcb-config/images/alpha_logo.jpg";
         std::system(createCmd.toStdString().c_str());
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
 {
-    qDebug() << "CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()";
+    KCB_DEBUG_ENTRY;
     int nRC = QMessageBox::warning(this, tr("Verify Branding Image Reset"),
                                    tr("The branding image will be reset to the default.\nDo you want to continue?"),
                                    QMessageBox::Yes, QMessageBox::Cancel);
@@ -791,6 +799,7 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
         sync();
         std::system("cp /home/pi/kcb-config/images/alpha_logo_touch.jpg /home/pi/kcb-config/images/alpha_logo.jpg");
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::onStopEdit()
@@ -963,13 +972,15 @@ void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
     {
         list << QString("/media/pi/%1").arg(usbDevice0);
     }
-    else if (!usbDevice1.isEmpty())
+    
+    if (!usbDevice1.isEmpty())
     {
         list << QString("/media/pi/%1").arg(usbDevice1);
     }
 
     KCB_DEBUG_TRACE("USBDevices" << list);
     m_report.OnNotifyUsbDrive(list);
+    OnNotifyUsbDrive(list);    
 }
 
 void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
@@ -1543,7 +1554,7 @@ void CFrmAdminInfo::setPStateValues(QString lockNums,
     _pState->setAccessCount(0);
     _pState->setAccessType(access_type);
 
-    if (access_type == ACCESS_TYPE_ALWAYS)
+    if (access_type == ACCESS_TYPE_LIMITED_USE)
     {
         _pState->setMaxAccess(2);
     }
@@ -2083,3 +2094,157 @@ void CFrmAdminInfo::codeHistoryTableCellSelected(int row, int col)
         }
     }
 }
+
+void CFrmAdminInfo::on_cbActionsSelect_currentIndexChanged(int index)
+{
+    KCB_DEBUG_ENTRY;
+    ui->cbFileFormat->setEnabled(false);
+    ui->cbEncryptedClear->setEnabled(false);
+    ui->btnActionExecute->setDisabled(true);
+
+    switch (index)
+    {
+        case ACTION_INDEX_INSTALL_APP:
+            m_util_action = UTIL_ACTION_INSTALL_APP;
+            m_file_filter = INSTALL_APP_FILTER;
+            break;
+
+        case ACTION_INDEX_SET_BRANDING_IMAGE:
+            m_util_action = UTIL_ACTION_SET_BRANDING_IMAGE;
+            m_file_filter = BRANDING_IMAGE_FILTER;
+            break;
+
+        case ACTION_INDEX_DEFAULT_BRANDING_IMAGE:
+            m_util_action = UTIL_ACTION_DEFAULT_BRANDING_IMAGE;
+            m_file_filter = BRANDING_IMAGE_FILTER;
+            break;
+
+        case ACTION_INDEX_IMPORT_CODES:
+        case ACTION_INDEX_EXPORT_CODES:
+            setFileFilterFromFormatSelection(ui->cbFileFormat->currentText());
+            if (index == ACTION_INDEX_IMPORT_CODES)
+            {
+                m_util_action = UTIL_ACTION_IMPORT_CODES;
+            }
+            else if (index == ACTION_INDEX_EXPORT_CODES)
+            {
+                ui->btnActionExecute->setEnabled(true);
+                m_util_action = UTIL_ACTION_EXPORT_CODES;
+            }
+            ui->cbFileFormat->setEnabled(true);
+            ui->cbEncryptedClear->setEnabled(true);
+            break;
+
+        default:
+            KCB_DEBUG_TRACE("Unknown action index" << index);
+            break;
+    }
+
+    populateFileCopyWidget(ui->cbUsbDrives->currentText());
+
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::on_btnActionExecute_clicked()
+{
+    switch (m_util_action)
+    {
+        case UTIL_ACTION_INSTALL_APP:
+            on_btnCopyFile_clicked();
+            break;
+
+        case UTIL_ACTION_SET_BRANDING_IMAGE:
+            on_btnCopyFileBrandingImage_clicked();
+            break;
+
+        case UTIL_ACTION_DEFAULT_BRANDING_IMAGE:
+            on_btnCopyFileBrandingImageReset_clicked();
+            break;
+
+        case UTIL_ACTION_IMPORT_CODES:
+            importAsXml();
+            break;
+
+        case UTIL_ACTION_EXPORT_CODES:
+            {
+                QString format = ui->cbFileFormat->currentText().toLower();
+                QString security = ui->cbEncryptedClear->currentText().toLower();
+
+                bool is_clear_encrypted = security == "clear" ? true : false;
+
+                bool result = kcb::ExportCodes(ui->cbUsbDrives->currentText(), format, is_clear_encrypted);
+                KCB_DEBUG_TRACE("export codes" << result);
+            }
+            break;
+
+        default:
+            KCB_DEBUG_TRACE("Unknown utility action" << m_util_action);
+            break;
+    }
+}
+
+void CFrmAdminInfo::OnNotifyUsbDrive(QStringList list)
+{    
+    ui->cbUsbDrives->clear();
+    if (list.count() > 0)
+    {
+        ui->cbUsbDrives->addItems(list);
+        ui->cbUsbDrives->setCurrentIndex(0);
+        ui->cbActionsSelect->setEnabled(true);
+        ui->cbActionsSelect->setCurrentIndex(0);
+    }
+    else
+    {
+        ui->cbUsbDrives->addItem("No Drive Inserted");
+        ui->cbActionsSelect->setDisabled(true);
+        ui->treeViewCopy->setModel(nullptr);
+    }
+}
+
+void CFrmAdminInfo::on_cbUsbDrives_currentIndexChanged(const QString &arg1)
+{
+    KCB_DEBUG_ENTRY;
+
+    populateFileCopyWidget(arg1);
+
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::on_cbFileFormat_currentIndexChanged(const QString &arg1)
+{
+    KCB_DEBUG_ENTRY;
+
+    setFileFilterFromFormatSelection(arg1);
+    populateFileCopyWidget(ui->cbUsbDrives->currentText());
+
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::setFileFilterFromFormatSelection(const QString filter)
+{
+    m_file_filter = IMPORT_CODES_FILTER;
+    
+    if (filter.toLower() == "xml" )
+    {
+        m_file_filter.clear();
+        m_file_filter << IMPORT_CODES_XML_FILTER;
+    }
+    else if (filter.toLower() == "json")
+    {
+        m_file_filter.clear();
+        m_file_filter << IMPORT_CODES_JSON_FILTER;
+    }
+    else if (filter.toLower() == "csv")
+    {
+        m_file_filter.clear();
+        m_file_filter << IMPORT_CODES_CSV_FILTER;
+    }
+    else if (filter.toLower() == "sql")
+    {
+        m_file_filter.clear();
+        m_file_filter << IMPORT_CODES_SQL_FILTER;
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+// EOF

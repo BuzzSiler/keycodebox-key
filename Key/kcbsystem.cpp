@@ -427,4 +427,9 @@ namespace kcb
 
         return ba;
     }
+
+    bool ExportCodes(const QString path_root, const QString format, const bool clear_encrypted, const QString filename)
+    {
+        return true;    
+    }
 }
