@@ -90,6 +90,9 @@ SOURCES += main.cpp\
     cardreader.cpp \
     adminrec.cpp \
     codeexporter.cpp \
+    codeelement.cpp \
+    codelistingelement.cpp \
+    xmlcodelistingreader.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -165,6 +168,9 @@ HEADERS  += keycodeboxmain.h \
     cardreader.h \
     adminrec.h \
     codeexporter.h \
+    codeelement.h \
+    codelistingelement.h \
+    xmlcodelistingreader.h \
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

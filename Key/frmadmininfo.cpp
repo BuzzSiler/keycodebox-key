@@ -24,6 +24,7 @@
 #include <QNetworkInterface>
 #include <QAbstractSocket>
 #include <QFileDialog>
+#include <QFile>
 #include "lockset.h"
 #include "lockstate.h"
 #include "menupushbutton.h"
@@ -37,6 +38,10 @@
 #include "kcbsystem.h"
 #include "frmnetworksettings.h"
 #include "codeexporter.h"
+
+#include "xmlcodelistingreader.h"
+#include "codelistingelement.h"
+#include "codeelement.h"
 
 #define ADMIN_TAB_INDEX (0)
 #define REPORT_TAB_INDEX (2)
@@ -615,161 +620,79 @@ void CFrmAdminInfo::on_btnCopyFile_clicked()
     }
 }
 
-
-void parseCode (xmlNodePtr cur,
-                QString& locks, QString &code1, QString &code2, QString &username, 
-                QString &question1, QString &question2, QString &question3, 
-                QDateTime &dtStart, QDateTime &dtEnd, int *access_type) 
+bool CFrmAdminInfo::importAsXml()
 {
-    cur = cur->xmlChildrenNode;
-    while (cur != NULL)
+    QFile file(_copyDirectory);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"locks")))
-        {
-            locks = QString::fromLatin1((char *)xmlNodeGetContent(cur));
-            qDebug() << "Locks" << locks;
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"code1")))
-        {
-            code1 = QString::fromLatin1((char *)xmlNodeGetContent(cur));
-            qDebug() << "code1" << code1;
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"code2")))
-        {
-            code2 = QString::fromLatin1((char *)xmlNodeGetContent(cur));  
-            qDebug() << "code2" << code2;            
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"username")))
-        {
-            username = QString::fromLatin1((char *)xmlNodeGetContent(cur));  
-            qDebug() << "username" << username;            
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"question1")))
-        {
-            question1 = QString::fromLatin1((char *)xmlNodeGetContent(cur));
-            qDebug() << "question1" << question1;
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"question2")))
-        {
-            question2 = QString::fromLatin1((char *)xmlNodeGetContent(cur));  
-            qDebug() << "question2" << question2;
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"question3")))
-        {
-            question3 = QString::fromLatin1((char *)xmlNodeGetContent(cur));  
-            qDebug() << "question3" << question3;
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"startDT")))
-        {
-            dtStart = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(cur)),Qt::ISODate);  
-            qDebug() << "startDT" << dtStart.toString();
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"endDT")))
-        {
-            dtEnd = QDateTime::fromString(QString::fromLatin1((char *)xmlNodeGetContent(cur)),Qt::ISODate);
-            qDebug() << "endDT" << dtEnd.toString();
-        }
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"accesstype")))
-        {
-            *access_type = atoi((char *)xmlNodeGetContent(cur));
-            qDebug() << "accesstype" << *access_type;  
-        }
-        cur = cur->next;
+        KCB_DEBUG_TRACE("Cannot read file" << file.errorString());
+        return false;
     }
-}
 
-void CFrmAdminInfo::importAsXml()
-{
-    KCB_DEBUG_ENTRY;
-
-    xmlDocPtr doc = NULL;
-
-    if ( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
+    CodeListing* codeListing = new CodeListing;
+    XmlCodeListingReader xmlReader(codeListing);
+    if (!xmlReader.read(&file))
     {
-        (void)QMessageBox::warning(this, tr("XML Parsing Failed"),
-                                       tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
-                                       QMessageBox::Ok);
-        qDebug() << "CFrmAdminInfo::on_btnCopyFileLoadCodes_clicked(), can't parse XML file: " << _copyDirectory;
-        return;
+        KCB_DEBUG_TRACE("Parse error in file " << xmlReader.errorString());
+        return false;
     }
+
+    codeListing->print();
 
     if (!_pworkingSet)
     {
         _pworkingSet = new CLockSet();
     }
 
-    xmlNodePtr cur = xmlDocGetRootElement(doc);
-
-    if (cur == NULL) 
+    CodeListing::Iterator iter;
+    for(iter = codeListing->begin(); iter != codeListing->end(); iter++)
     {
-        qDebug() << "empty document";
-        xmlFreeDoc(doc);
-        return;
-    }
+        Code* code = *iter;
 
-    if (xmlStrcmp(cur->name, (const xmlChar *) "codeListing")) 
-    {
-        qDebug() << "document of the wrong type, root node != codeListing";
-        xmlFreeDoc(doc);
-        return;
-    }    
+        QDateTime starttime = QDateTime::fromString(code->starttime(), DATETIME_FORMAT);
+        QDateTime endtime = QDateTime::fromString(code->endtime(), DATETIME_FORMAT);
 
-    QString locks = "";
-    QString code1 = "";
-    QString code2 = "";    
-    QString username = "";
-    QString question1 = "";
-    QString question2 = "";
-    QString question3 = "";
-    int access_type = 0;    
-
-    cur = cur->xmlChildrenNode;
-    while (cur != NULL) 
-    {
-        // Default start/end date/time to today's date
-        QDateTime dtStart = QDateTime::currentDateTime();
-        QDateTime dtEnd = QDateTime::currentDateTime();
-
-        if ((!xmlStrcmp(cur->name, (const xmlChar *)"code")))
+        /* Initial start/end dates (if present) based on access type
+            There are three access types:
+                - Always
+                - Timed
+                - Limited Use
+            Start/end dates are only valid for 'Timed' codes.  All other codes should be DEFAULT_DATETIME
+            While they are initialized above, it is possible that a customer will put a start/end
+            datetime in the XML file.
+            For display purposes, only keep date/times for 'Timed' codes.               
+        */
+        if (code->accesstype() == ACCESS_TYPE_ALWAYS || code->accesstype() == ACCESS_TYPE_LIMITED_USE)
         {
-            qDebug() << "Parsing code node";
-            parseCode (cur, locks, code1, code2, username, question1, question2, question3,
-                        dtStart, dtEnd, &access_type);
-            qDebug() << "Parse complete";
-
-            /* Initial start/end dates (if present) based on access type
-               There are three access types:
-                   - Always
-                   - Timed
-                   - Limited Use
-               Start/end dates are only valid for 'Timed' codes.  All other codes should be DEFAULT_DATETIME
-               While they are initialized above, it is possible that a customer will put a start/end
-               datetime in the XML file.               
-            */
-            if (access_type == ACCESS_TYPE_ALWAYS || access_type == ACCESS_TYPE_LIMITED_USE)
-            {
-                dtStart = DEFAULT_DATETIME;
-                dtEnd = DEFAULT_DATETIME;
-            }
-
-            _pState = createNewLockState();
-
-            setPStateValues(locks, code1, code2, username,
-							dtStart, dtEnd, false, false, false, 
-            				question1, question2, question3,
-                            access_type);
-            HandleCodeUpdate();
+            starttime = DEFAULT_DATETIME;
+            endtime = DEFAULT_DATETIME;
         }
-        cur = cur->next;
-    }
-    
-    xmlFreeDoc(doc);
-    xmlCleanupParser();
 
-    (void) QMessageBox::warning(this, tr("Bulk Code Upload Complete"),
-                                   tr("Please check the 'Codes' tab to see that your codes were added successfully."),
-                                   QMessageBox::Ok);
-    //KCB_DEBUG_EXIT;
+        QString code1 = code->code1();
+        QString code2 = code->code2();
+        if (codeListing->encrypted())
+        {
+            code1 = CEncryption::decryptString(code1);
+            code2 = CEncryption::decryptString(code2);
+        }
+
+        _pState = createNewLockState();
+        setPStateValues(code->locks(), 
+                        code1, 
+                        code2, 
+                        code->username(),
+                        starttime, 
+                        endtime, 
+                        false, false, false, 
+                        code->question1(), 
+                        code->question2(), 
+                        code->question3(),
+                        code->accesstype());
+        HandleCodeUpdate();
+
+    }
+
+    return true;
 }
 
 void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
@@ -2190,18 +2113,31 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
 
         case UTIL_ACTION_IMPORT_CODES:
             {
-                QString security = ui->cbEncryptedClear->currentText().toLower();
-                QString format = ui->cbFileFormat->currentText().toLower();
-                int nRC = QMessageBox::warning(this, tr("Code Import"),
-                                            QString(tr("You have selected import codes in %1 format (%2)\n"
-                                                       "Continuing will import all of the codes into the database.\n"
-                                                       "If there are duplicate codes, they must be removed manually.\n"
-                                                       "Do you want to continue?"
-                                                      )).arg("XML").arg(security == "clear" ? "unencrypted" : "encrypted"),
-                                            QMessageBox::Yes, QMessageBox::No);
+                int nRC = QMessageBox::warning(this, 
+                                               tr("Code Import"),
+                                               QString(tr("You have selected import codes in %1 format.\n"
+                                                          "Continuing will import all of the codes into the database.\n"
+                                                          "If there are duplicate codes, they must be removed manually.\n"
+                                                          "Do you want to continue?"
+                                                         )).arg("XML"),
+                                               QMessageBox::Yes, QMessageBox::No);
                 if (nRC == QMessageBox::Yes)                                        
                 {
-                    importAsXml();
+                    bool result = importAsXml();
+                    if (result)
+                    {
+                        (void) QMessageBox::information(this, 
+                                                        tr("Bulk Code Upload Complete"),
+                                                        tr("Please check the 'Codes' tab to see that your codes were added successfully."),
+                                                        QMessageBox::Ok);
+                    }
+                    else
+                    {
+                        (void) QMessageBox::warning(this, 
+                                                    tr("XML Parsing Failed"),
+                                                    tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
+                                                    QMessageBox::Ok);
+                    }
                 }
             }
             break;
@@ -2222,7 +2158,7 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
                 {
                     CodeExporter exporter(CodeExporter::StringToFormat(format), root_path, *lockset, clear_or_encrypted);
                     bool result = exporter.Export();
-                    //delete lockset;
+                    Q_ASSERT_X(result, Q_FUNC_INFO, "exporter export failed");
                 }
                 else
                 {

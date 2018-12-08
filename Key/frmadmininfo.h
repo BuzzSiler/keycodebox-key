@@ -251,7 +251,7 @@ class CFrmAdminInfo : public QDialog
         void OnNotifyUsbDrive(QStringList list);
         void setFileFilterFromFormatSelection(const QString filter);
                          
-        void importAsXml();                         
+        bool importAsXml();                         
 
     protected:
         void touchEvent(QTouchEvent *ev);
