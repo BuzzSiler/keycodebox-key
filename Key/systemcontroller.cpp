@@ -1239,3 +1239,8 @@ void CSystemController::getAllCodes1(QStringList& codes1)
 {
     _securityController.getAllCodes1(codes1);
 }
+
+void CSystemController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted)
+{
+    _securityController.readAllCodes(lockset, clear_or_encrypted);
+}

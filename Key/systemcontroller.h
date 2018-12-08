@@ -51,7 +51,7 @@ public:
     void reportActivity(QString locknums);
 
     void getAllCodes1(QStringList& codes1);
-
+    void readAllCodes(CLockSet **lockset, bool clear_or_encrypted);
 
 private:
     QThread                 *_pInitThread;

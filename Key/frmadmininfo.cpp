@@ -36,6 +36,7 @@
 #include "reportcontrolwidget.h"
 #include "kcbsystem.h"
 #include "frmnetworksettings.h"
+#include "codeexporter.h"
 
 #define ADMIN_TAB_INDEX (0)
 #define REPORT_TAB_INDEX (2)
@@ -683,7 +684,7 @@ void CFrmAdminInfo::importAsXml()
 
     xmlDocPtr doc = NULL;
 
-    if( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
+    if ( (doc = xmlReadFile(_copyDirectory.toStdString().c_str(), NULL, 0)) == NULL )
     {
         (void)QMessageBox::warning(this, tr("XML Parsing Failed"),
                                        tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
@@ -692,7 +693,7 @@ void CFrmAdminInfo::importAsXml()
         return;
     }
 
-    if(!_pworkingSet)
+    if (!_pworkingSet)
     {
         _pworkingSet = new CLockSet();
     }
@@ -892,7 +893,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
     // Display to the ui
     if (adminInfo)
     {
-        qDebug() << "Admin Info received.";
+        KCB_DEBUG_TRACE("Admin Info received.");
         _tmpAdminRec = *adminInfo;
 
         ui->lblName->setText(adminInfo->getAdminName());
@@ -915,7 +916,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
     }
     else
     {
-        qDebug() << "Admin Info received is blank.";
+        KCB_DEBUG_TRACE("Admin Info received is blank.");
     }
 }
 
@@ -997,6 +998,7 @@ void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
     else 
     {
         //TODO: reset the values...didn't save
+        KCB_DEBUG_TRACE("unsuccessful code state update");
     }
     on_btnReadCodes_clicked();
 }
@@ -1012,18 +1014,18 @@ void CFrmAdminInfo::on_cbInternetTime_clicked()
         setTimeZone();
         ui->dtSystemTime->setDisabled(true);
         // update system time here
-        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp ON";
+        KCB_DEBUG_TRACE("ntp ON");
         std::system("sudo /etc/init.d/ntp stop");
 
         QCoreApplication::processEvents();
-        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntpd -s";
+        KCB_DEBUG_TRACE("ntpd -s");
         std::system("sudo ntpd -s");
-        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp OFF";
+        KCB_DEBUG_TRACE("ntp OFF");
 
         QCoreApplication::processEvents();
 
         std::system("sudo /etc/init.d/ntp start");
-        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), setting datetime text";
+        KCB_DEBUG_TRACE("setting datetime text");
         ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
     }
     else
@@ -1043,7 +1045,8 @@ void CFrmAdminInfo::on_btnSetTime_clicked()
     }
 }
 
-void CFrmAdminInfo::OnCloseAdmin() {
+void CFrmAdminInfo::OnCloseAdmin() 
+{
     this->close();
 }
 
@@ -1232,6 +1235,7 @@ void CFrmAdminInfo::setupCodeTableContextMenu()
 
 void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
 {
+    KCB_DEBUG_ENTRY;
     // KCB_DEBUG_TRACE(pSet);
 
     Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
@@ -1326,12 +1330,13 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     {
         ui->cbLockNumHistory->addItem(QString::number(i));
     }
+    KCB_DEBUG_EXIT;
     
 }
 
 void CFrmAdminInfo::codeDeleteSelection()
 {
-    qDebug() << "codeDeleteSelection";
+    KCB_DEBUG_ENTRY;
 
     int nRC = QMessageBox::warning(this, tr("Verify Delete"),
                                    tr("Do you want to delete the selected code?"),
@@ -1340,23 +1345,26 @@ void CFrmAdminInfo::codeDeleteSelection()
     {
         deleteCodeByRow(_nRowSelected);
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::codeAddNew()
 {
-    qDebug() << "codeAddNew";
+    KCB_DEBUG_ENTRY;
     addCodeByRow();
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::codeInitNew()
 {
-    qDebug() << "codeInitNew";
+    KCB_DEBUG_ENTRY;
     addCodeByRow();
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::codeEnableAll()
 {
-    qDebug() << "Enabling all Limited Use codes";
+    KCB_DEBUG_TRACE("Enabling all Limited Use codes");
 
     /* Looping over all the codes in the working set
            if code access type is 'limited use' then
@@ -1366,7 +1374,7 @@ void CFrmAdminInfo::codeEnableAll()
     int nRow = 0;
     if (_pState)
     {
-        qDebug() << "Freeing _pState in CFrmAdminInfo::codeEnableAll";
+        KCB_DEBUG_TRACE("Freeing _pState in CFrmAdminInfo::codeEnableAll");
         _pState = 0;
     }
 
@@ -1378,7 +1386,7 @@ void CFrmAdminInfo::codeEnableAll()
     on_btnReadCodes_clicked();
     displayInTable(_pworkingSet);
 
-    qDebug() << "before loop iterator cellClicked";
+    KCB_DEBUG_TRACE("before loop iterator cellClicked");
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
@@ -1400,7 +1408,7 @@ void CFrmAdminInfo::codeEnableAll()
 
 void CFrmAdminInfo::codeEditSelection()
 {
-    qDebug() << "codeEditSelection row:" << QVariant(_nRowSelected).toString();
+    KCB_DEBUG_TRACE(QVariant(_nRowSelected).toString());
     editCodeByRow(_nRowSelected);
 }
 
@@ -1477,14 +1485,13 @@ void CFrmAdminInfo::setTime()
     QString sDate = QString("sudo date ") + dt.toString("MMddhhmmyyyy.ss");
     std::system(updateTime.toStdString().c_str());
     std::system(sDate.toStdString().c_str());
-    qDebug() << "system time: ";
-    qDebug() << sDate;
+    KCB_DEBUG_TRACE("system time:" << sDate);
     std::system("sudo hwclock --systohc");    // Set the hardware clock
 }
 
 void CFrmAdminInfo::OnCodeEditClose()
 {
-    qDebug() << "CFrmAdminInfo::OnCodeEditClose - NOT IMPLEMENTED";
+    KCB_DEBUG_TRACE("NOT IMPLEMENTED");
 }
 
 void CFrmAdminInfo::OnCodeEditReject()
@@ -1497,13 +1504,14 @@ void CFrmAdminInfo::OnCodeEditReject()
 
 void CFrmAdminInfo::OnCodeEditAccept()
 {
-    qDebug() << "CFrmAdminInfo::OnCodeEditAccept";
+    KCB_DEBUG_ENTRY;
     if (_pFrmCodeEditMulti)
     {
         _pFrmCodeEditMulti->getValues(_pState);
         _pFrmCodeEditMulti->hide();
         HandleCodeUpdate();
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::setPStateValues(QString lockNums, 
@@ -1582,7 +1590,7 @@ void CFrmAdminInfo::HandleCodeUpdate()
         QTableWidgetItem *item;
         item = table->item(_nRowSelected, nCol++);
 
-        qDebug() << "Item Text:" << item->text();
+        KCB_DEBUG_TRACE("Item Text:" << item->text());
 
 
         /* Note: The following code seems to assume dtStart/dtEnd will be datetime, but what about ALWAYS? */
@@ -1601,7 +1609,7 @@ void CFrmAdminInfo::HandleCodeUpdate()
             item->setText(_pState->getCode2());
             item = table->item(_nRowSelected, nCol++);
 
-            qDebug() << "start time" << _pState->getStartTime().toString() << "end time" << _pState->getEndTime().toString();
+            KCB_DEBUG_TRACE("start time" << _pState->getStartTime().toString() << "end time" << _pState->getEndTime().toString());
 
             item->setText(_pState->getStartTime().toString("MMM dd yyyy hh:mm AP"));
             item = table->item(_nRowSelected, nCol++);
@@ -1660,10 +1668,10 @@ void CFrmAdminInfo::OnRowSelected(int row, int column)
 
 bool CFrmAdminInfo::eventFilter(QObject *target, QEvent *event)
 {
-    qDebug() << "eventFilter. Event type:" << QVariant(event->type()).toString();
+    KCB_DEBUG_TRACE("eventFilter. Event type:" << QVariant(event->type()).toString());
     if(event->type() == QEvent::TouchBegin )
     {
-        qDebug() << "TouchBegin";
+        KCB_DEBUG_TRACE("TouchBegin");
         touchEvent(static_cast<QTouchEvent*>(event));
 
         if(ui->tblCodesList->rowCount() == 0 )
@@ -1683,12 +1691,12 @@ void CFrmAdminInfo::OnCodes(QString code1, QString code2)
 
 void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 {
-    qDebug() << "CFrmAdminInfo::touchEvent";
+    KCB_DEBUG_ENTRY;
     QList<QTouchEvent::TouchPoint>   lstPoints;
     switch (ev->type())
     {
     case QEvent::TouchBegin:
-        qDebug() << "TouchBegin rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString();
+        KCB_DEBUG_TRACE("TouchBegin rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
         lstPoints = ev->touchPoints();
         _lastTouchPos = lstPoints.at(0).screenPos().toPoint();
 
@@ -1706,7 +1714,7 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
         break;
 
     case QEvent::TouchEnd:
-        qDebug() << "TouchEnd rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString();
+        KCB_DEBUG_TRACE("TouchEnd rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
         if(ui->tblCodesList->rowCount() >= 0 )
         {
             _pTableMenuAdd->show();
@@ -1717,6 +1725,8 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
     default:
         break;
     }
+
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
@@ -1779,7 +1789,7 @@ void CFrmAdminInfo::editCodeByRow(int row)
     
     checkAndCreateCodeEditForm();
 
-    qDebug() << "Created CodeEditForm";
+    KCB_DEBUG_TRACE("Created CodeEditForm");
 
     // Get line values
     CLockSet::Iterator itor;
@@ -1790,7 +1800,7 @@ void CFrmAdminInfo::editCodeByRow(int row)
     }
     int nRow = 0;
 
-    qDebug() << "before loop iterator cellClicked";
+    KCB_DEBUG_TRACE("before loop iterator cellClicked");
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
@@ -1820,6 +1830,7 @@ void CFrmAdminInfo::editCodeByRow(int row)
 
 void CFrmAdminInfo::deleteCodeByRow(int row)
 {
+    KCB_DEBUG_ENTRY;
     checkAndCreateCodeEditForm();
 
     // Get line values
@@ -1831,7 +1842,7 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
     }
     int nRow = 0;
 
-    qDebug() << "before loop iterator cellClicked";
+    KCB_DEBUG_TRACE("before loop iterator cellClicked");
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
@@ -1850,7 +1861,7 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
 
         QString cmd = QString("%1%2").arg(QString(CMD_REMOVE_FP_FILE)).arg(_pState->getCode1());
 
-        qDebug() << "CFrmAdminInfo::deleteCodeByRow(), cmd: " << cmd;
+        KCB_DEBUG_TRACE("cmd: " << cmd);
 
         if( QDir(QString("/home/pi/")).exists() )
         {
@@ -1858,12 +1869,13 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
         }
         emit __OnUpdateCodeState(_pState);
     }
+    KCB_DEBUG_EXIT;    
 }
 
 void CFrmAdminInfo::purgeCodes()
 {
     // Removes all codes
-    qDebug() << "CFrmAdminInfo::purgeCodes()";
+    KCB_DEBUG_ENTRY;
 
     // Get line values
     CLockSet::Iterator itor;
@@ -1897,16 +1909,17 @@ void CFrmAdminInfo::purgeCodes()
         nRow++;
     }
 
-    qDebug() << "CFrmAdminInfo::purgeCodes():" << CMD_REMOVE_ALL_FP_FILES;
+    KCB_DEBUG_TRACE(CMD_REMOVE_ALL_FP_FILES);
     std::system( CMD_REMOVE_ALL_FP_FILES );
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_btnRebootSystem_clicked()
 {
     int nRC = QMessageBox::warning(this, tr("Verify System Reboot"),
                                    tr("System will be restarted.\nDo you want to restart?"),
-                                   QMessageBox::Yes, QMessageBox::Cancel);
-    if(nRC == QMessageBox::Yes)
+                                  QMessageBox::Ok, QMessageBox::Cancel);
+    if(nRC == QMessageBox::Ok)
     {
         if(_pcopymodel)
         {
@@ -1929,10 +1942,10 @@ void CFrmAdminInfo::on_btnPurgeCodes_clicked()
 
     int nRC = QMessageBox::warning(this, tr("Verify Remove All Codes"),
                                    tr("All access codes will be removed from the system\nDo you want to continue?"),
-                                   QMessageBox::Yes, QMessageBox::Cancel);
-    if(nRC == QMessageBox::Yes)
+                                   QMessageBox::Ok, QMessageBox::Cancel);
+    if(nRC == QMessageBox::Ok)
     {
-        KCB_DEBUG_TRACE("Yes Selected");
+        KCB_DEBUG_TRACE("Ok Selected");
         purgeCodes();
         usleep(50000);
 
@@ -2124,16 +2137,30 @@ void CFrmAdminInfo::on_cbActionsSelect_currentIndexChanged(int index)
             setFileFilterFromFormatSelection(ui->cbFileFormat->currentText());
             if (index == ACTION_INDEX_IMPORT_CODES)
             {
+                // Only XML format is supported
+                //      - set format to xml
+                //      - disable format and security control
+                int index = ui->cbFileFormat->findText("XML");
+                KCB_DEBUG_TRACE("found XML at" << index);
+                ui->cbFileFormat->setCurrentIndex(index);
+                ui->cbFileFormat->setDisabled(true);
+                ui->cbEncryptedClear->setDisabled(true);                
                 m_util_action = UTIL_ACTION_IMPORT_CODES;
             }
             else if (index == ACTION_INDEX_EXPORT_CODES)
             {
                 ui->btnActionExecute->setEnabled(true);
+                ui->cbFileFormat->setEnabled(true);
+                ui->cbEncryptedClear->setEnabled(true);
                 m_util_action = UTIL_ACTION_EXPORT_CODES;
             }
-            ui->cbFileFormat->setEnabled(true);
-            ui->cbEncryptedClear->setEnabled(true);
             break;
+
+        case ACTION_INDEX_EXPORT_LOGS:
+            ui->btnActionExecute->setEnabled(true);
+            m_util_action = UTIL_ACTION_EXPORT_LOGS;
+            m_file_filter = QStringList() << "*.log";
+            break;        
 
         default:
             KCB_DEBUG_TRACE("Unknown action index" << index);
@@ -2162,18 +2189,60 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
             break;
 
         case UTIL_ACTION_IMPORT_CODES:
-            importAsXml();
+            {
+                QString security = ui->cbEncryptedClear->currentText().toLower();
+                QString format = ui->cbFileFormat->currentText().toLower();
+                int nRC = QMessageBox::warning(this, tr("Code Import"),
+                                            QString(tr("You have selected import codes in %1 format (%2)\n"
+                                                       "Continuing will import all of the codes into the database.\n"
+                                                       "If there are duplicate codes, they must be removed manually.\n"
+                                                       "Do you want to continue?"
+                                                      )).arg("XML").arg(security == "clear" ? "unencrypted" : "encrypted"),
+                                            QMessageBox::Yes, QMessageBox::No);
+                if (nRC == QMessageBox::Yes)                                        
+                {
+                    importAsXml();
+                }
+            }
             break;
 
         case UTIL_ACTION_EXPORT_CODES:
             {
+                CLockSet *lockset;                
                 QString format = ui->cbFileFormat->currentText().toLower();
                 QString security = ui->cbEncryptedClear->currentText().toLower();
 
-                bool is_clear_encrypted = security == "clear" ? true : false;
+                bool clear_or_encrypted = security == "clear" ? true : false;
+                QString root_path = ui->cbUsbDrives->currentText();
+            
+                // A CLockSet object was allocated by this call to readAllCodes
+                // It must be delete before leaving this code block.
+                _psysController->readAllCodes(&lockset, clear_or_encrypted);
+                if (lockset && lockset->isValid())
+                {
+                    CodeExporter exporter(CodeExporter::StringToFormat(format), root_path, *lockset, clear_or_encrypted);
+                    bool result = exporter.Export();
+                    //delete lockset;
+                }
+                else
+                {
+                    (void) QMessageBox::information(this, tr("Code Export"),
+                                            QString(tr("There are no codes available to be exported")),
+                                            QMessageBox::Ok);
+                }
+            }
+            break;
 
-                bool result = kcb::ExportCodes(ui->cbUsbDrives->currentText(), format, is_clear_encrypted);
-                KCB_DEBUG_TRACE("export codes" << result);
+        case UTIL_ACTION_EXPORT_LOGS:
+            {
+                // Copy the log file from /home/pi/kcb-config/logs/messages.log to USB drive
+                QString source("/home/pi/kcb-config/logs/stderr.log");
+                QString target(QString("%1/messages_%2.log").arg(ui->cbUsbDrives->currentText()).arg(QDateTime::currentDateTime().toString(REPORT_FILE_FORMAT)));
+                bool result = QFile::copy(source, target);
+                if (!result)
+                {
+                    KCB_DEBUG_TRACE("failed to copy logs");
+                }
             }
             break;
 
@@ -2181,6 +2250,7 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
             KCB_DEBUG_TRACE("Unknown utility action" << m_util_action);
             break;
     }
+    KCB_DEBUG_EXIT;    
 }
 
 void CFrmAdminInfo::OnNotifyUsbDrive(QStringList list)

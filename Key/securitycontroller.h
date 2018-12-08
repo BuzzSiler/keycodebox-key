@@ -27,6 +27,8 @@ public:
     static QDateTime &roundDateTime(uint32_t res, QDateTime &datetime);
 
     void getAllCodes1(QStringList& codes1);
+    void readAllCodes(CLockSet **lockset, bool clear_or_encrypted);
+
 private:
     CSecurityUser       *_pSecurityUser;      // Default no access
     CModelSecurity      _modelSecurity;

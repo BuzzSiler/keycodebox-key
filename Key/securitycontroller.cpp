@@ -244,3 +244,8 @@ void CSecurityController::getAllCodes1(QStringList& codes1)
 {
     _modelSecurity.getAllCodes1(codes1);
 }
+
+void CSecurityController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted)
+{
+    _modelSecurity.readAllCodes(lockset, clear_or_encrypted);
+}

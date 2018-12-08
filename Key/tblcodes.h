@@ -100,9 +100,8 @@ class CTblCodes
                         QDateTime starttime, QDateTime endtime);
         bool resetCodeLimitedUse(CLockState &rec);                    
 
-        void selectCodeSet(QString &nLockNums, QDateTime start, QDateTime end, CLockSet **pLockSet);
-        void selectCodeSet(int ids, CLockSet **pLockSet);
-
+        void selectCodeSet(QString &nLockNums, QDateTime start, QDateTime end, CLockSet **pLockSet, bool clear_or_encrypted=false);
+        void selectCodeSet(int ids, CLockSet **pLockSet, bool clear_or_encrypted=false);
         void getAllCodes1(QStringList& codes1);
 
     private:
@@ -129,7 +128,7 @@ class CTblCodes
                               QString table,
                               QString condition);
 
-        void execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry, CLockSet **pLockSet);
+        void execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry, CLockSet **pLockSet, bool clear_or_encrypted);
         bool containsMatchingEntries(const QStringList& s1, const QStringList& s2);
 
 };

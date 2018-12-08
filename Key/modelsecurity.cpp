@@ -51,9 +51,19 @@ void CModelSecurity::OnReadLockSet(QString LockNums, QDateTime start, QDateTime 
     // KCB_DEBUG_ENTRY;
     CLockSet    *pLockSet;
 
-    _ptblCodes->selectCodeSet(LockNums, start, end, &pLockSet);
+    _ptblCodes->selectCodeSet(LockNums, start, end, &pLockSet, true);
     // qDebug() << "Selected locks:" << LockNums;
     emit __OnLockSet(pLockSet);
+}
+
+void CModelSecurity::readAllCodes(CLockSet **lockset, bool clear_or_encrypted)
+{
+    KCB_DEBUG_ENTRY;
+    QString locknums("*");
+
+    _ptblCodes->selectCodeSet(locknums, DEFAULT_DATE_TIME, QDateTime::currentDateTime(), lockset, clear_or_encrypted);
+
+    KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end)

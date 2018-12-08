@@ -302,7 +302,7 @@ bool CTblCodes::containsMatchingEntries(const QStringList& s1, const QStringList
     return true;
 }
 
-void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry, CLockSet **pLockSet)
+void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry, CLockSet **pLockSet, bool clear_or_encrypted)
 {
     CLockState *pLock;
     
@@ -370,8 +370,13 @@ void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry,
         pLock->setSequenceOrder(seq_order);
         pLock->setLockNums(lock_nums);
         pLock->setDescription(desc);
-        pLock->setCode1(CEncryption::decryptString(sCode1));
-        pLock->setCode2(CEncryption::decryptString(sCode2));
+        if (clear_or_encrypted)
+        {
+            sCode1 = CEncryption::decryptString(sCode1);
+            sCode2 = CEncryption::decryptString(sCode2);
+        }
+        pLock->setCode1(sCode1);
+        pLock->setCode2(sCode2);
         pLock->setStartTime(startDT);
         pLock->setEndTime(endDT);
         pLock->setStatus(status);
@@ -379,6 +384,7 @@ void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry,
         pLock->setRetryCount(retry_count);
         pLock->setMaxAccess(max_access);
         pLock->setMaxRetry(max_retry);
+        // Set or clear fingerprint based on fingerprint state, i.e., fp1 or fp2
         fp1 == true ? pLock->setFingerprint1() : pLock->clearFingerprint1();
         fp2 == true ? pLock->setFingerprint2() : pLock->clearFingerprint2();
         pLock->setAskQuestions(aq);
@@ -392,7 +398,7 @@ void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry,
     } while (qry.next());
 }
 
-void CTblCodes::selectCodeSet(QString &lockNums, QDateTime start, QDateTime end, CLockSet **pLockSet)
+void CTblCodes::selectCodeSet(QString &lockNums, QDateTime start, QDateTime end, CLockSet **pLockSet, bool clear_or_encrypted)
 {
     KCB_DEBUG_TRACE("lockNums" << lockNums << "start" << start.toString() << "end" << end.toString() << "pLockSet");
 
@@ -491,10 +497,10 @@ void CTblCodes::selectCodeSet(QString &lockNums, QDateTime start, QDateTime end,
     qry.bindValue(":stime", start);
     qry.bindValue(":etime", end);
 
-    execSelectCodeSetQuery(sl, qry, pLockSet);
+    execSelectCodeSetQuery(sl, qry, pLockSet, clear_or_encrypted);
 }
 
-void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
+void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet, bool clear_or_encrypted)
 {
     KCB_DEBUG_ENTRY;
 
@@ -512,7 +518,7 @@ void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet)
 
     qry.bindValue(":id", ids);
 
-    execSelectCodeSetQuery(QStringList(), qry, pLockSet);
+    execSelectCodeSetQuery(QStringList(), qry, pLockSet, clear_or_encrypted);
 }
 
 bool CTblCodes::tableExists()
