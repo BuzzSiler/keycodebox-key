@@ -31,6 +31,8 @@ class CLockSet : public QObject
         Iterator    end() { return _mmapLocks.end(); }
 
         void addToSet(CLockState *plockState);
+        bool isValid() {return _mmapLocks.count() > 0;}
+        
     private:
         QMultiMap<QString, CLockState*> _mmapLocks;
 
