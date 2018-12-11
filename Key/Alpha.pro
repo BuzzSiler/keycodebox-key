@@ -93,6 +93,8 @@ SOURCES += main.cpp\
     codeelement.cpp \
     codelistingelement.cpp \
     xmlcodelistingreader.cpp \
+    codeimportexportutil.cpp \
+    codeimporter.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -171,6 +173,8 @@ HEADERS  += keycodeboxmain.h \
     codeelement.h \
     codelistingelement.h \
     xmlcodelistingreader.h \
+    codeimportexportutil.h \
+    codeimporter.h \
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \

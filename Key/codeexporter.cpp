@@ -9,81 +9,17 @@
 #include "kcbcommon.h"
 
 
-int CodeExporter::StringToFormat(const QString& string)
-{
-    QString string_lower = string.toLower();
-
-    if (string_lower == "xml")
-    {
-        return XML_FORMAT;
-    }
-    else if (string_lower == "json")
-    {
-        return JSON_FORMAT;
-    }
-    else if (string_lower == "csv")
-    {
-        return CSV_FORMAT;
-    }
-    else if (string_lower == "sql")
-    {
-        return SQL_FORMAT;
-    }
-    else
-    {
-        KCB_DEBUG_TRACE("Invalid format requested" << string);
-        return INVALID_FORMAT;
-    }
-}
-
-QString CodeExporter::FormatToString(const int& format)
-{
-    QString string = "";
-
-    switch (format)
-    {
-        case XML_FORMAT:
-            string = "xml";
-            break;
-
-        case JSON_FORMAT:
-            string = "json";
-            break;
-
-        case CSV_FORMAT:
-            string = "csv";
-            break;
-
-        case SQL_FORMAT:
-            string = "sql";
-            break;
-
-        case INVALID_FORMAT:
-        default:
-            KCB_DEBUG_TRACE("Invalid format requested");
-            break;            
-    }
-
-    return string;
-}
-
-
-CodeExporter::CodeExporter(int format, QString& root_path, CLockSet& lock_set, bool clear_or_encrypted)
+CodeExporter::CodeExporter(CodeImportExportUtil::CODEFORMAT format, QString& root_path, CLockSet& lock_set, CodeImportExportUtil::CODESECURITY security)
     :
     m_format(format),
     m_root_path(root_path),
     m_lock_set(lock_set),
-    m_clear_or_encrypted(clear_or_encrypted)
+    m_security(security)
 {
 }
 
 CodeExporter::~CodeExporter()
 {
-}
-
-void CodeExporter::setFormat(int format)
-{
-    m_format = format;
 }
 
 bool CodeExporter::Export(QString filename)
@@ -97,21 +33,21 @@ bool CodeExporter::Export(QString filename)
 
     switch (m_format)
     {
-        case XML_FORMAT:
+        case CodeImportExportUtil::XML_FORMAT:
             result = ExportAsXml(output_filename);
             break;
 
-        case JSON_FORMAT:
+        case CodeImportExportUtil::JSON_FORMAT:
             result = ExportAsJson(output_filename);
             break;
 
-        case CSV_FORMAT:
+        case CodeImportExportUtil::CSV_FORMAT:
             result = ExportAsCsv(output_filename);
             break;
 
-        case SQL_FORMAT:
+        case CodeImportExportUtil::SQL_FORMAT:
             // Not implemented
-        case INVALID_FORMAT:
+        case CodeImportExportUtil::INVALID_FORMAT:
         default:
             KCB_DEBUG_TRACE("Invalid format requested");
     }
@@ -137,7 +73,7 @@ bool CodeExporter::ExportAsXml(QString filename)
     stream.writeStartDocument();
 
     stream.writeStartElement("codeListing");
-    stream.writeAttribute("encrypted", QString("%1").arg(m_clear_or_encrypted ? "Yes" : "No"));
+    stream.writeAttribute("security", QString("%1").arg(CodeImportExportUtil::SecurityToString(m_security)));
     stream.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
     CLockSet::Iterator itor;
@@ -180,7 +116,7 @@ bool CodeExporter::ExportAsJson(QString filename)
 
     /*
         {
-            "encrypted": true|false,
+            "security": "clear|encrypted|not specified",
             "codes":
             [
                 {
@@ -236,7 +172,7 @@ bool CodeExporter::ExportAsJson(QString filename)
     }
 
     QJsonObject obj;
-    obj.insert("encrypted", !m_clear_or_encrypted);
+    obj.insert("security", CodeImportExportUtil::SecurityToString(m_security));
     obj.insert("codes", codeListing);
     QByteArray ba = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
@@ -264,9 +200,9 @@ bool CodeExporter::ExportAsCsv(QString filename)
     {
         pState = itor.value();
 
-        QString group1 = QString("\"%1\",\"%2\",\"%3\",\"%4\"").arg(pState->getLockNums()).arg(pState->getCode1()).arg(pState->getCode2()).arg(pState->getDescription());
-        QString group2 = QString("\"%1\",\"%2\",\"%3\",%4").arg(pState->getQuestion1()).arg(pState->getQuestion2()).arg(pState->getQuestion3());
-        QString group3 = QString("\"%1\",\"%2\",%3").arg(pState->getStartTime().toString(DATETIME_FORMAT)).arg(pState->getEndTime().toString(DATETIME_FORMAT)).arg(pState->getAccessType());
+        QString group1 = QString("\"%1\",%2,%3,\"%4\"").arg(pState->getLockNums()).arg(pState->getCode1()).arg(pState->getCode2()).arg(pState->getDescription());
+        QString group2 = QString("\"%1\",\"%2\",\"%3\"").arg(pState->getQuestion1()).arg(pState->getQuestion2()).arg(pState->getQuestion3());
+        QString group3 = QString("%1,%2,%3").arg(pState->getStartTime().toString(DATETIME_FORMAT)).arg(pState->getEndTime().toString(DATETIME_FORMAT)).arg(pState->getAccessType());
         int num_bytes = file.write(QString("%1,%2,%3\n").arg(group1).arg(group2).arg(group3).toUtf8());
         KCB_DEBUG_TRACE("text size" << group1.length() + group2.length() + group3.length() << "wrote" << num_bytes);
     }

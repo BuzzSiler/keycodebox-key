@@ -18,6 +18,7 @@
 #include "systemcontroller.h"
 #include "clickablelabel.h"
 #include "frmcodeeditmulti.h"
+#include "codelistingelement.h"
 
 namespace Ui {
 class CFrmAdminInfo;
@@ -133,7 +134,6 @@ class CFrmAdminInfo : public QDialog
 
         void OnCloseAdmin();
         void OnMediaCheckTimeout();
-        void onModelDirectoryLoaded(QString path);
         void onRootPathChanged(QString path);
         void OnRowSelected(int row, int column);
         void deleteCodeByRow(int row);
@@ -164,6 +164,7 @@ class CFrmAdminInfo : public QDialog
         void on_btnActionExecute_clicked();
         void on_cbUsbDrives_currentIndexChanged(const QString &arg1);
         void on_cbFileFormat_currentIndexChanged(const QString &arg1);
+        void on_pbUtilUnmountDrive_clicked();
 
     private:
         Ui::CFrmAdminInfo   *ui;
@@ -186,7 +187,6 @@ class CFrmAdminInfo : public QDialog
         CLockSet            *_pworkingSet = 0;
         CLockHistorySet     *_phistoryWorkingSet = 0;
 
-        QFileSystemModel    *_pmodel;
         QFileSystemModel    *_pcopymodel;
         QPoint              _lastTouchPos;
 
@@ -251,7 +251,7 @@ class CFrmAdminInfo : public QDialog
         void OnNotifyUsbDrive(QStringList list);
         void setFileFilterFromFormatSelection(const QString filter);
                          
-        bool importAsXml();                         
+        void insertCodes(CodeListing& codeListing);
 
     protected:
         void touchEvent(QTouchEvent *ev);

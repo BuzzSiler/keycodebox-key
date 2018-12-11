@@ -37,11 +37,12 @@
 #include "reportcontrolwidget.h"
 #include "kcbsystem.h"
 #include "frmnetworksettings.h"
-#include "codeexporter.h"
 
 #include "xmlcodelistingreader.h"
-#include "codelistingelement.h"
 #include "codeelement.h"
+#include "codeexporter.h"
+#include "codeimporter.h"
+
 
 #define ADMIN_TAB_INDEX (0)
 #define REPORT_TAB_INDEX (2)
@@ -129,11 +130,6 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
 CFrmAdminInfo::~CFrmAdminInfo()
 {
     delete ui;
-
-    if(_pmodel) 
-    {
-        delete _pmodel;
-    }
 
     if(_pcopymodel) 
     {
@@ -265,7 +261,6 @@ bool CFrmAdminInfo::isInternetTime()
 
 void CFrmAdminInfo::initialize()
 {
-    _pmodel = 0;
     _pcopymodel = 0;
     _bClose = false;
     ui->widgetEdit->setVisible(false);
@@ -510,15 +505,9 @@ void CFrmAdminInfo::onRootPathChanged(QString path)
     qDebug() << "Root path loaded" << path;
 }
 
-void CFrmAdminInfo::onModelDirectoryLoaded(QString path)
-{
-    qDebug() << "loaded" << path;
-    _pmodel->sort(0, Qt::AscendingOrder);
-}
-
 void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QStringList sFilter)
 {
-    //KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
     if(_pcopymodel)
     {
         delete _pcopymodel;
@@ -563,12 +552,13 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QStringList sFilt
     ui->treeViewCopy->setModel(_pcopymodel);
     ui->treeViewCopy->setRootIndex(index);
     ui->treeViewCopy->header()->setSectionResizeMode(QHeaderView::Fixed);
-    ui->treeViewCopy->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->treeViewCopy->header()->resizeSection(1, 60);
+    ui->treeViewCopy->header()->resizeSection(0, 300);
+    ui->treeViewCopy->header()->resizeSection(1, 70);
     ui->treeViewCopy->header()->resizeSection(2, 60);
+    ui->treeViewCopy->header()->resizeSection(3, 75);
     ui->treeViewCopy->header()->setStretchLastSection(false);
 
-    //KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::onCopyRootPathChanged(QString path)
@@ -620,24 +610,11 @@ void CFrmAdminInfo::on_btnCopyFile_clicked()
     }
 }
 
-bool CFrmAdminInfo::importAsXml()
+void CFrmAdminInfo::insertCodes(CodeListing& codeListing)
 {
-    QFile file(_copyDirectory);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        KCB_DEBUG_TRACE("Cannot read file" << file.errorString());
-        return false;
-    }
+    KCB_DEBUG_ENTRY;
 
-    CodeListing* codeListing = new CodeListing;
-    XmlCodeListingReader xmlReader(codeListing);
-    if (!xmlReader.read(&file))
-    {
-        KCB_DEBUG_TRACE("Parse error in file " << xmlReader.errorString());
-        return false;
-    }
-
-    codeListing->print();
+    //codeListing.print();
 
     if (!_pworkingSet)
     {
@@ -645,9 +622,11 @@ bool CFrmAdminInfo::importAsXml()
     }
 
     CodeListing::Iterator iter;
-    for(iter = codeListing->begin(); iter != codeListing->end(); iter++)
+    for(iter = codeListing.begin(); iter != codeListing.end(); iter++)
     {
         Code* code = *iter;
+
+        //code->print();
 
         QDateTime starttime = QDateTime::fromString(code->starttime(), DATETIME_FORMAT);
         QDateTime endtime = QDateTime::fromString(code->endtime(), DATETIME_FORMAT);
@@ -670,7 +649,7 @@ bool CFrmAdminInfo::importAsXml()
 
         QString code1 = code->code1();
         QString code2 = code->code2();
-        if (codeListing->encrypted())
+        if (codeListing.encrypted())
         {
             code1 = CEncryption::decryptString(code1);
             code2 = CEncryption::decryptString(code2);
@@ -691,8 +670,7 @@ bool CFrmAdminInfo::importAsXml()
         HandleCodeUpdate();
 
     }
-
-    return true;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
@@ -2034,8 +2012,8 @@ void CFrmAdminInfo::codeHistoryTableCellSelected(int row, int col)
 void CFrmAdminInfo::on_cbActionsSelect_currentIndexChanged(int index)
 {
     KCB_DEBUG_ENTRY;
-    ui->cbFileFormat->setEnabled(false);
-    ui->cbEncryptedClear->setEnabled(false);
+    ui->cbFileFormat->setDisabled(true);
+    ui->cbSecurity->setDisabled(true);
     ui->btnActionExecute->setDisabled(true);
 
     switch (index)
@@ -2060,21 +2038,16 @@ void CFrmAdminInfo::on_cbActionsSelect_currentIndexChanged(int index)
             setFileFilterFromFormatSelection(ui->cbFileFormat->currentText());
             if (index == ACTION_INDEX_IMPORT_CODES)
             {
-                // Only XML format is supported
-                //      - set format to xml
-                //      - disable format and security control
+                ui->cbFileFormat->setEnabled(true);
                 int index = ui->cbFileFormat->findText("XML");
-                KCB_DEBUG_TRACE("found XML at" << index);
                 ui->cbFileFormat->setCurrentIndex(index);
-                ui->cbFileFormat->setDisabled(true);
-                ui->cbEncryptedClear->setDisabled(true);                
                 m_util_action = UTIL_ACTION_IMPORT_CODES;
             }
             else if (index == ACTION_INDEX_EXPORT_CODES)
             {
                 ui->btnActionExecute->setEnabled(true);
                 ui->cbFileFormat->setEnabled(true);
-                ui->cbEncryptedClear->setEnabled(true);
+                ui->cbSecurity->setEnabled(true);
                 m_util_action = UTIL_ACTION_EXPORT_CODES;
             }
             break;
@@ -2123,9 +2096,21 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
                                                QMessageBox::Yes, QMessageBox::No);
                 if (nRC == QMessageBox::Yes)                                        
                 {
-                    bool result = importAsXml();
+                    CodeImportExportUtil::CODEFORMAT format = CodeImportExportUtil::StringToFormat(ui->cbFileFormat->currentText());
+                    CodeImportExportUtil::CODESECURITY security = CodeImportExportUtil::NOTSPECIFIED_SECURITY; // handles the case where security is specified in the file format
+
+                    // If the format is CSV then we take the security from the security combo box
+                    if (format == CodeImportExportUtil::CSV_FORMAT)
+                    {
+                        security = CodeImportExportUtil::StringToSecurity(ui->cbSecurity->currentText());                        
+                    }
+
+                    CodeListing codeListing;
+                    CodeImporter importer(format, _copyDirectory, security);
+                    bool result = importer.import(codeListing);
                     if (result)
                     {
+                        insertCodes(codeListing);
                         (void) QMessageBox::information(this, 
                                                         tr("Bulk Code Upload Complete"),
                                                         tr("Please check the 'Codes' tab to see that your codes were added successfully."),
@@ -2133,9 +2118,10 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
                     }
                     else
                     {
+                        QString format_str = CodeImportExportUtil::FormatToString(format).toUpper();
                         (void) QMessageBox::warning(this, 
-                                                    tr("XML Parsing Failed"),
-                                                    tr("Can't parse given XML file\nPlease check syntax and integrity of your file."),
+                                                    tr("%1 Parsing Failed").arg(format_str),
+                                                    tr("Can't parse given %1 file\nPlease check syntax and integrity of your file.").arg(format_str),
                                                     QMessageBox::Ok);
                     }
                 }
@@ -2144,19 +2130,18 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
 
         case UTIL_ACTION_EXPORT_CODES:
             {
-                CLockSet *lockset;                
-                QString format = ui->cbFileFormat->currentText().toLower();
-                QString security = ui->cbEncryptedClear->currentText().toLower();
-
-                bool clear_or_encrypted = security == "clear" ? true : false;
+                CodeImportExportUtil::CODEFORMAT format = CodeImportExportUtil::StringToFormat(ui->cbFileFormat->currentText());
+                CodeImportExportUtil::CODESECURITY security = CodeImportExportUtil::StringToSecurity(ui->cbSecurity->currentText());
+                bool clear_or_encrypted = security == CodeImportExportUtil::CLEAR_SECURITY ? true : false;
                 QString root_path = ui->cbUsbDrives->currentText();
+                CLockSet *lockset;                
             
                 // A CLockSet object was allocated by this call to readAllCodes
                 // It must be delete before leaving this code block.
                 _psysController->readAllCodes(&lockset, clear_or_encrypted);
                 if (lockset && lockset->isValid())
                 {
-                    CodeExporter exporter(CodeExporter::StringToFormat(format), root_path, *lockset, clear_or_encrypted);
+                    CodeExporter exporter(format, root_path, *lockset, security);
                     bool result = exporter.Export();
                     Q_ASSERT_X(result, Q_FUNC_INFO, "exporter export failed");
                 }
@@ -2198,12 +2183,17 @@ void CFrmAdminInfo::OnNotifyUsbDrive(QStringList list)
         ui->cbUsbDrives->setCurrentIndex(0);
         ui->cbActionsSelect->setEnabled(true);
         ui->cbActionsSelect->setCurrentIndex(0);
+        ui->pbUtilUnmountDrive->setEnabled(true);
     }
     else
     {
+        ui->treeViewCopy->setModel(nullptr);
         ui->cbUsbDrives->addItem("No Drive Inserted");
         ui->cbActionsSelect->setDisabled(true);
-        ui->treeViewCopy->setModel(nullptr);
+        ui->pbUtilUnmountDrive->setDisabled(true);
+        ui->btnActionExecute->setDisabled(true);
+        ui->cbFileFormat->setDisabled(true);
+        ui->cbSecurity->setDisabled(true);
     }
 }
 
@@ -2219,6 +2209,9 @@ void CFrmAdminInfo::on_cbUsbDrives_currentIndexChanged(const QString &arg1)
 void CFrmAdminInfo::on_cbFileFormat_currentIndexChanged(const QString &arg1)
 {
     KCB_DEBUG_ENTRY;
+    
+    bool is_csv = ui->cbFileFormat->currentText() == "CSV";
+    ui->cbSecurity->setEnabled(is_csv);
 
     setFileFilterFromFormatSelection(arg1);
     populateFileCopyWidget(ui->cbUsbDrives->currentText());
@@ -2252,5 +2245,24 @@ void CFrmAdminInfo::setFileFilterFromFormatSelection(const QString filter)
     }
 }
 
-//-------------------------------------------------------------------------------------------------
-// EOF
+void CFrmAdminInfo::on_pbUtilUnmountDrive_clicked()
+{
+    KCB_DEBUG_ENTRY;
+
+    // Set the model to null to disconnect the watcher signals
+    ui->treeViewCopy->setModel(nullptr);
+
+    // If there is an active model, then disconnect and delete
+    if(_pcopymodel)
+    {
+        _pcopymodel->disconnect();
+        delete _pcopymodel;
+        _pcopymodel = 0;
+    }
+
+    QString path = ui->cbUsbDrives->currentText();
+    KCB_DEBUG_TRACE("Unmounting" << path);
+    kcb::UnmountUsb(path);
+
+    KCB_DEBUG_EXIT;
+}

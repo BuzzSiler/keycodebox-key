@@ -12,8 +12,9 @@ class CodeListing
 
         void addCode(Code* code);
         void print();
-        void setEncrypted(bool value) {m_encrypted = value;}
-        bool encrypted() {return m_encrypted;}
+        void setEncrypted(bool value) { m_encrypted = value; }
+        bool encrypted() { return m_encrypted; }
+        int count() { return m_codes.count(); }
 
         Iterator begin() { return m_codes.begin(); }
         Iterator end() { return m_codes.end(); }

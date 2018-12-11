@@ -303,7 +303,13 @@ namespace kcb
 
     void UnmountUsb(QString path)
     {
-        std::system(QString("umount %1").arg(path).toStdString().c_str());
+        // QDir::toNativeSeparators() is supposed to escape spaces in paths but it doesn't seem to
+        // Using replace instead
+        path = path.replace(" ", "\\ ");
+        // Note: -l is needed to unmount while there may be components attached to the drive
+        // Per umount help,
+        //      -l, --lazy : detach the filesystem now, clean up things later
+        std::system(QString("umount -l %1").arg(path).toStdString().c_str());
     }
 
     void Reboot()

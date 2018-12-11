@@ -2,16 +2,18 @@
 #include "codelistingelement.h"
 #include "codeelement.h"
 #include "kcbcommon.h"
+#include "codeimportexportutil.h"
 
-XmlCodeListingReader::XmlCodeListingReader(CodeListing* codelisting)
+XmlCodeListingReader::XmlCodeListingReader(CodeListing& codelisting)
+    :
+    m_codelisting(codelisting)
 {
-    m_codelisting = codelisting;
 }
 
-bool XmlCodeListingReader::read(QIODevice *device)
+bool XmlCodeListingReader::read(QIODevice& device)
 {
     KCB_DEBUG_ENTRY;
-    m_reader.setDevice(device);
+    m_reader.setDevice(&device);
 
     if (m_reader.readNextStartElement()) 
     {
@@ -54,11 +56,15 @@ void XmlCodeListingReader::readCodeListing()
 void XmlCodeListingReader::readEncryptedAttribute()
 {
     KCB_DEBUG_ENTRY;
-    Q_ASSERT(m_reader.name() == "codeListing" && m_reader.attributes().hasAttribute("encrypted"));
+    Q_ASSERT(m_reader.name() == "codeListing" && m_reader.attributes().hasAttribute("security"));
 
-    QString yesno = m_reader.attributes().value("encrypted").toString();
-    bool encrypted = yesno == "yes" ? true : false;
-    m_codelisting->setEncrypted(encrypted);
+    QString security = "not specified";
+    if (m_reader.attributes().hasAttribute("security"))
+    {
+        security = m_reader.attributes().value("security").toString();
+    }
+    bool encrypted = CodeImportExportUtil::StringToSecurity(security) == CodeImportExportUtil::ENCRYPTED_SECURITY ? true : false;
+    m_codelisting.setEncrypted(encrypted);
     KCB_DEBUG_EXIT;
 }
 
@@ -117,7 +123,7 @@ void XmlCodeListingReader::readCode()
         }
     }
 
-    m_codelisting->addCode(code);
+    m_codelisting.addCode(code);
     KCB_DEBUG_EXIT;
 }
 

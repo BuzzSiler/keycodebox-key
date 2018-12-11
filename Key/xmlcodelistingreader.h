@@ -4,20 +4,20 @@
 #include <QXmlStreamReader>
 #include <QString>
 
-class CodeListing;
+#include "codelistingelement.h"
 class Code;
 class QIODevice;
 
 class XmlCodeListingReader
 {
 public:
-    XmlCodeListingReader(CodeListing* codelisting);
-    bool read(QIODevice *device);
+    XmlCodeListingReader(CodeListing& codelisting);
+    bool read(QIODevice& device);
     QString errorString() const;
     bool encrypted() const;
 private:
     QXmlStreamReader m_reader;
-    CodeListing*     m_codelisting;
+    CodeListing&      m_codelisting;
 
     void readCodeListing();
     void readEncryptedAttribute();

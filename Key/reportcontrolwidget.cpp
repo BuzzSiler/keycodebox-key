@@ -9,6 +9,7 @@
 #include "kcbcommon.h"
 #include "checkablestringlistmodel.h"
 #include "dlgdownloadreports.h"
+#include "kcbsystem.h"
 
 static const QString DEFAULT_REPORT_DIRECTORY = QString("/home/pi/kcb-config/reports");
 
@@ -164,11 +165,11 @@ void ReportControlWidget::OnNotifyUsbDrive(QStringList drives)
     // KCB_DEBUG_ENTRY;
     m_usb_drives = drives;
     KCB_DEBUG_TRACE("drives" << m_usb_drives);
+
     if (m_usb_drives.count() == 0)
     {
         ui->cbUsbDrives->clear();
         ui->cbUsbDrives->addItem(tr("DEFAULT"));
-        ui->cbStoreToUsbDrive->setChecked(false);
     }
 
     updateUi();
@@ -319,7 +320,7 @@ void ReportControlWidget::on_cbStoreToUsbDrive_clicked()
     {
         ui->cbUsbDrives->clear();
         ui->cbUsbDrives->addItems(m_usb_drives);
-        ui->cbUsbDrives->setCurrentIndex(0);
+        ui->cbUsbDrives->setCurrentIndex(0);    
     }
     else
     {
@@ -596,6 +597,7 @@ void ReportControlWidget::updateUi()
     ui->cbDeleteOlderThan->setEnabled(store_file_enabled);
     ui->cbStoreToUsbDrive->setEnabled(store_usb_enabled);
     ui->cbUsbDrives->setEnabled(store_usb_enabled && ui->cbStoreToUsbDrive->isChecked());
+    ui->pbReportUnmountDrive->setEnabled(store_usb_enabled && ui->cbStoreToUsbDrive->isChecked());
 
     // KCB_DEBUG_TRACE(m_curr_report_directory);
     bool dir_empty = m_curr_report_directory.isEmpty();
@@ -623,4 +625,16 @@ void ReportControlWidget::updateUi()
     ui->pbDownloadSelectedReports->setEnabled(!ui->cbStoreToUsbDrive->isChecked() && one_or_more_selected);
 
     // KCB_DEBUG_EXIT;
+}
+
+void ReportControlWidget::on_pbReportUnmountDrive_clicked()
+{
+    KCB_DEBUG_ENTRY;
+    ui->lvAvailableReports->setModel(nullptr);
+    m_lv_model.disconnect();
+    KCB_DEBUG_TRACE("Unmounting");
+    kcb::UnmountUsb(ui->cbUsbDrives->currentText());
+    ui->cbStoreToUsbDrive->setChecked(false);
+    updateUi();
+    KCB_DEBUG_EXIT;
 }
