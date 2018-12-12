@@ -661,7 +661,8 @@ void CFrmAdminInfo::insertCodes(CodeListing& codeListing)
                         code->username(),
                         starttime, 
                         endtime, 
-                        false, false, false, 
+                        false, false,
+                        code->askquestion(), 
                         code->question1(), 
                         code->question2(), 
                         code->question3(),
@@ -2230,8 +2231,12 @@ void CFrmAdminInfo::on_cbFileFormat_currentIndexChanged(const QString &arg1)
 {
     KCB_DEBUG_ENTRY;
     
+    bool is_import = ui->cbActionsSelect->currentText() == "Import Codes";
+    bool is_export = ui->cbActionsSelect->currentText() == "Export Codes";
     bool is_csv = ui->cbFileFormat->currentText() == "CSV";
-    ui->cbSecurity->setEnabled(is_csv);
+
+    KCB_DEBUG_TRACE("export" << is_export << "import" << is_import << "csv" << is_csv);
+    ui->cbSecurity->setEnabled(is_export || (is_import && is_csv));
 
     setFileFilterFromFormatSelection(arg1);
     populateFileCopyWidget(ui->cbUsbDrives->currentText());

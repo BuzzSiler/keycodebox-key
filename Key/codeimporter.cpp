@@ -112,7 +112,8 @@ bool CodeImporter::ImportAsJson(QFile& file, CodeListing& codeListing)
 
     QJsonArray codes = root_obj["codes"].toArray();
 
-    Code *code = new Code();
+    KCB_DEBUG_TRACE("found" << codes.count() << "codes");
+
     foreach (const QJsonValue & value, codes) 
     {
         QJsonObject code_obj = value.toObject();
@@ -121,6 +122,9 @@ bool CodeImporter::ImportAsJson(QFile& file, CodeListing& codeListing)
             KCB_DEBUG_TRACE("found empty code object ... continuing");
             continue;
         }
+
+        Code *code = new Code();
+
         code->setLocks(code_obj["locknums"].toString());
         code->setCode1(code_obj["code1"].toString());
         code->setCode2(code_obj["code2"].toString());
@@ -276,6 +280,10 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
             codeListing.addCode(code);
         }
     }
+
+    // CSV files do not have a facility for storing the code security, use the security
+    // provided when the importer was created, i.e., m_security.
+    codeListing.setEncrypted(m_security == CodeImportExportUtil::ENCRYPTED_SECURITY);
     
     KCB_DEBUG_EXIT;
     return true;

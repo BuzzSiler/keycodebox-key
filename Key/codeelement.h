@@ -15,7 +15,7 @@ class Code
         QString username() const {return m_username;}
         void setUsername(const QString& value) {m_username = value;}
         QString question1() const {return m_question1;}
-        void setQuestion1(const QString& value) {m_question1 = value;}
+        void setQuestion1(const QString& value) {m_ask_question = !value.isEmpty(); m_question1 = value;}
         QString question2() const {return m_question2;}
         void setQuestion2(const QString& value) {m_question2 = value;}
         QString question3() const {return m_question3;}
@@ -26,6 +26,7 @@ class Code
         void setEndTime(const QString& value) {m_endtime = value;}
         int accesstype() const {return m_accesstype;}
         void setAccessType(const int& value) {m_accesstype = value;}
+        bool askquestion() const {return m_ask_question;}
         
         void print() const;
         
@@ -40,6 +41,7 @@ class Code
         QString m_starttime;
         QString m_endtime;
         int m_accesstype;
+        bool m_ask_question;
 };
 
 #endif
