@@ -19,6 +19,7 @@
 #include "clickablelabel.h"
 #include "frmcodeeditmulti.h"
 #include "codelistingelement.h"
+#include "kcbcommon.h"
 
 namespace Ui {
 class CFrmAdminInfo;
@@ -196,7 +197,7 @@ class CFrmAdminInfo : public QDialog
 
         QString             _copyDirectory;
 
-        bool                _testEmail;
+        EMAIL_ADMIN_SELECT  _testEmail;
 
         SelectLocksWidget&  m_select_locks;
         QStringList         _codesInUse;
@@ -252,6 +253,8 @@ class CFrmAdminInfo : public QDialog
         void setFileFilterFromFormatSelection(const QString filter);
                          
         void insertCodes(CodeListing& codeListing);
+        void updateTmpAdminRec();
+        void updateAdminForEmail(EMAIL_ADMIN_SELECT email_select);
 
     protected:
         void touchEvent(QTouchEvent *ev);

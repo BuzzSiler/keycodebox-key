@@ -103,8 +103,7 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CFrmAdminInfo), 
     _pworkingSet(0),
-    // Explicit initialization needed to prevent spurious test emails
-    _testEmail(false),
+    _testEmail(EMAIL_INVALID),
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
     m_report(* new ReportControlWidget(this))
 
@@ -757,6 +756,19 @@ void CFrmAdminInfo::on_lblAssistPassword_clicked()
     ui->lblAssistPassword->setText(text);
 }
 
+void CFrmAdminInfo::updateTmpAdminRec()
+{
+    _tmpAdminRec.setAdminName(ui->lblName->text());
+    _tmpAdminRec.setAdminEmail(ui->lblEmail->text());
+    _tmpAdminRec.setAdminPhone(ui->lblPhone->text());
+    _tmpAdminRec.setPassword(ui->lblPassword->text());
+    _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text());
+    _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
+    _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
+    _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
+    _tmpAdminRec.setDisplayTakeReturnButtons(ui->chkDisplayTakeReturnButtons->isChecked());
+}
+
 void CFrmAdminInfo::on_btnDone_clicked()
 {
     KCB_DEBUG_ENTRY;
@@ -768,16 +780,7 @@ void CFrmAdminInfo::on_btnDone_clicked()
     system(qPrintable("vcgencmd display_power 1"));
 
     // Update the Admin Info and close the dialog - syscontroller needs to switch
-    _tmpAdminRec.setAdminName(ui->lblName->text());
-    _tmpAdminRec.setAdminEmail(ui->lblEmail->text());
-    _tmpAdminRec.setAdminPhone(ui->lblPhone->text());
-    _tmpAdminRec.setPassword(ui->lblPassword->text());
-    _tmpAdminRec.setAssistPassword(ui->lblAssistPassword->text());
-    _tmpAdminRec.setDisplayFingerprintButton(ui->chkDisplayFingerprintButton->isChecked());
-    _tmpAdminRec.setDisplayShowHideButton(ui->chkDisplayShowHideButton->isChecked());
-    _tmpAdminRec.setDisplayPowerDownTimeout(ui->cbDisplayPowerDownTimeout->currentIndex());
-    _tmpAdminRec.setDisplayTakeReturnButtons(ui->chkDisplayTakeReturnButtons->isChecked());
-
+    updateTmpAdminRec();
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
     KCB_DEBUG_EXIT;
@@ -833,12 +836,11 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
            the user can "Save" without closing and then you can enable
            the "Test Email" button once it is saved.
         */
-        if (_testEmail)
+        if (_testEmail == EMAIL_ADMIN_RECV || _testEmail == EMAIL_ADMIN_SEND)
         {
-            emit __OnSendTestEmail(2 /*ADMIN_RECV*/);
-            _testEmail = false;
+            emit __OnSendTestEmail((int) _testEmail);
         }
-
+        _testEmail = EMAIL_INVALID;
     } 
     else 
     {
@@ -854,6 +856,7 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
     {
         emit __OnRequestCurrentAdmin();
     }
+
     KCB_DEBUG_EXIT;
 }
 
@@ -1197,11 +1200,13 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
             lock_items.insert(s.toInt());
         }
         
+        //KCB_DEBUG_TRACE("code1(e)" << pState->getCode1() << "code1(c)" << CEncryption::decryptString(pState->getCode1()));
+
         nCol = 0;
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getLockNums()));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getDescription()));
-        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode1()));
-        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getCode2()));
+        table->setItem(nRow, nCol++, new QTableWidgetItem(CEncryption::decryptString(pState->getCode1())));
+        table->setItem(nRow, nCol++, new QTableWidgetItem(CEncryption::decryptString(pState->getCode2())));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getAccessTime().toString("yyyy-MM-dd HH:mm:ss AP")));
 		
         QByteArray ba = pState->getImage();
@@ -1895,18 +1900,33 @@ void CFrmAdminInfo::OnTabSelected(int index)
     last_index = index;
 }
 
+void CFrmAdminInfo::updateAdminForEmail(EMAIL_ADMIN_SELECT email_select)
+{
+    // Note: the mechanism for sending a test email is as follows:
+    //    1. set the selection type, i.e., send admin test email or send report test email
+    //    2. update the admin settings, i.e., if we changed the admin email or other email related parameters
+    //    3. clear the 'close' variable because we aren't closing the admin screen
+    //    4. update the admin
+    // After the admin update signal is sent, the admin will be updated in the database and a signal issued
+    // which will arrive in at slot OnUpdatedCurrentAdmin.  In OnUpdatedCurrentAdmin, the _testEmail variable
+    // will be checked and if properly set, the appropriate test email will be requested from the system
+    // controller.
+    _testEmail = email_select;
+    _bClose = false;
+    updateTmpAdminRec();
+    emit __UpdateCurrentAdmin(&_tmpAdminRec);
+}
+
 void CFrmAdminInfo::on_btnTestEmail_clicked()
 {
     KCB_DEBUG_TRACE("Testing admin send email");
-    emit __OnSendTestEmail(1 /*ADMIN_SEND*/);
+    updateAdminForEmail(EMAIL_ADMIN_SEND);
 }
 
 void CFrmAdminInfo::on_btnTestUserEmail_clicked()
 {
     KCB_DEBUG_TRACE("Testing admin recv email");
-    _testEmail = true;
-    emit __OnSendTestEmail(2 /*ADMIN_RECV*/);
-    _testEmail = false;
+    updateAdminForEmail(EMAIL_ADMIN_RECV);
 }
 
 void CFrmAdminInfo::OnDisplayFingerprintButton(bool state)

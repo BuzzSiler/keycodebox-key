@@ -1171,9 +1171,9 @@ void CSystemController::OnBrightnessChanged(int nValue)
     }
 }
 
-void CSystemController::OnSendTestEmail(int test_type)
+void CSystemController::OnSendTestEmail(int select_type)
 {
-    KCB_DEBUG_TRACE("Sending Test Email (" << test_type << ")");
+    KCB_DEBUG_TRACE("Sending Test Email (" << select_type << ")");
 
     QString SMTPSvr;
     int SMTPPort;
@@ -1186,7 +1186,7 @@ void CSystemController::OnSendTestEmail(int test_type)
 
     QString body;
     
-    if (test_type == 1 /* ADMIN_SEND */)
+    if (select_type == EMAIL_ADMIN_SEND)
     {
         /* When this button is clicked we will send an email from the account configure in the
         email settings to the email configured in the Administrator tab.
@@ -1206,7 +1206,7 @@ void CSystemController::OnSendTestEmail(int test_type)
 
         body = tr("You have successfully configured the email settings!");
     }
-    else if (test_type == 2 /* ADMIN_RECV */)
+    else if (select_type == EMAIL_ADMIN_RECV)
     {
         /* When this button is clicked we will send an email from test@keycodebox.com to the 
         Administrators email.
@@ -1227,7 +1227,7 @@ void CSystemController::OnSendTestEmail(int test_type)
     }
     else
     {
-        qDebug() << "Invalid test type" << test_type;
+        qDebug() << "Invalid test type" << select_type;
         return;
     }
 

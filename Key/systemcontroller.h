@@ -15,6 +15,7 @@
 #include "fingerprintreader.h"
 #include "dlgfingerprintverify.h"
 #include "frmselectlocks.h"
+#include "kcbcommon.h"
 
 
 class Omnikey5427CKReader;
@@ -203,7 +204,7 @@ public slots:
 signals:
     void __RequestLastSuccessfulLogin(QString locknums);
     void __RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3);
-    void __OnSendTestEmail(int test_type);
+    void __OnSendTestEmail(int select_type);
     
 public slots:
     void RequestLastSuccessfulLogin(QString locknums);
@@ -216,7 +217,7 @@ public slots:
 
     void OnUpdateCodeState(CLockState *rec) { emit __OnUpdateCodeState(rec); }
     void OnUpdatedCodeState(bool bSuccess) { emit __OnUpdatedCodeState(bSuccess); }
-    void OnSendTestEmail(int test_type);
+    void OnSendTestEmail(int select_type);
 
 private slots:
     void OnCodeEntered(QString sCode);

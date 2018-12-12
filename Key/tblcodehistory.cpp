@@ -196,7 +196,6 @@ void CTblCodeHistory::selectLastLockCodeHistorySet(QString &lockNums, QDateTime 
     selectLockCodeHistorySet(lockNums, start, end, pLockHistorySet);
 }
 
-
 bool CTblCodeHistory::tableExists()
 {
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");

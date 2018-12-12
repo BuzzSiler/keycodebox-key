@@ -69,4 +69,7 @@ const QString KCB_IMAGE_PATH = QString("/home/pi/kcb-config/images");
 
 #define REPORT_FILE_FORMAT "yyyy-MM-dd-HH_mm_ss"
 
+
+typedef enum { EMAIL_ADMIN_RECV, EMAIL_ADMIN_SEND, EMAIL_INVALID } EMAIL_ADMIN_SELECT;
+
 #endif
