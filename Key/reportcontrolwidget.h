@@ -46,6 +46,7 @@ class ReportControlWidget : public QWidget
         void on_pbGenerateReport_clicked();
         void on_dtStartDateTime_dateTimeChanged(const QDateTime &dateTime);
         void updateAvailableReports();
+        void on_pbReportUnmountDrive_clicked();
 
     private:
         QDateTime m_report_freq;
@@ -67,7 +68,7 @@ class ReportControlWidget : public QWidget
         bool OneOrMoreReportsSelected();
         void ClearSelectAllReports(Qt::CheckState state);
         void checkInvalidReportStorage();
-        bool ConfirmDisableSafeToFile();
+        bool ConfirmDisableSaveToFile();
 };
 
 #endif // REPORTCONTROLWIDGET_H

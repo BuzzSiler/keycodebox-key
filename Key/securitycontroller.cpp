@@ -126,6 +126,7 @@ void CSecurityController::CheckAccessCodeOne(QString code1)
     _sCode2 = "";       // clear code2
 
     emit __VerifyCodeOne(code1);       // This should cross thread to the _modelSecurity object
+    KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::CheckAccessCodeTwo(QString code2)
@@ -137,6 +138,7 @@ void CSecurityController::CheckAccessCodeTwo(QString code2)
     QString sCodeEnc(CEncryption::encryptString(code2));
 
     emit __VerifyCodeTwo(sCodeEnc);       // This should cross thread to the _modelSecurity object
+    KCB_DEBUG_EXIT;
 }
 
 /**
@@ -241,4 +243,9 @@ void CSecurityController::OnRequestedCurrentAdmin(CAdminRec *admin)
 void CSecurityController::getAllCodes1(QStringList& codes1)
 {
     _modelSecurity.getAllCodes1(codes1);
+}
+
+void CSecurityController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted)
+{
+    _modelSecurity.readAllCodes(lockset, clear_or_encrypted);
 }

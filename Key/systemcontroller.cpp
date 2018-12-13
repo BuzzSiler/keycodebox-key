@@ -22,6 +22,7 @@
 #include "kcbapplication.h"
 #include "omnikey5427ckreader.h"
 #include "keycodeboxsettings.h"
+#include "kcbsystem.h"
 
 static bool fleetwave_enabled;
 
@@ -476,7 +477,7 @@ void CSystemController::OnFingerprintCodeEntered(QString sCode)
 
 void CSystemController::OnFingerprintCodeEnteredTwo(QString sCode)
 {
-    qDebug() << "SystemController::OnFingerprintCodeEnteredTwo:" << sCode;
+    KCB_DEBUG_TRACE("code" << sCode);
 
     //if( _securityController.CheckAccessCodeTwoFingerprint() )
     //  check to see if the directory exists with fingerprintreader class
@@ -489,17 +490,20 @@ void CSystemController::OnFingerprintCodeEnteredTwo(QString sCode)
 
 void CSystemController::OnAdminPasswordEntered(QString sPW)
 {
-    qDebug() << "SystemController::OnAdminPasswordEntered";
+    KCB_DEBUG_ENTRY;
     _securityController.CheckAdminPassword(sPW);
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
+    KCB_DEBUG_ENTRY;
     _padminInfo = adminInfo;
     _bCurrentAdminRetrieved = true;
 
     qDebug() << "CSystemController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(adminInfo);
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnAdminDialogClosed()
@@ -579,6 +583,7 @@ void CSystemController::OnUserCodeCancel()
 void CSystemController::OnOpenLockRequest(QString lockNum)
 {
     KCB_DEBUG_TRACE(lockNum);
+    kcb::TakeAndStorePicture();
     _LockController.openLocks(lockNum);
 }
 
@@ -759,6 +764,10 @@ void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mountedDeviceCount)
 {
     static int lastFoundDeviceCount = 0;
+    
+    // Consider moving the following code that lists folders in /media/pi 
+    // parses the output into kcbsystem.
+    // The function should return a list of folder strings
     std::string listCmd = "ls /media/pi/";
     FILE *cmdF;
     std::string sOutput;
@@ -817,6 +826,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
     {
         strcpy(mountedDevices[0], "");
     }
+
     if( !oldDeviceFound[1] )
     {
         strcpy(mountedDevices[1], "");
@@ -824,6 +834,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
 
     if( (existingDeviceCount > 1) )
     {
+        KCB_DEBUG_TRACE("Existing Device Count" << existingDeviceCount);
         return existingDeviceCount;
     }
 
@@ -834,7 +845,6 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
         {
             strcpy(mountedDevices[i],foundDevices[i]);
             refreshAdminDeviceList = true;
-            lastFoundDeviceCount = foundDeviceCount;
         }
     }
 
@@ -851,7 +861,24 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
     QString device0 = QString::fromStdString(dev0);
     QString device1 = QString::fromStdString(dev1);
 
-    if( refreshAdminDeviceList )
+    //KCB_DEBUG_TRACE("dev0" << device0 << "dev1" << device1);
+
+    // The purpose of this logic is to ensure clients are notified when there is a 
+    // change to the mounted USB drives, i.e., 
+    //  - If a drive is added
+    //  - If a drive is removed
+    bool device_added = foundDeviceCount > lastFoundDeviceCount;
+    bool device_removed = foundDeviceCount < lastFoundDeviceCount;
+    lastFoundDeviceCount = foundDeviceCount;
+
+    //KCB_DEBUG_TRACE("da" << device_added << "dr" << device_removed << "nd" << foundDeviceCount << "lfdc" << lastFoundDeviceCount);
+
+    if (device_added || device_removed)
+    {
+        refreshAdminDeviceList = true;
+    }
+
+    if ( refreshAdminDeviceList )
     {
         emit __OnFoundNewStorageDevice(device0, device1);
     }
@@ -1054,7 +1081,7 @@ void CSystemController::RequestLastSuccessfulLogin(QString locknums)
 
 void CSystemController::sendEmailReport(QDateTime access, QString desc, QString lockNums)
 {
-    qDebug() << "Sending email";
+    KCB_DEBUG_TRACE("Sending email");
 
     QString SMTPSvr = DEFAULT_SMTP_SERVER;
     int SMTPPort = DEFAULT_SMTP_PORT;
@@ -1108,18 +1135,16 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
     }
     if(_bCurrentAdminRetrieved && pLockHistory)
     {
-        qDebug() << "OnLastSuccessfulLoginRequest()";
 
+        QDateTime dtAccess = pLockHistory->getAccessTime();
+        QString sDesc = pLockHistory->getDescription();
+        QString LockNums = pLockHistory->getLockNums();
         QDateTime dtFreq = _padminInfo->getDefaultReportFreq();
 
         if (IS_EVERY_ACTIVITY(dtFreq))
         {
             if (_padminInfo->getReportViaEmail())
-            {
-                QDateTime dtAccess = pLockHistory->getAccessTime();
-                QString sDesc = pLockHistory->getDescription();
-                QString LockNums = pLockHistory->getLockNums();
-                
+            {                
                 sendEmailReport(dtAccess, sDesc, LockNums);
             }
 
@@ -1146,9 +1171,9 @@ void CSystemController::OnBrightnessChanged(int nValue)
     }
 }
 
-void CSystemController::OnSendTestEmail(int test_type)
+void CSystemController::OnSendTestEmail(int select_type)
 {
-    qDebug() << "Sending Test Email (" << test_type << ")";
+    KCB_DEBUG_TRACE("Sending Test Email (" << select_type << ")");
 
     QString SMTPSvr;
     int SMTPPort;
@@ -1161,7 +1186,7 @@ void CSystemController::OnSendTestEmail(int test_type)
 
     QString body;
     
-    if (test_type == 1 /* ADMIN_SEND */)
+    if (select_type == EMAIL_ADMIN_SEND)
     {
         /* When this button is clicked we will send an email from the account configure in the
         email settings to the email configured in the Administrator tab.
@@ -1181,7 +1206,7 @@ void CSystemController::OnSendTestEmail(int test_type)
 
         body = tr("You have successfully configured the email settings!");
     }
-    else if (test_type == 2 /* ADMIN_RECV */)
+    else if (select_type == EMAIL_ADMIN_RECV)
     {
         /* When this button is clicked we will send an email from test@keycodebox.com to the 
         Administrators email.
@@ -1202,7 +1227,7 @@ void CSystemController::OnSendTestEmail(int test_type)
     }
     else
     {
-        qDebug() << "Invalid test type" << test_type;
+        qDebug() << "Invalid test type" << select_type;
         return;
     }
 
@@ -1213,4 +1238,9 @@ void CSystemController::OnSendTestEmail(int test_type)
 void CSystemController::getAllCodes1(QStringList& codes1)
 {
     _securityController.getAllCodes1(codes1);
+}
+
+void CSystemController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted)
+{
+    _securityController.readAllCodes(lockset, clear_or_encrypted);
 }

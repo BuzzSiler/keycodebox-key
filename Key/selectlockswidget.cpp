@@ -40,14 +40,13 @@ void SelectLocksWidget::setLocks(QString locks)
     Q_ASSERT(m_role == USER);
     Q_ASSERT(locks != "");
 
-    // qDebug() << "Locks:" << locks;
+    KCB_DEBUG_TRACE("Locks:" << locks);
 
     m_lock_cab.disableAllLocks();
     m_lock_cab.setEnabledLocks(locks);
 
     ui->lstSelectedLocks->clear();
-
-    ui->btnOpenSelected->setEnabled(locks.length() > 0 ? true : false);
+    ui->btnOpenSelected->setEnabled(false);
 }
 
 QString SelectLocksWidget::getLocks()

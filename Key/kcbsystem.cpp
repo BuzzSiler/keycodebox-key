@@ -6,6 +6,10 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QFileInfo>
+#include <QImage>
+#include <QBuffer>
+#include <QDir>
+#include <QFile>
 #include "kcbcommon.h"
 
 namespace kcb
@@ -33,6 +37,11 @@ namespace kcb
         stdOut = proc.readAllStandardOutput();
         stdErr = proc.readAllStandardError();
         status = proc.exitStatus();
+
+        if (status == QProcess::CrashExit)
+        {
+            KCB_DEBUG_TRACE(QString("%1 crashed").arg(program));
+        }
     }
 
     void GetRpiSerialNumber(QString& serial_number)
@@ -294,7 +303,13 @@ namespace kcb
 
     void UnmountUsb(QString path)
     {
-        std::system(QString("umount %1").arg(path).toStdString().c_str());
+        // QDir::toNativeSeparators() is supposed to escape spaces in paths but it doesn't seem to
+        // Using replace instead
+        path = path.replace(" ", "\\ ");
+        // Note: -l is needed to unmount while there may be components attached to the drive
+        // Per umount help,
+        //      -l, --lazy : detach the filesystem now, clean up things later
+        std::system(QString("umount -l %1").arg(path).toStdString().c_str());
     }
 
     void Reboot()
@@ -303,4 +318,119 @@ namespace kcb
         std::system("sudo shutdown -r now");
     }
 
+    void TakeAndStorePicture(QString filename)
+    {
+        if (HasCamera())
+        {
+            if (filename.isEmpty())
+            {
+                filename = QString("temp_%1.jpg").arg(QDate::currentDate().toString("yyyy-MM-dd"));
+                KCB_DEBUG_TRACE("Taking/Storing image:" << filename);
+            }
+
+            QString path = QString("%1/%2").arg(KCB_IMAGE_PATH).arg(filename);
+			if (QFile::exists(path))
+			{
+				KCB_DEBUG_TRACE(path << "exists" << "no picture taken");
+				return;
+			}
+			
+            // Issue the command to take a picture: raspistill
+            // raspistill -n -w 320 -h 240 -q 50 -o <path to image files> 
+            // -n no preview
+			// -t timeout 1 second
+			//     Note: the help says timeout is in milliseconds, but timeing tests
+			//           show that it is seconds.  The default timeout is 5 seconds.
+            // -w image width
+            // -h image height
+            // -q jpeg quality (0 .. 100)
+            // -o <path to image files>
+            //  & Run in background
+            std::system(QString("raspistill -n -t 1 -w 160 -h 120 -q 50 -o %1").arg(path).toStdString().c_str());
+        }
+    }
+
+    bool HasCamera()
+    {
+        // Issuing: vcgencmd get_camera
+        // Outputs: supported=x detected=y, where x and y will be either 0 or 1
+        // Typically: 
+        //    supported=0 detected=0 means the camera is not connected or connected and not configured
+        //    supported=1 detected=1 means the camera is connected and configured
+        // There should not be any case where the camera is conected but not configured or not connected and configured;
+        // however, such occurrences will be logged
+
+        QString stdOut;
+        QString stdErr;
+        int status;
+
+        ExecuteCommand(QString("vcgencmd"), QStringList() << QString("get_camera"), stdOut, stdErr, status);
+
+        if (status == QProcess::CrashExit)
+        {
+            return false;
+        }
+
+        if (!stdOut.isEmpty())
+        {
+            QString trimmed = stdOut.trimmed();
+            bool equals = trimmed == "supported=1 detected=1";
+            KCB_DEBUG_TRACE(trimmed << equals);
+            if (trimmed == "supported=1 detected=1")
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    QByteArray GetImageAsByteArray(QString filename, bool delete_file)
+    {
+        QString path;
+
+        //KCB_DEBUG_TRACE("filename" << filename);
+        if (filename.isEmpty())
+        {            
+            // Find a file with format: temp_<datetime>.jpg
+            QDir dir(KCB_IMAGE_PATH);
+            QStringList name_filters;
+            name_filters << QString("temp_%1.jpg").arg(QDate::currentDate().toString("yyyy-MM-dd"));
+            QFileInfoList fil = dir.entryInfoList(name_filters, QDir::NoDotAndDotDot|QDir::Files);
+            fil = dir.entryInfoList(name_filters, QDir::NoDotAndDotDot|QDir::Files);
+            KCB_DEBUG_TRACE("num files" << fil.count());
+
+            if (fil.count() > 0)
+            {
+                filename = fil[0].fileName();
+                KCB_DEBUG_TRACE("filename" << filename);
+            }
+			else
+			{
+				KCB_DEBUG_TRACE("failed to locate image file");
+				// Consider using a default image
+				return QByteArray();
+			}
+        }
+
+        path = QString("%1/%2").arg(KCB_IMAGE_PATH).arg(filename);
+
+        QFile file(path);
+        if (!file.open(QIODevice::ReadOnly)) 
+        {
+            KCB_DEBUG_TRACE("unable to open" << path);
+            return QByteArray();
+        }
+        QByteArray ba = file.readAll();
+
+        if (delete_file)
+        {       
+            if (QFile::exists(path))
+            {
+                QFile::remove(path);
+            }
+        }
+
+        return ba;
+    }
 }

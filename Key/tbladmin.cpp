@@ -38,244 +38,7 @@ const char *freportdirectory = "report_directory";
 const char *fdisplaypowerdown = "display_power_down_timeout";
 const char *freportdeletion = "report_deletion";
 
-CAdminRec::CAdminRec() : 
-    QObject(nullptr),
-    default_report_freq(*new QDateTime(NEVER)),
-    default_report_start(*new QDateTime(DEFAULT_DATE_TIME)),
-    default_report_delete_freq(*new QDateTime(MONTHLY))
-{
-    ids = -1;
-    admin_name = "";
-    admin_email = "";
-    admin_phone = "";
-
-    password = "";
-    assist_password = "";
-    max_locks = 32;
-
-    show_fingerprint = false;
-    show_password = false;
-    show_takereturn = false;
-    smtp_server = "";
-    smtp_port = 0;
-    smtp_type = 0; // 0=TCP, 1=SSL, 2=TSL
-    smtp_username = "";
-    smtp_password = "";
-    vnc_server = "";
-    vnc_port = 0;
-    vnc_type = 0; // 0=TCP, 1=SSL, 2=TSL
-    vnc_username = "";
-    vnc_password = "";
-
-    report_via_email = false;
-    report_save_to_file = false;
-    report_directory = "";
-
-    display_power_down_timeout = 0;
-}
-
-CAdminRec &CAdminRec::operator=(CAdminRec &newRec) 
-{
-    ids = newRec.ids;
-    admin_name = newRec.admin_name;
-    admin_email = newRec.admin_email;
-    admin_phone = newRec.admin_phone;
-    default_report_freq = newRec.default_report_freq;
-    default_report_start = newRec.default_report_start;
-    password = newRec.password;
-    assist_password = newRec.assist_password;
-    max_locks = newRec.max_locks;
-
-    show_fingerprint = newRec.show_fingerprint;
-    show_password = newRec.show_password;
-    show_takereturn = newRec.show_takereturn;
-    smtp_server = newRec.smtp_server;
-    smtp_port = newRec.smtp_port;
-    smtp_type = newRec.smtp_type;
-    smtp_username = newRec.smtp_username;
-    smtp_password = newRec.smtp_password;
-
-    vnc_port = newRec.vnc_port;
-    vnc_password = newRec.vnc_password;
-
-    report_via_email = newRec.report_via_email;
-    report_save_to_file = newRec.report_save_to_file;
-    report_directory = newRec.report_directory;
-
-    display_power_down_timeout = newRec.display_power_down_timeout;
-
-    default_report_delete_freq = newRec.default_report_delete_freq;
-
-    return *this;
-}
-
-
-QJsonObject& CAdminRec::jsonRecord(QJsonObject &json)
-{
-    json.insert(fid, QJsonValue(ids));
-    json.insert(fname, QJsonValue(admin_name));
-    json.insert(femail, QJsonValue(admin_email)); // text,
-    json.insert(fphone, QJsonValue(admin_phone)); // text,
-
-    json.insert(ffreq, QJsonValue(default_report_freq.toString(DATETIME_FORMAT)));
-    json.insert(fstart, QJsonValue(default_report_start.toString(DATETIME_FORMAT)));    // DATETIME,
-    json.insert(fpassword, QJsonValue(password));    // text,
-    json.insert(fassistpassword, QJsonValue(assist_password)); //text
-    json.insert(fshowFingerprint, QJsonValue(show_fingerprint));
-    json.insert(fshowPassword, QJsonValue(show_password));
-    json.insert(fshowTakeReturn, QJsonValue(show_takereturn));
-    json.insert(fmaxlocks, QJsonValue((int)max_locks));
-
-    // remote desktop
-    json.insert(fvncport, QJsonValue(vnc_port));
-    json.insert(fvncpassword, QJsonValue(vnc_password));
-
-    json.insert(fsmtpserver, QJsonValue(smtp_server));
-    json.insert(fsmtpport, QJsonValue(smtp_port));
-    json.insert(fsmtptype, QJsonValue(smtp_type));
-    json.insert(fsmtpusername, QJsonValue(smtp_username));
-    json.insert(fsmtppassword, QJsonValue(smtp_password));
-
-    json.insert(freportviaemail, QJsonValue(report_via_email));
-    json.insert(freporttofile, QJsonValue(report_save_to_file));
-    json.insert(freportdirectory, QJsonValue(report_directory));
-    json.insert(freportdeletion, QJsonValue(default_report_delete_freq.toString(DATETIME_FORMAT)));
-
-    return json;
-}
-
-// QString CAdminRec::jsonRecordAsString()
-// {
-//     QJsonObject jsonObj;
-//     jsonObj = this->jsonRecord(jsonObj);
-//     QJsonDocument doc(jsonObj);
-//     QString str(doc.toJson(QJsonDocument::Compact));
-//     return str;
-// }
-
-bool CAdminRec::setFromJsonObject(QJsonObject jsonObj)
-{
-    try {
-    //    ids = jsonObj.value(fid).toInt();
-        if(!jsonObj.value(fname).isUndefined())
-        {
-            admin_name = jsonObj.value(fname).toString();
-        }
-        if(!jsonObj.value(femail).isUndefined())
-        {
-            admin_email = jsonObj.value(femail).toString();
-        }
-        if(!jsonObj.value(fphone).isUndefined())
-        {
-            admin_phone = jsonObj.value(fphone).toString();
-        }
-        if(!jsonObj.value(ffreq).isUndefined())
-        {            
-            default_report_freq.fromString(jsonObj.value(ffreq).toString(), "yyyy-MM-dd HH:mm:ss");
-        }        
-        if(!jsonObj.value(fstart).isUndefined())
-        {            
-            default_report_start.fromString(jsonObj.value(fstart).toString(), "yyyy-MM-dd HH:mm:ss");
-        }        
-        if(!jsonObj.value(fpassword).isUndefined())
-        {            
-            password = jsonObj.value(fpassword).toString();
-        }        
-        if(!jsonObj.value(fassistpassword).isUndefined())
-        {            
-            assist_password = jsonObj.value(fassistpassword).toString();
-        }        
-        if(!jsonObj.value(fshowFingerprint).isUndefined())
-        {            
-            show_fingerprint = jsonObj.value(fshowFingerprint).toBool();
-        }        
-        if(!jsonObj.value(fshowPassword).isUndefined())
-        {            
-            show_password = jsonObj.value(fshowPassword).toBool();
-        }        
-        if(!jsonObj.value(fshowTakeReturn).isUndefined())
-        {
-            show_takereturn = jsonObj.value(fshowTakeReturn).toBool();
-        }
-        if(!jsonObj.value(fmaxlocks).isUndefined())
-        {            
-            max_locks = jsonObj.value(fmaxlocks).toInt();
-        }        
-        if(!jsonObj.value(fsmtpserver).isUndefined())
-        {            
-            smtp_server = jsonObj.value(fsmtpserver).toString();
-        }        
-        if(!jsonObj.value(fsmtpport).isUndefined())
-        {            
-            smtp_port = jsonObj.value(fsmtpport).toInt();
-        }        
-        if(!jsonObj.value(fsmtpusername).isUndefined())
-        {            
-            smtp_username = jsonObj.value(fsmtpusername).toString();
-        }        
-        if(!jsonObj.value(fsmtppassword).isUndefined())
-        {            
-            smtp_password = jsonObj.value(fsmtppassword).toString();
-        }        
-        if(!jsonObj.value(fvncport).isUndefined())
-        {            
-            vnc_port = jsonObj.value(fvncport).toInt();
-        }        
-        if(!jsonObj.value(fvncpassword).isUndefined())
-        {        
-            vnc_password = jsonObj.value(fvncpassword).toString();
-        }        
-        if(!jsonObj.value(freportviaemail).isUndefined())
-        {
-            report_via_email = jsonObj.value(freportviaemail).toBool();
-        }        
-        if(!jsonObj.value(freporttofile).isUndefined())
-        {            
-            report_save_to_file = jsonObj.value(freporttofile).toBool();
-        }        
-        if(!jsonObj.value(freportdirectory).isUndefined())
-        {
-            report_directory = jsonObj.value(freportdirectory).toString();
-        }
-
-        // Add power down and report deletion
-    } catch(std::exception &e)
-    {
-        qDebug() << "CAdminRec::setFromJsonObject()" << e.what();
-    }
-
-    return true;
-}
-
-/**
- * @brief CAdminRec::setFromJsonString
- * @param strJson - must be an object "{}"
- * @return
- */
-bool CAdminRec::setFromJsonString(QString strJson)
-{
-    QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
-    // check validity of the document
-    if(!doc.isNull())
-    {
-        if(doc.isObject())
-        {
-            setFromJsonObject(doc.object());
-        }
-        else
-        {
-            qDebug() << "Document is not an object" << endl;
-            return false;
-        }
-    }
-    else
-    {
-        qDebug() << "Invalid JSON...\n" << strJson << endl;
-        return false;
-    }
-
-    return true;
-}
+static const QString VERSION = "1.0";
 
 CTblAdmin::CTblAdmin(QSqlDatabase *db)
 {
@@ -336,7 +99,8 @@ bool CTblAdmin::createTable()
                 " smtp_server text, smtp_port text, smtp_type text, smtp_username text, smtp_password text,"
                 " vnc_port text, vnc_password text,"
                 " report_via_email text, report_to_file text, report_directory text, display_power_down_timeout integer,"
-                " report_deletion DATETIME)";
+                " report_deletion DATETIME,"
+                " version)";
 
         qry.prepare( sql );
 
@@ -369,7 +133,7 @@ void CTblAdmin::currentTimeFormat(QString format, QString strBuffer, int nExpect
 
 bool CTblAdmin::createAdminDefault()
 {
-    qDebug() << "CTblAdmin::createAdminDefault()";
+    KCB_DEBUG_ENTRY;
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("INSERT OR IGNORE INTO ") + TABLENAME +
@@ -381,7 +145,7 @@ bool CTblAdmin::createAdminDefault()
                             "smtp_server, smtp_port, smtp_type, smtp_username, smtp_password, "
                             "report_via_email, report_to_file, report_directory, "
                             "vnc_port, vnc_password, display_power_down_timeout, "
-                            "report_deletion)"
+                            "report_deletion, version)"
                   " VALUES ('admin', "
                             "'admin@email.com', '555.555.5555', :freq, "
                             ":start, :pw, "
@@ -389,7 +153,8 @@ bool CTblAdmin::createAdminDefault()
                             "32, "
                             ":smtp_server, :smtp_port, :smtp_type, :smtp_username, :smtp_password, "
                             "1, 0, '', "
-                            "5901, 'vnc_password', 0, :deletion)");
+                            "5901, ':vnc_password', 0, :deletion,"
+                            ":version)");
     qry.prepare(sql);
 
     qDebug() << "SQL:" << sql;
@@ -422,6 +187,7 @@ bool CTblAdmin::createAdminDefault()
     qry.bindValue(":smtp_username", "kcb@keycodebox.com");
     qry.bindValue(":smtp_password", encSMTPPW);
     qry.bindValue(":vnc_password", encVNCPW);
+    qry.bindValue(":version", VERSION);
 
     if( !qry.exec() ) 
     {
@@ -782,6 +548,91 @@ bool CTblAdmin::tableExists()
     return false;
 }
 
+bool CTblAdmin::columnExists(QString column)
+{
+    KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    
+    QStringList::iterator  itor;
+    QSqlQuery qry(*_pDB);
+    bool foundColumn = false;
+
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+
+    if( _pDB && _pDB->isOpen() )
+    {
+        QString sql("PRAGMA TABLE_INFO(admin);");
+
+        qry.prepare( sql );
+
+        if( qry.exec() )
+        {
+            while( qry.next() )
+            {
+                if( qry.value(1).toString().compare(column) == 0 )
+                {
+                    KCB_DEBUG_TRACE("found column: " << column);
+
+                    foundColumn = true;
+                    break;
+                }
+            }
+        }
+        else
+            qDebug() << qry.lastError();
+
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
+    }
+    return foundColumn;
+}
+
+void CTblAdmin::createColumn(QString column, QString fieldType, QString value)
+{
+    KCB_DEBUG_ENTRY;
+
+    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+    
+    if( _pDB && _pDB->isOpen() ) 
+    {
+        KCB_DEBUG_TRACE("Creating table");
+        QSqlQuery qry(*_pDB);
+
+        QString sql("ALTER TABLE  ");
+        sql += TABLENAME;
+        sql += " ADD ";
+        sql += column;
+        sql += " ";
+        sql += fieldType;
+        sql += " ";
+        sql += QString("DEFAULT '%1' NOT NULL").arg(value);
+
+        qry.prepare( sql );
+
+        if( !qry.exec() )
+        {
+            qDebug() << qry.lastError();
+        }
+        else
+        {
+            qDebug() << "Table altered!";
+        }
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
+    }
+}
+
 void CTblAdmin::initialize()
 {
     if(!tableExists())
@@ -790,6 +641,11 @@ void CTblAdmin::initialize()
     }
     if(tableExists())
     {
+        if (!columnExists(QString("version")))
+        {            
+            createColumn(QString("version"), QString("text"), VERSION);
+        }
+
         if( !readAdmin() ) {
             if( createAdminDefault() ) {
                 readAdmin();

@@ -67,9 +67,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>50</x>
       <y>80</y>
-      <width>261</width>
+      <width>211</width>
       <height>31</height>
      </rect>
     </property>
@@ -83,7 +83,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>320</x>
+      <x>310</x>
       <y>80</y>
       <width>111</width>
       <height>31</height>
@@ -122,9 +122,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>50</x>
       <y>120</y>
-      <width>171</width>
+      <width>211</width>
       <height>31</height>
      </rect>
     </property>
@@ -139,9 +139,9 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>260</y>
+      <y>280</y>
       <width>101</width>
-      <height>41</height>
+      <height>35</height>
      </rect>
     </property>
     <property name="text">
@@ -155,9 +155,9 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>210</y>
+      <y>240</y>
       <width>101</width>
-      <height>41</height>
+      <height>35</height>
      </rect>
     </property>
     <property name="text">
@@ -209,9 +209,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>260</x>
       <y>120</y>
-      <width>231</width>
+      <width>211</width>
       <height>31</height>
      </rect>
     </property>
@@ -223,9 +223,9 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>310</y>
+      <y>330</y>
       <width>101</width>
-      <height>41</height>
+      <height>35</height>
      </rect>
     </property>
     <property name="text">
@@ -239,13 +239,29 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>360</y>
+      <y>370</y>
       <width>101</width>
-      <height>41</height>
+      <height>35</height>
      </rect>
     </property>
     <property name="text">
      <string>Clear All</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbReportUnmountDrive">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>200</y>
+      <width>101</width>
+      <height>35</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Unmount</string>
     </property>
    </widget>
   </widget>
@@ -269,9 +285,9 @@
    <widget class="QDateTimeEdit" name="dtReportStart">
     <property name="geometry">
      <rect>
-      <x>135</x>
+      <x>141</x>
       <y>40</y>
-      <width>207</width>
+      <width>201</width>
       <height>41</height>
      </rect>
     </property>
@@ -292,9 +308,9 @@
    <widget class="QDateTimeEdit" name="dtReportEnd">
     <property name="geometry">
      <rect>
-      <x>135</x>
+      <x>141</x>
       <y>100</y>
-      <width>207</width>
+      <width>201</width>
       <height>41</height>
      </rect>
     </property>
@@ -402,7 +418,7 @@
      <rect>
       <x>8</x>
       <y>40</y>
-      <width>121</width>
+      <width>131</width>
       <height>41</height>
      </rect>
     </property>
@@ -413,9 +429,9 @@
    <widget class="QComboBox" name="cbFrequency">
     <property name="geometry">
      <rect>
-      <x>135</x>
+      <x>141</x>
       <y>40</y>
-      <width>207</width>
+      <width>201</width>
       <height>41</height>
      </rect>
     </property>
@@ -453,9 +469,9 @@
    <widget class="QDateTimeEdit" name="dtStartDateTime">
     <property name="geometry">
      <rect>
-      <x>135</x>
+      <x>141</x>
       <y>100</y>
-      <width>207</width>
+      <width>201</width>
       <height>41</height>
      </rect>
     </property>

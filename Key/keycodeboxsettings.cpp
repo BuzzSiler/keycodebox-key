@@ -28,7 +28,7 @@ void KeyCodeBoxSettings::JsonFromFile()
     file.setFileName(m_filename);
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     val = file.readAll();
-    KCB_DEBUG_TRACE(val);
+    //KCB_DEBUG_TRACE(val);
     file.close();
     doc = QJsonDocument::fromJson(val.toUtf8());
     m_json_obj = doc.object();

@@ -265,7 +265,7 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
     KCB_DEBUG_ENTRY;
     if(!_pfUsercode)
     {
-        qDebug() << "MainWindow::OnDisplayCodeDialog(): new CFrmUserCode";
+        KCB_DEBUG_TRACE("new CFrmUserCode");
         _pfUsercode = new CFrmUserCode();
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
@@ -308,16 +308,14 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
     }
     else
     {
+        KCB_DEBUG_TRACE("hiding all forms except user code");
         hideFormsExcept(_pfUsercode);
 
         disconnect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, 0);
         connect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, SLOT(OnCodeEntered(QString)));
 
-        disconnect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, 0);
+        disconnect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, 0);        
         connect(_pfUsercode, SIGNAL(__FingerprintCodeEntered(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
-
-        qDebug() << "MainWindow::OnDisplayCodeDialog()";
-
     }
     _pfUsercode->SetDisplayFingerprintButton(_psystemController->getDisplayFingerprintButton());
     _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());
@@ -371,7 +369,7 @@ void MainWindow::hideFormsExcept(QDialog * pfrm)
     }
     if(_pfUsercode && _pfUsercode != pfrm)
     {
-        _pfUsercode->SetDisplayCodeEntryControls(false);        
+        _pfUsercode->SetDisplayCodeEntryControls(false);   
         _pfUsercode->hide();
     }
     pfrm->activateWindow();

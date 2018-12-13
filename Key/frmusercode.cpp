@@ -1,17 +1,18 @@
+#include "frmusercode.h"
+#include "ui_frmusercode.h"
+
 #include <QDebug>
 #include <QLineEdit>
 #include <QDateTime>
 #include <QMessageBox>
 #include <QCheckBox>
-#include "frmusercode.h"
-#include "ui_frmusercode.h"
-#include "hidreader.h"
-#include <libfprint/fprint.h>
-#include "dlgfingerprint.h"
+#include <QMouseEvent>
+
+#include "keycodeboxsettings.h"
 #include "version.h"
 #include "kcbcommon.h"
 #include "kcbapplication.h"
-#include "keycodeboxsettings.h"
+
 
 static bool fleetwave_enabled;
 
@@ -357,7 +358,7 @@ void CFrmUserCode::show()
 
 void CFrmUserCode::SetDisplayTakeReturnButtons(bool state)
 {
-    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;    
     KCB_DEBUG_TRACE("TakeReturn state" << state);
     m_takereturn_state = state;
     ui->pbTake->setEnabled(state);

@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QByteArray>
 
 
 namespace kcb
@@ -19,5 +20,8 @@ namespace kcb
     bool UpdateAppFile(QString filename_fq);
     void UnmountUsb(QString path);
     void Reboot();
+    void TakeAndStorePicture(QString filename="");
+    bool HasCamera();
+    QByteArray GetImageAsByteArray(QString filename="", bool delete_file=true);
 }
 #endif // KCBSYSTEM_H

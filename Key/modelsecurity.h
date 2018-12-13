@@ -18,7 +18,7 @@ class CModelSecurity : public QObject
         explicit CModelSecurity(QObject *parent = 0);    
         ~CModelSecurity();
         void getAllCodes1(QStringList& codes1);
-
+        void readAllCodes(CLockSet **lockset, bool clear_or_encrypted);
 
     signals:
         void __QuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3);

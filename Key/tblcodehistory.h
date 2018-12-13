@@ -3,6 +3,7 @@
 
 #include <QtSql>
 #include <QtDebug>
+#include <QByteArray>
 #include "lockstate.h"
 #include "lockhistoryrec.h"
 #include "lockhistoryset.h"
@@ -16,23 +17,9 @@ class CTblCodeHistory
 
         bool addLockCodeHistory(CLockHistoryRec &lockHistoryRec);
 
-        bool addLockCodeHistory(QString locknums, QString code1, QString code2,
-                        QString accessSelection,
-                        QDateTime starttime, QDateTime endtime, int maxAccess,
-                        QString status, QString desc, QString sequence, int sequenceNum,
-                        int maxRetry, QDateTime accesstime,
-                        bool adminNotificationSent, QString userNotificationEmail,
-                        bool userNotificationSent);
 
         bool addLockCodeHistoryWithAnswers(CLockHistoryRec &lockHistoryRec, QString answer1, QString answer2, QString answer3);
 
-        bool addLockCodeHistoryWithAnswers(QString locknums, QString code1, QString code2,
-                        QString accessSelection,
-                        QDateTime starttime, QDateTime endtime, int maxAccess,
-                        QString status, QString desc, QString sequence, int sequenceNum,
-                        int maxRetry, QDateTime accesstime,
-                        bool adminNotificationSent, QString userNotificationEmail,
-                        bool userNotificationSent, QString answer1, QString answer2, QString answer3);
 
         void currentTimeFormat(QString format, QString strBuffer, int nExpectedLength);
 
@@ -70,6 +57,20 @@ class CTblCodeHistory
 
         void execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistorySet **pLockHistorySet);
 
+        bool addLockCodeHistory(QString locknums, QString code1, QString code2,
+                        QString accessSelection,
+                        QDateTime starttime, QDateTime endtime, int maxAccess,
+                        QString status, QString desc, QString sequence, int sequenceNum,
+                        int maxRetry, QDateTime accesstime,
+                        bool adminNotificationSent, QString userNotificationEmail,
+                        bool userNotificationSent, QByteArray image);
+        bool addLockCodeHistoryWithAnswers(QString locknums, QString code1, QString code2,
+                        QString accessSelection,
+                        QDateTime starttime, QDateTime endtime, int maxAccess,
+                        QString status, QString desc, QString sequence, int sequenceNum,
+                        int maxRetry, QDateTime accesstime,
+                        bool adminNotificationSent, QString userNotificationEmail,
+                        bool userNotificationSent, QString answer1, QString answer2, QString answer3, QByteArray image);
 };
 
 #endif // CTBLCODEHISTORY_H

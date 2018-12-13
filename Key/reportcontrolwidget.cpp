@@ -9,6 +9,7 @@
 #include "kcbcommon.h"
 #include "checkablestringlistmodel.h"
 #include "dlgdownloadreports.h"
+#include "kcbsystem.h"
 
 static const QString DEFAULT_REPORT_DIRECTORY = QString("/home/pi/kcb-config/reports");
 
@@ -72,7 +73,7 @@ void ReportControlWidget::setValues(CAdminRec& adminInfo)
 
     m_report_directory = m_curr_report_directory = adminInfo.getReportDirectory();
 
-    // If the report directory is empty, then we are no storing report to files
+    // If the report directory is empty, then we are not storing report to files
     // If the report directory is the default directory, then we are storing reports to the default directory
     // If the report directory is not empty and not the default directory then we are storing reports to a USB drive
     bool dir_empty = m_curr_report_directory.isEmpty();
@@ -141,7 +142,7 @@ void ReportControlWidget::getValues(CAdminRec& adminInfo)
     if (ui->cbSaveToFile->isChecked())
     {
         int index = ui->cbDeleteOlderThan->currentIndex();
-        Q_ASSERT_X(index >= 0 && index <= m_delete_freq.count(), Q_FUNC_INFO, "delete frequency index out of range");
+        Q_ASSERT_X(index >= 0 && index <= m_delete_frequencies.count(), Q_FUNC_INFO, "delete frequency index out of range");
         deleteFreq = m_delete_frequencies[index];
     }
     KCB_DEBUG_TRACE(m_delete_freq.toString());
@@ -163,6 +164,14 @@ void ReportControlWidget::OnNotifyUsbDrive(QStringList drives)
 {
     // KCB_DEBUG_ENTRY;
     m_usb_drives = drives;
+    KCB_DEBUG_TRACE("drives" << m_usb_drives);
+
+    if (m_usb_drives.count() == 0)
+    {
+        ui->cbUsbDrives->clear();
+        ui->cbUsbDrives->addItem(tr("DEFAULT"));
+    }
+
     updateUi();
     // KCB_DEBUG_EXIT;
 }
@@ -243,7 +252,7 @@ void ReportControlWidget::checkInvalidReportStorage()
     }
 }
 
-bool ReportControlWidget::ConfirmDisableSafeToFile()
+bool ReportControlWidget::ConfirmDisableSaveToFile()
 {
     bool confirmed = true;
 
@@ -289,10 +298,10 @@ void ReportControlWidget::on_cbSaveToFile_clicked()
     }
     else
     {
-        bool confirmed = ConfirmDisableSafeToFile();
+        bool confirmed = ConfirmDisableSaveToFile();
         if (confirmed)
         {
-            m_curr_report_directory = "None";
+            m_curr_report_directory = "";
             checkInvalidReportStorage();
         }
         else
@@ -311,7 +320,7 @@ void ReportControlWidget::on_cbStoreToUsbDrive_clicked()
     {
         ui->cbUsbDrives->clear();
         ui->cbUsbDrives->addItems(m_usb_drives);
-        ui->cbUsbDrives->setCurrentIndex(0);
+        ui->cbUsbDrives->setCurrentIndex(0);    
     }
     else
     {
@@ -588,6 +597,7 @@ void ReportControlWidget::updateUi()
     ui->cbDeleteOlderThan->setEnabled(store_file_enabled);
     ui->cbStoreToUsbDrive->setEnabled(store_usb_enabled);
     ui->cbUsbDrives->setEnabled(store_usb_enabled && ui->cbStoreToUsbDrive->isChecked());
+    ui->pbReportUnmountDrive->setEnabled(store_usb_enabled && ui->cbStoreToUsbDrive->isChecked());
 
     // KCB_DEBUG_TRACE(m_curr_report_directory);
     bool dir_empty = m_curr_report_directory.isEmpty();
@@ -615,4 +625,16 @@ void ReportControlWidget::updateUi()
     ui->pbDownloadSelectedReports->setEnabled(!ui->cbStoreToUsbDrive->isChecked() && one_or_more_selected);
 
     // KCB_DEBUG_EXIT;
+}
+
+void ReportControlWidget::on_pbReportUnmountDrive_clicked()
+{
+    KCB_DEBUG_ENTRY;
+    ui->lvAvailableReports->setModel(nullptr);
+    m_lv_model.disconnect();
+    KCB_DEBUG_TRACE("Unmounting");
+    kcb::UnmountUsb(ui->cbUsbDrives->currentText());
+    ui->cbStoreToUsbDrive->setChecked(false);
+    updateUi();
+    KCB_DEBUG_EXIT;
 }

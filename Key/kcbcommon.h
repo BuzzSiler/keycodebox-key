@@ -6,7 +6,6 @@
 #include <QDebug>
 #include <QObject>
 
-
 #define MAX_NUM_LOCKS_PER_CABINET 32
 
 
@@ -16,8 +15,11 @@
 // Debug Macros
 #define KCB_DEBUG_ENTRY qDebug() << Q_FUNC_INFO << "ENTRY"
 #define KCB_DEBUG_EXIT qDebug() << Q_FUNC_INFO << "EXIT"
+
 #define KCB_DEBUG_TRACE(text)   qDebug() << Q_FUNC_INFO << text
 #define KCB_WARNING_TRACE(text)   qWarning() << Q_FUNC_INFO << text
+#define KCB_CRITICAL_TRACE(text)   qCritical() << Q_FUNC_INFO << text
+#define KCB_FATAL_TRACE(text)   qFatal() << Q_FUNC_INFO << text
 
 #define DATETIME_FORMAT QStringLiteral("yyyy-MM-dd HH:mm:ss")
 
@@ -62,5 +64,12 @@ const QString USER_CODE_TAKE_RETURN_PROMPT = QString("<%1>").arg(QObject::tr("Se
 const QString USER_CODE_FLEETWAVE_PROMPT = QString("<%1>").arg(QObject::tr("Please Present Your Card"));
 const QString USER_CODE_PROMPT = QString("<%1 #1>").arg(QObject::tr("Please Enter Code"));
 const QString USER_CODE_CODE2_PROMPT = QString("<%1>").arg(QObject::tr("Please Enter Second Code"));
+
+const QString KCB_IMAGE_PATH = QString("/home/pi/kcb-config/images");
+
+#define REPORT_FILE_FORMAT "yyyy-MM-dd-HH_mm_ss"
+
+
+typedef enum { EMAIL_ADMIN_RECV, EMAIL_ADMIN_SEND, EMAIL_INVALID } EMAIL_ADMIN_SELECT;
 
 #endif
