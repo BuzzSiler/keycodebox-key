@@ -42,6 +42,7 @@
 #include "codeelement.h"
 #include "codeexporter.h"
 #include "codeimporter.h"
+#include "logger.h"
 
 
 #define ADMIN_TAB_INDEX (0)
@@ -654,14 +655,26 @@ void CFrmAdminInfo::insertCodes(CodeListing& codeListing)
             code2 = CEncryption::decryptString(code2);
         }
 
+        // Check if the code has been designated as a fingerprint
+        bool code1_fp = false;
+        bool code2_fp = false;
+        if (code1.toLower() == "fingerprint")
+        {
+            code1_fp = true;
+        }
+        if (code2.toLower() == "fingerprint")
+        {
+            code2_fp = true;
+        }
+
         _pState = createNewLockState();
         setPStateValues(code->locks(), 
                         code1, 
                         code2, 
                         code->username(),
                         starttime, 
-                        endtime, 
-                        false, false,
+                        endtime,
+                        code1_fp, code2_fp,
                         code->askquestion(), 
                         code->question1(), 
                         code->question2(), 
@@ -2178,12 +2191,20 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
         case UTIL_ACTION_EXPORT_LOGS:
             {
                 // Copy the log file from /home/pi/kcb-config/logs/messages.log to USB drive
-                QString source("/home/pi/kcb-config/logs/stderr.log");
-                QString target(QString("%1/messages_%2.log").arg(ui->cbUsbDrives->currentText()).arg(QDateTime::currentDateTime().toString(REPORT_FILE_FORMAT)));
-                bool result = QFile::copy(source, target);
-                if (!result)
+                QStringList nameFilter;
+                nameFilter << "messages*.log" << "stderr.log";
+                QDir dir("/home/pi/kcb-config/logs");
+                QStringList log_list = dir.entryList(nameFilter, QDir::Files); 
+
+                foreach (auto entry, log_list)
                 {
-                    KCB_DEBUG_TRACE("failed to copy logs");
+                    QString source = QString("%1/%2").arg("/home/pi/kcb-config/logs").arg(entry);
+                    QString target = QString("%1/%2").arg(ui->cbUsbDrives->currentText()).arg(entry);
+                    bool result = QFile::copy(source, target);
+                    if (!result)
+                    {
+                        KCB_DEBUG_TRACE("failed to copy logs");
+                    }
                 }
             }
             break;
@@ -2290,4 +2311,32 @@ void CFrmAdminInfo::on_pbUtilUnmountDrive_clicked()
     kcb::UnmountUsb(path);
 
     KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::on_cbLogLevel_currentIndexChanged(const QString &arg1)
+{
+    kcb::Logger::LOG_LEVEL level = kcb::Logger::LEVEL_INFO;
+
+    if (arg1 == "INFO")
+    {
+        level = kcb::Logger::LEVEL_INFO;
+    }
+    else if (arg1 == "DEBUG")
+    {
+        level = kcb::Logger::LEVEL_DEBUG;
+    }
+    else if (arg1 == "WARNING")
+    {
+        level = kcb::Logger::LEVEL_WARNING;
+    }
+    else if (arg1 == "CRITICAL")
+    {
+        level = kcb::Logger::LEVEL_CRITICAL;
+    }
+    else if (arg1 == "FATAL")
+    {
+        level = kcb::Logger::LEVEL_FATAL;
+    }
+
+    kcb::Logger::setLevel(level);
 }

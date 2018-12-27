@@ -5,21 +5,13 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QObject>
+#include "logger.h"
 
 #define MAX_NUM_LOCKS_PER_CABINET 32
 
 
 #define KCB_FAILED (-1)
 #define KCB_SUCCESS (0)
-
-// Debug Macros
-#define KCB_DEBUG_ENTRY qDebug() << Q_FUNC_INFO << "ENTRY"
-#define KCB_DEBUG_EXIT qDebug() << Q_FUNC_INFO << "EXIT"
-
-#define KCB_DEBUG_TRACE(text)   qDebug() << Q_FUNC_INFO << text
-#define KCB_WARNING_TRACE(text)   qWarning() << Q_FUNC_INFO << text
-#define KCB_CRITICAL_TRACE(text)   qCritical() << Q_FUNC_INFO << text
-#define KCB_FATAL_TRACE(text)   qFatal() << Q_FUNC_INFO << text
 
 #define DATETIME_FORMAT QStringLiteral("yyyy-MM-dd HH:mm:ss")
 

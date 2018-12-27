@@ -19,6 +19,7 @@
 #include "magtekcardreader.h"
 #include "systemcontroller.h"
 #include "kcbcommon.h"
+#include "logger.h"
 
 MainWindow::DISP_POWER_STATE MainWindow::display_power_state = MainWindow::DISP_POWER_ON;
 MainWindow      *gpmainWindow;
@@ -40,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _psystemController(new CSystemController(this))
 {
     ui->setupUi(this);
+
+    LOG_TRACE_DEBUG("starting application");
 
     system(qPrintable("vcgencmd display_power 1"));
     MainWindow::display_power_state = MainWindow::DISP_POWER_ON;
