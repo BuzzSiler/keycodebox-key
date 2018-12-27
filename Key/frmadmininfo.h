@@ -167,6 +167,8 @@ class CFrmAdminInfo : public QDialog
         void on_cbFileFormat_currentIndexChanged(const QString &arg1);
         void on_pbUtilUnmountDrive_clicked();
 
+        void on_cbLogLevel_currentIndexChanged(const QString &arg1);
+
     private:
         Ui::CFrmAdminInfo   *ui;
         CSystemController   *_psysController;
