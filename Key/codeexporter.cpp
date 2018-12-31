@@ -123,7 +123,7 @@ bool CodeExporter::ExportAsJson(QString filename)
                     "locknums": "1,6,11,16", 
                     "code1": "AwJtIxh81Dgb", 
                     "code2": "AwJt3HI=", 
-                    "description": "", 
+                    "username": "", 
                     "question1": "", 
                     "question2": "", 
                     "question3": "", 
@@ -136,7 +136,7 @@ bool CodeExporter::ExportAsJson(QString filename)
                     "locknums": "1,6,11,16", 
                     "code1": "AwJtIxh81Dgb", 
                     "code2": "AwJt3HI=", 
-                    "description": "", 
+                    "username": "", 
                     "question1": "", 
                     "question2": "", 
                     "question3": "", 
@@ -160,7 +160,7 @@ bool CodeExporter::ExportAsJson(QString filename)
         code.insert(QString("locknums"), QJsonValue(pState->getLockNums()));
         code.insert(QString("code1"), QJsonValue(pState->getCode1()));
         code.insert(QString("code2"), QJsonValue(pState->getCode2()));
-        code.insert(QString("description"), QJsonValue(pState->getDescription()));
+        code.insert(QString("username"), QJsonValue(pState->getDescription()));
         code.insert(QString("question1"), QJsonValue(pState->getQuestion1()));
         code.insert(QString("question2"), QJsonValue(pState->getQuestion2()));
         code.insert(QString("question3"), QJsonValue(pState->getQuestion3()));
@@ -192,7 +192,7 @@ bool CodeExporter::ExportAsCsv(QString filename)
     QFile file(filename);
     file.open( QIODevice::WriteOnly | QIODevice::Text );
 
-    file.write(QString("locknums,code1,code2,description,question1,question2,question3,starttime,endtime,access_type\n").toUtf8()); 
+    file.write(QString("locknums,code1,code2,username,question1,question2,question3,starttime,endtime,access_type\n").toUtf8()); 
 
     CLockSet::Iterator itor;
     CLockState *pState;

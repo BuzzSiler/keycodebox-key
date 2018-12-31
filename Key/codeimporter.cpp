@@ -247,7 +247,7 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
                 {
                     code->setCode2(value);
                 }
-                else if (entry == "description")
+                else if (entry == "username")
                 {
                     code->setUsername(value);
                 }
