@@ -658,14 +658,17 @@ void CFrmAdminInfo::insertCodes(CodeListing& codeListing)
         // Check if the code has been designated as a fingerprint
         bool code1_fp = false;
         bool code2_fp = false;
-        if (code1.toLower() == "fingerprint")
+        if (code1.toLower().contains("fp"))
         {
             code1_fp = true;
+            code1 = code1.split(" ")[0];
         }
-        if (code2.toLower() == "fingerprint")
+        if (code2.toLower().contains("fp"))
         {
             code2_fp = true;
+            code2 = code2.split(" ")[0];
         }
+
 
         _pState = createNewLockState();
         setPStateValues(code->locks(), 
