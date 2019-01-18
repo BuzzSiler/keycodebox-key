@@ -2001,24 +2001,7 @@ void CFrmAdminInfo::on_pbNetworkSettings_clicked()
         // Notify the world about the changes
         emit __UpdateCurrentAdmin(&_tmpAdminRec);
 
-        // Write VNC credentials to file
-        FILE *pF;
-        std::string sOutput = "";
-        QString createCmd = "echo '|";
-        createCmd += QString::number(vncPort);
-        createCmd += " ";
-        createCmd += vncPassword;
-        createCmd +="|' > /home/pi/run/vnc_creds.txt";
-
-        pF = popen(createCmd.toStdString().c_str(), "r");
-        if(!pF)
-        {
-            qDebug() << "failed to create vnc file";
-        }
-
-        ExtractCommandOutput(pF, sOutput);
-        fclose(pF);
-
+        kcb::SetVNCCredentials(QString::number(vncPort), vncPassword);
     }
 }
 

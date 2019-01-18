@@ -4,6 +4,7 @@
 #include <QtCore>
 
 #include "logger.h"
+#include "kcbsystem.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +13,8 @@ int main(int argc, char *argv[])
 
     kcb::Logger::installHandler();
     kcb::Logger::setLevel(kcb::Logger::LEVEL_INFO);
+
+    kcb::BackupDatabase();
 
     MainWindow w;
     w.show();

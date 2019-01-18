@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonDocument>
+#include <QMap>
+
 #include "encryption.h"
 #include <exception>
 #include "kcbcommon.h"
@@ -39,6 +41,12 @@ const char *fdisplaypowerdown = "display_power_down_timeout";
 const char *freportdeletion = "report_deletion";
 
 static const QString VERSION = "1.0";
+
+static const QStringList DATA_FIELDS = {"admin_name", "admin_email", "admin_phone", "default_report_freq", "default_report_start", "password",
+                                        "assist_password", "show_fingerprint", "show_password", "show_takereturn", "max_locks", "smtp_server", 
+                                        "smtp_port", "smtp_type", "smtp_username", "smtp_password", "vnc_port", "vnc_password", 
+                                        "report_via_email", "report_to_file", "report_directory", "display_power_down_timeout", "report_deletion DATETIME", 
+                                        "version"};
 
 CTblAdmin::CTblAdmin(QSqlDatabase *db)
 {
@@ -157,7 +165,7 @@ bool CTblAdmin::createAdminDefault()
                             ":version)");
     qry.prepare(sql);
 
-    qDebug() << "SQL:" << sql;
+    KCB_DEBUG_TRACE("SQL:" << sql);
 
     QString sTime;
     sTime = EVERY_12_HOURS.toString(DATETIME_FORMAT);
@@ -191,19 +199,19 @@ bool CTblAdmin::createAdminDefault()
 
     if( !qry.exec() ) 
     {
-        qDebug() << "CTblAdmin::createAdminDefault():" << qry.lastError();
+        KCB_DEBUG_TRACE(qry.lastError());
         return false;
     }
     else 
     {
-        qDebug( "Inserted!" );
+        KCB_DEBUG_TRACE( "Inserted!" );
         return true;
     }
 }
 
 bool CTblAdmin::readAdmin()
 {
-    qDebug( )<< "CTblAdmin::readAdmin()";
+    KCB_DEBUG_ENTRY;
 
     QSqlQuery query(*_pDB);
     QString sql = "SELECT admin_name, admin_email, admin_phone, "
@@ -536,21 +544,25 @@ bool CTblAdmin::updateAdmin(QJsonObject adminObj)
 
 bool CTblAdmin::tableExists()
 {
+    KCB_DEBUG_ENTRY;
     QStringList lstTables = _pDB->tables();
     QStringList::iterator  itor;
 
     for(itor = lstTables.begin(); itor != lstTables.end(); itor++)
     {
-        if((*itor)==TABLENAME.toStdString().c_str()) {
+        if((*itor)==TABLENAME.toStdString().c_str()) 
+        {
+            KCB_DEBUG_TRACE(true);
             return true;
         }
     }
+    KCB_DEBUG_TRACE(false);
     return false;
 }
 
 bool CTblAdmin::columnExists(QString column)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
     
@@ -558,7 +570,7 @@ bool CTblAdmin::columnExists(QString column)
     QSqlQuery qry(*_pDB);
     bool foundColumn = false;
 
-    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+    // KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
     Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
@@ -575,7 +587,7 @@ bool CTblAdmin::columnExists(QString column)
             {
                 if( qry.value(1).toString().compare(column) == 0 )
                 {
-                    KCB_DEBUG_TRACE("found column: " << column);
+                    // KCB_DEBUG_TRACE("found column: " << column);
 
                     foundColumn = true;
                     break;
@@ -583,7 +595,9 @@ bool CTblAdmin::columnExists(QString column)
             }
         }
         else
+        {
             qDebug() << qry.lastError();
+        }
 
     } 
     else 
@@ -633,23 +647,317 @@ void CTblAdmin::createColumn(QString column, QString fieldType, QString value)
     }
 }
 
-void CTblAdmin::initialize()
-{
-    if(!tableExists())
-    {
-        createTable();
-    }
-    if(tableExists())
-    {
-        if (!columnExists(QString("version")))
-        {            
-            createColumn(QString("version"), QString("text"), VERSION);
-        }
 
-        if( !readAdmin() ) {
-            if( createAdminDefault() ) {
-                readAdmin();
+
+QSqlQuery CTblAdmin::createQuery(const QStringList& column_list,
+                                 const QString& table)
+{
+    KCB_DEBUG_ENTRY;
+
+    Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database is null");
+    Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
+
+    QSqlQuery query(*_pDB);
+    QString sql;
+    
+    query.setForwardOnly(true);
+
+    auto select = QString("SELECT %1").arg(column_list.join(","));
+    sql += QString("%1").arg(select);
+    auto from = QString("FROM %1").arg(table);
+    sql += QString(" %1").arg(from);
+
+    qDebug() << "SQL:" << sql;
+
+    if ( !query.prepare(sql) )
+    {
+        KCB_WARNING_TRACE("prepare failed" << query.lastError());
+    }
+
+    KCB_DEBUG_EXIT;
+
+    return query;
+}
+
+
+int CTblAdmin::queryCommonFields(const QStringList& common_fields, QMap<QString, QString>& dict)
+{
+    KCB_DEBUG_ENTRY;
+
+    auto query = createQuery(common_fields, QString("ADMIN"));
+
+    if (!query.exec())
+    {
+        qDebug() << query.lastError().text() << query.lastQuery();
+        return KCB_FAILED;
+    }
+
+    KCB_DEBUG_TRACE("Active" << query.isActive() << "Select" << query.isSelect());
+
+    while (query.next())
+    {
+        foreach (auto field, common_fields)
+        {
+            QString value = QUERY_VALUE(query, field).toString();
+            // KCB_DEBUG_TRACE("Adding" << field << "value" << value << "to dict");
+            dict[field] = value;
+        }
+    }
+
+    KCB_DEBUG_EXIT;
+
+    return KCB_SUCCESS;
+}
+
+int CTblAdmin::dropTable()
+{
+    QSqlQuery query(*_pDB);
+    QString sql("DROP TABLE ADMIN");
+    
+    query.setForwardOnly(true);
+
+    qDebug() << "SQL:" << sql;
+
+    if ( !query.prepare(sql) )
+    {
+        KCB_WARNING_TRACE("prepare failed" << query.lastError());
+        return KCB_FAILED;
+    }
+
+    if ( !query.exec() )
+    {
+        qDebug() << query.lastError().text() << query.lastQuery();
+        return KCB_FAILED;
+    }
+
+    return KCB_SUCCESS;
+}
+
+bool CTblAdmin::getVersion()
+{
+    _version = "";
+
+    auto query = createQuery(QStringList() << "version", "ADMIN");
+
+    if (!query.exec())
+    {
+        KCB_DEBUG_TRACE(query.lastError().text() << query.lastQuery());
+        return false;
+    }
+
+    KCB_DEBUG_TRACE("Active" << query.isActive() << "Select" << query.isSelect());
+
+    while (query.next())
+    {
+        _version = QUERY_VALUE(query, "version").toString();
+    }
+
+    return !_version.isEmpty();
+}
+
+void CTblAdmin::populateAdminWithDefaults()
+{
+    if (!readAdmin()) 
+    {
+        KCB_DEBUG_TRACE("Failed to read admin table, creating defaults");
+        if( createAdminDefault() ) 
+        {
+            KCB_DEBUG_TRACE("Defaults created, reading admin");
+            bool result = readAdmin();
+            KCB_DEBUG_TRACE("readAdmin returned" << result);
+        }
+    }
+}
+
+void CTblAdmin::updateAdminFromCommonFields(const QMap<QString, QString>& fieldValues)
+{          
+    if (fieldValues.count() > 0)
+    {
+        foreach (auto key, fieldValues.keys())
+        {
+            if (key == "admin")
+            {
+                _currentAdmin.setAdminName(fieldValues[key]);
+            }
+            else if (key == "admin_email")
+            {
+                _currentAdmin.setAdminEmail(fieldValues[key]);
+            }
+            else if (key == "admin_phone")
+            {
+                _currentAdmin.setAdminPhone(fieldValues[key]);
+            }
+            else if (key == "default_report_freq")
+            {
+                _currentAdmin.setDefaultReportFreq(QDateTime::fromString(fieldValues[key], DATETIME_FORMAT));
+            }
+            else if (key == "default_report_start")
+            {
+                _currentAdmin.setDefaultReportStart(QDateTime::fromString(fieldValues[key], DATETIME_FORMAT));
+            }
+            else if (key == "password")
+            {
+                _currentAdmin.setPassword(fieldValues[key]);
+            }
+            else if (key == "assist_password")
+            {
+                _currentAdmin.setAssistPassword(fieldValues[key]);
+            }
+            else if (key == "show_fingerprint")
+            {
+                _currentAdmin.setDisplayFingerprintButton(static_cast<bool>(fieldValues[key].toInt()));
+            }
+            else if (key == "show_password")
+            {
+                _currentAdmin.setDisplayShowHideButton(static_cast<bool>(fieldValues[key].toInt()));
+            }
+            else if (key == "max_locks")
+            {
+                _currentAdmin.setMaxLocks(fieldValues[key].toInt());
+            }
+            else if (key == "smtp_server")
+            {
+                _currentAdmin.setSMTPServer(fieldValues[key]);
+            }
+            else if (key == "smtp_port")
+            {
+                _currentAdmin.setSMTPPort(fieldValues[key].toInt());
+            }
+            else if (key == "smtp_type")
+            {
+                _currentAdmin.setSMTPType(fieldValues[key].toInt());
+            }
+            else if (key == "smtp_username")
+            {
+                _currentAdmin.setSMTPUsername(fieldValues[key]);
+            }
+            else if (key == "smtp_password")
+            {
+                _currentAdmin.setSMTPPassword(fieldValues[key]);
+            }
+            else if (key == "vnc_port")
+            {
+                _currentAdmin.setVNCPort(fieldValues[key].toInt());
+            }
+            else if (key == "vnc_password")
+            {
+                _currentAdmin.setVNCPassword(fieldValues[key]);
+            }
+            else if (key == "report_via_email")
+            {
+                _currentAdmin.setReportViaEmail(static_cast<bool>(fieldValues[key].toInt()));
+            }
+            else if (key == "report_to_file")
+            {
+                _currentAdmin.setReportToFile(static_cast<bool>(fieldValues[key].toInt()));
+            }
+            else if (key == "report_directory")
+            {
+                _currentAdmin.setReportDirectory(fieldValues[key]);
+            }
+            else if (key == "display_power_down_timeout")
+            {
+                _currentAdmin.setDisplayPowerDownTimeout(fieldValues[key].toInt());
             }
         }
+
+        updateAdmin(_currentAdmin.getAdminName(), 
+                    _currentAdmin.getAdminEmail(),
+                    _currentAdmin.getAdminPhone(),
+                    _currentAdmin.getDefaultReportFreq(),
+                    _currentAdmin.getDefaultReportStart(),
+                    _currentAdmin.getPassword(),
+                    _currentAdmin.getAssistPassword(),
+                    _currentAdmin.getDisplayFingerprintButton(),
+                    _currentAdmin.getDisplayShowHideButton(),
+                    _currentAdmin.getMaxLocks(),
+                    _currentAdmin.getSMTPServer(),
+                    _currentAdmin.getSMTPPort(),
+                    _currentAdmin.getSMTPType(),
+                    _currentAdmin.getSMTPUsername(),
+                    _currentAdmin.getSMTPPassword(),
+                    _currentAdmin.getVNCPort(),
+                    _currentAdmin.getVNCPassword(),
+                    _currentAdmin.getReportViaEmail(),
+                    _currentAdmin.getReportToFile(),
+                    _currentAdmin.getReportDirectory(),
+                    _currentAdmin.getDisplayPowerDownTimeout(),
+                    _currentAdmin.getDefaultReportDeleteFreq(),
+                    _currentAdmin.getDisplayTakeReturnButtons());
+    }
+}
+
+QStringList CTblAdmin::getCommonFields()
+{
+    QStringList commonFields;
+
+    foreach (auto field, DATA_FIELDS)
+    {
+        if (columnExists(field))
+        {
+            commonFields.append(field);
+        }
+    }
+
+    return commonFields;
+}
+
+QMap<QString, QString> CTblAdmin::mergeCommonFields(const QStringList& fields)
+{
+    QMap<QString, QString> commonFieldValues;
+
+    KCB_DEBUG_TRACE("Found" << fields.count() << "common fields");
+    if (fields.count() > 0)
+    {
+        // Perform a query on common fields and obtain values
+        int result = queryCommonFields(fields, commonFieldValues);
+
+        // Having captured all common field values, drop the table
+        result = dropTable();
+        KCB_DEBUG_TRACE("dropTable returned" << result);
+
+        // Create a new table
+        createTable();
+    }
+
+    return commonFieldValues;
+}
+
+void CTblAdmin::initialize()
+{
+    KCB_DEBUG_ENTRY;
+    if (tableExists())
+    {
+        KCB_DEBUG_TRACE("Table found, checking version info ...");
+
+        // See if the table has a version field
+        if (getVersion())
+        {
+            if (_version == VERSION)
+            {
+                KCB_DEBUG_TRACE("Table is at current version " << _version << ".  No migration needed");
+                bool result = readAdmin();
+                KCB_DEBUG_TRACE("readAdmin returned" << result);
+            }
+            else
+            {
+                KCB_DEBUG_TRACE("Migrating from" << _version << "to" << VERSION);
+            }
+        }
+        else
+        {
+            KCB_DEBUG_TRACE("Handling non-version table migration");
+
+            QStringList commonFields = getCommonFields(); 
+            QMap<QString, QString> commonFieldValues = mergeCommonFields(commonFields);           
+            populateAdminWithDefaults();
+            updateAdminFromCommonFields(commonFieldValues);
+        }
+    }
+    else
+    {
+        KCB_DEBUG_TRACE("No table found, creating new with defaults");
+        createTable();
+        populateAdminWithDefaults();
     }
 }

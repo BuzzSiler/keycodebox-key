@@ -17,6 +17,23 @@ QJsonObject KeyCodeBoxSettings::m_json_obj = QJsonObject();
 QString KeyCodeBoxSettings::m_filename = SETTINGS_FULL_PATH;
 CABINET_VECTOR KeyCodeBoxSettings::m_cabinet_info = CABINET_VECTOR(0);
 
+static QString const DEFAULT_KCB_SETTINGS = QString("{\"enable_fleetwave\":false,\"cabinets\":[{\"model\":\"KB32\",\"num_locks\":32,\"start\":1,\"stop\":32}]}");
+
+
+void KeyCodeBoxSettings::createDefault()
+{
+    // If the kcb.json file does not exist, then create one with a default cabinet
+    if (!QFile::exists(m_filename))
+    {
+        QFile file(m_filename);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream out(&file);
+            out << DEFAULT_KCB_SETTINGS;
+            file.close();
+        }
+    }
+}
 
 void KeyCodeBoxSettings::JsonFromFile()
 {
@@ -25,6 +42,9 @@ void KeyCodeBoxSettings::JsonFromFile()
     QJsonDocument doc;
 
     KCB_DEBUG_ENTRY;
+    
+    createDefault();
+
     file.setFileName(m_filename);
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     val = file.readAll();
@@ -66,6 +86,8 @@ CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
     #define RANGE_TO_INDEX(s, p) (s >= 1 && p <= 32 ? 0 : s >= 32 && p <= 64 ? 1 : s >= 65 && p <= 86 ? 2 : -1)
 
     QJsonArray cabArray = m_json_obj["cabinets"].toArray();
+
+    KCB_DEBUG_TRACE("cabArray count" << cabArray.count());
 
     m_cabinet_info.clear();
     m_cabinet_info.fill(NULL_CABINET_INFO, cabArray.size());

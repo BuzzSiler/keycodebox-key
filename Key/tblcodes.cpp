@@ -102,8 +102,6 @@ int CTblCodes::checkCodeOne(QString code,
 
     qry.bindValue(":time", time.toString("yyyy-MM-dd HH:mm:ss"));
 
-
-
     if (!qry.exec())
     {
         qDebug() << qry.lastError().text() << qry.lastQuery();
