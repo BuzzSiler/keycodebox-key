@@ -4,12 +4,15 @@
 #include <ctime>
 #include <string>
 #include <QObject>
+#include <QMap>
 #include <QDateTime>
+#include <QSqlQuery>
 #include "adminrec.h"
 
 class QSqlDatabase;
 class QJsonObject;
 class QString;
+class QStringList;
 
 
 
@@ -26,12 +29,23 @@ class CTblAdmin
         bool columnExists(QString column);
 
         CAdminRec   _currentAdmin;
+        QString _version;
 
         void currentTimeFull(QString strBuffer);
         void currentTimeFormat(QString format, QString strBuffer, int nExpectedLength);
         bool createAdminDefault();
         void initialize();
         bool readAdmin();
+        int queryCommonFields(const QStringList& common_fields, QMap<QString, QString>& dict);
+        QSqlQuery createQuery(const QStringList& column_list,
+                              const QString& table);
+        int dropTable();
+        bool getVersion();
+        QStringList getCommonFields();
+        void populateAdminWithDefaults();
+        void updateAdminFromCommonFields(const QMap<QString, QString>& fieldValues);
+        QMap<QString, QString> mergeCommonFields(const QStringList& fields);
+
 
     public:
         CTblAdmin(QSqlDatabase *db);

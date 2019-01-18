@@ -23,5 +23,6 @@ namespace kcb
     void TakeAndStorePicture(QString filename="");
     bool HasCamera();
     QByteArray GetImageAsByteArray(QString filename="", bool delete_file=true);
+    void BackupDatabase();
 }
 #endif // KCBSYSTEM_H

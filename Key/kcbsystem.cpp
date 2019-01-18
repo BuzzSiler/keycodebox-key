@@ -89,40 +89,12 @@ namespace kcb
 
     void SetVNCCredentials(QString vnc_port, QString vnc_password)
     {
-        // echo '|<vncport> <vncpassword>|' > /home/pi/kcb-config/config/vnc_creds.txt
-
         KCB_DEBUG_TRACE(vnc_port << vnc_password);
 
+        std::system("rm /home/pi/kcb-config/config/vnc_creds.txt");
         QString program = QString("echo '|%1 %2|' > /home/pi/kcb-config/config/vnc_creds.txt").arg(vnc_port).arg(vnc_password);
-        QStringList arguments;
-//        arguments << QString("'|%1 %2|'").arg(vnc_port).arg(vnc_password);
-//        arguments << QString(">");
-//        arguments << QString("/home/pi/kcb-config/config/vnc_creds.txt");
-        QString stdOut;
-        QString stdErr;
-        int status;
-
-        ExecuteCommand(program, arguments, stdOut, stdErr, status);
-
-        qDebug() << stdOut;
-        qDebug() << stdErr;
-
-        // FILE *pF;
-        // std::string sOutput = "";
-        // QString createCmd = "echo '|";
-        // createCmd += QString::number(vncport);
-        // createCmd += " ";
-        // createCmd += vncpassword;
-        // createCmd +="|' > /home/pi/run/vnc_creds.txt";
-
-        // pF = popen(createCmd.toStdString().c_str(), "r");
-        // if(!pF)
-        // {
-        //     qDebug() << "failed to create vnc file";
-        // }
-
-        // ExtractCommandOutput(pF, sOutput);
-        // fclose(pF);
+        KCB_DEBUG_TRACE(program);
+        std::system(program.toStdString().c_str());
     }
 
     static QString GetNetworkInfo(NETWORK_INFO_TYPE type)
@@ -433,4 +405,15 @@ namespace kcb
 
         return ba;
     }
+
+    void BackupDatabase()
+    {
+        KCB_DEBUG_ENTRY;
+        (void) std::system("rm /home/pi/kcb-config/database/alpha-*.db.bak");
+        QString backup_command = QString("cp /home/pi/run/Alpha.db /home/pi/kcb-config/database/alpha-%1.db.bak");
+        backup_command = backup_command.arg(QDateTime::currentDateTime().toString(REPORT_FILE_FORMAT));
+        (void) std::system(backup_command.toStdString().c_str());
+        KCB_DEBUG_EXIT;
+    }
+
 }

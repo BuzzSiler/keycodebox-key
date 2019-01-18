@@ -39,6 +39,8 @@ class KeyCodeBoxSettings : public QObject
 
         static void JsonFromFile();
         static void JsonToFile();
+        static void createDefault();
+
 };
 
 #endif // KEYCODEBOXSETTINGS_H
