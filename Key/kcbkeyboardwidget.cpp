@@ -17,6 +17,8 @@ KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowState(Qt::WindowFullScreen);
+
     ui->pbCtrlReturn->setDisabled(true);
 
     // Find buttons for capturing click event and mapping to slots to edit the value

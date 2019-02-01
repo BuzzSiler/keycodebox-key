@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QMouseEvent>
+#include <QScreen>
 
 #include "keycodeboxsettings.h"
 #include "version.h"
@@ -48,9 +49,25 @@ void CFrmUserCode::initialize()
 
 void CFrmUserCode::mousePressEvent(QMouseEvent* event)
 {
-    KCB_DEBUG_TRACE(event->x() << event->y());
+    QScreen *screen = QApplication::primaryScreen();
+    KCB_DEBUG_TRACE(event->x() << event->y() << screen->availableGeometry());
 
-    if (event->x() >= 830 && event->y() <= 20)
+    int right = screen->availableGeometry().right();
+    int top = screen->availableGeometry().top();
+    int left = screen->availableGeometry().left();
+    int bottom = screen->availableGeometry().bottom();
+
+    #define LEFT_MARGIN (20)
+    #define RIGHT_MARGIN (20)
+    #define TOP_MARGIN (20)
+    #define BOTTOM_MARGIN (20)
+
+    bool in_upper_right = event->x() >= (right - RIGHT_MARGIN) && event->y() <= (top + TOP_MARGIN);
+    bool in_upper_left = event->x() <= (left + LEFT_MARGIN) && event->y() <= (top + TOP_MARGIN);
+    bool in_lower_right = event->x() >= (right - RIGHT_MARGIN) && event->y() >= (bottom - BOTTOM_MARGIN);
+    bool in_lower_left = event->x() <= (left + LEFT_MARGIN) && event->y() >= (bottom - BOTTOM_MARGIN);
+
+    if (in_upper_right || in_upper_left || in_lower_right || in_lower_left)
     {
         EnterAdminControl();
     }

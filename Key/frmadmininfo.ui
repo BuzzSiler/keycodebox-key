@@ -9,9 +9,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>848</width>
+    <width>800</width>
     <height>480</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>848</width>
+    <height>480</height>
+   </size>
   </property>
   <property name="baseSize">
    <size>
@@ -22,521 +34,752 @@
   <property name="windowTitle">
    <string>Admin Information</string>
   </property>
-  <widget class="QTabWidget" name="tabWidget">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>848</width>
-     <height>481</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>16</pointsize>
-    </font>
-   </property>
-   <property name="tabPosition">
-    <enum>QTabWidget::North</enum>
-   </property>
-   <property name="tabShape">
-    <enum>QTabWidget::Rounded</enum>
-   </property>
-   <property name="currentIndex">
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_10">
+   <property name="leftMargin">
     <number>0</number>
    </property>
-   <widget class="QWidget" name="tabAdministrator">
-    <attribute name="title">
-     <string>Admin</string>
-    </attribute>
-    <widget class="QPushButton" name="btnDone">
-     <property name="geometry">
-      <rect>
-       <x>620</x>
-       <y>320</y>
-       <width>175</width>
-       <height>49</height>
-      </rect>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>800</width>
+       <height>480</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>848</width>
+       <height>480</height>
+      </size>
      </property>
      <property name="font">
       <font>
-       <pointsize>15</pointsize>
+       <pointsize>16</pointsize>
       </font>
      </property>
-     <property name="text">
-      <string>Save and Close</string>
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
      </property>
-    </widget>
-    <widget class="Line" name="line_3">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>270</y>
-       <width>821</width>
-       <height>16</height>
-      </rect>
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
      </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+     <property name="currentIndex">
+      <number>3</number>
      </property>
-    </widget>
-    <widget class="QDateTimeEdit" name="dtSystemTime">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>360</y>
-       <width>241</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::UpDownArrows</enum>
-     </property>
-     <property name="accelerated">
-      <bool>true</bool>
-     </property>
-     <property name="showGroupSeparator" stdset="0">
-      <bool>true</bool>
-     </property>
-     <property name="maximumDate">
-      <date>
-       <year>2055</year>
-       <month>12</month>
-       <day>31</day>
-      </date>
-     </property>
-     <property name="minimumDate">
-      <date>
-       <year>2016</year>
-       <month>6</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="currentSection">
-      <enum>QDateTimeEdit::MonthSection</enum>
-     </property>
-     <property name="displayFormat">
-      <string>MMM dd yyyy hh:mm:ss AP</string>
-     </property>
-     <property name="calendarPopup">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cbInternetTime">
-     <property name="geometry">
-      <rect>
-       <x>300</x>
-       <y>310</y>
-       <width>131</width>
-       <height>26</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::WheelFocus</enum>
-     </property>
-     <property name="text">
-      <string>Internet Time</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btnSetTime">
-     <property name="geometry">
-      <rect>
-       <x>300</x>
-       <y>370</y>
-       <width>140</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Set Time</string>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="cbTimeZone">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>310</y>
-       <width>241</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <item>
-      <property name="text">
-       <string>Timezone</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="QGroupBox" name="gpAdminInfo">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>541</width>
-       <height>261</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <widget class="QWidget" name="layoutWidget1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>141</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QLabel" name="lName">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Administrator</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lEmail">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Email</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lPhone">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Phone</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lPassword">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Admin Password</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lAssistPassword">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Assist Password</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="Line" name="line_2">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>10</y>
-        <width>20</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <widget class="QWidget" name="layoutWidget2">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>10</y>
-        <width>371</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="CClickableLabel" name="lblName">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <underline>true</underline>
-          </font>
-         </property>
-         <property name="mouseTracking">
-          <bool>false</bool>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="rightMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="CClickableLabel" name="lblEmail">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <underline>true</underline>
-            </font>
-           </property>
-           <property name="mouseTracking">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnTestUserEmail">
-           <property name="maximumSize">
-            <size>
-             <width>100</width>
-             <height>27</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Test Email</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="CClickableLabel" name="lblPhone">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <underline>true</underline>
-          </font>
-         </property>
-         <property name="mouseTracking">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="CClickableLabel" name="lblPassword">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <underline>true</underline>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="CClickableLabel" name="lblAssistPassword">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <underline>true</underline>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-    <widget class="QGroupBox" name="gpPredictiveKey">
-     <property name="geometry">
-      <rect>
-       <x>560</x>
-       <y>10</y>
-       <width>271</width>
-       <height>261</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <widget class="QWidget" name="">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>251</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_9">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Log Level</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="cbLogLevel">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <item>
-          <property name="text">
-           <string>INFO</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>DEBUG</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>WARNING</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>CRITICAL</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>FATAL</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-    <zorder>gpAdminInfo</zorder>
-    <zorder>btnDone</zorder>
-    <zorder>line_3</zorder>
-    <zorder>dtSystemTime</zorder>
-    <zorder>cbInternetTime</zorder>
-    <zorder>btnSetTime</zorder>
-    <zorder>cbTimeZone</zorder>
-    <zorder>gpPredictiveKey</zorder>
-   </widget>
-   <widget class="QWidget" name="tabUtilities">
-    <property name="styleSheet">
-     <string notr="true">QTabWidget::tab:disabled { width: 0; height: 0; margin: 0; padding: 0; border: none; }</string>
-    </property>
-    <attribute name="title">
-     <string>Utilities</string>
-    </attribute>
-    <widget class="QLineEdit" name="edInfo">
-     <property name="geometry">
-      <rect>
-       <x>229</x>
-       <y>4</y>
-       <width>451</width>
-       <height>100</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="visible">
-      <bool>false</bool>
-     </property>
-     <property name="acceptDrops">
-      <bool>false</bool>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>9</y>
-       <width>831</width>
-       <height>431</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_10">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <widget class="QWidget" name="tabAdministrator">
+      <attribute name="title">
+       <string>Admin</string>
+      </attribute>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>473</width>
+         <height>235</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="hloSettingsUtilities">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMaximumSize</enum>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>6</number>
+        </property>
         <item>
-         <widget class="QGroupBox" name="groupBox_5">
+         <widget class="QGroupBox" name="gpAdminInfo">
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <property name="topMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <property name="bottomMargin">
+              <number>5</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="lName">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Administrator</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lEmail">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Email</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lPhone">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Phone</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lPassword">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Admin Password</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lAssistPassword">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Assist Password</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <widget class="CClickableLabel" name="lblName">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <underline>true</underline>
+                </font>
+               </property>
+               <property name="mouseTracking">
+                <bool>false</bool>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textInteractionFlags">
+                <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout">
+               <property name="rightMargin">
+                <number>10</number>
+               </property>
+               <item>
+                <widget class="CClickableLabel" name="lblEmail">
+                 <property name="font">
+                  <font>
+                   <pointsize>12</pointsize>
+                   <underline>true</underline>
+                  </font>
+                 </property>
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnTestUserEmail">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>100</width>
+                   <height>27</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Test Email</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="CClickableLabel" name="lblPhone">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <underline>true</underline>
+                </font>
+               </property>
+               <property name="mouseTracking">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="CClickableLabel" name="lblPassword">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <underline>true</underline>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="CClickableLabel" name="lblAssistPassword">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <underline>true</underline>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="gpGeneral">
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_11">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Log Level</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cbLogLevel">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <item>
+                <property name="text">
+                 <string>INFO</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>DEBUG</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>WARNING</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>CRITICAL</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>FATAL</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>95</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>595</width>
+         <height>212</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="hloTimeSaveClose">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMaximumSize</enum>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="gbTimeSaveClose">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_12">
+             <item>
+              <spacer name="verticalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cbTimeZone">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Timezone</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDateTimeEdit" name="dtSystemTime">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::UpDownArrows</enum>
+               </property>
+               <property name="accelerated">
+                <bool>true</bool>
+               </property>
+               <property name="showGroupSeparator" stdset="0">
+                <bool>true</bool>
+               </property>
+               <property name="maximumDate">
+                <date>
+                 <year>2055</year>
+                 <month>12</month>
+                 <day>31</day>
+                </date>
+               </property>
+               <property name="minimumDate">
+                <date>
+                 <year>2016</year>
+                 <month>6</month>
+                 <day>1</day>
+                </date>
+               </property>
+               <property name="currentSection">
+                <enum>QDateTimeEdit::MonthSection</enum>
+               </property>
+               <property name="displayFormat">
+                <string>MMM dd yyyy hh:mm:ss AP</string>
+               </property>
+               <property name="calendarPopup">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>83</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="cbInternetTime">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::WheelFocus</enum>
+               </property>
+               <property name="text">
+                <string>Internet Time</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnSetTime">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Set Time</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>82</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnDone">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>50</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Save and Close</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>83</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tabUtilities">
+      <property name="styleSheet">
+       <string notr="true">QTabWidget::tab:disabled { width: 0; height: 0; margin: 0; padding: 0; border: none; }</string>
+      </property>
+      <attribute name="title">
+       <string>Utilities</string>
+      </attribute>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>630</width>
+         <height>166</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="hloDisplayNetworkSystem">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMaximumSize</enum>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="gbDisplay">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -546,6 +789,18 @@
            <string>Display</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
@@ -657,7 +912,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_4">
+         <widget class="QGroupBox" name="gbNetwork">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -667,6 +922,18 @@
            <string>Network</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
@@ -741,7 +1008,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_3">
+         <widget class="QGroupBox" name="gbSystem">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -751,6 +1018,18 @@
            <string>System</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
            <item>
             <widget class="QPushButton" name="btnRebootSystem">
              <property name="minimumSize">
@@ -791,9 +1070,32 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_8">
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>387</width>
+         <height>257</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="hloActionsUsbDrive">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMaximumSize</enum>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>6</number>
+        </property>
         <item>
          <widget class="QGroupBox" name="groupBox">
           <property name="font">
@@ -805,6 +1107,31 @@
            <string>Actions</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <spacer name="verticalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item>
             <widget class="QComboBox" name="cbActionsSelect">
              <property name="enabled">
@@ -955,6 +1282,19 @@
              </property>
             </widget>
            </item>
+           <item>
+            <spacer name="verticalSpacer_9">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
         </item>
@@ -969,6 +1309,31 @@
            <string>USB Drive</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <spacer name="verticalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_7">
              <item>
@@ -1044,2202 +1409,658 @@
          </widget>
         </item>
        </layout>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tabReportWidget">
-    <attribute name="title">
-     <string>Report</string>
-    </attribute>
-    <widget class="QWidget" name="verticalLayoutWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>841</width>
-       <height>441</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="vloReportSettings"/>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tabDoors">
-    <attribute name="title">
-     <string>Doors</string>
-    </attribute>
-    <widget class="QWidget" name="verticalLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>841</width>
-       <height>441</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="vloSelectLocks"/>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tabCodes">
-    <attribute name="title">
-     <string>Codes</string>
-    </attribute>
-    <widget class="QTableWidget" name="tblCodesList">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>56</y>
-       <width>841</width>
-       <height>391</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>841</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="hloCodes">
-      <property name="leftMargin">
-       <number>10</number>
-      </property>
-      <property name="rightMargin">
-       <number>10</number>
-      </property>
-      <item>
-       <widget class="QComboBox" name="cbLockNum">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tabReportWidget">
+      <attribute name="title">
+       <string>Report</string>
+      </attribute>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>100</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="vloReportSettings">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMaximumSize</enum>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>110</width>
-          <height>16777215</height>
-         </size>
+        <property name="leftMargin">
+         <number>6</number>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
+        <property name="topMargin">
+         <number>6</number>
         </property>
-        <item>
-         <property name="text">
-          <string>All Locks</string>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>6</number>
+        </property>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tabDoors">
+      <attribute name="title">
+       <string>Doors</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_11">
+       <item>
+        <layout class="QVBoxLayout" name="vloSelectLocks">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMaximumSize</enum>
          </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblCodeFrom">
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>From</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="dtStartCodeList">
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::UpDownArrows</enum>
-        </property>
-        <property name="accelerated">
-         <bool>true</bool>
-        </property>
-        <property name="showGroupSeparator" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="dateTime">
-         <datetime>
-          <hour>0</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </datetime>
-        </property>
-        <property name="date">
-         <date>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </date>
-        </property>
-        <property name="minimumDateTime">
-         <datetime>
-          <hour>0</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </datetime>
-        </property>
-        <property name="maximumDate">
-         <date>
-          <year>2055</year>
-          <month>12</month>
-          <day>31</day>
-         </date>
-        </property>
-        <property name="minimumDate">
-         <date>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </date>
-        </property>
-        <property name="currentSection">
-         <enum>QDateTimeEdit::MonthSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>MMM dd yyyy hh:mm AP</string>
-        </property>
-        <property name="calendarPopup">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblCodeTo">
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>To</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="dtEndCodeList">
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::UpDownArrows</enum>
-        </property>
-        <property name="accelerated">
-         <bool>true</bool>
-        </property>
-        <property name="showGroupSeparator" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="dateTime">
-         <datetime>
-          <hour>0</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </datetime>
-        </property>
-        <property name="date">
-         <date>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </date>
-        </property>
-        <property name="minimumDateTime">
-         <datetime>
-          <hour>0</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </datetime>
-        </property>
-        <property name="maximumDate">
-         <date>
-          <year>2055</year>
-          <month>12</month>
-          <day>31</day>
-         </date>
-        </property>
-        <property name="minimumDate">
-         <date>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </date>
-        </property>
-        <property name="currentSection">
-         <enum>QDateTimeEdit::MonthSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>MMM dd yyyy hh:mm AP</string>
-        </property>
-        <property name="calendarPopup">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnReadCodes">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>80</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Read</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tabHistory">
-    <attribute name="title">
-     <string>History</string>
-    </attribute>
-    <widget class="QTableWidget" name="tblHistory">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>56</y>
-       <width>841</width>
-       <height>391</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>841</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <property name="leftMargin">
-       <number>10</number>
-      </property>
-      <property name="rightMargin">
-       <number>10</number>
-      </property>
-      <item>
-       <widget class="QComboBox" name="cbLockNumHistory">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>110</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <item>
-         <property name="text">
-          <string>All Locks</string>
+         <property name="leftMargin">
+          <number>6</number>
          </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblHistoryFrom">
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>From</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="dtStartCodeHistoryList">
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::UpDownArrows</enum>
-        </property>
-        <property name="accelerated">
-         <bool>true</bool>
-        </property>
-        <property name="showGroupSeparator" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="dateTime">
-         <datetime>
-          <hour>0</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </datetime>
-        </property>
-        <property name="minimumDateTime">
-         <datetime>
-          <hour>0</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </datetime>
-        </property>
-        <property name="maximumDate">
-         <date>
-          <year>2055</year>
-          <month>12</month>
-          <day>31</day>
-         </date>
-        </property>
-        <property name="minimumDate">
-         <date>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </date>
-        </property>
-        <property name="currentSection">
-         <enum>QDateTimeEdit::MonthSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>MMM dd yyyy hh:mm AP</string>
-        </property>
-        <property name="calendarPopup">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblHistoryTo">
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>To</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="dtEndCodeHistoryList">
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::UpDownArrows</enum>
-        </property>
-        <property name="accelerated">
-         <bool>true</bool>
-        </property>
-        <property name="showGroupSeparator" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="dateTime">
-         <datetime>
-          <hour>0</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </datetime>
-        </property>
-        <property name="minimumDateTime">
-         <datetime>
-          <hour>0</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </datetime>
-        </property>
-        <property name="maximumDate">
-         <date>
-          <year>2055</year>
-          <month>12</month>
-          <day>31</day>
-         </date>
-        </property>
-        <property name="minimumDate">
-         <date>
-          <year>2016</year>
-          <month>1</month>
-          <day>1</day>
-         </date>
-        </property>
-        <property name="currentSection">
-         <enum>QDateTimeEdit::MonthSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>MMM dd yyyy hh:mm AP</string>
-        </property>
-        <property name="calendarPopup">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnRead">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>80</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Read</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-  </widget>
-  <widget class="QWidget" name="widgetEdit" native="true">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>848</width>
-     <height>480</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>15</pointsize>
-    </font>
-   </property>
-   <widget class="QWidget" name="widgetKeyboard" native="true">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>119</y>
-      <width>800</width>
-      <height>361</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>15</pointsize>
-     </font>
-    </property>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>-10</y>
-       <width>781</width>
-       <height>371</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>15</pointsize>
-      </font>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <widget class="QPushButton" name="btnA">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>A</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnB">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>B</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnC">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>C</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnD">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>D</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnG">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>G</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnE">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>E</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnF">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>F</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnH">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>H</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnJ">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>J</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnI">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>I</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnM">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>M</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnK">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>K</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnL">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>L</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnP">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>P</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnR">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>R</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnN">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>N</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnS">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>S</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnO">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>O</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnT">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>T</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnQ">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Q</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnW">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>W</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_At">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>@</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnX">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>X</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnU">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>U</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnY">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Y</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Dash">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>-</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnPeriod">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>.</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnZ">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Z</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnV">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>V</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Underscore">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>_</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Semicolon">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Ampersand">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>&amp;&amp;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Dollar">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>$</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Plus">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>+</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Colon">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>:</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Apostrophe">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>'</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Quote">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>&quot;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_QuestionMark">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>?</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Slash">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>/</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Splat">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>*</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_LeftParen">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>(</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Exclamation">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>!</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Pound">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>#</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Percent">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>%</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_RightParen">
-      <property name="geometry">
-       <rect>
-        <x>720</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>)</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Caret">
-      <property name="geometry">
-       <rect>
-        <x>720</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>^</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_0">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_7">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>7</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Space">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>314</y>
-        <width>91</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Space</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_9">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>9</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_5">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>5</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_1">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>1</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_3">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>3</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_6">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>6</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Return">
-      <property name="geometry">
-       <rect>
-        <x>694</x>
-        <y>314</y>
-        <width>81</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Enter</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_8">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>8</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_2">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_4">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>4</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Back">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>17</y>
-        <width>91</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Back</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Del">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>78</y>
-        <width>91</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Del</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Close">
-      <property name="geometry">
-       <rect>
-        <x>696</x>
-        <y>17</y>
-        <width>80</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Close</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Clear">
-      <property name="geometry">
-       <rect>
-        <x>695</x>
-        <y>78</y>
-        <width>80</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Clear</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_LeftSquare">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>[</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_LeftCurly">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>{</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_RightSquare">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>]</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Back_Slash">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>\</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_LeftAngle">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>&lt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Tilde">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>~</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_RightAngle">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>&gt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_RightCurly">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>}</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_OpenApost">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>`</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Upper_Lower">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>254</y>
-        <width>111</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Lower</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
+         <property name="topMargin">
+          <number>6</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabCodes">
+      <attribute name="title">
+       <string>Codes</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_14">
+         <property name="leftMargin">
+          <number>6</number>
+         </property>
+         <property name="topMargin">
+          <number>6</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="hloCodes">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="cbLockNum">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>110</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>All Locks</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblCodeFrom">
+             <property name="maximumSize">
+              <size>
+               <width>40</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>From</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateTimeEdit" name="dtStartCodeList">
+             <property name="minimumSize">
+              <size>
+               <width>220</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::UpDownArrows</enum>
+             </property>
+             <property name="accelerated">
+              <bool>true</bool>
+             </property>
+             <property name="showGroupSeparator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dateTime">
+              <datetime>
+               <hour>0</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </datetime>
+             </property>
+             <property name="date">
+              <date>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </date>
+             </property>
+             <property name="minimumDateTime">
+              <datetime>
+               <hour>0</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </datetime>
+             </property>
+             <property name="maximumDate">
+              <date>
+               <year>2055</year>
+               <month>12</month>
+               <day>31</day>
+              </date>
+             </property>
+             <property name="minimumDate">
+              <date>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </date>
+             </property>
+             <property name="currentSection">
+              <enum>QDateTimeEdit::MonthSection</enum>
+             </property>
+             <property name="displayFormat">
+              <string>MMM dd yyyy hh:mm AP</string>
+             </property>
+             <property name="calendarPopup">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblCodeTo">
+             <property name="maximumSize">
+              <size>
+               <width>40</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>To</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateTimeEdit" name="dtEndCodeList">
+             <property name="minimumSize">
+              <size>
+               <width>220</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::UpDownArrows</enum>
+             </property>
+             <property name="accelerated">
+              <bool>true</bool>
+             </property>
+             <property name="showGroupSeparator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dateTime">
+              <datetime>
+               <hour>0</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </datetime>
+             </property>
+             <property name="date">
+              <date>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </date>
+             </property>
+             <property name="minimumDateTime">
+              <datetime>
+               <hour>0</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </datetime>
+             </property>
+             <property name="maximumDate">
+              <date>
+               <year>2055</year>
+               <month>12</month>
+               <day>31</day>
+              </date>
+             </property>
+             <property name="minimumDate">
+              <date>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </date>
+             </property>
+             <property name="currentSection">
+              <enum>QDateTimeEdit::MonthSection</enum>
+             </property>
+             <property name="displayFormat">
+              <string>MMM dd yyyy hh:mm AP</string>
+             </property>
+             <property name="calendarPopup">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnReadCodes">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>80</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Read</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QTableWidget" name="tblCodesList">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabHistory">
+      <attribute name="title">
+       <string>History</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_17">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="leftMargin">
+          <number>6</number>
+         </property>
+         <property name="topMargin">
+          <number>6</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="cbLockNumHistory">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>110</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>All Locks</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblHistoryFrom">
+             <property name="maximumSize">
+              <size>
+               <width>40</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>From</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateTimeEdit" name="dtStartCodeHistoryList">
+             <property name="minimumSize">
+              <size>
+               <width>220</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::UpDownArrows</enum>
+             </property>
+             <property name="accelerated">
+              <bool>true</bool>
+             </property>
+             <property name="showGroupSeparator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dateTime">
+              <datetime>
+               <hour>0</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </datetime>
+             </property>
+             <property name="minimumDateTime">
+              <datetime>
+               <hour>0</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </datetime>
+             </property>
+             <property name="maximumDate">
+              <date>
+               <year>2055</year>
+               <month>12</month>
+               <day>31</day>
+              </date>
+             </property>
+             <property name="minimumDate">
+              <date>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </date>
+             </property>
+             <property name="currentSection">
+              <enum>QDateTimeEdit::MonthSection</enum>
+             </property>
+             <property name="displayFormat">
+              <string>MMM dd yyyy hh:mm AP</string>
+             </property>
+             <property name="calendarPopup">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblHistoryTo">
+             <property name="maximumSize">
+              <size>
+               <width>40</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>To</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateTimeEdit" name="dtEndCodeHistoryList">
+             <property name="minimumSize">
+              <size>
+               <width>220</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::UpDownArrows</enum>
+             </property>
+             <property name="accelerated">
+              <bool>true</bool>
+             </property>
+             <property name="showGroupSeparator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dateTime">
+              <datetime>
+               <hour>0</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </datetime>
+             </property>
+             <property name="minimumDateTime">
+              <datetime>
+               <hour>0</hour>
+               <minute>0</minute>
+               <second>0</second>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </datetime>
+             </property>
+             <property name="maximumDate">
+              <date>
+               <year>2055</year>
+               <month>12</month>
+               <day>31</day>
+              </date>
+             </property>
+             <property name="minimumDate">
+              <date>
+               <year>2016</year>
+               <month>1</month>
+               <day>1</day>
+              </date>
+             </property>
+             <property name="currentSection">
+              <enum>QDateTimeEdit::MonthSection</enum>
+             </property>
+             <property name="displayFormat">
+              <string>MMM dd yyyy hh:mm AP</string>
+             </property>
+             <property name="calendarPopup">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnRead">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>80</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Read</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QTableWidget" name="tblHistory">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </widget>
-   </widget>
-   <widget class="QLabel" name="lblCurrentEditFieldName">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>411</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>15</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="edText">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>771</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="focusPolicy">
-     <enum>Qt::StrongFocus</enum>
-    </property>
-   </widget>
-  </widget>
-  <zorder>widgetEdit</zorder>
-  <zorder>tabWidget</zorder>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>

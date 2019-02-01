@@ -25,6 +25,7 @@
 #include <QAbstractSocket>
 #include <QFileDialog>
 #include <QFile>
+#include <QScreen>
 #include "lockset.h"
 #include "lockstate.h"
 #include "menupushbutton.h"
@@ -111,11 +112,26 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    KCB_DEBUG_TRACE("layout" << layout() << "spacing" << layout()->spacing());
+ 
     // For some reason, the admin form does not show full screen without the following
     // flags being set.  Maybe this should be don't at in the main so it gets
     // inherited?  Not sure.  Until this is resolved, just set these flags.
     CFrmAdminInfo::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    CFrmAdminInfo::showFullScreen();
+
+    QScreen *screen = QApplication::primaryScreen();
+
+    int width = screen->availableGeometry().right();
+    int height = screen->availableGeometry().bottom();
+
+    KCB_DEBUG_TRACE("parent" << parent->x() << parent->y() << parent->width() << parent->height() << width << height);
+    KCB_DEBUG_TRACE("minsize" << minimumSize() << "maxsize" << maximumSize());
+
+    resize(parent->width(), parent->height());
+
+    KCB_DEBUG_TRACE("tabwidget size hint" << ui->tabWidget->sizeHint());
+    ui->tabWidget->setGeometry(parent->x(), parent->y(), parent->width(), parent->height());
+    KCB_DEBUG_TRACE("tabwidget geometry" << ui->tabWidget->geometry());
 
     ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
 
@@ -263,7 +279,6 @@ void CFrmAdminInfo::initialize()
 {
     _pcopymodel = 0;
     _bClose = false;
-    ui->widgetEdit->setVisible(false);
 
     populateTimeZoneSelection(ui->cbTimeZone);
     startMediaTimer();
@@ -720,12 +735,6 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
     KCB_DEBUG_EXIT;
 }
 
-void CFrmAdminInfo::onStopEdit()
-{
-    ui->tabWidget->show();
-    ui->widgetEdit->hide();
-}
-
 void CFrmAdminInfo::RunKeyboard(QString& text, bool numbersOnly)
 {
     KcbKeyboardDialog kkd;
@@ -801,11 +810,6 @@ void CFrmAdminInfo::on_btnDone_clicked()
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
     KCB_DEBUG_EXIT;
-}
-
-void CFrmAdminInfo::hideKeyboard(bool bHide) 
-{
-    ui->widgetEdit->setVisible(bHide);
 }
 
 void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
@@ -1181,7 +1185,7 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     table->setColumnWidth(2, 100);
     table->setColumnWidth(3, 100);
     table->setColumnWidth(4, 350);
-    table->setColumnWidth(5, 50);
+    table->setColumnWidth(5, 100);
     
     table->verticalHeader()->hide();
     

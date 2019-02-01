@@ -13,9 +13,11 @@ KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent) :
     ui(new Ui::KcbKeyboardDialog)
 {
     ui->setupUi(this);
-    ui->vloKeyboard->addWidget(&m_keyboard);
 
     setWindowState(Qt::WindowFullScreen);
+
+    ui->vloKeyboard->addWidget(&m_keyboard);
+
 
     connect(&m_keyboard, SIGNAL(NotifyClose()), this, SLOT(reject()));
     connect(&m_keyboard, SIGNAL(NotifyEnter()), this, SLOT(accept()));

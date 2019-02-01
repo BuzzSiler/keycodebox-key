@@ -94,7 +94,6 @@ class CFrmAdminInfo : public QDialog
         void OnFoundNewStorageDevice(QString device0, QString device1);
 
 
-        void onStopEdit();
         void OnCodeEditClose();
         void OnTabSelected(int index);
         void OnDisplayFingerprintButton(bool);
@@ -222,7 +221,6 @@ class CFrmAdminInfo : public QDialog
         bool isInternetTime();
         void onButtonClick(char key);
         void onBackSpace();
-        void hideKeyboard(bool bHide);
 
         void initializeConnections();
         void createCodeTableHeader();

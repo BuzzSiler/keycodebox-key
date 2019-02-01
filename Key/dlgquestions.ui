@@ -13,1390 +13,6 @@
   <property name="windowTitle">
    <string>Questions Response</string>
   </property>
-  <widget class="QWidget" name="widgetEdit" native="true">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>480</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>15</pointsize>
-    </font>
-   </property>
-   <widget class="QWidget" name="widgetKeyboard" native="true">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>119</y>
-      <width>800</width>
-      <height>361</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>15</pointsize>
-     </font>
-    </property>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>-10</y>
-       <width>781</width>
-       <height>371</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>15</pointsize>
-      </font>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <widget class="QPushButton" name="btnA">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>A</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnB">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>B</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnC">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>C</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnD">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>D</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnG">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>G</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnE">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>E</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnF">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>F</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnH">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>H</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnJ">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>J</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnI">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>17</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>I</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnM">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>M</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnK">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>K</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnL">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>L</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnP">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>P</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnR">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>R</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnN">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>N</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnS">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>S</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnO">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>O</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnT">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>T</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnQ">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>77</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Q</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnW">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>W</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_At">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>@</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnX">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>X</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnU">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>U</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnY">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Y</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Dash">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>-</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnPeriod">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>.</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnZ">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Z</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btnV">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>V</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Underscore">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>_</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Semicolon">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Ampersand">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>&amp;&amp;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Dollar">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>$</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Plus">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>+</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Colon">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>:</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Apostrophe">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>'</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Quote">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>&quot;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_QuestionMark">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>?</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Slash">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>/</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Splat">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>*</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_LeftParen">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>(</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Exclamation">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>!</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Pound">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>#</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Percent">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>%</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_RightParen">
-      <property name="geometry">
-       <rect>
-        <x>720</x>
-        <y>196</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>)</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Caret">
-      <property name="geometry">
-       <rect>
-        <x>720</x>
-        <y>136</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>^</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_0">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_7">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>7</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Space">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>314</y>
-        <width>91</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Space</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_9">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>9</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_5">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>5</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_1">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>1</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_3">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>3</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_6">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>6</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Return">
-      <property name="geometry">
-       <rect>
-        <x>694</x>
-        <y>314</y>
-        <width>81</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Enter</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_8">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>8</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_2">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_4">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>314</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>4</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Back">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>17</y>
-        <width>91</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Back</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Del">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>78</y>
-        <width>91</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Del</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Close">
-      <property name="geometry">
-       <rect>
-        <x>696</x>
-        <y>17</y>
-        <width>80</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Close</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Clear">
-      <property name="geometry">
-       <rect>
-        <x>695</x>
-        <y>78</y>
-        <width>80</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Clear</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_LeftSquare">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>[</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_LeftCurly">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>{</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_RightSquare">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>]</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Back_Slash">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>\</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_LeftAngle">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>&lt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Tilde">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>~</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_RightAngle">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>&gt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_RightCurly">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>}</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_OpenApost">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>254</y>
-        <width>55</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>15</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>`</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_Upper_Lower">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>254</y>
-        <width>111</width>
-        <height>55</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Lower</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QLabel" name="lblCurrentEditFieldName">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>411</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>15</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="edText">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>771</width>
-      <height>71</height>
-     </rect>
-    </property>
-   </widget>
-  </widget>
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
@@ -1427,342 +43,543 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="label_question1">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>75</x>
-      <y>79</y>
-      <width>580</width>
-      <height>28</height>
+      <x>10</x>
+      <y>10</y>
+      <width>831</width>
+      <height>461</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_question2">
-    <property name="geometry">
-     <rect>
-      <x>75</x>
-      <y>189</y>
-      <width>580</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_question3">
-    <property name="geometry">
-     <rect>
-      <x>75</x>
-      <y>299</y>
-      <width>580</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelLockNum">
-    <property name="geometry">
-     <rect>
-      <x>234</x>
-      <y>20</y>
-      <width>380</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Please answer the following questions:</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="CClickableLineEdit" name="edtAnswer1">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>76</x>
-      <y>110</y>
-      <width>591</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="maxLength">
-     <number>18</number>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="clrAnswer1">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>110</y>
-      <width>75</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Clear</string>
-    </property>
-   </widget>
-   <widget class="CClickableLineEdit" name="edtAnswer2">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>76</x>
-      <y>220</y>
-      <width>591</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="clrAnswer2">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>220</y>
-      <width>75</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Clear</string>
-    </property>
-   </widget>
-   <widget class="CClickableLineEdit" name="edtAnswer3">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>76</x>
-      <y>330</y>
-      <width>591</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="inputMask">
-     <string/>
-    </property>
-    <property name="maxLength">
-     <number>25</number>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="clrAnswer3">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>330</y>
-      <width>75</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Clear</string>
-    </property>
-   </widget>
-   <widget class="QDialogButtonBox" name="bbOkCancel">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>348</x>
-      <y>400</y>
-      <width>152</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-    <property name="standardButtons">
-     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-    </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>220</y>
-      <width>161</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="hloChevinAnswer2">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="rbAnswer2Yes">
+      <spacer name="verticalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLockNum">
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Please answer the following questions:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_question1">
        <property name="font">
         <font>
          <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Yes</string>
+        <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="rbAnswer2No">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>80</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="hloChevinAnswer1">
+         <item>
+          <widget class="QRadioButton" name="rbAnswer1Yes">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Yes</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbAnswer1No">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>No</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="CClickableLineEdit" name="edtAnswer1">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>350</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="maxLength">
+          <number>18</number>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="clrAnswer1">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Clear</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_question2">
        <property name="font">
         <font>
          <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>No</string>
+        <string/>
        </property>
       </widget>
      </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>330</y>
-      <width>161</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="hloChevinAnswer3">
      <item>
-      <widget class="QRadioButton" name="rbAnswer3Yes">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>80</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="hloChevinAnswer2">
+         <item>
+          <widget class="QRadioButton" name="rbAnswer2Yes">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Yes</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbAnswer2No">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>No</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="CClickableLineEdit" name="edtAnswer2">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>350</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="clrAnswer2">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Clear</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_question3">
        <property name="font">
         <font>
          <pointsize>14</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Yes</string>
+        <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="rbAnswer3No">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>No</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <spacer name="horizontalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>80</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="hloChevinAnswer3">
+         <item>
+          <widget class="QRadioButton" name="rbAnswer3Yes">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Yes</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbAnswer3No">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>No</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="CClickableLineEdit" name="edtAnswer3">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>350</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="inputMask">
+          <string/>
+         </property>
+         <property name="maxLength">
+          <number>25</number>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="clrAnswer3">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Clear</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>110</y>
-      <width>161</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="hloChevinAnswer1">
      <item>
-      <widget class="QRadioButton" name="rbAnswer1Yes">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
+      <spacer name="verticalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
-       <property name="text">
-        <string>Yes</string>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
        </property>
-      </widget>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>75</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
-      <widget class="QRadioButton" name="rbAnswer1No">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <spacer name="horizontalSpacer_9">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QDialogButtonBox" name="bbOkCancel">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="standardButtons">
+          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+         </property>
+         <property name="centerButtons">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_10">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
-       <property name="text">
-        <string>No</string>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>18</height>
+        </size>
        </property>
-      </widget>
+      </spacer>
      </item>
     </layout>
    </widget>

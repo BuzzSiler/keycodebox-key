@@ -3,6 +3,7 @@
 
 #include <QDateTime>
 #include <QProcess>
+#include <QScreen>
 #include <iostream>
 #include <cstdlib>
 
@@ -47,6 +48,19 @@ MainWindow::MainWindow(QWidget *parent) :
     system(qPrintable("vcgencmd display_power 1"));
     MainWindow::display_power_state = MainWindow::DISP_POWER_ON;
 
+    QScreen* screen = QApplication::primaryScreen();
+    KCB_DEBUG_TRACE("available screen" << screen->availableGeometry());
+    KCB_DEBUG_TRACE("size hint" << sizeHint());
+
+    int x = screen->availableGeometry().x();
+    int y = screen->availableGeometry().y();
+    int width = screen->availableGeometry().right();
+    int height = screen->availableGeometry().bottom();
+
+    KCB_DEBUG_TRACE("parent" << x << y << width << height);
+
+    setGeometry(x, y, width, height);    
+
     QMainWindow::showFullScreen();
     QMainWindow::activateWindow();
     QMainWindow::raise();
@@ -69,11 +83,15 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     // Scale the image...
-    _pPixmapItem = new CClickableGraphicsItem(_pPixmap->scaled(760, 390));
+    QRect ag = QApplication::primaryScreen()->availableGeometry();
+    
+    KCB_DEBUG_TRACE("geometry" << ag << "sizehint" << sizeHint());
+    _pPixmapItem = new CClickableGraphicsItem(_pPixmap->scaled(ag.right(), ag.bottom()));
     _pscene->addItem(_pPixmapItem);
     ui->graphicsView->show();
 
     ui->graphicsView->setClickedFunc(&(OnImageClicked) );
+    ui->graphicsView->fitInView(ag);
 
     _pdisplayPowerDown = new QTimer();
    
@@ -124,7 +142,7 @@ void MainWindow::SetupAdmin(QObject *psysController)
     KCB_DEBUG_ENTRY;
     if (!_pfAdminInfo)
     {
-        _pfAdminInfo = new CFrmAdminInfo();
+        _pfAdminInfo = new CFrmAdminInfo(this);
         _pfAdminInfo->hide();
         _pfAdminInfo->setSystemController((CSystemController*)psysController);
     }

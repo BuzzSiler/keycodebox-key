@@ -6,15 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>329</width>
-    <height>416</height>
+    <width>322</width>
+    <height>347</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -38,6 +50,9 @@ QPushButton[checkable=true]:checked {
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QVBoxLayout" name="vloSelectedCabinet">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinimumSize</enum>
+     </property>
      <item>
       <layout class="QHBoxLayout" name="hloSelectedCabinet">
        <item>
@@ -104,10 +119,16 @@ QPushButton[checkable=true]:checked {
          <property name="enabled">
           <bool>true</bool>
          </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -126,10 +147,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock02">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -148,10 +175,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock03">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -170,10 +203,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock04">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -199,10 +238,16 @@ QPushButton[checkable=true]:checked {
        </property>
        <item>
         <widget class="QPushButton" name="pbLock05">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -221,10 +266,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock06">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -243,10 +294,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock07">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -265,10 +322,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock08">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -294,10 +357,16 @@ QPushButton[checkable=true]:checked {
        </property>
        <item>
         <widget class="QPushButton" name="pbLock09">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -316,10 +385,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock10">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -338,10 +413,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock11">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -360,10 +441,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock12">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -389,10 +476,16 @@ QPushButton[checkable=true]:checked {
        </property>
        <item>
         <widget class="QPushButton" name="pbLock13">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -411,10 +504,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock14">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -433,10 +532,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock15">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -455,10 +560,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock16">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -484,10 +595,16 @@ QPushButton[checkable=true]:checked {
        </property>
        <item>
         <widget class="QPushButton" name="pbLock17">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -506,10 +623,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock18">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -528,10 +651,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock19">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -550,10 +679,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock20">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -579,10 +714,16 @@ QPushButton[checkable=true]:checked {
        </property>
        <item>
         <widget class="QPushButton" name="pbLock21">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -601,10 +742,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock22">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -623,10 +770,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock23">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -645,10 +798,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock24">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -674,10 +833,16 @@ QPushButton[checkable=true]:checked {
        </property>
        <item>
         <widget class="QPushButton" name="pbLock25">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -696,10 +861,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock26">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -718,10 +889,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock27">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -740,10 +917,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock28">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -769,10 +952,16 @@ QPushButton[checkable=true]:checked {
        </property>
        <item>
         <widget class="QPushButton" name="pbLock29">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -794,10 +983,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock30">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -816,10 +1011,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbLock31">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -841,10 +1042,16 @@ QPushButton[checkable=true]:checked {
          <property name="enabled">
           <bool>true</bool>
          </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>35</width>
-           <height>35</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -878,10 +1085,16 @@ QPushButton[checkable=true]:checked {
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QPushButton" name="pbSelectAll">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>32</height>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -896,10 +1109,16 @@ QPushButton[checkable=true]:checked {
        </item>
        <item>
         <widget class="QPushButton" name="pbClearAll">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>32</height>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -913,6 +1132,19 @@ QPushButton[checkable=true]:checked {
         </widget>
        </item>
       </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
