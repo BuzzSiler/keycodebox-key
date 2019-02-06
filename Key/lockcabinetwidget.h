@@ -39,6 +39,7 @@ class LockCabinetWidget : public QWidget
         void on_pbClearAll_clicked();
         void on_cbSelectedCabinet_currentIndexChanged(int index);
         void lockSelected(int lock_index);
+        QString elideText(QString& text, const QFont& font, const int width);
 
     private:
         typedef struct _tag_cab_state

@@ -4,6 +4,7 @@
 #include "kcbkeyboarddialog.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
+#include "kcbsystem.h"
 #include "keycodeboxsettings.h"
 
 static const QString css_warn = "color: black; background-color: red";
@@ -22,11 +23,7 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // For some reason, the admin form does not show full screen without the following
-    // flags being set.  Maybe this should be don't at in the main so it gets
-    // inherited?  Not sure.  Until this is resolved, just set these flags.
-    CDlgQuestions::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    CDlgQuestions::showFullScreen();
+    kcb::SetWindowParams(this);
 
     fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 

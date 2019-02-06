@@ -10,7 +10,9 @@ FrmNetworkSettings::FrmNetworkSettings(QWidget *parent) :
     ui(new Ui::FrmNetworkSettings)
 {
     ui->setupUi(this);
-    FrmNetworkSettings::showFullScreen();
+
+    kcb::SetWindowParams(this);
+
 
     ui->lblIpAddressValue->setText(kcb::GetHostAddress());
     ui->lblIpBroadcastValue->setText(kcb::GetBcastAddress());

@@ -11,10 +11,10 @@
 #include "lockcabinetwidget.h"
 #include "lockstate.h"
 #include "kcbcommon.h"
+#include "kcbutils.h"
+#include "kcbsystem.h"
 #include "kcbkeyboarddialog.h"
 #include "dlgeditquestions.h"
-#include "kcbutils.h"
-#include "kcbcommon.h"
 #include "keycodeboxsettings.h"
 
 static const QString FP_HOME_DIR = "/home/pi/run/prints/";
@@ -31,7 +31,7 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    FrmCodeEditMulti::showFullScreen();
+    kcb::SetWindowParams(this);
 
     connect(&m_lock_cab, SIGNAL(NotifyLockSelected(QString, bool)), this, SLOT(OnNotifyLockSelected(QString, bool)));
 
@@ -57,10 +57,6 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     ui->dtEndAccess->setDateTime(QDateTime::currentDateTime());
     ui->dtEndAccess->setVisible(false);
 
-    //ui->lblStartAccessTextOverlay->setText(tr("ALWAYS"));
-    //ui->lblStartAccessTextOverlay->setVisible(true);
-    //ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
-    //ui->lblEndAccessTextOverlay->setVisible(true);
     m_access_type_label.setText("");
     m_access_state_label.setText("");
     m_access_type_label.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -69,7 +65,6 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     m_access_type_label.hide();
     m_access_state_label.setEnabled(false);
     m_access_state_label.hide();
-
 
     resetQuestions();
 
@@ -271,7 +266,7 @@ void FrmCodeEditMulti::on_pbClearUsername_clicked()
 
 void FrmCodeEditMulti::on_pbEditQuestions_clicked()
 {
-    CDlgEditQuestions *eq = new CDlgEditQuestions();
+    CDlgEditQuestions *eq = new CDlgEditQuestions(this);
     eq->setValues(m_questions);
     if (eq->exec())
     {

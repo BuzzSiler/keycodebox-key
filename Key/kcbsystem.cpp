@@ -10,16 +10,42 @@
 #include <QBuffer>
 #include <QDir>
 #include <QFile>
+#include <QScreen>
+#include <QApplication>
+#include <QWidget>
 #include "kcbcommon.h"
+#include "keycodeboxsettings.h"
 
 namespace kcb
 {
-    static const QString NEW_APP_COPY_COMMAND = "sudo cp %1 %2";
-    static const QString APP_DIR = "/home/pi/kcb-config/bin";
-    static const QString NEW_APP_TARGET = "%1/%2_NEW";
+    static int const WAVESHARE_10INCH_WIDTH = 848;
+    static int const WAVESHARE_10INCH_HEIGHT = 480;
+    static int const OFFICIAL_7INCH_WIDTH = 800;
+    static int const OFFICIAL_7INCH_HEIGHT = 480;
+
+    typedef enum {DISP_POWER_OFF, DISP_POWER_ON} DISP_POWER_STATE;
+    static DISP_POWER_STATE display_power_state = DISP_POWER_ON;
+
+    static QString const NEW_APP_COPY_COMMAND = "sudo cp %1 %2";
+    static QString const APP_DIR = "/home/pi/kcb-config/bin";
+    static QString const NEW_APP_TARGET = "%1/%2_NEW";
+
+    static QString const KCBCONFIG_SETTINGS_PATH("/home/pi/kcb-config/settings");
+    static QString const KCBCONFIG_WAVESHARE_DISPLAY_CONFIG_FILE("config.waveshare.txt");
+    static QString const KCBCONFIG_OFFICIAL_DISPLAY_CONFIG_FILE("config.official.txt");
+    static QString const BOOT_CONFIG_FILE("/boot/config.txt");
 
     typedef enum { HOST_ADDRESS, BCAST_ADDRESS, NETWORK_MASK, MAC_ADDRESS } NETWORK_INFO_TYPE;
 
+    static bool is7InchDisplay()
+    {
+        QScreen *screen = QApplication::primaryScreen();
+
+        int width = screen->availableGeometry().right();
+        int height = screen->availableGeometry().bottom();
+
+        return width == 800 && height == 480;
+    }
 
     void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status)
     {
@@ -416,4 +442,141 @@ namespace kcb
         KCB_DEBUG_EXIT;
     }
 
+    void TurnOffDisplay()
+    {
+        KCB_DEBUG_ENTRY;
+        display_power_state = DISP_POWER_OFF;
+
+        if (is7InchDisplay())
+        {
+            system(qPrintable("sudo /home/pi/kcb-config/scripts/displayonoff.sh 1"));
+        }
+        else
+        {
+            system(qPrintable("vcgencmd display_power 0"));
+        }
+        KCB_DEBUG_EXIT;
+    }
+
+    void TurnOnDisplay()
+    {
+        KCB_DEBUG_ENTRY;
+        display_power_state = DISP_POWER_ON;
+
+        if (is7InchDisplay())
+        {
+            system(qPrintable("sudo /home/pi/kcb-config/scripts/displayonoff.sh 0"));
+        }
+        else
+        {
+            system(qPrintable("vcgencmd display_power 1"));
+        }
+        KCB_DEBUG_EXIT;
+    }
+
+    bool isDisplayPowerOn()
+    {
+        return display_power_state == DISP_POWER_ON;
+    }
+
+    void GetScreenDimensions(int&  width, int& height)
+    {
+        QScreen* screen = QApplication::primaryScreen();
+        QScreen* gui_screen = QGuiApplication::primaryScreen();
+        KCB_DEBUG_TRACE("available app screen" << screen->availableGeometry());
+        KCB_DEBUG_TRACE("available gui screen" << gui_screen->availableGeometry());
+
+        width = screen->availableGeometry().right();
+        height = screen->availableGeometry().bottom();
+
+        KCB_DEBUG_TRACE("Screen Dimensions:" << width << "x" << height);
+    }
+
+    void GetAvailableGeometry(QRect& rect)
+    {
+        QScreen* screen = QApplication::primaryScreen();
+        rect = screen->availableGeometry();
+        KCB_DEBUG_TRACE("Available Geometry:" << rect);
+    }
+
+    void SetWindowParams(QWidget* widget)
+    {
+        int width;
+        int height;
+        GetScreenDimensions(width, height);        
+        QRect ag;
+        GetAvailableGeometry(ag);
+
+        widget->setGeometry(ag.x(), ag.y(), ag.width(), ag.height());
+        widget->setMinimumSize(width, height);
+        widget->setMaximumSize(width, height);
+        widget->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+        widget->showFullScreen();
+    }
+
+    bool IsHdmiConnected()
+    {
+        QString stdOut;
+        QString stdErr;
+        int status;
+        bool is_connected = false;
+
+        ExecuteCommand(QString("tvservice"), QStringList() << QString("-s"), stdOut, stdErr, status);
+
+        if (status == QProcess::CrashExit)
+        {
+            return false;
+        }
+
+        if (!stdOut.isEmpty())
+        {
+            // HDMI cable disconnected
+            // ~ $ tvservice -s
+            // state 0x120009 [HDMI DMT (87) RGB full 16:9], 848x480 @ 60.00Hz, progressive
+
+            // HDMI cable connected
+            // ~ $ tvservice -s
+            // state 0x12000a [HDMI DMT (87) RGB full 16:9], 848x480 @ 60.00Hz, progressive
+
+            QString trimmed = stdOut.trimmed();
+            QStringList splits = trimmed.split(" ");
+            KCB_DEBUG_TRACE("hdmi splits" << splits);
+            QString tvservice_state = splits[1];
+
+
+            is_connected = tvservice_state == QString("0x12000a");
+        }
+
+        return is_connected;
+    }
+
+    void SetupDisplay()
+    {
+        if (KeyCodeBoxSettings::isDisplaySet())
+        {
+            return;
+        }
+
+        QString config_file;
+        if (IsHdmiConnected())
+        {
+            config_file = KCBCONFIG_WAVESHARE_DISPLAY_CONFIG_FILE;
+        }
+        else
+        {
+            config_file = KCBCONFIG_OFFICIAL_DISPLAY_CONFIG_FILE;
+        }
+
+        QString command = QString("sudo cp %1/%2 %3").arg(KCBCONFIG_SETTINGS_PATH).arg(config_file).arg(BOOT_CONFIG_FILE);
+        KCB_DEBUG_TRACE(command);
+        int status = std::system(command.toStdString().c_str());
+        if (status != 0)
+        {
+            KCB_DEBUG_TRACE("system command failure:" << status);
+        }
+
+        KeyCodeBoxSettings::setDisplay();
+        KCB_DEBUG_TRACE("Rebooting");
+        Reboot();
+    }
 }

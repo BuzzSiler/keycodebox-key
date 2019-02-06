@@ -13,10 +13,11 @@ int main(int argc, char *argv[])
 
     kcb::Logger::installHandler();
     kcb::Logger::setLevel(kcb::Logger::LEVEL_INFO);
-
     kcb::BackupDatabase();
 
+    // Note: This function may invoke a reboot
+    kcb::SetupDisplay();
+    
     MainWindow w;
-    w.show();
     return a.exec();
 }

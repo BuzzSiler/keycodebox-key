@@ -5,6 +5,9 @@
 #include <QStringList>
 #include <QByteArray>
 
+class QRect;
+class QWidget;
+
 
 namespace kcb
 {
@@ -24,5 +27,13 @@ namespace kcb
     bool HasCamera();
     QByteArray GetImageAsByteArray(QString filename="", bool delete_file=true);
     void BackupDatabase();
+    void TurnOffDisplay();
+    void TurnOnDisplay();
+    bool isDisplayPowerOn();
+    void GetScreenDimensions(int&  width, int& height);
+    void GetAvailableGeometry(QRect& rect);
+    void SetWindowParams(QWidget* window);
+    void SetupDisplay();
+
 }
 #endif // KCBSYSTEM_H

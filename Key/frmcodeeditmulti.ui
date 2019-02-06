@@ -16,6 +16,18 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>480</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>800</width>
+    <height>480</height>
+   </size>
+  </property>
   <property name="font">
    <font>
     <pointsize>12</pointsize>
@@ -26,16 +38,10 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
+    <number>15</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
+    <number>15</number>
    </property>
    <item>
     <widget class="QGroupBox" name="gbSettings">
@@ -588,7 +594,7 @@
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer">
+       <spacer name="vsStartEndToSaveControl">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -652,7 +658,7 @@
      <zorder>vsCodesToAccess</zorder>
      <zorder>vsAccessToStartEnd</zorder>
      <zorder></zorder>
-     <zorder>verticalSpacer</zorder>
+     <zorder>vsStartEndToSaveControl</zorder>
     </widget>
    </item>
    <item>

@@ -12,8 +12,13 @@
 #include "keycodeboxsettings.h"
 #include "version.h"
 #include "kcbcommon.h"
+#include "kcbsystem.h"
 #include "kcbapplication.h"
 
+static int const LEFT_MARGIN = 20;
+static int const RIGHT_MARGIN = 20;
+static int const TOP_MARGIN = 20;
+static int const BOTTOM_MARGIN = 20;
 
 static bool fleetwave_enabled;
 
@@ -25,7 +30,9 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     m_takereturn_state(false)
 {
     ui->setupUi(this);
-    CFrmUserCode::showFullScreen();
+
+    kcb::SetWindowParams(this);
+
     initialize();
 
     fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
@@ -56,11 +63,6 @@ void CFrmUserCode::mousePressEvent(QMouseEvent* event)
     int top = screen->availableGeometry().top();
     int left = screen->availableGeometry().left();
     int bottom = screen->availableGeometry().bottom();
-
-    #define LEFT_MARGIN (20)
-    #define RIGHT_MARGIN (20)
-    #define TOP_MARGIN (20)
-    #define BOTTOM_MARGIN (20)
 
     bool in_upper_right = event->x() >= (right - RIGHT_MARGIN) && event->y() <= (top + TOP_MARGIN);
     bool in_upper_left = event->x() <= (left + LEFT_MARGIN) && event->y() <= (top + TOP_MARGIN);

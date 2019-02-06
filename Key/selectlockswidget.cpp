@@ -5,9 +5,12 @@
 #include <QAbstractButton>
 #include <QSignalMapper>
 #include <QVector>
+#include <QTimer>
 #include "lockcabinetwidget.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
+
+static int const TIMEOUT_PERIOD = 1000;
 
 SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
     QWidget(parent),
@@ -15,9 +18,14 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
     m_cancel_open(false),
     m_lock_cab(* new LockCabinetWidget(this)),
     m_lock_list{},
+    m_timeout(0),
+    m_timer(* new QTimer(this)),
     ui(new Ui::SelectLocksWidget)
 {
     ui->setupUi(this);
+
+    ui->lblTimeRemaining->setVisible(false);
+    ui->lblTimeTitle->setVisible(false);
 
     ui->vloLockCabinet->addWidget(&m_lock_cab);
 
@@ -27,6 +35,10 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
     {
         ui->btnCancelOpen->setEnabled(true);
     }
+
+    connect(&m_timer, &QTimer::timeout, this, &SelectLocksWidget::update);
+    m_timer.setSingleShot(true);
+
 }
 
 SelectLocksWidget::~SelectLocksWidget()
@@ -65,6 +77,22 @@ QString SelectLocksWidget::getLocks()
     }
 
     return locks.join(",");
+}
+
+void SelectLocksWidget::setTimer(int seconds)
+{
+    m_timeout = seconds;
+    ui->lblTimeRemaining->setVisible(true);
+    ui->lblTimeTitle->setVisible(true);
+    ui->lblTimeRemaining->setText(QString::number(seconds));
+}
+
+void SelectLocksWidget::startTimer()
+{
+    if (m_timeout > 0)
+    {
+        m_timer.start(TIMEOUT_PERIOD);
+    }
 }
 
 void SelectLocksWidget::createLockListStr(QString cab, QString lock, QString& str)
@@ -200,5 +228,28 @@ void SelectLocksWidget::on_btnOpenSelected_clicked()
     else // m_role == USER
     {
         emit NotifyOpen();
+    }
+}
+
+void SelectLocksWidget::update()
+{
+    if (m_timeout == 0)
+    {
+        ui->lblTimeRemaining->setStyleSheet("color: black");
+        //ui->lblTimeRemaining->setText(QString::number(30));
+        emit NotifyTimeout();
+    }
+
+    // Set color to red for last 10 seconds
+    if (m_timeout == 11)
+    {
+        ui->lblTimeRemaining->setStyleSheet("color: red");
+    }
+
+    if (m_timeout > 0)
+    {
+        m_timeout = m_timeout - 1;
+        ui->lblTimeRemaining->setText(QString::number(m_timeout));
+        m_timer.start(TIMEOUT_PERIOD);
     }
 }

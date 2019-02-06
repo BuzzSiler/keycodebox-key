@@ -16,7 +16,7 @@ class KcbKeyboardWidget : public QWidget
         Q_OBJECT
 
     public:
-        explicit KcbKeyboardWidget(QWidget *parent = 0);
+        explicit KcbKeyboardWidget(QWidget *parent = 0, bool for_password = false);
         ~KcbKeyboardWidget();
 
         void setValue(const QString value,
@@ -25,6 +25,8 @@ class KcbKeyboardWidget : public QWidget
         void clear();
         void numbersOnly(bool state);
         void ipAddress(bool state);
+        void resetPassword();
+        void invalidPassword();
 
     signals:
         void NotifyClose();
@@ -38,6 +40,7 @@ class KcbKeyboardWidget : public QWidget
         void alphaClicked(QString value);
         void controlClicked(QString value);
         void OnReturnClicked();
+        void on_pbCtrlShowHide_clicked();
 
     private:
         typedef void (*SLOT_PTR_TYPE)(QWidget *);
@@ -52,11 +55,15 @@ class KcbKeyboardWidget : public QWidget
 
         QString m_value;
         QStringList m_codes_in_use;
+        bool m_for_password;
 
         Ui::KcbKeyboardWidget *ui;
 
         void updateValue(QString value);
         void updateUi();
+        void hidePlaceholders();
+        void retainAndHide(QWidget* widget);
+
 
 };
 
