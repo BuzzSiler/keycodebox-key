@@ -41,6 +41,7 @@ class KcbKeyboardDialog : public QDialog
     private:
         KcbKeyboardWidget& m_keyboard;
         QStringList m_empty_list;
+        bool m_for_password;
         Ui::KcbKeyboardDialog *ui;
 
 

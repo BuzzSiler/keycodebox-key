@@ -33,13 +33,13 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_10">
    <property name="leftMargin">
-    <number>15</number>
+    <number>9</number>
    </property>
    <property name="topMargin">
     <number>9</number>
    </property>
    <property name="rightMargin">
-    <number>15</number>
+    <number>9</number>
    </property>
    <property name="bottomMargin">
     <number>9</number>

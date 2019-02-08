@@ -1,7 +1,10 @@
 #include "kcbapplication.h"
+
 #include <QString>
 #include <QDebug>
 #include <QObject>
+
+#include "kcbcommon.h"
 
 static QString last_transaction_username;
 static QString last_transaction_locks;
@@ -43,24 +46,32 @@ namespace kcb
 
         clearAccessSelection();
 
-        qDebug() << "Getting Access Selection" << selection;
+        KCB_DEBUG_TRACE("Getting Access Selection" << selection);
 
         return selection;
     }
 
     void Application::clearAccessSelection()
     {
+        KCB_DEBUG_ENTRY;
         m_selection = ACCESS_NONE;
+        KCB_DEBUG_EXIT;
     }
 
     bool Application::isTakeSelection()
     {
-        return m_selection == ACCESS_TAKE;
+        KCB_DEBUG_ENTRY;
+        bool result = m_selection == ACCESS_TAKE;
+        KCB_DEBUG_EXIT;
+        return result;
     }
 
     bool Application::isReturnSelection()
     {
-        return m_selection == ACCESS_RETURN;
+        KCB_DEBUG_ENTRY;
+        bool result = m_selection == ACCESS_RETURN;
+        KCB_DEBUG_EXIT;
+        return result;
     }
 
     void Application::SetLastTransaction(QString username, QString locks, QString datetime)

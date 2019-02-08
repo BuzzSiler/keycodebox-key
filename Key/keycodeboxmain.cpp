@@ -363,6 +363,7 @@ void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
 
 void MainWindow::hideFormsExcept(QDialog * pfrm) 
 {
+    KCB_DEBUG_ENTRY;
     if (&kkd != pfrm)
     {
         kkd.hide();
@@ -372,9 +373,15 @@ void MainWindow::hideFormsExcept(QDialog * pfrm)
         _pfUsercode->SetDisplayCodeEntryControls(false);   
         _pfUsercode->hide();
     }
+    if(_pQuestions && _pQuestions != pfrm) 
+    {
+        _pQuestions->hide();
+    }
+
     pfrm->activateWindow();
     pfrm->raise();
     pfrm->setFocus();
+    KCB_DEBUG_EXIT;
 }
 
 bool MainWindow::isVncConnectionActive(int vncPort)
@@ -522,23 +529,31 @@ void MainWindow::OnEnrollFingerprintDialog(QString sCode)
 {
     Q_UNUSED(sCode);
 
-    qDebug() << "MainWindow::OnEnrollFingerprintDialog()";
+    KCB_DEBUG_ENTRY;
 
     _pdFingerprint->show();
     _pdFingerprint->setDefaultStage(1);
     _pdFingerprint->setMessage("");
     _pdFingerprint->setOkDisabled(true);
+
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3)
 {
     KCB_DEBUG_ENTRY;
+    // Needed to force all other windows hidden.  This is a kludge -- hopefully temporary
+    hideFormsExcept(_pQuestions);
     _pQuestions->setValues(lockNum, question1, question2, question3);
+    // Needed to force the questions dialog to the top
+    _pQuestions->raise();
     _pQuestions->show();
     KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnQuestionUserDialogClose()
 {
+    KCB_DEBUG_ENTRY;
     _pQuestions->hide();
+    KCB_DEBUG_EXIT;
 }

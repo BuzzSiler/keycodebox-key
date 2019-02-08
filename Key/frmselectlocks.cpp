@@ -1,10 +1,13 @@
 #include "frmselectlocks.h"
 #include "ui_frmselectlocks.h"
+
 #include <QObject>
 #include <QDebug>
+
 #include "selectlockswidget.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
+#include "kcbsystem.h"
 
 CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
     QDialog(parent),
@@ -12,6 +15,8 @@ CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
     ui(new Ui::CFrmSelectLocks)
 {
     ui->setupUi(this);
+
+    kcb::SetWindowParams(this);
 
     ui->vloSelectLocks->addWidget(&m_select_locks);
 

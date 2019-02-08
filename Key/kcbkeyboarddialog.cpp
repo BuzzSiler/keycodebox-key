@@ -11,6 +11,7 @@
 KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent, bool for_password) :
     QDialog(parent),
     m_keyboard(* new KcbKeyboardWidget(this, for_password)),
+    m_for_password(for_password),
     ui(new Ui::KcbKeyboardDialog)
 {
     ui->setupUi(this);
@@ -19,16 +20,8 @@ KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent, bool for_password) :
 
     ui->hloKeyboard->addWidget(&m_keyboard);
 
-
     connect(&m_keyboard, SIGNAL(NotifyClose()), this, SLOT(reject()));
-    if (for_password)
-    {
-        connect(&m_keyboard, SIGNAL(NotifyEnter()), this, SLOT(Accept()));
-    }
-    else
-    {
-        connect(&m_keyboard, SIGNAL(NotifyEnter()), this, SLOT(accept()));
-    }
+    connect(&m_keyboard, SIGNAL(NotifyEnter()), this, SLOT(Accept()));
     connect(&m_keyboard, SIGNAL(NotifyClose()), this, SIGNAL(NotifyCancelled()));
 
     m_empty_list.clear();
@@ -79,8 +72,14 @@ void KcbKeyboardDialog::ClearText()
 void KcbKeyboardDialog::Accept()
 {
     KCB_DEBUG_ENTRY;
-    QString value = m_keyboard.getValue();
-    emit NotifyEntered(value);
+    if (m_for_password)
+    {
+        QString value = m_keyboard.getValue();
+        emit NotifyEntered(value);
+    }
+
+    accept();
+
     KCB_DEBUG_EXIT;
 }
 

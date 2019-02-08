@@ -456,6 +456,7 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                 return;
             }
 
+            KCB_DEBUG_TRACE("bAskQuestions" << bAskQuestions);
             if ( bAskQuestions && kcb::Application::isReturnSelection() )
             {
                 qDebug() << "QUESTION1: " << question1;

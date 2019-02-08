@@ -742,14 +742,6 @@ bool CSystemController::getDisplayTakeReturnButtons()
     return _padminInfo->getDisplayTakeReturnButtons();
 }
 
-CFrmUserCode* CSystemController::getUserCodeOne()
-{
-    if(!_pfUsercode)
-    {
-    }
-    return (CFrmUserCode *)NULL;
-}
-
 void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 {
     char cChar = '\0';

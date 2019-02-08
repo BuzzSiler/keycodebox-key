@@ -30,7 +30,7 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     m_takereturn_state(false)
 {
     ui->setupUi(this);
-
+    
     kcb::SetWindowParams(this);
 
     initialize();
