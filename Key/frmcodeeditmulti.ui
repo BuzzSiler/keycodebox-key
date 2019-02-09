@@ -36,7 +36,7 @@
   <property name="windowTitle">
    <string>Code Edit Multilock</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_3">
    <property name="leftMargin">
     <number>15</number>
    </property>
@@ -54,19 +54,7 @@
      <property name="title">
       <string>Settings</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="leftMargin">
-       <number>6</number>
-      </property>
-      <property name="topMargin">
-       <number>6</number>
-      </property>
-      <property name="rightMargin">
-       <number>6</number>
-      </property>
-      <property name="bottomMargin">
-       <number>6</number>
-      </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QHBoxLayout" name="hloCode1">
         <item>
@@ -411,7 +399,7 @@
        </spacer>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="hloAccessType">
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="lbAccessType">
           <property name="font">
@@ -425,16 +413,13 @@
          </widget>
         </item>
         <item>
-         <spacer name="hslAccessType">
+         <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Preferred</enum>
-          </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>100</width>
+            <width>40</width>
             <height>20</height>
            </size>
           </property>
@@ -442,6 +427,12 @@
         </item>
         <item>
          <widget class="QComboBox" name="cbAccessType">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -470,8 +461,24 @@
           </item>
          </widget>
         </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="hloStartAccess">
         <item>
-         <spacer name="hsrAccessType">
+         <widget class="QLabel" name="lblStartAccess">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Start Access</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -483,103 +490,51 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QDateTimeEdit" name="dtStartAccess">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
-       <spacer name="vsAccessToStartEnd">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="hloStartEndAccess">
+       <layout class="QHBoxLayout" name="hloEndAccess">
         <item>
-         <layout class="QVBoxLayout" name="vloStartEndAccessLabel">
-          <item>
-           <widget class="QLabel" name="lblStartAccess">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Start Access</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblEndAccess">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>End Access</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QLabel" name="lblEndAccess">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>End Access</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <spacer name="hslStartEndAccess">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Preferred</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>100</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="vloStartEndDte">
-          <item>
-           <widget class="QDateTimeEdit" name="dtStartAccess">
-            <property name="minimumSize">
-             <size>
-              <width>250</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QDateTimeEdit" name="dtEndAccess">
-            <property name="minimumSize">
-             <size>
-              <width>250</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="hsrStartEndAccess">
+         <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -591,17 +546,44 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QDateTimeEdit" name="dtEndAccess">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
-       <spacer name="vsStartEndToSaveControl">
+       <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>40</height>
+          <height>18</height>
          </size>
         </property>
        </spacer>
@@ -656,9 +638,8 @@
       </item>
      </layout>
      <zorder>vsCodesToAccess</zorder>
-     <zorder>vsAccessToStartEnd</zorder>
      <zorder></zorder>
-     <zorder>vsStartEndToSaveControl</zorder>
+     <zorder>verticalSpacer</zorder>
     </widget>
    </item>
    <item>

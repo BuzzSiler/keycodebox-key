@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QDir>
 #include <QLabel>
+#include <QFont>
 
 #include "lockcabinetwidget.h"
 #include "lockstate.h"
@@ -189,21 +190,16 @@ void FrmCodeEditMulti::updateAccessType(int index)
     ui->dtStartAccess->setVisible(is_timed);
     ui->dtEndAccess->setVisible(is_timed);
 
-    //ui->lblStartAccessTextOverlay->setVisible(!is_timed);
-    //ui->lblStartAccessTextOverlay->setEnabled(!is_timed);
-    //ui->lblEndAccessTextOverlay->setVisible(!is_timed);
-    //ui->lblEndAccessTextOverlay->setEnabled(!is_timed);
-    QRect dt_start_rect = ui->dtStartAccess->geometry();
-    QRect dt_end_rect = ui->dtEndAccess->geometry();
-    KCB_DEBUG_TRACE("dt start" << dt_start_rect << "dt_end_rect" << dt_end_rect);
     m_access_type_label.setText("");
     m_access_state_label.setText("");
-    m_access_type_label.setGeometry(dt_start_rect);
-    m_access_state_label.setGeometry(dt_end_rect);
     m_access_type_label.setEnabled(!is_timed);
-    m_access_type_label.hide();
     m_access_state_label.setEnabled(!is_timed);
-    m_access_state_label.hide();
+    m_access_type_label.setVisible(!is_timed);
+    m_access_state_label.setVisible(!is_timed);
+    ui->hloStartAccess->removeWidget(&m_access_type_label);
+    ui->hloEndAccess->removeWidget(&m_access_state_label);
+    ui->dtStartAccess->setVisible(is_timed);
+    ui->dtEndAccess->setVisible(is_timed);
 
     switch (index)
     {
@@ -211,6 +207,8 @@ void FrmCodeEditMulti::updateAccessType(int index)
             {
             QDateTime curr = QDateTime::currentDateTime();
             // Note: There are checks for start/end access so we set the same date/time to both
+            ui->dtStartAccess->setVisible(true);
+            ui->dtEndAccess->setVisible(true);
             ui->dtStartAccess->setDateTime(curr);
             ui->dtEndAccess->setDateTime(curr);
             }
@@ -218,8 +216,8 @@ void FrmCodeEditMulti::updateAccessType(int index)
 
         case ACCESS_TYPE_LIMITED_USE:
             {
-            //ui->lblStartAccessTextOverlay->setText(tr("LIMITED USE (Take/Return only)"));
-            //ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
+            ui->hloStartAccess->addWidget(&m_access_type_label);
+            ui->hloEndAccess->addWidget(&m_access_state_label);
             m_access_type_label.setText(tr("LIMITED USE (Take/Return only)"));
             m_access_state_label.setText(tr("ACTIVE"));
             m_access_type_label.show();
@@ -232,8 +230,8 @@ void FrmCodeEditMulti::updateAccessType(int index)
         case ACCESS_TYPE_ALWAYS:
         default:
             {
-            //ui->lblStartAccessTextOverlay->setText(tr("ALWAYS"));
-            //ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
+            ui->hloStartAccess->addWidget(&m_access_type_label);
+            ui->hloEndAccess->addWidget(&m_access_state_label);
             m_access_type_label.setText(tr("ALWAYS"));
             m_access_state_label.setText(tr("ACTIVE"));
             m_access_type_label.show();
@@ -243,6 +241,7 @@ void FrmCodeEditMulti::updateAccessType(int index)
             }
             break;
     }
+
 
 }
 
