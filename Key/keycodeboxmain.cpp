@@ -3,6 +3,7 @@
 
 #include <QDateTime>
 #include <QProcess>
+#include <QScreen>
 #include <iostream>
 #include <cstdlib>
 
@@ -20,8 +21,9 @@
 #include "systemcontroller.h"
 #include "kcbcommon.h"
 #include "logger.h"
+#include "kcbsystem.h"
+#include "kcbkeyboarddialog.h"
 
-MainWindow::DISP_POWER_STATE MainWindow::display_power_state = MainWindow::DISP_POWER_ON;
 MainWindow      *gpmainWindow;
 
 void MainWindow::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
@@ -38,21 +40,21 @@ void MainWindow::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _psystemController(new CSystemController(this))
+    _psystemController(new CSystemController(this)),
+    kkd(*new KcbKeyboardDialog(this, true))
 {
     ui->setupUi(this);
 
     LOG_TRACE_DEBUG("starting application");
 
-    system(qPrintable("vcgencmd display_power 1"));
-    MainWindow::display_power_state = MainWindow::DISP_POWER_ON;
-
-    QMainWindow::showFullScreen();
-    QMainWindow::activateWindow();
-    QMainWindow::raise();
-    initialize();
-
     setAttribute(Qt::WA_AcceptTouchEvents, true);
+    
+    kcb::SetWindowParams(this);
+    QRect ag;
+    kcb::GetAvailableGeometry(ag);
+    QCursor::setPos(ag.width(), ag.height());
+
+    initialize();
 
     _pscene = new QGraphicsScene(this);
     ui->graphicsView->setScene(_pscene);
@@ -69,11 +71,12 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     // Scale the image...
-    _pPixmapItem = new CClickableGraphicsItem(_pPixmap->scaled(760, 390));
+    _pPixmapItem = new CClickableGraphicsItem(_pPixmap->scaled(ag.width(), ag.height()));
     _pscene->addItem(_pPixmapItem);
     ui->graphicsView->show();
 
     ui->graphicsView->setClickedFunc(&(OnImageClicked) );
+    ui->graphicsView->fitInView(ag);
 
     _pdisplayPowerDown = new QTimer();
    
@@ -111,12 +114,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     gpmainWindow = this;
 
-    qDebug() << "MainWindow: moveToThread.";
+    KCB_DEBUG_TRACE("moveToThread");
     _psystemController->moveToThread(&_sysControlThread);
-
     SetupAdmin(_psystemController);
-
     _sysControlThread.start();
+
+    kcb::TurnOnDisplay();
 }
 
 void MainWindow::SetupAdmin(QObject *psysController)
@@ -124,7 +127,7 @@ void MainWindow::SetupAdmin(QObject *psysController)
     KCB_DEBUG_ENTRY;
     if (!_pfAdminInfo)
     {
-        _pfAdminInfo = new CFrmAdminInfo();
+        _pfAdminInfo = new CFrmAdminInfo(this);
         _pfAdminInfo->hide();
         _pfAdminInfo->setSystemController((CSystemController*)psysController);
     }
@@ -164,7 +167,6 @@ bool MainWindow::isInternetTime()
 
 void MainWindow::initialize() {
     _pfUsercode = 0;
-    _pfAdminPW = 0;
     _pfAdminInfo = 0;
     _pdFingerprint = 0;
     _pQuestions = 0;
@@ -192,13 +194,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::OnDisplayPowerDown()
 {
-    system(qPrintable("vcgencmd display_power 0"));
-    MainWindow::display_power_state = MainWindow::DISP_POWER_OFF;
+    kcb::TurnOffDisplay();
 }
 
 void MainWindow::OnDisplayPoweredOn()
 {
-    if (display_power_state == MainWindow::DISP_POWER_ON)
+    if (kcb::isDisplayPowerOn())
     {
         if (!_pfAdminInfo)
         {
@@ -216,15 +217,13 @@ void MainWindow::OnDisplayPoweredOn()
 void MainWindow::OnImageClicked()
 {
     KCB_DEBUG_ENTRY;
-    if (display_power_state == MainWindow::DISP_POWER_ON)
+    if (kcb::isDisplayPowerOn())
     {
         emit gpmainWindow->__TouchScreenTouched();
     }
     else
     {
-        qDebug() << "Powering on display";
-        system(qPrintable("vcgencmd display_power 1"));
-        display_power_state = MainWindow::DISP_POWER_ON;
+        kcb::TurnOnDisplay();
 
         emit gpmainWindow->__DisplayPoweredOn();
     }
@@ -241,10 +240,7 @@ void MainWindow::OnDisplayTimeoutScreen()
         _pfUsercode->OnClearCodeDisplay();
         _pfUsercode->hide();
     }
-    if(_pfAdminPW) 
-    {
-        _pfAdminPW->hide();
-    }
+    kkd.hide();
     if(_pfAdminInfo) 
     {
         _pfAdminInfo->hide();
@@ -269,7 +265,7 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
     if(!_pfUsercode)
     {
         KCB_DEBUG_TRACE("new CFrmUserCode");
-        _pfUsercode = new CFrmUserCode();
+        _pfUsercode = new CFrmUserCode(this);
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
 
@@ -300,7 +296,7 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
 
         if( !_pQuestions )
         {
-            _pQuestions = new CDlgQuestions();
+            _pQuestions = new CDlgQuestions(this);
             _pQuestions->hide();
             connect(psysController, SIGNAL(__onQuestionUserDialog(QString,QString,QString,QString)), this, SLOT(OnQuestionUserDialog(QString,QString,QString,QString)));
             connect(_pQuestions, SIGNAL(__OnQuestionsCancel()), psysController, SLOT(QuestionUserCancel()));
@@ -329,10 +325,10 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
 
 void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 {
+    KCB_DEBUG_ENTRY;
     if(!_pfUsercode) 
     {
-        qDebug() << "MainWindow::OnDisplayUserCodeTwoDialog()";
-        _pfUsercode = new CFrmUserCode();
+        _pfUsercode = new CFrmUserCode(this);
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
         connect(psysController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfUsercode, SLOT(OnDisplayFingerprintButton(bool)));
@@ -357,6 +353,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
     _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());    
     _pfUsercode->SetDisplayTakeReturnButtons(_psystemController->getDisplayTakeReturnButtons());  
     _pfUsercode->show();
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
@@ -366,18 +363,25 @@ void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
 
 void MainWindow::hideFormsExcept(QDialog * pfrm) 
 {
-    if(_pfAdminPW && _pfAdminPW != pfrm)
+    KCB_DEBUG_ENTRY;
+    if (&kkd != pfrm)
     {
-        _pfAdminPW->hide();
+        kkd.hide();
     }
     if(_pfUsercode && _pfUsercode != pfrm)
     {
         _pfUsercode->SetDisplayCodeEntryControls(false);   
         _pfUsercode->hide();
     }
+    if(_pQuestions && _pQuestions != pfrm) 
+    {
+        _pQuestions->hide();
+    }
+
     pfrm->activateWindow();
     pfrm->raise();
     pfrm->setFocus();
+    KCB_DEBUG_EXIT;
 }
 
 bool MainWindow::isVncConnectionActive(int vncPort)
@@ -428,23 +432,18 @@ void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
     bool result = isVncConnectionActive(5901);
     if (result)
     {
-        system(qPrintable("vcgencmd display_power 0"));
+        kcb::TurnOffDisplay();
     }
 
-    if(!_pfAdminPW) 
-    {
-        qDebug() << "MainWindow::OnDisplayUserCodeTwoDialog()";
-        _pfAdminPW = new CFrmAdminPassword();
-    }
-    hideFormsExcept(_pfAdminPW);
-    connect(psysController, SIGNAL(__OnClearEntry()), _pfAdminPW, SLOT(OnClearCodeDisplay()));
-    disconnect(_pfAdminPW, SIGNAL(__PasswordEntered(QString)), psysController, 0);
-    connect(_pfAdminPW, SIGNAL(__PasswordEntered(QString)), psysController, SLOT(OnAdminPasswordEntered(QString)));
+    connect(psysController, SIGNAL(__OnClearEntry()), &kkd, SLOT(ClearText()));
+    connect(&kkd, SIGNAL(NotifyEntered(QString)), psysController, SLOT(OnAdminPasswordEntered(QString)));
+    connect(&kkd, SIGNAL(NotifyCancelled()), this, SLOT(OnAdminPasswordCancel()));
+    connect(&kkd, SIGNAL(NotifyCancelled()), _psystemController, SLOT(OnAdminPasswordCancel()));
     connect(psysController, SIGNAL(__AdminSecurityCheckFailed()), this, SLOT(OnAdminSecurityCheckFailed()));
-    connect(_pfAdminPW, SIGNAL(__OnAdminPasswordCancel()), this, SLOT(OnAdminPasswordCancel()));
-    connect(_pfAdminPW, SIGNAL(__OnAdminPasswordCancel()), _psystemController, SLOT(OnAdminPasswordCancel()));
-    _pfAdminPW->OnEnableKeyboard(true);
-    _pfAdminPW->show();
+
+    hideFormsExcept(&kkd);
+    kkd.resetPassword();  
+    kkd.show();
     KCB_DEBUG_EXIT;
 }
 
@@ -455,7 +454,22 @@ void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
  */
 void MainWindow::OnAdminSecurityCheckFailed()
 {
-    _pfAdminPW->OnNewMessage(tr("Incorrect Password"), 5000);
+    KCB_DEBUG_ENTRY;
+
+    kkd.invalidPassword();
+    kkd.show();
+    hideFormsExcept(&kkd);
+
+    // Start a timer for 5 seconds default
+    QTimer::singleShot(5000, this, SLOT(ResetKeyboard()));
+    KCB_DEBUG_EXIT;
+}
+
+void MainWindow::ResetKeyboard()
+{
+    KCB_DEBUG_ENTRY;
+    kkd.resetPassword();
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
@@ -473,9 +487,8 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
 void MainWindow::OnAdminPasswordCancel()
 {
     KCB_DEBUG_ENTRY;
-    system(qPrintable("vcgencmd display_power 1"));    
-    _pfAdminPW->hide();
-    _pfAdminPW->OnEnableKeyboard(true);
+    kcb::TurnOnDisplay();    
+    kkd.hide();
     KCB_DEBUG_EXIT;
 }
 
@@ -516,23 +529,31 @@ void MainWindow::OnEnrollFingerprintDialog(QString sCode)
 {
     Q_UNUSED(sCode);
 
-    qDebug() << "MainWindow::OnEnrollFingerprintDialog()";
+    KCB_DEBUG_ENTRY;
 
     _pdFingerprint->show();
     _pdFingerprint->setDefaultStage(1);
     _pdFingerprint->setMessage("");
     _pdFingerprint->setOkDisabled(true);
+
+    KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3)
 {
     KCB_DEBUG_ENTRY;
+    // Needed to force all other windows hidden.  This is a kludge -- hopefully temporary
+    hideFormsExcept(_pQuestions);
     _pQuestions->setValues(lockNum, question1, question2, question3);
+    // Needed to force the questions dialog to the top
+    _pQuestions->raise();
     _pQuestions->show();
     KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnQuestionUserDialogClose()
 {
+    KCB_DEBUG_ENTRY;
     _pQuestions->hide();
+    KCB_DEBUG_EXIT;
 }

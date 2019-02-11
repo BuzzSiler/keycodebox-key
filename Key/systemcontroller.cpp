@@ -478,13 +478,6 @@ void CSystemController::OnFingerprintCodeEntered(QString sCode)
 void CSystemController::OnFingerprintCodeEnteredTwo(QString sCode)
 {
     KCB_DEBUG_TRACE("code" << sCode);
-
-    //if( _securityController.CheckAccessCodeTwoFingerprint() )
-    //  check to see if the directory exists with fingerprintreader class
-    //  if it doesn't:
-    //  emit fingerprint dialog for enrollment, else do nothing
-    // else
-
     _securityController.CheckFingerprintAccessCodeTwo(sCode);
 }
 
@@ -501,7 +494,7 @@ void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
     _padminInfo = adminInfo;
     _bCurrentAdminRetrieved = true;
 
-    qDebug() << "CSystemController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
+    KCB_DEBUG_TRACE("emit __OnRequestedCurrentAdmin(CAdminRec*)");
     emit __OnRequestedCurrentAdmin(adminInfo);
     KCB_DEBUG_EXIT;
 }
@@ -740,14 +733,6 @@ bool CSystemController::getDisplayShowHideButton()
 bool CSystemController::getDisplayTakeReturnButtons()
 {
     return _padminInfo->getDisplayTakeReturnButtons();
-}
-
-CFrmUserCode* CSystemController::getUserCodeOne()
-{
-    if(!_pfUsercode)
-    {
-    }
-    return (CFrmUserCode *)NULL;
 }
 
 void CSystemController::ExtractCommandOutput(FILE *pF, std::string &rtnStr)

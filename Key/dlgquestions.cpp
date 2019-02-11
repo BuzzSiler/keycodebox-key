@@ -4,6 +4,7 @@
 #include "kcbkeyboarddialog.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
+#include "kcbsystem.h"
 #include "keycodeboxsettings.h"
 
 static const QString css_warn = "color: black; background-color: red";
@@ -20,13 +21,12 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
     _answer3("0")
 
 {
+    KCB_DEBUG_ENTRY;
     ui->setupUi(this);
 
-    // For some reason, the admin form does not show full screen without the following
-    // flags being set.  Maybe this should be don't at in the main so it gets
-    // inherited?  Not sure.  Until this is resolved, just set these flags.
-    CDlgQuestions::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    CDlgQuestions::showFullScreen();
+    kcb::SetWindowParams(this);
+
+    raise();
 
     fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 
@@ -54,6 +54,7 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
 
     ui->bbOkCancel->button(QDialogButtonBox::Ok)->setDisabled(!fleetwave_enabled);
     ui->bbOkCancel->button(QDialogButtonBox::Cancel)->setEnabled(!fleetwave_enabled);
+    KCB_DEBUG_EXIT;
 }
 
 CDlgQuestions::~CDlgQuestions()
@@ -80,6 +81,7 @@ void CDlgQuestions::getValues(QString& question1, QString& question2, QString& q
 
 void CDlgQuestions::setValues(QString lockNum, QString question1, QString question2, QString question3)
 {
+    KCB_DEBUG_ENTRY;
     _lockNum = lockNum;
 
     if (!question1.isEmpty())
@@ -126,10 +128,12 @@ void CDlgQuestions::setValues(QString lockNum, QString question1, QString questi
     }
 
     enableOk();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::RunKeyboard(QString& text)
 {
+    KCB_DEBUG_ENTRY;
     KcbKeyboardDialog kkd;
 
     kkd.setValue(text);
@@ -137,19 +141,23 @@ void CDlgQuestions::RunKeyboard(QString& text)
     {
         text = kkd.getValue();
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_edtAnswer1_clicked()
 {
+    KCB_DEBUG_ENTRY;
     QString text = ui->edtAnswer1->text();
     RunKeyboard(text);
     ui->clrAnswer1->setEnabled(!text.isEmpty());
     ui->edtAnswer1->setText(text);
     enableOk();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_edtAnswer2_clicked()
 {
+    KCB_DEBUG_ENTRY;
     if (ui->edtAnswer1->isEnabled())
     {
         QString text = ui->edtAnswer2->text();
@@ -158,10 +166,12 @@ void CDlgQuestions::on_edtAnswer2_clicked()
         ui->edtAnswer2->setText(text);
     }
     enableOk();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_edtAnswer3_clicked()
 {
+    KCB_DEBUG_ENTRY;
     if (ui->edtAnswer3->isEnabled())
     {
         QString text = ui->edtAnswer3->text();
@@ -170,31 +180,39 @@ void CDlgQuestions::on_edtAnswer3_clicked()
         ui->edtAnswer3->setText(text);
     }
     enableOk();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_clrAnswer1_clicked()
 {
+    KCB_DEBUG_ENTRY;
     ui->edtAnswer1->setText("");
     ui->edtAnswer1->setFocus();
     enableOk();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_clrAnswer2_clicked()
 {
+    KCB_DEBUG_ENTRY;
     ui->edtAnswer2->setText("");
     ui->edtAnswer2->setFocus();
     enableOk();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_clrAnswer3_clicked()
 {
+    KCB_DEBUG_ENTRY;
     ui->edtAnswer3->setText("");
     ui->edtAnswer3->setFocus();
     enableOk();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_bbOkCancel_accepted()
 {
+    KCB_DEBUG_ENTRY;
     QString answer1;
     QString answer2;
     QString answer3;
@@ -221,16 +239,20 @@ void CDlgQuestions::on_bbOkCancel_accepted()
     on_rbAnswer1No_clicked();
     on_rbAnswer2No_clicked();
     on_rbAnswer3No_clicked();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_bbOkCancel_rejected()
 {
+    KCB_DEBUG_ENTRY;
     emit __OnQuestionsClose();
     emit __OnQuestionsCancel();
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::enableOk()
 {
+    KCB_DEBUG_ENTRY;
     bool q1_required = !ui->label_question1->text().isEmpty();
     bool q2_required = !ui->label_question2->text().isEmpty();
     bool q3_required = !ui->label_question3->text().isEmpty();
@@ -255,6 +277,7 @@ void CDlgQuestions::enableOk()
 
         ui->bbOkCancel->button(QDialogButtonBox::Ok)->setEnabled(q1_valid && q2_valid && q3_valid);
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CDlgQuestions::on_rbAnswer1Yes_clicked()

@@ -4,6 +4,8 @@
 #include <QtGlobal>
 #include <QDebug>
 #include <QSignalMapper>
+#include <QFontMetrics>
+
 #include "kcbutils.h"
 #include "kcbcommon.h"
 #include "keycodeboxsettings.h"
@@ -243,11 +245,12 @@ void LockCabinetWidget::lockSelected(int lock_index)
 
     if (checked)
     {
+        KCB_DEBUG_TRACE("calling AddLockToSelected");
         AddLockToSelected(lock);
     }
     else
     {
-        KCB_DEBUG_TRACE("calling RemoveLockFromSelected" << Q_FUNC_INFO);
+        KCB_DEBUG_TRACE("calling RemoveLockFromSelected");
         RemoveLockFromSelected(lock);
     }
 
@@ -398,6 +401,13 @@ void LockCabinetWidget::VectorToString(QVector<QString> vtr, QString& str)
     }
 }
 
+QString LockCabinetWidget::elideText(QString& text, const QFont& font, const int width)
+{
+    QFontMetrics metrix(font);
+    QString clippedText = metrix.elidedText(text, Qt::ElideMiddle, width);
+    return clippedText;
+}
+
 void LockCabinetWidget::AddLockToSelected(const QString lock)
 {
     Q_ASSERT_X(lock != "", Q_FUNC_INFO, "empty string");
@@ -408,6 +418,7 @@ void LockCabinetWidget::AddLockToSelected(const QString lock)
         m_selected_locks.append(lock);
         QString sorted_string;
         VectorToString(m_selected_locks, sorted_string);
+        sorted_string = elideText(sorted_string, ui->lblCurrentSelectedLocks->font(), ui->lblCurrentSelectedLocks->width());
         ui->lblCurrentSelectedLocks->setText(sorted_string);
     }
 }
@@ -422,6 +433,7 @@ void LockCabinetWidget::RemoveLockFromSelected(const QString lock)
         m_selected_locks.removeAt(lock_index);
         QString sorted_string;
         VectorToString(m_selected_locks, sorted_string);
+        sorted_string = elideText(sorted_string, ui->lblCurrentSelectedLocks->font(), ui->lblCurrentSelectedLocks->width());
         ui->lblCurrentSelectedLocks->setText(sorted_string);
     }
 }

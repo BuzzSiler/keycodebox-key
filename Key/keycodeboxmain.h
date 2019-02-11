@@ -17,6 +17,7 @@
 #include "dlgquestions.h"
 
 class CClickableGraphicsItem;
+class KcbKeyboardDialog;
 
 namespace Ui {
 class MainWindow;
@@ -26,86 +27,83 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-private:
-    //    QThread myObjThread;
-    Ui::MainWindow *ui;
-    CSystemControllerThread     _sysControlThread;
-    QGraphicsWidget     *_pGWidget;
-    CSystemController   *_psystemController;
+    private:
+        Ui::MainWindow *ui;
+        CSystemControllerThread     _sysControlThread;
+        QGraphicsWidget*            _pGWidget;
+        CSystemController*          _psystemController;
 
-    CFrmUserCode        *_pfUsercode;
-    CFrmAdminPassword   *_pfAdminPW;
-    CFrmAdminInfo       *_pfAdminInfo;
+        CFrmUserCode*               _pfUsercode;
+        CFrmAdminInfo*              _pfAdminInfo;
 
-    CDlgFingerprint *_pdFingerprint;
+        CDlgFingerprint*            _pdFingerprint;
 
-    CDlgQuestions *_pQuestions;
-    
-    QGraphicsScene      *_pscene;
-    QPixmap             *_pPixmap;
-    CClickableGraphicsItem  *_pPixmapItem;
-    QTimer *_pdisplayPowerDown;
+        CDlgQuestions*              _pQuestions;
+        
+        QGraphicsScene*             _pscene;
+        QPixmap*                    _pPixmap;
+        CClickableGraphicsItem*     _pPixmapItem;
+        QTimer*                     _pdisplayPowerDown;
+        KcbKeyboardDialog&          kkd;
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    public:
+        explicit MainWindow(QWidget *parent = 0);
+        ~MainWindow();
 
-    static void OnImageClicked();
-    void ExtractCommandOutput(FILE *pF, std::string &rtnStr);
-    bool isInternetTime();
-    bool isVncConnectionActive(int vncPort);
-    
-    typedef enum {DISP_POWER_OFF, DISP_POWER_ON} DISP_POWER_STATE;
-    static DISP_POWER_STATE display_power_state;
+        static void OnImageClicked();
+        void ExtractCommandOutput(FILE *pF, std::string &rtnStr);
+        bool isInternetTime();
+        bool isVncConnectionActive(int vncPort);
+        
+    signals:
+        void __TouchScreenTouched();
+        void __DisplayPoweredOn();
+        void __onCode(QString sCode);
 
-signals:
-    void __TouchScreenTouched();
-    void __DisplayPoweredOn();
-    void __onCode(QString sCode);
+        void __onFingerprintCode(QString sCode);
 
-    void __onFingerprintCode(QString sCode);
+        void __onCodes(QString sCode1, QString sCode2);
+        void __onFingerprintEnrollment(int code);
 
-    void __onCodes(QString sCode1, QString sCode2);
-    void __onFingerprintEnrollment(int code);
+        void __StopUserTimeout();
 
-    void __StopUserTimeout();
+    private slots:
 
-private slots:
+        void OnDisplayTimeoutScreen();
+        void OnDisplayCodeDialog(QObject *psysController);
+        void OnDisplayUserCodeTwoDialog(QObject *psysController);
+        void OnDisplayThankYouDialog(QObject *psysController);
+        void OnDisplayAdminPasswordDialog(QObject *psysController);
+        void OnDisplayAdminMainDialog(QObject *psysController);
 
-    void OnDisplayTimeoutScreen();
-    void OnDisplayCodeDialog(QObject *psysController);
-    void OnDisplayUserCodeTwoDialog(QObject *psysController);
-    void OnDisplayThankYouDialog(QObject *psysController);
-    void OnDisplayAdminPasswordDialog(QObject *psysController);
-    void OnDisplayAdminMainDialog(QObject *psysController);
+        void OnAdminPasswordCancel();
 
-    void OnAdminPasswordCancel();
+        void OnAdminSecurityCheckFailed();
+        void OnUserCodeCancel();
 
-    void OnAdminSecurityCheckFailed();
-    void OnUserCodeCancel();
+        void OnUserCodeOne(QString sCode1);
+        void OnUserCodeTwo(QString sCode2);
 
-    void OnUserCodeOne(QString sCode1);
-    void OnUserCodeTwo(QString sCode2);
+        void OnUserFingerprintCodeOne(QString sCode1);
+        void OnUserFingerprintCodeTwo(QString sCode2);
 
-    void OnUserFingerprintCodeOne(QString sCode1);
-    void OnUserFingerprintCodeTwo(QString sCode2);
+        void OnEnrollFingerprintDialog(QString sCode);
 
-    void OnEnrollFingerprintDialog(QString sCode);
+        void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3);
+        void OnQuestionUserDialogClose();
 
-    void OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3);
-    void OnQuestionUserDialogClose();
+        void OnDisplayPoweredOn();
+        void OnDisplayPowerDown();
+        void ResetKeyboard();
 
-    void OnDisplayPoweredOn();
-    void OnDisplayPowerDown();
-
-private:
-    void initialize();
-    void hideFormsExcept(QDialog *pfrm);
-    void SetupAdmin(QObject *psysController);
+    private:
+        void initialize();
+        void hideFormsExcept(QDialog *pfrm);
+        void SetupAdmin(QObject *psysController);
 
 
-protected:
-    void keyPressEvent(QKeyEvent *e);
+    protected:
+        void keyPressEvent(QKeyEvent *e);
 
 };
 

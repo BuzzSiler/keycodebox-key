@@ -2,6 +2,7 @@
 #include "ui_dlgeditquestions.h"
 #include <QDebug>
 #include "kcbutils.h"
+#include "kcbsystem.h"
 #include "kcbkeyboarddialog.h"
 
 static const QString css_warn = "color: black; background-color: red";
@@ -13,7 +14,8 @@ CDlgEditQuestions::CDlgEditQuestions(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    CDlgEditQuestions::showFullScreen();
+    kcb::SetWindowParams(this);
+
 
     ui->buttonBoxQuestions->button(QDialogButtonBox::Save)->setDisabled(true);
     ui->buttonBoxQuestions->button(QDialogButtonBox::Cancel)->setEnabled(true);

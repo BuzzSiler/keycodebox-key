@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QDateTime>
+#include <QLabel>
 
 namespace Ui {
     class FrmCodeEditMulti;
@@ -74,6 +75,8 @@ class FrmCodeEditMulti : public QDialog
         QStringList m_codes_in_use;
         bool m_initialized;
         Ui::FrmCodeEditMulti *ui;
+        QLabel& m_access_type_label;
+        QLabel& m_access_state_label;
 
         void updateAccessType(int index);
         void updateUi();

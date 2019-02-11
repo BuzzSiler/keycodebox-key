@@ -95,7 +95,6 @@ private:
     void initializeSecurityConnections();
     void initializeLockController();
 
-    CFrmUserCode *getUserCodeOne();
     void initializeReportController();
     void startTimeoutTimer(int duration);
     void stopTimeoutTimer();

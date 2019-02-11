@@ -7,12 +7,18 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QMouseEvent>
+#include <QScreen>
 
 #include "keycodeboxsettings.h"
 #include "version.h"
 #include "kcbcommon.h"
+#include "kcbsystem.h"
 #include "kcbapplication.h"
 
+static int const LEFT_MARGIN = 50;
+static int const RIGHT_MARGIN = 50;
+static int const TOP_MARGIN = 50;
+static int const BOTTOM_MARGIN = 50;
 
 static bool fleetwave_enabled;
 
@@ -24,7 +30,9 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
     m_takereturn_state(false)
 {
     ui->setupUi(this);
-    CFrmUserCode::showFullScreen();
+    
+    kcb::SetWindowParams(this);
+
     initialize();
 
     fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
@@ -48,9 +56,20 @@ void CFrmUserCode::initialize()
 
 void CFrmUserCode::mousePressEvent(QMouseEvent* event)
 {
-    KCB_DEBUG_TRACE(event->x() << event->y());
+    QScreen *screen = QApplication::primaryScreen();
+    KCB_DEBUG_TRACE(event->x() << event->y() << screen->availableGeometry());
 
-    if (event->x() >= 830 && event->y() <= 20)
+    int right = screen->availableGeometry().right();
+    int top = screen->availableGeometry().top();
+    int left = screen->availableGeometry().left();
+    int bottom = screen->availableGeometry().bottom();
+
+    bool in_upper_right = event->x() >= (right - RIGHT_MARGIN) && event->y() <= (top + TOP_MARGIN);
+    bool in_upper_left = event->x() <= (left + LEFT_MARGIN) && event->y() <= (top + TOP_MARGIN);
+    bool in_lower_right = event->x() >= (right - RIGHT_MARGIN) && event->y() >= (bottom - BOTTOM_MARGIN);
+    bool in_lower_left = event->x() <= (left + LEFT_MARGIN) && event->y() >= (bottom - BOTTOM_MARGIN);
+
+    if (in_upper_right || in_upper_left || in_lower_right || in_lower_left)
     {
         EnterAdminControl();
     }

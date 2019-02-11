@@ -8,7 +8,6 @@ CFrmAdminPassword::CFrmAdminPassword(QWidget *parent) :
     ui(new Ui::CFrmAdminPassword)
 {
     ui->setupUi(this);
-    CFrmAdminPassword::showFullScreen();
 }
 
 CFrmAdminPassword::~CFrmAdminPassword()

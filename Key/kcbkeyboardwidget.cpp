@@ -6,18 +6,24 @@
 #include <QMessageBox>
 #include "kcbutils.h"
 #include "kcbcommon.h"
+#include "kcbsystem.h"
 
-KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
+KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent, bool for_password) :
     QWidget(parent),
     m_digit_mapper(* new QSignalMapper(this)),
     m_alpha_mapper(* new QSignalMapper(this)),
     m_ctrl_mapper(* new QSignalMapper(this)),
     m_value(""),
+    m_for_password(for_password),
     ui(new Ui::KcbKeyboardWidget)
 {
     ui->setupUi(this);
 
-    ui->pbCtrlReturn->setDisabled(true);
+    ui->pbCtrlReturn->setEnabled(true);
+    ui->pbCtrlShowHide->setEnabled(for_password);
+
+    // Make placeholders invisible but without affecting the layout
+    hidePlaceholders();
 
     // Find buttons for capturing click event and mapping to slots to edit the value
     m_digit = this->findChildren<QPushButton *>(QRegularExpression("pbDigit.*"), Qt::FindChildrenRecursively);
@@ -57,17 +63,39 @@ KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent) :
         connect(btn, SIGNAL(clicked()), &m_ctrl_mapper, SLOT(map()));
         m_ctrl_mapper.setMapping(btn, m_control[ii]->text());
     }
+
     connect(&m_ctrl_mapper, SIGNAL(mapped(QString)), this, SLOT(controlClicked(QString)));
 
     connect(ui->pbCtrlClose, SIGNAL(clicked()), this, SIGNAL(NotifyClose()));
     connect(ui->pbCtrlReturn, SIGNAL(clicked()), this, SLOT(OnReturnClicked()));
     connect(ui->edText, SIGNAL(textChanged(QString)), this, SLOT(OnTextChanged(QString)));
+    
+    if (for_password)
+    {
+        resetPassword();
+    }
 }
 
 KcbKeyboardWidget::~KcbKeyboardWidget()
 {
     Kcb::Utils::DestructorMsg(this);
     delete ui;
+}
+
+void KcbKeyboardWidget::retainAndHide(QWidget* widget)
+{
+    QSizePolicy sp_retain = widget->sizePolicy();
+    sp_retain.setRetainSizeWhenHidden(true);
+    widget->setSizePolicy(sp_retain);
+}
+
+void KcbKeyboardWidget::hidePlaceholders()
+{
+    retainAndHide(ui->pbPlaceholder1);
+    retainAndHide(ui->pbPlaceholder2);
+    retainAndHide(ui->pbPlaceholder3);
+    retainAndHide(ui->pbPlaceholder4);
+    retainAndHide(ui->pbPlaceholder5);
 }
 
 void KcbKeyboardWidget::clear()
@@ -151,6 +179,7 @@ void KcbKeyboardWidget::alphaClicked(QString value)
 
 void KcbKeyboardWidget::controlClicked(QString value)
 {
+    KCB_DEBUG_ENTRY;
     if (value == tr("Back"))
     {
         QString value = ui->edText->text();
@@ -192,7 +221,7 @@ void KcbKeyboardWidget::controlClicked(QString value)
 
 void KcbKeyboardWidget::updateUi()
 {
-    ui->pbCtrlReturn->setDisabled(ui->edText->text() == m_value);
+    ui->pbCtrlReturn->setEnabled(m_for_password || ui->edText->text() != m_value);
 }
 
 void KcbKeyboardWidget::OnReturnClicked()
@@ -213,4 +242,49 @@ void KcbKeyboardWidget::OnReturnClicked()
         KCB_DEBUG_TRACE("Emitting NotifyEnter");
         emit NotifyEnter();
     }
+}
+
+void KcbKeyboardWidget::resetPassword()
+{
+    KCB_DEBUG_ENTRY;
+    // Note: passwords can be empty so enable the enter button
+    ui->pbCtrlReturn->setEnabled(m_for_password);
+
+    ui->pbCtrlShowHide->setEnabled(true);
+    ui->pbCtrlShowHide->setChecked(false);
+    on_pbCtrlShowHide_clicked();
+
+    ui->edText->setPlaceholderText("<Enter Password>");
+    ui->edText->setText("");
+    ui->edText->setEchoMode(QLineEdit::Password);
+
+    ui->wgAlpha->setEnabled(true);
+    ui->wgDigit->setEnabled(true);
+    ui->wgControl->setEnabled(true);
+    KCB_DEBUG_EXIT;
+}
+
+void KcbKeyboardWidget::invalidPassword()
+{
+    KCB_DEBUG_ENTRY;
+    ui->wgAlpha->setDisabled(true);
+    ui->wgDigit->setDisabled(true);
+    ui->wgControl->setDisabled(true);
+    ui->edText->setPlaceholderText(tr("Incorrect Password"));
+    ui->edText->setText("");
+    KCB_DEBUG_EXIT;
+}
+
+void KcbKeyboardWidget::on_pbCtrlShowHide_clicked()
+{
+    if (ui->pbCtrlShowHide->isChecked())
+    {
+        ui->pbCtrlShowHide->setText(tr("Hide"));
+        ui->edText->setEchoMode(QLineEdit::Normal);
+    }
+    else
+    {
+        ui->pbCtrlShowHide->setText(tr("Show"));
+        ui->edText->setEchoMode(QLineEdit::Password);
+    }    
 }

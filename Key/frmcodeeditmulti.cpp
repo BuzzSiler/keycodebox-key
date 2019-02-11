@@ -1,17 +1,21 @@
 #include "frmcodeeditmulti.h"
 #include "ui_frmcodeeditmulti.h"
+
 #include <QSignalMapper>
 #include <QDebug>
 #include <QTouchEvent>
 #include <QMessageBox>
 #include <QDir>
+#include <QLabel>
+#include <QFont>
+
 #include "lockcabinetwidget.h"
 #include "lockstate.h"
 #include "kcbcommon.h"
+#include "kcbutils.h"
+#include "kcbsystem.h"
 #include "kcbkeyboarddialog.h"
 #include "dlgeditquestions.h"
-#include "kcbutils.h"
-#include "kcbcommon.h"
 #include "keycodeboxsettings.h"
 
 static const QString FP_HOME_DIR = "/home/pi/run/prints/";
@@ -22,18 +26,20 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     QDialog(parent),
     m_lock_cab(* new LockCabinetWidget(this)),
     m_initialized(false),
-    ui(new Ui::FrmCodeEditMulti)
+    ui(new Ui::FrmCodeEditMulti),
+    m_access_type_label(*new QLabel(this)),
+    m_access_state_label(*new QLabel(this))
 {
     ui->setupUi(this);
 
-    FrmCodeEditMulti::showFullScreen();
+    kcb::SetWindowParams(this);
 
     connect(&m_lock_cab, SIGNAL(NotifyLockSelected(QString, bool)), this, SLOT(OnNotifyLockSelected(QString, bool)));
 
     ui->bbSaveCancel->button(QDialogButtonBox::Save)->setDisabled(true);
     ui->bbSaveCancel->button(QDialogButtonBox::Cancel)->setEnabled(true);
 
-    ui->hloLockCabinet->addWidget(&m_lock_cab);
+    ui->vloLockCabinet->addWidget(&m_lock_cab);
 
     ui->edCode1->setText("");
     ui->cbFingerprint->setDisabled(true);
@@ -52,10 +58,14 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     ui->dtEndAccess->setDateTime(QDateTime::currentDateTime());
     ui->dtEndAccess->setVisible(false);
 
-    ui->lblStartAccessTextOverlay->setText(tr("ALWAYS"));
-    ui->lblStartAccessTextOverlay->setVisible(true);
-    ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
-    ui->lblEndAccessTextOverlay->setVisible(true);
+    m_access_type_label.setText("");
+    m_access_state_label.setText("");
+    m_access_type_label.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_access_state_label.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_access_type_label.setEnabled(false);
+    m_access_type_label.hide();
+    m_access_state_label.setEnabled(false);
+    m_access_state_label.hide();
 
     resetQuestions();
 
@@ -180,10 +190,16 @@ void FrmCodeEditMulti::updateAccessType(int index)
     ui->dtStartAccess->setVisible(is_timed);
     ui->dtEndAccess->setVisible(is_timed);
 
-    ui->lblStartAccessTextOverlay->setVisible(!is_timed);
-    ui->lblStartAccessTextOverlay->setEnabled(!is_timed);
-    ui->lblEndAccessTextOverlay->setVisible(!is_timed);
-    ui->lblEndAccessTextOverlay->setEnabled(!is_timed);
+    m_access_type_label.setText("");
+    m_access_state_label.setText("");
+    m_access_type_label.setEnabled(!is_timed);
+    m_access_state_label.setEnabled(!is_timed);
+    m_access_type_label.setVisible(!is_timed);
+    m_access_state_label.setVisible(!is_timed);
+    ui->hloStartAccess->removeWidget(&m_access_type_label);
+    ui->hloEndAccess->removeWidget(&m_access_state_label);
+    ui->dtStartAccess->setVisible(is_timed);
+    ui->dtEndAccess->setVisible(is_timed);
 
     switch (index)
     {
@@ -191,26 +207,41 @@ void FrmCodeEditMulti::updateAccessType(int index)
             {
             QDateTime curr = QDateTime::currentDateTime();
             // Note: There are checks for start/end access so we set the same date/time to both
+            ui->dtStartAccess->setVisible(true);
+            ui->dtEndAccess->setVisible(true);
             ui->dtStartAccess->setDateTime(curr);
             ui->dtEndAccess->setDateTime(curr);
             }
             break;
 
         case ACCESS_TYPE_LIMITED_USE:
-            ui->lblStartAccessTextOverlay->setText(tr("LIMITED USE (Take/Return only)"));
-            ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
+            {
+            ui->hloStartAccess->addWidget(&m_access_type_label);
+            ui->hloEndAccess->addWidget(&m_access_state_label);
+            m_access_type_label.setText(tr("LIMITED USE (Take/Return only)"));
+            m_access_state_label.setText(tr("ACTIVE"));
+            m_access_type_label.show();
+            m_access_state_label.show();
             ui->dtStartAccess->setDateTime(DEFAULT_DATETIME);
             ui->dtEndAccess->setDateTime(DEFAULT_DATETIME);
+            }
             break;
 
         case ACCESS_TYPE_ALWAYS:
         default:
-            ui->lblStartAccessTextOverlay->setText(tr("ALWAYS"));
-            ui->lblEndAccessTextOverlay->setText(tr("ACTIVE"));
+            {
+            ui->hloStartAccess->addWidget(&m_access_type_label);
+            ui->hloEndAccess->addWidget(&m_access_state_label);
+            m_access_type_label.setText(tr("ALWAYS"));
+            m_access_state_label.setText(tr("ACTIVE"));
+            m_access_type_label.show();
+            m_access_state_label.show();
             ui->dtStartAccess->setDateTime(DEFAULT_DATETIME);
             ui->dtEndAccess->setDateTime(DEFAULT_DATETIME);
+            }
             break;
     }
+
 
 }
 
@@ -234,7 +265,7 @@ void FrmCodeEditMulti::on_pbClearUsername_clicked()
 
 void FrmCodeEditMulti::on_pbEditQuestions_clicked()
 {
-    CDlgEditQuestions *eq = new CDlgEditQuestions();
+    CDlgEditQuestions *eq = new CDlgEditQuestions(this);
     eq->setValues(m_questions);
     if (eq->exec())
     {

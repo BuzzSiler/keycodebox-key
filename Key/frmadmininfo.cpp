@@ -25,6 +25,7 @@
 #include <QAbstractSocket>
 #include <QFileDialog>
 #include <QFile>
+#include <QScreen>
 #include "lockset.h"
 #include "lockstate.h"
 #include "menupushbutton.h"
@@ -106,25 +107,24 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     _pworkingSet(0),
     _testEmail(EMAIL_INVALID),
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
-    m_report(* new ReportControlWidget(this))
+    m_report(* new ReportControlWidget(this)),
+    m_file_filter{0},
+    m_util_action(UTIL_ACTION_INSTALL_APP)
 
 {
     ui->setupUi(this);
 
-    // For some reason, the admin form does not show full screen without the following
-    // flags being set.  Maybe this should be don't at in the main so it gets
-    // inherited?  Not sure.  Until this is resolved, just set these flags.
-    CFrmAdminInfo::setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    CFrmAdminInfo::showFullScreen();
-
-    ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
-
-    initialize();
-
     setAttribute(Qt::WA_AcceptTouchEvents, true);
 
-    ui->cbUsbDrives->addItem("No Drive Inserted");
-    m_file_filter = INSTALL_APP_FILTER;    
+
+    kcb::SetWindowParams(this);
+
+    // For whatever reason, the tabWidget will not take on the geometry of the parent (not wide enough).
+    // Consequently, it is necessary to explicitly set the geometry to be the same as the parent.
+    ui->tabWidget->setGeometry(parent->x(), parent->y(), parent->width(), parent->height());
+    
+    initialize();
+
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -221,7 +221,7 @@ void CFrmAdminInfo::show()
         ui->tabWidget->setTabEnabled(1, true);
         ui->gpAdminInfo->setVisible(true);
         ui->vloSelectLocks->addWidget(&m_select_locks);
-        ui->vloReportSettings->addWidget(&m_report);
+        ui->hloReportSettings->addWidget(&m_report);
         // Force tabwidget to show administrator tab
         emit ui->tabWidget->currentChanged(ADMIN_TAB_INDEX);
     }
@@ -263,10 +263,13 @@ void CFrmAdminInfo::initialize()
 {
     _pcopymodel = 0;
     _bClose = false;
-    ui->widgetEdit->setVisible(false);
-
+    m_util_action = UTIL_ACTION_INSTALL_APP;
+    
     populateTimeZoneSelection(ui->cbTimeZone);
     startMediaTimer();
+
+    ui->cbLockNum->setInsertPolicy(QComboBox::InsertAlphabetically);
+    ui->cbUsbDrives->addItem("No Drive Inserted");
 
     ui->dtStartCodeList->setDisplayFormat(DATETIME_FORMAT);
     ui->dtEndCodeList->setDisplayFormat(DATETIME_FORMAT);
@@ -720,12 +723,6 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
     KCB_DEBUG_EXIT;
 }
 
-void CFrmAdminInfo::onStopEdit()
-{
-    ui->tabWidget->show();
-    ui->widgetEdit->hide();
-}
-
 void CFrmAdminInfo::RunKeyboard(QString& text, bool numbersOnly)
 {
     KcbKeyboardDialog kkd;
@@ -789,23 +786,13 @@ void CFrmAdminInfo::updateTmpAdminRec()
 void CFrmAdminInfo::on_btnDone_clicked()
 {
     KCB_DEBUG_ENTRY;
-    /* This slot is called when we are leaving the admin interface.
-       It seems like the most obvious place to re-enable display power
-       It would be preferrable to have all power control in the same
-       module -- maybe one day :-)
-    */
-    system(qPrintable("vcgencmd display_power 1"));
+    kcb::TurnOnDisplay();
 
     // Update the Admin Info and close the dialog - syscontroller needs to switch
     updateTmpAdminRec();
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
     KCB_DEBUG_EXIT;
-}
-
-void CFrmAdminInfo::hideKeyboard(bool bHide) 
-{
-    ui->widgetEdit->setVisible(bHide);
 }
 
 void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
@@ -1009,21 +996,27 @@ void CFrmAdminInfo::createCodeTableHeader()
 
     QTableWidget *table = ui->tblCodesList;
 
+    KCB_DEBUG_TRACE("table width" << table->horizontalHeader()->width());
+
+    int hh_width = table->horizontalHeader()->width();
+    int delta = hh_width / 20;
+
     table->clear();
     table->setColumnCount(7);
 
-    table->setColumnWidth(0, 40);
-    table->setColumnWidth(1, 80);
-    table->setColumnWidth(2, 150);
-    table->setColumnWidth(3, 110);
-    table->setColumnWidth(4, 110);
-    table->setColumnWidth(5, 155);
-    table->setColumnWidth(6, 155);
+    table->setColumnWidth(0, 1 * delta);
+    table->setColumnWidth(1, 2 * delta);
+    table->setColumnWidth(2, 4 * delta);
+    table->setColumnWidth(3, 3 * delta);
+    table->setColumnWidth(4, 3 * delta);
+    table->setColumnWidth(5, 4 * delta);
+    table->setColumnWidth(6, 4 * delta);
 
     table->verticalHeader()->hide();
     
     QStringList headers;
     headers << "Line" << "Locks" << "Username" << "Code#1" << "Code#2" << "Start Time" << "End Time";
+
     table->setHorizontalHeaderLabels(headers);
     table->verticalHeader()->setFixedWidth(60);
     table->horizontalHeader()->setFixedHeight(50);
@@ -1172,16 +1165,20 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     // Setup the table display
 
     QTableWidget    *table = ui->tblHistory;
+
+    int hh_width = table->horizontalHeader()->width();
+    int delta = hh_width / 20;
+
     table->clearContents();
     table->setRowCount(pSet->getLockHistoryMap()->size());
     table->setColumnCount(6);
 
-    table->setColumnWidth(0, 80);
-    table->setColumnWidth(1, 120);
-    table->setColumnWidth(2, 100);
-    table->setColumnWidth(3, 100);
-    table->setColumnWidth(4, 350);
-    table->setColumnWidth(5, 50);
+    table->setColumnWidth(0, 2 * delta);
+    table->setColumnWidth(1, 6 * delta);
+    table->setColumnWidth(2, 2 * delta);
+    table->setColumnWidth(3, 2 * delta);
+    table->setColumnWidth(4, 6 * delta);
+    table->setColumnWidth(5, 2 * delta);
     
     table->verticalHeader()->hide();
     

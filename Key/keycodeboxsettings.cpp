@@ -130,4 +130,19 @@ int KeyCodeBoxSettings::getLocksPerCabinet(int cab_index)
 }
 
 
+bool KeyCodeBoxSettings::isDisplaySet()
+{
+    KCB_DEBUG_ENTRY;
+    JsonFromFile();
+    bool value = m_json_obj["display"].toBool();
+    KCB_DEBUG_EXIT;
+    return value;
+}
 
+void KeyCodeBoxSettings::setDisplay()
+{
+    KCB_DEBUG_ENTRY;
+    m_json_obj.insert(QString("display"), QJsonValue(true));
+    JsonToFile();
+    KCB_DEBUG_EXIT;
+}

@@ -20,7 +20,7 @@ INCLUDEPATH += /usr/include/libusb-1.0
 LIBS += -L/usr/lib/arm-linux-gnueabihf -lhidapi-hidraw
 
 SOURCES += main.cpp\
-        keycodeboxmain.cpp \
+    keycodeboxmain.cpp \
     lockcontroller.cpp \
     usbdrivecontroller.cpp \
     usbcontroller.cpp \
@@ -181,13 +181,9 @@ HEADERS  += keycodeboxmain.h \
     logger.h \
 
 FORMS    += mainwindow.ui \
-    qwerty_keypad.ui \
-    alpha_keypad.ui \
-    number_keypad.ui \
     frmusercode.ui \
     frmadmininfo.ui \
     frmadminpassword.ui \
-    dlgfullkeyboard.ui \
     dlgfingerprint.ui\
     dlgfingerprintverify.ui \
     dlgeditquestions.ui \

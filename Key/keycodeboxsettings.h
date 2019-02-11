@@ -25,12 +25,14 @@ typedef QVector<CABINET_INFO> CABINET_VECTOR;
 
 class KeyCodeBoxSettings : public QObject
 {
-        Q_OBJECT
+    Q_OBJECT
     public:
         static bool isFleetwaveEnabled();
         static int getNumCabinets();
         static int getLocksPerCabinet(int cab_index);
         static CABINET_VECTOR getCabinetsInfo();
+        static bool isDisplaySet();
+        static void setDisplay();
 
     private:
         static QJsonObject m_json_obj;
