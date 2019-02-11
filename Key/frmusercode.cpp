@@ -15,10 +15,10 @@
 #include "kcbsystem.h"
 #include "kcbapplication.h"
 
-static int const LEFT_MARGIN = 20;
-static int const RIGHT_MARGIN = 20;
-static int const TOP_MARGIN = 20;
-static int const BOTTOM_MARGIN = 20;
+static int const LEFT_MARGIN = 50;
+static int const RIGHT_MARGIN = 50;
+static int const TOP_MARGIN = 50;
+static int const BOTTOM_MARGIN = 50;
 
 static bool fleetwave_enabled;
 

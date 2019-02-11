@@ -107,7 +107,9 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     _pworkingSet(0),
     _testEmail(EMAIL_INVALID),
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
-    m_report(* new ReportControlWidget(this))
+    m_report(* new ReportControlWidget(this)),
+    m_file_filter{0},
+    m_util_action(UTIL_ACTION_INSTALL_APP)
 
 {
     ui->setupUi(this);
@@ -123,7 +125,6 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     
     initialize();
 
-    m_file_filter = INSTALL_APP_FILTER;    
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -262,7 +263,8 @@ void CFrmAdminInfo::initialize()
 {
     _pcopymodel = 0;
     _bClose = false;
-
+    m_util_action = UTIL_ACTION_INSTALL_APP;
+    
     populateTimeZoneSelection(ui->cbTimeZone);
     startMediaTimer();
 
