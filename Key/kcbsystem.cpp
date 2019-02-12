@@ -23,6 +23,12 @@ namespace kcb
     static int const OFFICIAL_7INCH_WIDTH = 800;
     static int const OFFICIAL_7INCH_HEIGHT = 480;
 
+    static int const DISPLAY_OFF_7INCH = 1;
+    static int const DISPLAY_ON_7INCH = 0;
+    static int const DISPLAY_OFF_10INCH = 0;
+    static int const DISPLAY_ON_10INCH = 1;
+
+
     typedef enum {DISP_POWER_OFF, DISP_POWER_ON} DISP_POWER_STATE;
     static DISP_POWER_STATE display_power_state = DISP_POWER_ON;
 
@@ -36,16 +42,6 @@ namespace kcb
     static QString const BOOT_CONFIG_FILE("/boot/config.txt");
 
     typedef enum { HOST_ADDRESS, BCAST_ADDRESS, NETWORK_MASK, MAC_ADDRESS } NETWORK_INFO_TYPE;
-
-    static bool is7InchDisplay()
-    {
-        QScreen *screen = QApplication::primaryScreen();
-
-        int width = screen->availableGeometry().right();
-        int height = screen->availableGeometry().bottom();
-
-        return width == 800 && height == 480;
-    }
 
     void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status)
     {
@@ -442,19 +438,22 @@ namespace kcb
         KCB_DEBUG_EXIT;
     }
 
+    static void SetDisplayPower(int value7inch, int value10inch)
+    {
+        // Note: Below are two commands for setting the power of the displays.  Only one display is installed
+        // at a time, but they use completely different commands and do not conflict with each other.
+        // Issuing both commands when only on display is present has no detrimental effects.
+        system(qPrintable(QString("sudo /home/pi/kcb-config/scripts/displayonoff.sh %1").arg(value7inch)));
+        system(qPrintable(QString("vcgencmd display_power %1").arg(value10inch)));
+    }
+
     void TurnOffDisplay()
     {
         KCB_DEBUG_ENTRY;
         display_power_state = DISP_POWER_OFF;
 
-        if (is7InchDisplay())
-        {
-            system(qPrintable("sudo /home/pi/kcb-config/scripts/displayonoff.sh 1"));
-        }
-        else
-        {
-            system(qPrintable("vcgencmd display_power 0"));
-        }
+        SetDisplayPower(DISPLAY_OFF_7INCH, DISPLAY_OFF_10INCH);
+
         KCB_DEBUG_EXIT;
     }
 
@@ -463,14 +462,8 @@ namespace kcb
         KCB_DEBUG_ENTRY;
         display_power_state = DISP_POWER_ON;
 
-        if (is7InchDisplay())
-        {
-            system(qPrintable("sudo /home/pi/kcb-config/scripts/displayonoff.sh 0"));
-        }
-        else
-        {
-            system(qPrintable("vcgencmd display_power 1"));
-        }
+        SetDisplayPower(DISPLAY_ON_7INCH, DISPLAY_ON_10INCH);
+
         KCB_DEBUG_EXIT;
     }
 
