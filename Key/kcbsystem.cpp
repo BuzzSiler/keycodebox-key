@@ -18,16 +18,15 @@
 
 namespace kcb
 {
+    static int const DISPLAY_OFF_7_INCH = 1;
+    static int const DISPLAY_OFF_10_INCH = 0;
+    static int const DISPLAY_ON_7_INCH = 0;
+    static int const DISPLAY_ON_10_INCH = 1;
+
     static int const WAVESHARE_10INCH_WIDTH = 848;
     static int const WAVESHARE_10INCH_HEIGHT = 480;
     static int const OFFICIAL_7INCH_WIDTH = 800;
     static int const OFFICIAL_7INCH_HEIGHT = 480;
-
-    static int const DISPLAY_OFF_7INCH = 1;
-    static int const DISPLAY_ON_7INCH = 0;
-    static int const DISPLAY_OFF_10INCH = 0;
-    static int const DISPLAY_ON_10INCH = 1;
-
 
     typedef enum {DISP_POWER_OFF, DISP_POWER_ON} DISP_POWER_STATE;
     static DISP_POWER_STATE display_power_state = DISP_POWER_ON;
@@ -440,20 +439,24 @@ namespace kcb
 
     static void SetDisplayPower(int value7inch, int value10inch)
     {
+        KCB_DEBUG_ENTRY;
+
+        KCB_DEBUG_TRACE("7 inch" << value7inch << "10 inch" << value10inch);
         // Note: Below are two commands for setting the power of the displays.  Only one display is installed
         // at a time, but they use completely different commands and do not conflict with each other.
         // Issuing both commands when only on display is present has no detrimental effects.
-        system(qPrintable(QString("sudo /home/pi/kcb-config/scripts/displayonoff.sh %1").arg(value7inch)));
-        system(qPrintable(QString("vcgencmd display_power %1").arg(value10inch)));
+        QString cmd7inch = QString("sudo /home/pi/kcb-config/scripts/displayonoff.sh %1").arg(value7inch);
+        QString cmd10inch = QString("vcgencmd display_power %1").arg(value10inch);
+        system(qPrintable(cmd7inch));
+        system(qPrintable(cmd10inch));
+        KCB_DEBUG_EXIT;
     }
 
     void TurnOffDisplay()
     {
         KCB_DEBUG_ENTRY;
         display_power_state = DISP_POWER_OFF;
-
-        SetDisplayPower(DISPLAY_OFF_7INCH, DISPLAY_OFF_10INCH);
-
+        SetDisplayPower(DISPLAY_OFF_7_INCH, DISPLAY_OFF_10_INCH);
         KCB_DEBUG_EXIT;
     }
 
@@ -461,9 +464,7 @@ namespace kcb
     {
         KCB_DEBUG_ENTRY;
         display_power_state = DISP_POWER_ON;
-
-        SetDisplayPower(DISPLAY_ON_7INCH, DISPLAY_ON_10INCH);
-
+        SetDisplayPower(DISPLAY_ON_7_INCH, DISPLAY_ON_10_INCH);
         KCB_DEBUG_EXIT;
     }
 
