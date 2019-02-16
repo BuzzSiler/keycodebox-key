@@ -58,7 +58,7 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
 
 CDlgQuestions::~CDlgQuestions()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 

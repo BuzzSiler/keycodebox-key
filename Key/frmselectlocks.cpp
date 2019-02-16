@@ -29,7 +29,7 @@ CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
 
 CFrmSelectLocks::~CFrmSelectLocks()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::Utils::DestructorMsg(this);
     delete ui;
 }
 
