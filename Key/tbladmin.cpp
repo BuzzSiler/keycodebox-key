@@ -322,7 +322,9 @@ bool CTblAdmin::isPassword(QString password, QString type)
 
 bool CTblAdmin::createTable()
 {
-    if( _pDB && _pDB->isOpen() ) {
+    KCB_DEBUG_TRACE("Creating Table");
+    if( _pDB && _pDB->isOpen() ) 
+    {
         QSqlQuery qry(*_pDB);
         QString sql = "CREATE TABLE IF NOT EXISTS " + TABLENAME +
                 "(ids integer primary key unique, admin_name text,"
@@ -384,6 +386,7 @@ bool CTblAdmin::createAdminDefault()
                             "'admin@email.com', '555.555.5555', :freq, "
                             ":start, :pw, "
                             ":assistpw, :showFingerprint, :showPassword, :showTakeReturn, "
+                            "32, "
                             ":smtp_server, :smtp_port, :smtp_type, :smtp_username, :smtp_password, "
                             "1, 0, '', "
                             "5901, 'vnc_password', 0, :deletion)");
