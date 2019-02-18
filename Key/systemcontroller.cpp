@@ -6,8 +6,10 @@
 #include <QString>
 #include <QAbstractSocket>
 #include <QMetaEnum>
+
 #include <iostream>
 #include <sstream>
+
 #include "systemcontroller.h"
 #include "frmusercode.h"
 #include "encryption.h"
@@ -22,8 +24,13 @@
 #include "kcbapplication.h"
 #include "omnikey5427ckreader.h"
 #include "keycodeboxsettings.h"
+#include "fleetwave.h"
+#include "uidreader.h"
+#include "securereader.h"
 
-static bool fleetwave_enabled;
+static bool support_omnikey5427_reader;
+static QString prompt;
+static bool support_secure_reader;
 
 static const QString DEFAULT_SMTP_SERVER = "smtpout.secureserver.net";
 static const int DEFAULT_SMTP_PORT = 465;
@@ -43,7 +50,10 @@ CSystemController::CSystemController(QObject *parent) :
 {
     Q_UNUSED(parent);
 
-    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
+    bool fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
+    prompt = fleetwave_enabled ? fleetwave::FleetwaveSettings::getPrompt() : USER_CODE_PROMPT;
+    support_omnikey5427_reader = (fleetwave_enabled && (fleetwave::FleetwaveSettings::getInput() == fleetwave::FLEETWAVE_INPUT::HIDCARD));
+    support_secure_reader = support_omnikey5427_reader && fleetwave::FleetwaveSettings::isSecure();
 }
 
 CSystemController::~CSystemController()
@@ -262,9 +272,16 @@ void CSystemController::initializeReaders()
         _pdFingerprintVerify->hide();
     }
     
-    if (fleetwave_enabled)
+    if (support_omnikey5427_reader)
     {
-        _omnikey5427CKReader = new Omnikey5427CKReader();
+        if (support_secure_reader)
+        {
+            _omnikey5427CKReader = new Omnikey5427CKReader(new QThread(), new SecureReader());
+        }
+        else
+        {
+            _omnikey5427CKReader = new Omnikey5427CKReader(new QThread(), new UidReader());
+        }
         connect(_omnikey5427CKReader, SIGNAL(__onHIDSwipeCodes(QString,QString)), this, SLOT(OnHIDCard(QString,QString)));
         _omnikey5427CKReader->Start();
     }
@@ -359,8 +376,12 @@ void CSystemController::OnHIDCard(QString sCode1, QString sCode2)
         qDebug() << "... EUserCodeTwo: " << sCode2;
         emit __onUserCodeTwo(sCode2);
     }
+
+    // Note: The following code caused different behavior between entering a code using
+    // the keypad and entering a code using an HID card.  This whole state machine is
+    // a mess and really needs to be completely re-architected.
     // Always emit the two -- s.b.going to the AdminInfo screen only
-    emit __onUserCodes(sCode1, sCode2);
+    //emit __onUserCodes(sCode1, sCode2);
 }
 
 void CSystemController::initializeReportController()
@@ -665,12 +686,17 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
 
 void CSystemController::OnSecurityCheckedFailed()
 {
-    //    _systemState = EPasswordFailed;
+    KCB_DEBUG_ENTRY;
     emit __OnCodeMessage(tr("Incorrect Code"));
     emit __OnClearEntry();
 
     QTimer::singleShot(4000, this, SLOT(resetCodeMessage()));
 
+    // Note: If the wrong code was entered, the user should not have a second chance
+    // Therefore, we force a screen timeout and the user will have to start all over
+    // again.
+    _systemState = ETimeoutScreen;
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::resetCodeMessage()
@@ -678,7 +704,6 @@ void CSystemController::resetCodeMessage()
     KCB_DEBUG_ENTRY;
     if(_systemState == EUserCodeOne) 
     {
-        QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
         emit __OnCodeMessage(prompt);
     } 
     else if(_systemState == EUserCodeTwo) 
@@ -1029,14 +1054,13 @@ void CSystemController::stopTimeoutTimer()
         delete _ptimer;
         _ptimer = 0;
     }
-    KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
     KCB_DEBUG_EXIT;
 }
 
 void CSystemController::startTimeoutTimer(int duration)
 {
-    qDebug() << "SingleShot timer " << QVariant(duration).toString();
-    KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
+    KCB_DEBUG_ENTRY;
+    KCB_DEBUG_TRACE("SingleShot timer " << QVariant(duration).toString());
     
     if(!_ptimer) 
     {
@@ -1045,6 +1069,8 @@ void CSystemController::startTimeoutTimer(int duration)
     }
     _ptimer->stop();
     _ptimer->start(duration);
+
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::RequestLastSuccessfulLogin(QString locknums)

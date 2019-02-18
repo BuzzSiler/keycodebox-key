@@ -1,12 +1,25 @@
 #include "fleetwave.h"
 #include "kcbcommon.h"
 #include "kcbsystem.h"
+#include "kcbutils.h"
 
 #include <QProcess>
 
 namespace fleetwave
 {
-    static const QString CHEVIN_SCRIPT = QString("/home/pi/kcb-config/scripts/chevin.py");
+    static QString const CHEVIN_SCRIPT = QString("/home/pi/kcb-config/scripts/chevin.py");
+    static QString const SETTINGS_PATH = QString("/home/pi/kcb-config/settings");
+    static QString const CHEVIN_FILE = QString("chevin.json");
+    static QString const SETTINGS_FULL_PATH = SETTINGS_PATH + "/" + CHEVIN_FILE;
+
+    static QString const USED_CODE_FLEETWAVE_KEYPAD_PROMPT = QString("<%1>").arg(QObject::tr("Please Enter Code Using Keypad"));
+    static QString const USER_CODE_FLEETWAVE_HIDCARD_PROMPT = QString("<%1>").arg(QObject::tr("Please Present Your Card"));
+    static QString const HIDCARD = QString("hidcard");
+    static QString const KEYPAD = QString("keypad");
+
+
+    QJsonObject FleetwaveSettings::m_json_obj = QJsonObject();
+    QString FleetwaveSettings::m_filename = SETTINGS_FULL_PATH;
 
     static bool isValidLock(QString lock)
     {
@@ -43,11 +56,13 @@ namespace fleetwave
         kcb::ExecuteCommand(program, arguments, stdOut, stdErr, status);
         if (stdOut == "failed" || status == QProcess::CrashExit)
         {
+            KCB_DEBUG_TRACE("Fleetwave failed");
             return FLEETWAVE_FAILED;
         }
 
         if (stdOut == "error")
         {
+            KCB_DEBUG_TRACE("Fleetwave error");
             return FLEETWAVE_ERROR;
         }
 
@@ -188,6 +203,53 @@ namespace fleetwave
         KCB_DEBUG_TRACE("Received lock" << stdOut);
 
         return lockNum == stdOut ? FLEETWAVE_OK : FLEETWAVE_ERROR;
+    }
+
+    QString FleetwaveSettings::getPrompt()
+    {
+        FLEETWAVE_INPUT result = getInput();
+        if (result == FLEETWAVE_INPUT::KEYPAD)
+        {
+            return USED_CODE_FLEETWAVE_KEYPAD_PROMPT;
+        }
+        else if (result == FLEETWAVE_INPUT::HIDCARD)
+        {
+            return USER_CODE_FLEETWAVE_HIDCARD_PROMPT;
+        }
+
+        return "INVALID";
+    }
+
+    FLEETWAVE_INPUT FleetwaveSettings::getInput()
+    {
+        KCB_DEBUG_ENTRY;
+        FLEETWAVE_INPUT result = FLEETWAVE_INPUT::NONE;
+        kcb::Utils::JsonFromFile(m_filename, m_json_obj);
+        QString value = m_json_obj["input"].toString();
+        if (value.toLower() == HIDCARD)
+        {
+            result = FLEETWAVE_INPUT::HIDCARD;
+        }
+        else if (value.toLower() == KEYPAD)
+        {
+            result = FLEETWAVE_INPUT::KEYPAD;
+        }
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    bool FleetwaveSettings::isSecure()
+    {
+        KCB_DEBUG_ENTRY;
+        bool result = false;
+        kcb::Utils::JsonFromFile(m_filename, m_json_obj);
+        QJsonValue value = m_json_obj["secure"];
+        if ( value != QJsonValue::Undefined )
+        {
+            result = value.toBool(false);
+        }        
+        KCB_DEBUG_EXIT;
+        return result;
     }
 
 }

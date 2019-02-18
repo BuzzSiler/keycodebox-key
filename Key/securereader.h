@@ -1,5 +1,5 @@
-#ifndef UIDREADER_H
-#define UIDREADER_H
+#ifndef SECUREREADER_H
+#define SECUREREADER_H
 
 #include "cardreader.h"
 
@@ -7,17 +7,17 @@ class QObject;
 class QThread;
 class QProcess;
 
-class UidReader : public CardReader
+class SecureReader : public CardReader
 {
     public:
-        explicit UidReader(QObject *parent = nullptr);
-        ~UidReader();
+        explicit SecureReader(QObject *parent = nullptr);
+        ~SecureReader();
         void Connect(QThread& thread);
-        void DoParseStdOut();
+        void DoParserStdOut();
     protected:
         void DoScan();
         void DoParse();
         QString DoConvert(QString value);
 };
 
-#endif // UIDREADER_H
+#endif // SECUREREADER_H

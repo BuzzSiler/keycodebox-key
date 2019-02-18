@@ -24,7 +24,8 @@ namespace kcb
         stdOut = "";
         stdErr = "";
 
-        //KCB_DEBUG_TRACE(program << arguments);
+        KCB_DEBUG_TRACE(program << arguments);
+        KCB_DEBUG_TRACE("process state" << proc.state());
 
         proc.start(program, arguments);
         (void) proc.waitForStarted();

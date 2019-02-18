@@ -1,7 +1,9 @@
 #ifndef FLEETWAVE_H
 #define FLEETWAVE_H
 
+#include <QObject>
 #include <QString>
+#include <QJsonObject>
 
 namespace fleetwave 
 {
@@ -14,10 +16,27 @@ namespace fleetwave
                                         // etc.
                    } FLEETWAVE_RETURN_TYPE;
 
+
+
     FLEETWAVE_RETURN_TYPE SendTakeRequest(QString code, QString& lockNum);
     FLEETWAVE_RETURN_TYPE SendTakeComplete(QString code, QString lockNum);
     FLEETWAVE_RETURN_TYPE SendReturnRequest(QString code, QString& lockNum, QString& question1, QString& question2, QString& question3);
     FLEETWAVE_RETURN_TYPE SendReturnComplete(QString lockNum, QString answer1, QString answer2, QString answer3);
+
+    enum class FLEETWAVE_INPUT { NONE, HIDCARD, KEYPAD };
+
+    class FleetwaveSettings : public QObject
+    {
+        Q_OBJECT
+        public:
+            static QString getPrompt();
+            static FLEETWAVE_INPUT getInput();
+            static bool isSecure();
+
+        private:
+            static QJsonObject m_json_obj;
+            static QString m_filename;
+    };
 }
 
 #endif

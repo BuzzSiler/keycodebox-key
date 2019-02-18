@@ -8,6 +8,10 @@
 #include <QDebug>
 
 #include "kcbcommon.h"
+#include "kcbutils.h"
+
+#define NULL_CABINET_INFO { "", 0, -1, -1 }
+#define RANGE_TO_INDEX(s, p) (s >= 1 && p <= 32 ? 0 : s >= 32 && p <= 64 ? 1 : s >= 65 && p <= 86 ? 2 : -1)
 
 static QString const SETTINGS_PATH = QString("/home/pi/kcb-config/settings");
 static QString const KEYCODEBOX_FILE = QString("kcb.json");
@@ -20,32 +24,7 @@ CABINET_VECTOR KeyCodeBoxSettings::m_cabinet_info = CABINET_VECTOR(0);
 
 void KeyCodeBoxSettings::JsonFromFile()
 {
-    QString val;
-    QFile file;
-    QJsonDocument doc;
-
-    KCB_DEBUG_ENTRY;
-    file.setFileName(m_filename);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    val = file.readAll();
-    KCB_DEBUG_TRACE(val);
-    file.close();
-    doc = QJsonDocument::fromJson(val.toUtf8());
-    m_json_obj = doc.object();
-    KCB_DEBUG_EXIT;
-}
-
-void KeyCodeBoxSettings::JsonToFile()
-{
-    QString val;
-    QFile file;
-    KCB_DEBUG_ENTRY;
-    QJsonDocument doc(m_json_obj);
-    file.setFileName(SETTINGS_FULL_PATH);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    file.write(doc.toJson());
-    file.close();
-    KCB_DEBUG_EXIT;
+    kcb::Utils::JsonFromFile(m_filename, m_json_obj);
 }
 
 bool KeyCodeBoxSettings::isFleetwaveEnabled()
@@ -61,9 +40,6 @@ CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
 {
     KCB_DEBUG_ENTRY;
     JsonFromFile();
-
-    #define NULL_CABINET_INFO { "", 0, -1, -1 }
-    #define RANGE_TO_INDEX(s, p) (s >= 1 && p <= 32 ? 0 : s >= 32 && p <= 64 ? 1 : s >= 65 && p <= 86 ? 2 : -1)
 
     QJsonArray cabArray = m_json_obj["cabinets"].toArray();
 

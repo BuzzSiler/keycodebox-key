@@ -1,4 +1,4 @@
-#include "scanner.h"
+#include "uidreader.h"
 
 #include <QProcess>
 #include <QThread>
@@ -8,22 +8,28 @@
 #include <QRegularExpression>
 
 #include "kcbcommon.h"
+#include "kcbsystem.h"
+#include "kcbutils.h"
 
-Scanner::Scanner(QObject *parent) :
-    QObject(parent),
-    m_proc(* new QProcess())
+UidReader::UidReader(QObject *parent) :
+    CardReader(parent)
 {
-
+    kcb::Utils::ConstructorMsg(this);
 }
 
-void Scanner::Connect(QThread& thread)
+UidReader::~UidReader()
 {
-    connect(&thread, &QThread::started, this, &Scanner::Scan);
+    kcb::Utils::DestructorMsg(this);
 }
 
-void Scanner::Scan()
+void UidReader::Connect(QThread& thread)
 {
-    connect(&m_proc, &QProcess::readyReadStandardOutput, this, &Scanner::ParseStdOut);
+    connect(&thread, &QThread::started, this, &CardReader::Scan);
+}
+
+void UidReader::DoScan()
+{
+    connect(&m_proc, &QProcess::readyReadStandardOutput, this, &CardReader::ParseStdOut);
 
     while (1)
     {
@@ -32,7 +38,7 @@ void Scanner::Scan()
     }
 }
 
-void Scanner::ParseStdOut()
+void UidReader::DoParse()
 {
     static bool is_omnikey5427_reader = false;
     static bool is_card_inserted_removed = false;
@@ -108,12 +114,11 @@ Reader 0: HID OMNIKEY 5427 CK (010100534841353633015B4923175730) 00 00
     {
         KCB_DEBUG_TRACE("Everything is good.  Go get the UID");
 
-        QProcess proc;
-        proc.start(QString("opensc-tool"), QStringList() << "-s" << "ffca000000");
-        (void) proc.waitForStarted();
-        (void) proc.waitForFinished();
-
-        QString stdOut = proc.readAllStandardOutput();
+        // Change this to system::ExecuteCommand
+        QString stdOut;
+        QString stdErr;
+        int status;
+        kcb::ExecuteCommand(QString("opensc-tool"), QStringList() << "-s" << "ffca000000", stdOut, stdErr, status);
 
         if (stdOut.contains("Received (SW1=0x90, SW2=0x00"))
         {
@@ -129,3 +134,18 @@ Reader 0: HID OMNIKEY 5427 CK (010100534841353633015B4923175730) 00 00
         is_valid_atr = false;
     }
 }
+
+QString UidReader::DoConvert(QString value)
+{
+    bool isOk;
+    qulonglong hex_value = value.toULongLong(&isOk, 16);
+    if (isOk)
+    {
+        return QString::number(hex_value);
+    }
+    else
+    {
+        return "COULD NOT CONVERT";
+    }
+}
+

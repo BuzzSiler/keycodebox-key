@@ -25,7 +25,7 @@ typedef QVector<CABINET_INFO> CABINET_VECTOR;
 
 class KeyCodeBoxSettings : public QObject
 {
-        Q_OBJECT
+    Q_OBJECT
     public:
         static bool isFleetwaveEnabled();
         static int getNumCabinets();
@@ -38,7 +38,6 @@ class KeyCodeBoxSettings : public QObject
         static CABINET_VECTOR m_cabinet_info;
 
         static void JsonFromFile();
-        static void JsonToFile();
 };
 
 #endif // KEYCODEBOXSETTINGS_H

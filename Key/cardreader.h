@@ -5,21 +5,27 @@
 
 class QThread;
 class QProcess;
+class QString;
 
 class CardReader : public QObject
 {
     Q_OBJECT
     public:
         explicit CardReader(QObject *parent = nullptr);
-        void Connect(QThread& thread);
+        virtual ~CardReader();
+        QString Convert(QString value);
+        virtual void Connect(QThread& thread);
+
     signals:
         void DigitsReceived(QString);
-    private slots:
-        void ParseStdOut();
     public slots:
+        void ParseStdOut();
         void Scan();
 
-    private:
+    protected:
+        virtual void DoScan() = 0;
+        virtual void DoParse() = 0;
+        virtual QString DoConvert(QString value) = 0;
         QProcess& m_proc;
 
 };

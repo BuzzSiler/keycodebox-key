@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 #include <QDateTime>
-#include <QProcess>
 #include <iostream>
 #include <cstdlib>
 
@@ -486,13 +485,13 @@ void MainWindow::OnUserCodeCancel()
 
 void MainWindow::OnUserCodeOne(QString sCode1)
 {
-    qDebug() << "MainWindow::OnUserCodeTwo" << sCode1;
+    KCB_DEBUG_TRACE(sCode1);
     emit __onCode(sCode1);
 }
 
 void MainWindow::OnUserCodeTwo(QString sCode2)
 {
-    qDebug() << "MainWindow::OnUserCodeTwo" << sCode2;
+    KCB_DEBUG_TRACE(sCode2);
     emit __onCode(sCode2);
 }
 

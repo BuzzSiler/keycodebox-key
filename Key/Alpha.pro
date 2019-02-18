@@ -87,7 +87,9 @@ SOURCES += main.cpp\
     omnikey5427ckreader.cpp \
     keycodeboxsettings.cpp \
     frmnetworksettings.cpp \
-    cardreader.cpp
+    cardreader.cpp \
+    uidreader.cpp \
+    securereader.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -160,7 +162,9 @@ HEADERS  += keycodeboxmain.h \
     omnikey5427ckreader.h \
     keycodeboxsettings.h \
     frmnetworksettings.h \
-    cardreader.h
+    cardreader.h \
+    uidreader.h \
+    securereader.h \
 
 FORMS    += mainwindow.ui \
     qwerty_keypad.ui \
@@ -199,4 +203,4 @@ DEPENDPATH += /usr/lib/arm-linux-gnueabihf
 DEFINES += SQLITE_CORE
 
 CONFIG += c++11
-TRANSLATIONS = trans_fr.ts trans_sp.ts
+TRANSLATIONS = tra
