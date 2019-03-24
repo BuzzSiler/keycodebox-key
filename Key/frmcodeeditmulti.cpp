@@ -74,7 +74,7 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
 
 FrmCodeEditMulti::~FrmCodeEditMulti()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::ClassAllocation::DestructorMsg(this);
     delete ui;
 }
 

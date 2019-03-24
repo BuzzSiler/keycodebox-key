@@ -67,7 +67,7 @@ LockCabinetWidget::LockCabinetWidget(QWidget *parent) :
 
 LockCabinetWidget::~LockCabinetWidget()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::ClassAllocation::DestructorMsg(this);
     delete ui;
 }
 
