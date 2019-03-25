@@ -19,7 +19,6 @@ CABINET_VECTOR KeyCodeBoxSettings::m_cabinet_info = CABINET_VECTOR(0);
 
 static QString const DEFAULT_KCB_SETTINGS = QString("{\"enable_fleetwave\":false,\"cabinets\":[{\"model\":\"KB32\",\"num_locks\":32,\"start\":1,\"stop\":32}]}");
 
-
 void KeyCodeBoxSettings::createDefault()
 {
     // If the kcb.json file does not exist, then create one with a default cabinet
@@ -41,7 +40,7 @@ void KeyCodeBoxSettings::JsonFromFile()
     QFile file;
     QJsonDocument doc;
 
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     
     createDefault();
 
@@ -52,20 +51,25 @@ void KeyCodeBoxSettings::JsonFromFile()
     file.close();
     doc = QJsonDocument::fromJson(val.toUtf8());
     m_json_obj = doc.object();
-    KCB_DEBUG_EXIT;
+
+    //KCB_DEBUG_TRACE(doc.toJson(QJsonDocument::Compact));
+    // KCB_DEBUG_EXIT;
 }
 
 void KeyCodeBoxSettings::JsonToFile()
 {
     QString val;
     QFile file;
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QJsonDocument doc(m_json_obj);
+
+    //KCB_DEBUG_TRACE(doc.toJson(QJsonDocument::Compact));
+
     file.setFileName(SETTINGS_FULL_PATH);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     file.write(doc.toJson());
     file.close();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 bool KeyCodeBoxSettings::isFleetwaveEnabled()
@@ -129,7 +133,6 @@ int KeyCodeBoxSettings::getLocksPerCabinet(int cab_index)
     return m_cabinet_info[cab_index].num_locks;
 }
 
-
 bool KeyCodeBoxSettings::isDisplaySet()
 {
     KCB_DEBUG_ENTRY;
@@ -142,7 +145,180 @@ bool KeyCodeBoxSettings::isDisplaySet()
 void KeyCodeBoxSettings::setDisplay()
 {
     KCB_DEBUG_ENTRY;
-    m_json_obj.insert(QString("display"), QJsonValue(true));
+    JsonFromFile();
+    if (m_json_obj.contains("display"))
+    {
+        m_json_obj["display"] = QJsonValue(true).toBool();
+    }
+    else
+    {
+        m_json_obj.insert(QString("display"), QJsonValue(true));
+    }
     JsonToFile();
     KCB_DEBUG_EXIT;
+}
+
+void KeyCodeBoxSettings::setNetworkingSettings(NETWORK_SETTINGS const & settings)
+{
+    // KCB_DEBUG_ENTRY;
+    JsonFromFile();
+
+    QJsonObject static_ip;
+
+    if (m_json_obj.contains("static_ip"))
+    {
+        static_ip = m_json_obj["static_ip"].toObject();
+
+        m_json_obj.remove("static_ip");        
+
+        static_ip["address"] = settings.address;
+        static_ip["mask"] = settings.mask;
+        static_ip["broadcast"] = settings.broadcast;
+        static_ip["gateway"] = settings.gateway;
+        static_ip["dns"] = settings.dns;
+    }
+    else
+    {
+        static_ip.insert(QString("address"), QJsonValue(settings.address));
+        static_ip.insert(QString("mask"), QJsonValue(settings.mask));
+        static_ip.insert(QString("broadcast"), QJsonValue(settings.broadcast));
+        static_ip.insert(QString("gateway"), QJsonValue(settings.gateway));
+        static_ip.insert(QString("dns"), QJsonValue(settings.dns));
+    }
+
+    m_json_obj.insert(QString("static_ip"), QJsonValue(static_ip));
+
+    JsonToFile();
+    // KCB_DEBUG_EXIT;
+}
+
+NETWORK_SETTINGS KeyCodeBoxSettings::getNetworkingSettings()
+{
+    // KCB_DEBUG_ENTRY;
+    JsonFromFile();
+
+    NETWORK_SETTINGS ns { "0.0.0.0", "0.0.0.0", "0.0.0.0", "0.0.0.0", "0.0.0.0" };
+
+    if (m_json_obj.contains("static_ip"))
+    {
+        QJsonObject temp = m_json_obj["static_ip"].toObject();
+
+        ns.address = temp["address"].toString();
+        ns.mask = temp["mask"].toString();
+        ns.broadcast = temp["broadcast"].toString();
+        ns.gateway = temp["gateway"].toString();
+        ns.dns = temp["dns"].toString();
+    }    
+
+    // KCB_DEBUG_EXIT;
+    return ns;
+}
+
+void KeyCodeBoxSettings::SetEnableStaticAddressing()
+{
+    KCB_DEBUG_ENTRY;
+    JsonFromFile();
+
+    QJsonObject static_ip;
+    if (m_json_obj.contains("static_ip"))
+    {
+        static_ip = m_json_obj["static_ip"].toObject();
+        m_json_obj.remove("static_ip");        
+        static_ip["enabled"] = true;
+    }    
+    else
+    {
+        static_ip.insert(QString("enabled"), QJsonValue(true));
+    }
+
+    m_json_obj.insert(QString("static_ip"), QJsonValue(static_ip));
+
+    JsonToFile();
+    KCB_DEBUG_EXIT;
+}
+
+void KeyCodeBoxSettings::ClearEnableStaticAddressing()
+{
+    KCB_DEBUG_ENTRY;
+    JsonFromFile();
+
+    QJsonObject static_ip;
+    if (m_json_obj.contains("static_ip"))
+    {
+        static_ip = m_json_obj["static_ip"].toObject();
+        m_json_obj.remove("static_ip");        
+        static_ip["enabled"] = false;
+    }    
+    else
+    {
+        static_ip.insert(QString("enabled"), QJsonValue(true));
+    }
+
+    m_json_obj.insert(QString("static_ip"), QJsonValue(static_ip));
+
+    JsonToFile();
+    KCB_DEBUG_EXIT;
+}
+
+void KeyCodeBoxSettings::EnableStaticAddressing()
+{
+    KCB_DEBUG_ENTRY;
+    NETWORK_SETTINGS ns = getNetworkingSettings();
+    SetEnableStaticAddressing();
+    setNetworkingSettings(ns);
+    KCB_DEBUG_EXIT;
+}
+
+void KeyCodeBoxSettings::DisableStaticAddressing()
+{
+    KCB_DEBUG_ENTRY;
+    NETWORK_SETTINGS ns = getNetworkingSettings();
+    ClearEnableStaticAddressing();
+    setNetworkingSettings(ns);
+    KCB_DEBUG_EXIT;
+}
+
+bool KeyCodeBoxSettings::StaticAddressingEnabled()
+{
+    KCB_DEBUG_ENTRY;
+    JsonFromFile();
+
+    bool result = false;
+    
+    if (m_json_obj.contains("static_ip"))
+    {
+        auto temp = m_json_obj["static_ip"].toObject();
+
+        result = temp["enabled"].toBool();
+    }
+
+    return result;
+}
+
+QString KeyCodeBoxSettings::GetVncPort()
+{
+    QString result("");
+    // Get the VNC port from the configuration
+    // presently, vnc port is stored in two places:
+    //   the admin table in the database
+    //   a text file in kcb-config/config/vnc_creds.txt
+    // This needs to be fixed so that it is only in a single place
+    //   - preferrably kcb.json
+    if (QFile::exists("/home/pi/kcb-config/config/vnc_creds.txt"))
+    {
+        QFile vnc_file("/home/pi/kcb-config/config/vnc_creds.txt");
+
+        if (vnc_file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QString text = vnc_file.readAll();
+
+            // |<port> keycodebox|
+            QStringList parts = text.split(" ");
+
+            result = parts[0].right(parts[0].length() - 1);
+        }
+    }
+
+    KCB_DEBUG_TRACE("result" << result);
+    return result;
 }
