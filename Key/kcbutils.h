@@ -5,24 +5,24 @@
 #include <QString>
 #include <memory>
 
-namespace Kcb
+namespace kcb
 {
-    class Utils
+    class ClassAllocation
     {
         public:
-            Utils();
+            ClassAllocation();
             static void DestructorMsg(const QString& value);
             static void DestructorMsg(const QObject * const object);
 
             template<typename T, typename... Args>
-            static std::unique_ptr<T> make_unique(Args&&... args)
-            {
-                return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-            }
+            static std::unique_ptr<T> make_unique(Args&&... args);
 
         private:
-            explicit Utils(const Utils& rhs) = delete;
-            Utils& operator= (const Utils& rhs) = delete;
+            explicit ClassAllocation(const ClassAllocation& rhs) = delete;
+            ClassAllocation& operator= (const ClassAllocation& rhs) = delete;
     };
+
+    unsigned int countSetBits(int n);
+
 }
 #endif // KCBUTILS_H
