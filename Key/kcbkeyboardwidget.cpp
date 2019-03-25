@@ -26,7 +26,7 @@ KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent, bool for_password) :
     hidePlaceholders();
 
     // Find buttons for capturing click event and mapping to slots to edit the value
-    m_digit = this->findChildren<QPushButton *>(QRegularExpression("pbDigit.*"), Qt::FindChildrenRecursively);
+    m_digit = this->findChildren<QPushButton *>(QRegularExpression("pbDigit.*|pbDecPoint"), Qt::FindChildrenRecursively);
     m_alpha = this->findChildren<QPushButton *>(QRegularExpression("pb(A|L).*"), Qt::FindChildrenRecursively);
     m_control = this->findChildren<QPushButton *>(QRegularExpression("pbCtrl.*"), Qt::FindChildrenRecursively);
 
@@ -78,7 +78,7 @@ KcbKeyboardWidget::KcbKeyboardWidget(QWidget *parent, bool for_password) :
 
 KcbKeyboardWidget::~KcbKeyboardWidget()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::ClassAllocation::DestructorMsg(this);
     delete ui;
 }
 
@@ -138,8 +138,8 @@ void KcbKeyboardWidget::numbersOnly(bool state)
 
 void KcbKeyboardWidget::ipAddress(bool state)
 {
-    Q_UNUSED(state);
-    KCB_DEBUG_TRACE("Not implemented");
+    ui->wgAlpha->setDisabled(state);
+    ui->pbDecPoint->setEnabled(state);
 }
 
 void KcbKeyboardWidget::updateValue(QString value)
@@ -155,6 +155,7 @@ void KcbKeyboardWidget::updateValue(QString value)
 
 void KcbKeyboardWidget::digitClicked(QString value)
 {
+    KCB_DEBUG_TRACE("value" << value);
     updateValue(value);
 }
 

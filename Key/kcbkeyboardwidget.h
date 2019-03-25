@@ -42,7 +42,7 @@ class KcbKeyboardWidget : public QWidget
         void OnReturnClicked();
         void on_pbCtrlShowHide_clicked();
 
-    private:
+private:
         typedef void (*SLOT_PTR_TYPE)(QWidget *);
 
         QList<QPushButton *> m_digit;
