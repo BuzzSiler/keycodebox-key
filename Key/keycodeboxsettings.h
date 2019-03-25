@@ -50,6 +50,7 @@ class KeyCodeBoxSettings : public QObject
         static void DisableStaticAddressing();
         static bool StaticAddressingEnabled();   
         static QString GetVncPort();
+        static void SetVncCredentials(QString port, QString password);
 
 
     private:
@@ -60,7 +61,8 @@ class KeyCodeBoxSettings : public QObject
         static void JsonFromFile();
         static void JsonToFile();
         static void createDefault();
-
+        static void SetEnableStaticAddressing();
+        static void ClearEnableStaticAddressing();
 };
 
 #endif // KEYCODEBOXSETTINGS_H

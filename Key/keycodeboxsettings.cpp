@@ -322,3 +322,13 @@ QString KeyCodeBoxSettings::GetVncPort()
     KCB_DEBUG_TRACE("result" << result);
     return result;
 }
+
+void KeyCodeBoxSettings::SetVncCredentials(QString port, QString password)
+{
+    KCB_DEBUG_TRACE(port << password);
+
+    std::system("rm /home/pi/kcb-config/config/vnc_creds.txt");
+    QString command = QString("echo '|%1 %2|' > /home/pi/kcb-config/config/vnc_creds.txt").arg(port).arg(password);
+    KCB_DEBUG_TRACE(command);
+    std::system(command.toStdString().c_str());
+}
