@@ -53,7 +53,6 @@ class MainWindow : public QMainWindow
         static void OnImageClicked();
         void ExtractCommandOutput(FILE *pF, std::string &rtnStr);
         bool isInternetTime();
-        bool isVncConnectionActive(int vncPort);
         
     signals:
         void __TouchScreenTouched();

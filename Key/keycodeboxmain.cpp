@@ -384,52 +384,10 @@ void MainWindow::hideFormsExcept(QDialog * pfrm)
     KCB_DEBUG_EXIT;
 }
 
-bool MainWindow::isVncConnectionActive(int vncPort)
-{
-    FILE *pF;
-    std::string sOutput = "";
-    QString command = QString("ss sport = :%1").arg(QString::number(vncPort));
-
-    pF = popen(command.toStdString().c_str(), "r");
-    if(!pF)
-    {
-        qDebug() << "failed to get VNC connection";
-    }
-
-    ExtractCommandOutput(pF, sOutput);
-    fclose(pF);
-
-    /*
-    This is the output when VNC is not connected:
-    "Netid  State      Recv-Q Send-Q   Local Address:Port       Peer Address:Port
-    �"
-
-    This is the output when VNC is connected:
-    "Netid  State      Recv-Q Send-Q   Local Address:Port       Peer Address:Port
-    tcp    ESTAB      0      0        192.168.1.144:5901      192.168.1.123:5171
-    �"
-
-    No need to check the details, just split the string into lines and use the count.
-    If count > 1, then we have a VNC connection; otherwise, there is no VNC connection.
-    */
-    QStringList strList = QString::fromStdString(sOutput).trimmed().split("\n");
-    
-    qDebug() << strList;
-
-    return strList.count() > 2;
-}
-
 void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
 {
     KCB_DEBUG_ENTRY;
-    /* Detect if we are connected via VNC.  If so, then disable the display
-       so no one can see what the admin is doing
-
-       The following command wrapped in a function will return true if connected via VNC and false otherwise
-           ss sport = :5901
-       We will need to pass the VNC port as a parameter.
-    */
-    bool result = isVncConnectionActive(5901);
+    bool result = kcb::isVncConnectionActive();
     if (result)
     {
         kcb::TurnOffDisplay();
