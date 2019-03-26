@@ -15,6 +15,8 @@
 #include <QDirModel>
 #include <QFileSystemModel>
 #include <QPointF>
+#include <QList>
+#include <QNetworkInterface>
 #include "systemcontroller.h"
 #include "clickablelabel.h"
 #include "frmcodeeditmulti.h"
@@ -52,7 +54,7 @@ class CFrmAdminInfo : public QDialog
         void editCodeByRow(int row);
         void checkAndCreateCodeEditForm();
         void show();
-        int getDisplayPowerDownTimeout();
+        int  getDisplayPowerDownTimeout();
 
     signals:
         void __OnCloseFrmAdmin();
@@ -229,8 +231,7 @@ class CFrmAdminInfo : public QDialog
         void displayInHistoryTable(CLockHistorySet *pSet);
         void startMediaTimer();
         void setTableMenuLocation(QMenu*);
-        int nthSubstr(int n, const std::string& s, const std::string& p);
-        void getSystemIPAddressAndStatus();
+        void SetSystemIPAddressAndStatus();
         void populateFileCopyWidget(QString sDirectory, QStringList sFilter={});
         void purgeCodes();
 
@@ -255,7 +256,8 @@ class CFrmAdminInfo : public QDialog
         void insertCodes(CodeListing& codeListing);
         void updateTmpAdminRec();
         void updateAdminForEmail(EMAIL_ADMIN_SELECT email_select);
-
+        QString GetIpStylesheet(bool can_ping, bool can_multicast);
+        
     protected:
         void touchEvent(QTouchEvent *ev);
         bool eventFilter(QObject *target, QEvent *event);

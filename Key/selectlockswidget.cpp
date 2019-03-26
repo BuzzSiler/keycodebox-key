@@ -43,7 +43,7 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
 
 SelectLocksWidget::~SelectLocksWidget()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::ClassAllocation::DestructorMsg(this);
     delete ui;
 }
 

@@ -37,6 +37,7 @@
 #include "kcbkeyboarddialog.h"
 #include "reportcontrolwidget.h"
 #include "kcbsystem.h"
+#include "keycodeboxsettings.h"
 #include "frmnetworksettings.h"
 
 #include "xmlcodelistingreader.h"
@@ -291,128 +292,41 @@ void CFrmAdminInfo::initialize()
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabSelected(int)));
 }
 
-int CFrmAdminInfo::nthSubstr(int n, const std::string& s, const std::string& p)
+QString CFrmAdminInfo::GetIpStylesheet(bool can_ping, bool can_multicast)
 {
-    std::string::size_type i = s.find(p);     // Find the first occurrence
+    QString stylesheet(IP_ADDRESS_ERROR);
 
-    int j;
-    for (j = 1; j < n && i != std::string::npos; ++j)
+    if (can_ping)
     {
-        i = s.find(p, i+1); // Find the next occurrence
+        if (can_multicast)
+        {
+            stylesheet = CAN_MULTICAST_STYLESHEET;
+        }
+        else
+        {
+            stylesheet = CANNOT_MULTICAST_STYLESHEET;
+        }
     }
 
-    if (j == n)
-    {
-        return(i);
-    }
-    else
-    {
-        return(-1);
-    }
+    return stylesheet;
 }
 
-void CFrmAdminInfo::getSystemIPAddressAndStatus()
+void CFrmAdminInfo::SetSystemIPAddressAndStatus()
 {
-    QList< QPair<QString, unsigned int> > possibleMatches;
-    QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
-
-    if (ifaces.isEmpty())
-    {
-        return;
-    }
-
-    QList<QNetworkInterface> qualified_ifaces;
-
-    for (int i=0; i < ifaces.size(); i++)
-    {
-        unsigned int flags = ifaces[i].flags();
-        bool isLoopback = (bool)(flags & QNetworkInterface::IsLoopBack);
-        bool isP2P = (bool)(flags & QNetworkInterface::IsPointToPoint);
-        bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
-        QString name = ifaces[i].name();
-
-        /* The Omnikey5427 HID reader shows up on a USB network when plugged in
-           I'm not sure if that is the reader or the pcscd application that is
-           doing it.  Either way we aren't interested in USB networks
-         */
-        if ( name.contains("usb") )
-        {
-            continue;
-        }
-
-        // If this interface isn't running, we don't care about it
-        if ( !isRunning ) 
-        {
-            continue;
-        }
-
-        // We only want valid interfaces that aren't loopback/virtual and not point to point
-        if ( !ifaces[i].isValid() || isLoopback || isP2P ) 
-        {
-            continue;
-        }
-
-        qualified_ifaces.append(ifaces[i]);
-    }
-
-    foreach (auto iface, qualified_ifaces)
-    {
-        QList<QNetworkAddressEntry> addresses = iface.addressEntries();
-
-        foreach (auto addrEntry, addresses)
-        {
-            QHostAddress addr = addrEntry.ip();
-
-            // Ignore local host
-            if ( addr == QHostAddress::LocalHost ) 
-            {
-                continue;
-            }
-
-            // Ignore non-ipv4 addresses
-            if ( !addr.toIPv4Address() ) 
-            {
-                continue;
-            }
-
-            QString ip = addr.toString();
-            if ( ip.isEmpty() ) 
-            {
-                continue;
-            }
-
-            possibleMatches.append(QPair<QString, unsigned int>(ip, iface.flags()));
-        }
-    }
-
-    QPair<QString,unsigned int> ip_display(QString(tr("No Valid Address")), 0);
-
-    if (possibleMatches.length() == 1)
-    {
-        bool checkSuccessful = false;
-        QPair<QString, unsigned int>ip_display(possibleMatches[0]);
+    QString display_text("No Connection");
+    QString ip_address("");
+    bool can_ping = false;
+    bool can_multicast = false;
     
-        if (ip_display.second & QNetworkInterface::IsUp)
-        {
-            QString stylesheet = (ip_display.second & QNetworkInterface::CanMulticast) ? CAN_MULTICAST_STYLESHEET : CANNOT_MULTICAST_STYLESHEET;
-            ui->lblIPAddress->setStyleSheet(stylesheet);
+    kcb::GetIpAddressAndStatus(ip_address, can_ping, can_multicast);
 
-            QString gateway = kcb::GetGatewayAddress();
-            checkSuccessful = kcb::FPingAddress(gateway);
-        }
-
-        ui->lblIPAddress->setText(ip_display.first);
-        ui->lblIPAddress->setVisible(checkSuccessful);
-        if( !checkSuccessful )
-        {
-            ui->lblIPAddress->setStyleSheet(IP_ADDRESS_ERROR);
-        }
-    }
-    else
+    if (!ip_address.isEmpty())
     {
-        ui->lblIPAddress->setText(ip_display.first);
-        ui->lblIPAddress->setStyleSheet(IP_ADDRESS_ERROR);
+        display_text = ip_address;
     }
+
+    ui->lblIPAddress->setText(display_text);
+    ui->lblIPAddress->setStyleSheet(GetIpStylesheet(can_ping, can_multicast));
 }
 
 void CFrmAdminInfo::startMediaTimer()
@@ -426,7 +340,7 @@ void CFrmAdminInfo::OnMediaCheckTimeout()
 {
     _timerMedia.stop();
 
-    getSystemIPAddressAndStatus();
+    SetSystemIPAddressAndStatus();
 
     _timerMedia.start();
 }
@@ -1972,7 +1886,8 @@ void CFrmAdminInfo::on_pbNetworkSettings_clicked()
     FrmNetworkSettings ns;
 
     ns.setValues(_tmpAdminRec.getVNCPort(), _tmpAdminRec.getVNCPassword(),
-                 _tmpAdminRec.getSMTPServer(), _tmpAdminRec.getSMTPPort(), _tmpAdminRec.getSMTPType(), _tmpAdminRec.getSMTPUsername(), _tmpAdminRec.getSMTPPassword()
+                 _tmpAdminRec.getSMTPServer(), _tmpAdminRec.getSMTPPort(), _tmpAdminRec.getSMTPType(), 
+                 _tmpAdminRec.getSMTPUsername(), _tmpAdminRec.getSMTPPassword()
                  );
     if (ns.exec())
     {
@@ -1998,7 +1913,7 @@ void CFrmAdminInfo::on_pbNetworkSettings_clicked()
         // Notify the world about the changes
         emit __UpdateCurrentAdmin(&_tmpAdminRec);
 
-        kcb::SetVNCCredentials(QString::number(vncPort), vncPassword);
+        KeyCodeBoxSettings::SetVncCredentials(QString::number(vncPort), vncPassword);
     }
 }
 
