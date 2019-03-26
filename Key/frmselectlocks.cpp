@@ -27,7 +27,7 @@ CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
 
 CFrmSelectLocks::~CFrmSelectLocks()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::ClassAllocation::DestructorMsg(this);
     delete ui;
 }
 

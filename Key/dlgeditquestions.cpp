@@ -23,7 +23,7 @@ CDlgEditQuestions::CDlgEditQuestions(QWidget *parent) :
 
 CDlgEditQuestions::~CDlgEditQuestions()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::ClassAllocation::DestructorMsg(this);
     delete ui;
 }
 

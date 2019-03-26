@@ -23,6 +23,15 @@ typedef struct
 
 typedef QVector<CABINET_INFO> CABINET_VECTOR;
 
+typedef struct
+{
+    QString address;
+    QString mask;
+    QString broadcast;
+    QString gateway;
+    QString dns;
+} NETWORK_SETTINGS;
+
 class KeyCodeBoxSettings : public QObject
 {
     Q_OBJECT
@@ -34,6 +43,16 @@ class KeyCodeBoxSettings : public QObject
         static bool isDisplaySet();
         static void setDisplay();
 
+        static void setNetworkingSettings(NETWORK_SETTINGS const & settings);
+        static NETWORK_SETTINGS getNetworkingSettings();
+
+        static void EnableStaticAddressing();
+        static void DisableStaticAddressing();
+        static bool StaticAddressingEnabled();   
+        static QString GetVncPort();
+        static void SetVncCredentials(QString port, QString password);
+
+
     private:
         static QJsonObject m_json_obj;
         static QString m_filename;
@@ -42,7 +61,8 @@ class KeyCodeBoxSettings : public QObject
         static void JsonFromFile();
         static void JsonToFile();
         static void createDefault();
-
+        static void SetEnableStaticAddressing();
+        static void ClearEnableStaticAddressing();
 };
 
 #endif // KEYCODEBOXSETTINGS_H

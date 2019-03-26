@@ -30,7 +30,7 @@ KcbKeyboardDialog::KcbKeyboardDialog(QWidget *parent, bool for_password) :
 
 KcbKeyboardDialog::~KcbKeyboardDialog()
 {
-    Kcb::Utils::DestructorMsg(this);
+    kcb::ClassAllocation::DestructorMsg(this);
     delete ui;
 }
 

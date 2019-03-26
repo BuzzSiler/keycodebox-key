@@ -13,8 +13,12 @@
 #include <QScreen>
 #include <QApplication>
 #include <QWidget>
+#include <QList>
+#include <QNetworkInterface>
+#include <QPair>
 #include "kcbcommon.h"
 #include "keycodeboxsettings.h"
+#include "kcbutils.h"
 
 namespace kcb
 {
@@ -40,7 +44,23 @@ namespace kcb
     static QString const KCBCONFIG_OFFICIAL_DISPLAY_CONFIG_FILE("config.official.txt");
     static QString const BOOT_CONFIG_FILE("/boot/config.txt");
 
-    typedef enum { HOST_ADDRESS, BCAST_ADDRESS, NETWORK_MASK, MAC_ADDRESS } NETWORK_INFO_TYPE;
+    typedef enum { HOST_ADDRESS, BCAST_ADDRESS, NETWORK_MASK, GATEWAY_ADDRESS, DNS_ADDRESS, MAC_ADDRESS } NETWORK_INFO_TYPE;
+
+    QString const IP_COMPONENTS_REGEXP = "^inet addr:(.*)  Bcast:(.*)  Mask:(.*)$";
+    QString const MAC_ADDRESS_REGEXP = "^.*HWaddr (.*)$";
+    #define INET_ADDR_TEXT (1)
+    #define MAC_ADDR_TEXT (0)
+
+    static QString const BASE_DHCPCD_SETTINGS("hostname\n"
+                                "persistent\n"
+                                "option rapid_commit\n"
+                                "option domain_name_servers, domain_name, domain_search, host_name\n"
+                                "option classless_static_routes\n"
+                                "option ntp_servers\n"
+                                "require dhcp_server_identifier\n"
+                                "slaac private\n"
+                                "nohook lookup-hostname\n\n");
+
 
     void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status)
     {
@@ -108,17 +128,48 @@ namespace kcb
         }
     }
 
-    void SetVNCCredentials(QString vnc_port, QString vnc_password)
+    static QString MatchRegularExpression(QString text, int index, QString regexp)
     {
-        KCB_DEBUG_TRACE(vnc_port << vnc_password);
+        QRegularExpression regex(regexp);
+        // Inverted greediness allows .* to be minimal
+        regex.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
+        QRegularExpressionMatch match = regex.match(text.trimmed());
+        if (match.hasMatch()) 
+        {                        
+            return match.captured(index).trimmed();
+        }
 
-        std::system("rm /home/pi/kcb-config/config/vnc_creds.txt");
-        QString program = QString("echo '|%1 %2|' > /home/pi/kcb-config/config/vnc_creds.txt").arg(vnc_port).arg(vnc_password);
-        KCB_DEBUG_TRACE(program);
-        std::system(program.toStdString().c_str());
+        return QString("");
     }
 
-    static QString GetNetworkInfo(NETWORK_INFO_TYPE type)
+    static int TypeToIndex(NETWORK_INFO_TYPE type)
+    {
+        if (type == BCAST_ADDRESS)
+        {
+            return 2;
+        }
+        else if (type == NETWORK_MASK)
+        {
+            return 3;
+        }
+        else // HOST_ADDRESS || MAC_ADDRESS
+        {
+            return 1;
+        }
+    }
+
+    static QString ParseNetworkComponent(NETWORK_INFO_TYPE type, QString text)
+    {
+        QString regexp = IP_COMPONENTS_REGEXP;
+        if (type == MAC_ADDRESS)
+        {
+            regexp = MAC_ADDRESS_REGEXP;
+        }
+        int index = TypeToIndex(type);
+        return MatchRegularExpression(text, index, regexp);
+    }
+
+    static QString ParseNetworkInfo(NETWORK_INFO_TYPE type)
     {
         /*
         eth0      Link encap:Ethernet  HWaddr b8:27:eb:1e:67:9a
@@ -139,91 +190,19 @@ namespace kcb
         if (!stdOut.isEmpty())
         {
             QStringList strList = stdOut.split("\n");
-            
-            switch (type)
+            QString text = strList[INET_ADDR_TEXT];
+            if (type == MAC_ADDRESS)
             {
-                case HOST_ADDRESS:
-                case BCAST_ADDRESS:
-                case NETWORK_MASK:
-                {
-                    QRegularExpression regex("^inet addr:(.*)  Bcast:(.*)  Mask:(.*)$");
-                    // Inverted greediness allows .* to be minimal
-                    regex.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
-                    QRegularExpressionMatch match = regex.match(strList[1].trimmed());
-                    if (match.hasMatch()) 
-                    {
-                        int index = 0;
-                        switch (type)
-                        {
-                            case BCAST_ADDRESS:
-                                index = 2;
-                                break;
+                text = strList[MAC_ADDR_TEXT];
+            }
 
-                            case NETWORK_MASK:
-                                index = 3;
-                                break;
-
-                            case HOST_ADDRESS:
-                            default:
-                                index = 1;
-                                break;
-
-                        }
-
-                        return match.captured(index).trimmed();
-                    }
-                }
-                break;
-
-                case MAC_ADDRESS:
-                {
-                    QRegularExpression regex("^.*HWaddr (.*)$");
-                    // Inverted greediness allows .* to be minimal
-                    regex.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
-                    QRegularExpressionMatch match = regex.match(strList[0].trimmed());
-                    if (match.hasMatch()) 
-                    {
-                        return match.captured(1).trimmed();
-                    }
-                }
-                break;
-                    
-                default:
-                    return QString("");
-                    break;
-
-            };
+            return ParseNetworkComponent(type, text);
         }
 
         return QString("");
     }
 
-    QString GetHostAddress()
-    {
-        QString result = GetNetworkInfo(HOST_ADDRESS);
-        return result;
-    }
-
-    QString GetBcastAddress()
-    {
-        QString result = GetNetworkInfo(BCAST_ADDRESS);
-        return result;
-    }
-
-    QString GetMacAddress()
-    {
-        QString result = GetNetworkInfo(MAC_ADDRESS);
-        return result;
-    }
-
-    QString GetNetworkMask()
-    {
-        QString result = GetNetworkInfo(NETWORK_MASK);
-        KCB_DEBUG_TRACE("network mask" << result);
-        return result;
-    }
-
-    QString GetGatewayAddress()
+    static QString ParseGatewayAddress()
     {
         /*
             Command:
@@ -237,6 +216,7 @@ namespace kcb
         QString stdOut;
         QString stdErr;
         int status;
+
         ExecuteCommand(QString("ip"), QStringList() << QString("route") << QString("show"), stdOut, stdErr, status);
 
         QString result("");
@@ -263,6 +243,234 @@ namespace kcb
         }
 
         return result;
+    }
+
+    static QString ParseDnsAddress()
+    {
+        /*
+            # Generated by resolvconf
+            nameserver 192.168.1.1
+            nameserver 192.168.2.1
+            nameserver 192.168.3.1
+            nameserver 192.168.5.1
+        */
+        
+        QString stdOut;
+        QString stdErr;
+        int status;
+
+        KCB_DEBUG_ENTRY;
+        ExecuteCommand(QString("cat"), 
+                       QStringList() << 
+                       QString("/etc/resolv.conf") << 
+                       QString("|") << 
+                       QString("grep") << 
+                       QString("nameserver"), stdOut, stdErr, status);
+
+        QString result("");
+        if (!stdOut.isEmpty())
+        {
+            QStringList strList = stdOut.split("\n");
+            foreach (auto str, strList)
+            {
+                if (str.contains("nameserver"))
+                {
+                    QString address = str.trimmed().split(" ")[1];
+
+                    if (result.isEmpty())
+                    {
+                        result = address;
+                    }
+                    else
+                    {
+                        result += " " + address;
+                    }
+                }
+            }
+        }
+
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    static QString GetStaticNetworkInfo(NETWORK_INFO_TYPE type)
+    {
+        QString result("");
+        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
+
+        if (type == HOST_ADDRESS)
+        {
+            result = ns.address;
+        }
+        else if (type == BCAST_ADDRESS)
+        {
+            result = ns.broadcast;
+        }
+        else if (type == NETWORK_MASK)
+        {
+            result = ns.mask;
+        }
+        else if (type == GATEWAY_ADDRESS)
+        {
+            result = ns.gateway;
+        }
+        else if (type == DNS_ADDRESS)
+        {
+            result = ns.dns;
+        }
+        else if (type == MAC_ADDRESS)
+        {
+            result = ParseNetworkInfo(type);
+        }
+        else
+        {
+            result = "0.0.0.0";
+        }
+
+        return result;
+    }
+
+    static QString GetDynamicNetworkInfo(NETWORK_INFO_TYPE type)
+    {
+        KCB_DEBUG_ENTRY;
+        QString result("");
+
+        if (type == GATEWAY_ADDRESS)
+        {
+            result = ParseGatewayAddress();
+        }
+        else if (type == DNS_ADDRESS)
+        {
+            result = ParseDnsAddress();
+        }
+        else
+        {
+            result = ParseNetworkInfo(type);
+        }
+
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    static QString GetNetworkInfo(NETWORK_INFO_TYPE type)
+    {
+        KCB_DEBUG_ENTRY;
+        if (KeyCodeBoxSettings::StaticAddressingEnabled())
+        {
+            return GetStaticNetworkInfo(type);
+        }
+        else
+        {
+            return GetDynamicNetworkInfo(type);
+        }        
+    }
+
+    void SetHostAddress(QString const &value)
+    {
+        KCB_DEBUG_ENTRY;
+        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
+        ns.address = value;
+        KeyCodeBoxSettings::setNetworkingSettings(ns);
+        KCB_DEBUG_EXIT;
+    }
+
+    QString GetHostAddress()
+    {
+        KCB_DEBUG_ENTRY;
+        QString result = GetNetworkInfo(HOST_ADDRESS);
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    void SetNetworkMask(QString const &value)
+    {
+        KCB_DEBUG_ENTRY;
+        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
+        ns.mask = value;
+        KeyCodeBoxSettings::setNetworkingSettings(ns);
+        KCB_DEBUG_EXIT;
+    }
+
+    QString GetNetworkMask()
+    {
+        KCB_DEBUG_ENTRY;
+        QString result = GetNetworkInfo(NETWORK_MASK);
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    void SetBcastAddress(QString const &value)
+    {
+        KCB_DEBUG_ENTRY;
+        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
+        ns.broadcast = value;
+        KeyCodeBoxSettings::setNetworkingSettings(ns);
+        KCB_DEBUG_EXIT;
+    }
+
+    QString GetBcastAddress()
+    {
+        KCB_DEBUG_ENTRY;
+        QString result = GetNetworkInfo(BCAST_ADDRESS);
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    void SetGatewayAddress(QString const &value)
+    {
+        KCB_DEBUG_ENTRY;
+        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
+        ns.gateway = value;
+        KeyCodeBoxSettings::setNetworkingSettings(ns);
+        KCB_DEBUG_EXIT;
+    }
+
+    QString GetGatewayAddress()
+    {
+        KCB_DEBUG_ENTRY;
+        QString result = GetNetworkInfo(GATEWAY_ADDRESS);
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    void SetDnsAddress(QString const & value)
+    {
+        KCB_DEBUG_ENTRY;
+        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
+        ns.dns = value;
+        KeyCodeBoxSettings::setNetworkingSettings(ns);
+        KCB_DEBUG_EXIT;
+    }
+
+    QString GetDnsAddress()
+    {
+        KCB_DEBUG_ENTRY;
+        QString result = GetNetworkInfo(DNS_ADDRESS);
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    QString GetMacAddress()
+    {
+        KCB_DEBUG_ENTRY;
+        QString result = GetNetworkInfo(MAC_ADDRESS);
+        KCB_DEBUG_EXIT;
+        return result;
+    }
+
+    void EnableStaticAddressing()
+    {
+        KeyCodeBoxSettings::EnableStaticAddressing();
+    }
+
+    void DisableStaticAddressing()
+    {
+        KeyCodeBoxSettings::DisableStaticAddressing();
+    }
+
+    bool StaticAddressingEnabled()
+    {
+        return KeyCodeBoxSettings::StaticAddressingEnabled();
     }
 
     bool FPingAddress(QString address)
@@ -573,4 +781,183 @@ namespace kcb
         KCB_DEBUG_TRACE("Rebooting");
         Reboot();
     }
+
+    void RestartNetworkInterface()
+    {
+        std::system(QString("ip link set eth0 down && ip link set eth0 up").toStdString().c_str());
+    }
+
+    bool isVncConnectionActive()
+    {
+        /* 
+        This command:
+            ss sport = :<port>
+
+        returns the following:
+            Netid  State      Recv-Q Send-Q   Local Address:Port       Peer Address:Port   
+            tcp    ESTAB      0      281      192.168.1.146:5901      192.168.1.123:30310
+
+        when split on newline, this will yield two entrys in the string list when VNC is active
+        and one entry in the string list when VNC is not active.
+        */
+
+        QString stdOut;
+        QString stdErr;
+        int status;
+
+        QString vncPort = KeyCodeBoxSettings::GetVncPort();
+
+        ExecuteCommand(QString("ss"), QStringList() << QString("sport = :%1").arg(vncPort), stdOut, stdErr, status);
+
+        if (status == QProcess::CrashExit)
+        {
+            return false;
+        }
+
+        QStringList strList;
+
+        if (!stdOut.isEmpty())
+        {
+            strList = stdOut.trimmed().split("\n");
+            
+            KCB_DEBUG_TRACE(strList);
+
+        }
+
+        return strList.count() > 1;
+    }
+
+    static void SetDhcpcdConfFile(QString content)
+    {
+        if (QFile::exists("/etc/dhcpcd.conf"))
+        {
+            QFile::remove("/etcdhcpcd.conf");
+        }
+
+        QFile dhcpcdconf("/etc/dhcpcd.conf");
+        if (!dhcpcdconf.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            KCB_DEBUG_TRACE("Unable to create /etc/dhcpcd.conf");
+            return;
+        }
+
+        QTextStream out(&dhcpcdconf);
+        out << content;
+    }
+
+    void AddStaticAddressing(QString values)
+    {
+        SetDhcpcdConfFile(QString("%1%2").arg(BASE_DHCPCD_SETTINGS).arg(values));
+    }
+
+    void RemoveStaticAddressing()
+    {
+        SetDhcpcdConfFile(BASE_DHCPCD_SETTINGS);
+    }
+
+    QString IpAddrSubnetMaskToCidr(QString ip_addr, QString subnet_mask)
+    {
+        // Convert the ip address and subnet mask, e.g., 192.168.1.1, 255.255.255.0, to CIDR format, 192.168.1.1/24
+
+        if (subnet_mask.isEmpty() || !subnet_mask.contains(".") || ip_addr.isEmpty() || !ip_addr.contains("."))
+        {
+            KCB_DEBUG_TRACE("Invalid ip address and/or subnet mask");
+            return ip_addr;
+        }
+
+        QStringList mask_split = subnet_mask.split(".");
+        unsigned int mask_int = 0;
+        for (int ii = 3; ii >= 0; --ii)
+        {            
+            mask_int |= mask_split[ii].toInt() << (ii * 8);
+        }
+
+        // Count the bits set in the number
+        unsigned int num_bits = countSetBits(mask_int);
+
+        return QString("%1/%2").arg(ip_addr).arg(QString::number(num_bits));
+    }
+
+    static QList<QNetworkInterface> GetQualifiedInterfaces()
+    {        
+        QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
+
+        QList<QNetworkInterface> qualified_ifaces;
+
+        for (int i=0; i < ifaces.size(); i++)
+        {
+            unsigned int flags = ifaces[i].flags();
+            bool isLoopback = (bool)(flags & QNetworkInterface::IsLoopBack);
+            bool isP2P = (bool)(flags & QNetworkInterface::IsPointToPoint);
+            bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
+            QString name = ifaces[i].name();
+
+            bool ignore_usb_networks = name.contains("usb");
+            bool ignore_non_running = !isRunning;
+            bool ignore_non_loopback_or_virtual = !ifaces[i].isValid() || isLoopback || isP2P;
+
+            if ( ignore_usb_networks || ignore_non_running || ignore_non_loopback_or_virtual)
+            {
+                continue;
+            }
+
+            qualified_ifaces.append(ifaces[i]);
+        }
+
+        return qualified_ifaces;
+    }
+
+    static QList< QPair<QString, unsigned int> > GetPossibleMatches(QList<QNetworkInterface> qualified_ifaces)
+    {
+        QList< QPair<QString, unsigned int> > possibleMatches;
+
+        foreach (auto iface, qualified_ifaces)
+        {
+            QList<QNetworkAddressEntry> addresses = iface.addressEntries();
+
+            foreach (auto addrEntry, addresses)
+            {
+                QHostAddress addr = addrEntry.ip();
+
+                bool ignore_local_host = addr == QHostAddress::LocalHost;
+                bool ignore_nonipv4_address = !addr.toIPv4Address();
+                bool ignore_null_address = addr.toString().isEmpty();
+                
+                if ( ignore_local_host || ignore_nonipv4_address || ignore_null_address)
+                {
+                    continue;
+                }
+
+                possibleMatches.append(QPair<QString, unsigned int>(addr.toString(), iface.flags()));
+            }
+        }
+
+        return possibleMatches;
+    }
+
+    void GetIpAddressAndStatus(QString &ip_address, bool &can_ping, bool &can_multicast)
+    {
+        QList<QNetworkInterface> qualified_ifaces = GetQualifiedInterfaces();
+        QList< QPair<QString, unsigned int> > possibleMatches = GetPossibleMatches(qualified_ifaces);
+
+        bool is_match = possibleMatches.length() == 1;
+        bool interface_isup = false;
+        can_multicast = false;
+        can_ping = false;
+        ip_address = "";
+
+        if (is_match)
+        {    
+            QPair<QString, unsigned int>ip_display(possibleMatches[0]);
+            interface_isup = ip_display.second & QNetworkInterface::IsUp;
+            can_multicast = ip_display.second & QNetworkInterface::CanMulticast;
+            if (interface_isup)
+            {
+                QString gateway = kcb::GetGatewayAddress();
+                can_ping = kcb::FPingAddress(gateway);
+                ip_address = ip_display.first;
+            }
+        }
+    }
+
 }
