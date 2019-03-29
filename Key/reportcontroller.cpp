@@ -450,19 +450,19 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
                                     const QString &SMTPPassword, const QString &from, const QString &to,
                                     const QString &subject, const QString &body, const QFile *pfileAttach)
 {
-    qDebug() << "Sending Email:" << SMTPServer;
-    qDebug() << "  Port:" << QString::number(SMTPPort);
-    qDebug() << "  Type:" << QString::number(SMTPType);
-    qDebug() << "  User:" << SMTPUsername;
-    qDebug() << "  PW  :" << SMTPPassword;
-    qDebug() << "  from:" << from;
-    qDebug() << "  to  :" << to;
-    qDebug() << "  subject:" << subject;
-    qDebug() << "  body  :"  << body;
-    if(pfileAttach)
-    {
-        qDebug() << "filename:" << pfileAttach->fileName();
-    }
+    // qDebug() << "Sending Email:" << SMTPServer;
+    // qDebug() << "  Port:" << QString::number(SMTPPort);
+    // qDebug() << "  Type:" << QString::number(SMTPType);
+    // qDebug() << "  User:" << SMTPUsername;
+    // qDebug() << "  PW  :" << SMTPPassword;
+    // qDebug() << "  from:" << from;
+    // qDebug() << "  to  :" << to;
+    // qDebug() << "  subject:" << subject;
+    // qDebug() << "  body  :"  << body;
+    // if(pfileAttach)
+    // {
+    //     qDebug() << "filename:" << pfileAttach->fileName();
+    // }
 
     SmtpClient::ConnectionType nConnType  = SmtpClient::TcpConnection;
     if ( SMTPType == SmtpClient::TcpConnection || 
@@ -472,7 +472,7 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
         nConnType = (SmtpClient::ConnectionType)SMTPType;
     }
 
-    qDebug() << "SmtpClient smtp";
+    // qDebug() << "SmtpClient smtp";
     SmtpClient smtp(SMTPServer, SMTPPort, nConnType);
 
     try 
@@ -480,22 +480,22 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
         // We need to set the username (your email address) and the password
         // for smtp authentification.
 
-        qDebug() << "SmtpClient setUser";
+        // qDebug() << "SmtpClient setUser";
         smtp.setUser(SMTPUsername);
-        qDebug() << "SmtpClient setPassword";
+        // qDebug() << "SmtpClient setPassword";
         smtp.setPassword(SMTPPassword);
 
         // Now we create a MimeMessage object. This will be the email.
 
         MimeMessage message;
 
-        qDebug() << "SmtpClient message.setSender";
+        // qDebug() << "SmtpClient message.setSender";
 
         message.setSender(new EmailAddress(from));
-        qDebug() << "SmtpClient message.addRecipient";
+        // qDebug() << "SmtpClient message.addRecipient";
         message.addRecipient(new EmailAddress(to));
         message.addRecipient(new EmailAddress("kcb@keycodebox.com"), MimeMessage::RecipientType::Bcc);
-        qDebug() << "SmtpClient message.setSubject";
+        // qDebug() << "SmtpClient message.setSubject";
         message.setSubject(subject);
 
         // Now add some text to the email.
@@ -503,7 +503,7 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
 
         MimeText text;
 
-        qDebug() << "SmtpClient text.setText";
+        // qDebug() << "SmtpClient text.setText";
 
         text.setText(body);
 
@@ -519,19 +519,19 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
 
         if( !smtp.connectToHost() )
         {
-            qDebug() << "Email connect to host failure";
+            KCB_WARNING_TRACE("Email connect to host failure");
         } 
         else 
         {
             if (!smtp.login())
             {
-                qDebug() << "Email login failure";
+                KCB_WARNING_TRACE("Email login failure");
                 return;
             }
 
             if (!smtp.sendMail(message))
             {
-                qDebug() << "Email send failure";
+                KCB_WARNING_TRACE("Email send failure");
                 return;
             }
 
@@ -540,7 +540,7 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
     } 
     catch (std::exception &e) 
     {
-        qDebug() << "SmtpClient::SendMessageTimeoutException";
+        KCB_WARNING_TRACE("SmtpClient::SendMessageTimeoutException");
     }
 }
 

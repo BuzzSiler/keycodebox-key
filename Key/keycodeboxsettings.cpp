@@ -17,7 +17,7 @@ QJsonObject KeyCodeBoxSettings::m_json_obj = QJsonObject();
 QString KeyCodeBoxSettings::m_filename = SETTINGS_FULL_PATH;
 CABINET_VECTOR KeyCodeBoxSettings::m_cabinet_info = CABINET_VECTOR(0);
 
-static QString const DEFAULT_KCB_SETTINGS = QString("{\"enable_fleetwave\":false,\"cabinets\":[{\"model\":\"KB32\",\"num_locks\":32,\"start\":1,\"stop\":32}]}");
+static QString const DEFAULT_KCB_SETTINGS = QString("{\"enable_fleetwave\":false,\"cabinets\":[]}");
 
 void KeyCodeBoxSettings::createDefault()
 {
@@ -86,31 +86,33 @@ CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
     KCB_DEBUG_ENTRY;
     JsonFromFile();
 
-    #define NULL_CABINET_INFO { "", 0, -1, -1 }
-    #define RANGE_TO_INDEX(s, p) (s >= 1 && p <= 32 ? 0 : s >= 32 && p <= 64 ? 1 : s >= 65 && p <= 86 ? 2 : -1)
-
     QJsonArray cabArray = m_json_obj["cabinets"].toArray();
 
     KCB_DEBUG_TRACE("cabArray count" << cabArray.count());
 
+    #define NULL_CABINET_INFO { "", 0, -1, -1, "", 0}
     m_cabinet_info.clear();
-    m_cabinet_info.fill(NULL_CABINET_INFO, cabArray.size());
 
     foreach (auto elem, cabArray)
     {
         QJsonObject obj = elem.toObject();
+
         CABINET_INFO cab_info = { obj["model"].toString(), 
                                   obj["num_locks"].toInt(), 
                                   obj["start"].toInt(), 
-                                  obj["stop"].toInt() };
-        KCB_DEBUG_TRACE(cab_info.model << cab_info.num_locks << cab_info.start << cab_info.stop);
+                                  obj["stop"].toInt(),
+                                  obj["sw_version"].toString(),
+                                  obj["addr"].toString() };
+        KCB_DEBUG_TRACE(cab_info.model << cab_info.num_locks << cab_info.start << cab_info.stop << cab_info.sw_version << cab_info.addr);
 
-        m_cabinet_info[RANGE_TO_INDEX(cab_info.start, cab_info.stop)] = cab_info;
+        m_cabinet_info.append(cab_info);
     }
+
+    std::sort(m_cabinet_info.begin(), m_cabinet_info.end());
 
     foreach (auto entry, m_cabinet_info)
     {
-        KCB_DEBUG_TRACE(entry.model << entry.num_locks << entry.start << entry.stop);
+        KCB_DEBUG_TRACE(entry.model << entry.num_locks << entry.start << entry.stop << entry.sw_version << entry.addr);
     }
 
     KCB_DEBUG_EXIT;
@@ -131,6 +133,52 @@ int KeyCodeBoxSettings::getLocksPerCabinet(int cab_index)
     getCabinetsInfo();
     KCB_DEBUG_EXIT;
     return m_cabinet_info[cab_index].num_locks;
+}
+
+void KeyCodeBoxSettings::ClearCabinetConfig()
+{
+    KCB_DEBUG_ENTRY;
+    JsonFromFile();
+
+    if (m_json_obj.contains("cabinets"))
+    {
+        m_json_obj.remove("cabinets");
+    }
+
+    JsonToFile();
+
+    KCB_DEBUG_EXIT;
+}
+
+void KeyCodeBoxSettings::AddCabinet(CABINET_INFO const &cab)
+{
+    KCB_DEBUG_ENTRY;
+    QJsonObject cabinet;
+    cabinet.insert(QString("model"), QJsonValue(cab.model));
+    cabinet.insert(QString("num_locks"), QJsonValue(cab.num_locks));
+    cabinet.insert(QString("start"), QJsonValue(cab.start));
+    cabinet.insert(QString("stop"), QJsonValue(cab.stop));
+    cabinet.insert(QString("sw_version"), QJsonValue(cab.sw_version));
+    cabinet.insert(QString("addr"), QJsonValue(cab.addr));
+
+    QJsonArray cabinets;
+    if (m_json_obj.contains("cabinets"))
+    {
+        cabinets = m_json_obj["cabinets"].toArray();
+        m_json_obj.remove("cabinets");
+
+        cabinets.push_back(QJsonObject(cabinet));
+    }    
+    else
+    {
+        cabinets.push_back(cabinet);
+    }
+
+    m_json_obj.insert(QString("cabinets"), QJsonValue(cabinets));
+
+    JsonToFile();
+
+    KCB_DEBUG_EXIT;
 }
 
 bool KeyCodeBoxSettings::isDisplaySet()
@@ -169,7 +217,7 @@ void KeyCodeBoxSettings::setNetworkingSettings(NETWORK_SETTINGS const & settings
     {
         static_ip = m_json_obj["static_ip"].toObject();
 
-        m_json_obj.remove("static_ip");        
+        m_json_obj.remove("static_ip");
 
         static_ip["address"] = settings.address;
         static_ip["mask"] = settings.mask;
@@ -223,7 +271,7 @@ void KeyCodeBoxSettings::SetEnableStaticAddressing()
     if (m_json_obj.contains("static_ip"))
     {
         static_ip = m_json_obj["static_ip"].toObject();
-        m_json_obj.remove("static_ip");        
+        m_json_obj.remove("static_ip");
         static_ip["enabled"] = true;
     }    
     else
@@ -246,7 +294,7 @@ void KeyCodeBoxSettings::ClearEnableStaticAddressing()
     if (m_json_obj.contains("static_ip"))
     {
         static_ip = m_json_obj["static_ip"].toObject();
-        m_json_obj.remove("static_ip");        
+        m_json_obj.remove("static_ip");
         static_ip["enabled"] = false;
     }    
     else

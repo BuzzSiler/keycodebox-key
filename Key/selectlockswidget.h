@@ -28,6 +28,7 @@ class SelectLocksWidget : public QWidget
         QString getLocks();
         void setTimer(int seconds);
         void startTimer();
+        void updateCabinetConfig();
 
     signals:
         void NotifyRequestLockOpen(QString lockNum, bool is_user);

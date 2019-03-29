@@ -26,12 +26,13 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QScreen>
+
+
 #include "lockset.h"
 #include "lockstate.h"
 #include "menupushbutton.h"
 #include <exception>
 #include "encryption.h"
-#include "linux/reboot.h"
 #include <unistd.h>
 #include "selectlockswidget.h"
 #include "kcbkeyboarddialog.h"
@@ -46,11 +47,17 @@
 #include "codeimporter.h"
 #include "logger.h"
 
+#include "systemcontroller.h"
+#include "lockcontroller.h"
+
+#include "cabinetrowdelegate.h"
+
 
 #define ADMIN_TAB_INDEX (0)
 #define REPORT_TAB_INDEX (2)
 #define CODES_TAB_INDEX (4)
 #define CODE_HISTORY_TAB_INDEX (5)
+#define SYSTEM_TAB_INDEX (6)
 
 #define ACTION_INDEX_INSTALL_APP (0)
 #define ACTION_INDEX_SET_BRANDING_IMAGE (1)
@@ -110,7 +117,8 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::ADMIN)),
     m_report(* new ReportControlWidget(this)),
     m_file_filter{0},
-    m_util_action(UTIL_ACTION_INSTALL_APP)
+    m_util_action(UTIL_ACTION_INSTALL_APP),
+    m_model(* new QStandardItemModel(0, 6))
 
 {
     ui->setupUi(this);
@@ -123,9 +131,26 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     // For whatever reason, the tabWidget will not take on the geometry of the parent (not wide enough).
     // Consequently, it is necessary to explicitly set the geometry to be the same as the parent.
     ui->tabWidget->setGeometry(parent->x(), parent->y(), parent->width(), parent->height());
-    
+
+    ui->pgbDiscoverHardware->setVisible(false);
+
     initialize();
 
+    QStringList headers;
+    headers << "Model" << "First Lock" << "Last Lock" << "Total Locks" << "Board Addr" << "SW Version";
+
+    m_model.setHorizontalHeaderLabels(headers);
+    ui->tvCabinets->setModel(&m_model);
+    ui->tvCabinets->verticalHeader()->hide();
+    ui->tvCabinets->verticalHeader()->setFixedWidth(60);
+    ui->tvCabinets->horizontalHeader()->setFixedHeight(50);
+    ui->tvCabinets->horizontalHeader()->setStretchLastSection(true);
+    ui->tvCabinets->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    ui->tvCabinets->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    connect(&m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(OnItemChanged(QStandardItem*)));
+
+    ui->pbResetCabinetConfig->setDisabled(true);
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -193,6 +218,8 @@ void CFrmAdminInfo::initializeConnections()
 
     connect( ui->tblHistory, SIGNAL( cellClicked(int, int) ), this, SLOT( codeHistoryTableCellSelected( int, int ) ) );
     connect( ui->cbUsbDrives, SIGNAL(currentIndexChanged(QString) ), this, SLOT(on_cbUsbDrives_currentIndexChanged(QString) ) );
+
+    connect(_psysController, SIGNAL(DiscoverHardwareProgressUpdate(int)), this, SLOT(OnDiscoverHardwareProgressUpdate(int)));
 
 }
 
@@ -290,6 +317,8 @@ void CFrmAdminInfo::initialize()
     }
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabSelected(int)));
+
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 QString CFrmAdminInfo::GetIpStylesheet(bool can_ping, bool can_multicast)
@@ -396,10 +425,7 @@ void CFrmAdminInfo::populateTimeZoneSelection(QComboBox *cbox)
 
 void CFrmAdminInfo::setTimeZone()
 {
-    qDebug() << "CFrmAdminInfo::setTimeZone()";
-    qDebug() << ui->cbTimeZone->currentText();
-
-    // setTimeZone
+    KCB_DEBUG_ENTRY;
 
     QString unlink = QString("sudo unlink /etc/localtime");
     QString link = QString("sudo ln -s /usr/share/zoneinfo/") + ui->cbTimeZone->currentText() + QString(" /etc/localtime");
@@ -415,6 +441,7 @@ void CFrmAdminInfo::setTimeZone()
     {
         ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
     }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::onRootPathChanged(QString path)
@@ -504,10 +531,9 @@ void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
     }
     else
     {
-       ui->btnActionExecute->setEnabled(false);        
+       ui->btnActionExecute->setEnabled(false);
     }
 
-    //KCB_DEBUG_TRACE("Copy from File" << _copyDirectory);
     //KCB_DEBUG_EXIT;
 }
 
@@ -1812,6 +1838,10 @@ void CFrmAdminInfo::OnTabSelected(int index)
         // Force the codes to be read into the codes tab
         emit ui->btnRead->clicked();
     }
+    else if (index == SYSTEM_TAB_INDEX)
+    {
+        SetCabinetInfo();
+    }
 
     if (last_index != REPORT_TAB_INDEX && index == REPORT_TAB_INDEX)
     {
@@ -2076,6 +2106,10 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
                     CodeExporter exporter(format, root_path, *lockset, security);
                     bool result = exporter.Export();
                     Q_ASSERT_X(result, Q_FUNC_INFO, "exporter export failed");
+                    if (!result)
+                    {
+                        KCB_WARNING_TRACE("Failure exporting codes");
+                    }
                 }
                 else
                 {
@@ -2237,4 +2271,152 @@ void CFrmAdminInfo::on_cbLogLevel_currentIndexChanged(const QString &arg1)
     }
 
     kcb::Logger::setLevel(level);
+}
+
+void CFrmAdminInfo::on_pbDiscoverHardware_clicked()
+{
+    // signal the lockcontroller to start detecting the hardware
+    // it would seem to be a good idea to do that in a separate thread so
+    // the ui remains responsive, but should we allow the user to do anything
+    // else while we are detecting hardware?
+    ui->pbResetCabinetConfig->setDisabled(true);
+    ui->pbApplyChanges->setDisabled(true);
+    ui->pgbDiscoverHardware->setValue(0);
+    ui->pgbDiscoverHardware->setVisible(true);
+    ui->pbDiscoverHardware->setDisabled(true);
+    _psysController->DiscoverHardware();
+    ui->pgbDiscoverHardware->setValue(100);
+
+    SetCabinetInfo();
+
+    m_select_locks.updateCabinetConfig();
+    if (_pFrmCodeEditMulti)
+    {
+        _pFrmCodeEditMulti->updateCabinetConfig();
+    }
+
+    ui->pbDiscoverHardware->setEnabled(true);
+    ui->pgbDiscoverHardware->setVisible(false);
+}
+
+void CFrmAdminInfo::OnDiscoverHardwareProgressUpdate(int value)
+{
+    ui->pgbDiscoverHardware->setValue(value);
+}
+
+void CFrmAdminInfo::ClearCabinetInfo()
+{
+    KCB_DEBUG_ENTRY;
+    m_model.removeRows(0, m_model.rowCount());
+    ui->pbResetCabinetConfig->setDisabled(true);
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::SetCabinetInfo()
+{
+    KCB_DEBUG_ENTRY;
+    CABINET_VECTOR cabinets = KeyCodeBoxSettings::getCabinetsInfo();
+
+    ClearCabinetInfo();
+
+    foreach (auto cab, cabinets)
+    {
+        m_model.insertRow(m_model.rowCount(),
+                          QList<QStandardItem *>() << new QStandardItem(cab.model)
+                                                   << new QStandardItem(QString::number(cab.start))
+                                                   << new QStandardItem(QString::number(cab.stop))
+                                                   << new QStandardItem(QString::number(cab.num_locks))
+                                                   << new QStandardItem(cab.addr)
+                                                   << new QStandardItem(cab.sw_version));
+        ui->tvCabinets->setItemDelegateForRow(m_model.rowCount() - 1, new CabinetRowDelegate(this));
+    }
+
+    ui->pbResetCabinetConfig->setEnabled(cabinets.count() > 0);
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
+{
+
+    int col = item->column();
+    int row = item->row();
+
+    ui->pbApplyChanges->setEnabled(col == 3 || col == 2 || col == 1);
+
+    // Note: This code works in a cascading fashion.  By changing the total locks column,
+    // this code will be called to notify there was a change.  Each time this function
+    // is called it will use the current column to make an update to the next row (if one exists)
+    // which will in turn force this function to be called again.  Each time, a single change is
+    // made to the model.
+
+    if (col == 3)
+    {
+        QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tvCabinets->model());
+        int total = model->data(model->index(row, col)).toInt();
+        int first = model->data(model->index(row, col-2)).toInt();
+        model->setData(model->index(row, col-1), first + total - 1);
+    }
+    else if (col == 2)
+    {
+        QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tvCabinets->model());
+        if (model->rowCount() > (row + 1))
+        {
+            int last = model->data(model->index(row, col)).toInt();
+            model->setData(model->index(row+1, col-1), last + 1);
+        }
+    }
+    else if (col == 1)
+    {
+        QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tvCabinets->model());
+        int first = model->data(model->index(row, col)).toInt();
+        int total = model->data(model->index(row, col+2)).toInt();
+        model->setData(model->index(row, col+1), first + total - 1);
+    }
+
+}
+
+void CFrmAdminInfo::on_pbApplyChanges_clicked()
+{
+    KCB_DEBUG_ENTRY;
+
+    ui->pbApplyChanges->setDisabled(true);
+    KeyCodeBoxSettings::ClearCabinetConfig();
+
+    for (int rr = 0; rr < m_model.rowCount(); ++rr)
+    {
+        QString model = m_model.data(m_model.index(rr, 0)).toString();
+        int start = m_model.data(m_model.index(rr, 1)).toInt();
+        int stop = m_model.data(m_model.index(rr, 2)).toInt();
+        int num_locks = m_model.data(m_model.index(rr, 3)).toInt();
+        QString addr = m_model.data(m_model.index(rr, 4)).toString();
+        QString sw_version = m_model.data(m_model.index(rr, 5)).toString();
+
+        KCB_DEBUG_TRACE("model" << model << "first" << start << "last" << stop << "total" << num_locks << "addr" << addr << "sw" << sw_version);
+        KeyCodeBoxSettings::AddCabinet({model, num_locks, start, stop, sw_version, addr});
+    }
+
+    _psysController->UpdateLockRanges();
+
+    m_select_locks.updateCabinetConfig();
+    if (_pFrmCodeEditMulti)
+    {
+        _pFrmCodeEditMulti->updateCabinetConfig();
+    }
+
+    KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::on_pbResetCabinetConfig_clicked()
+{
+    ui->pbApplyChanges->setDisabled(true);
+    ui->pbResetCabinetConfig->setDisabled(true);
+    ui->pbDiscoverHardware->setDisabled(true);
+    ClearCabinetInfo();
+    KeyCodeBoxSettings::ClearCabinetConfig();
+    m_select_locks.updateCabinetConfig();
+    if (_pFrmCodeEditMulti)
+    {
+        _pFrmCodeEditMulti->updateCabinetConfig();
+    }
+    ui->pbDiscoverHardware->setEnabled(true);
 }

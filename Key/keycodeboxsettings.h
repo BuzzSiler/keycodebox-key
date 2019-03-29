@@ -13,12 +13,18 @@ class QJsonParseError;
 
 typedef std::pair<QJsonObject, QJsonParseError> JsonObjErrPair;
 
-typedef struct 
+typedef struct cab_info
 {
     QString model;
     int   num_locks;
     int   start;
     int   stop;
+    QString sw_version;
+    QString addr;
+    bool operator<(const cab_info& a) const
+    {
+        return start < a.start;
+    }
 } CABINET_INFO;
 
 typedef QVector<CABINET_INFO> CABINET_VECTOR;
@@ -40,6 +46,10 @@ class KeyCodeBoxSettings : public QObject
         static int getNumCabinets();
         static int getLocksPerCabinet(int cab_index);
         static CABINET_VECTOR getCabinetsInfo();
+
+        static void ClearCabinetConfig();
+        static void AddCabinet(CABINET_INFO const &cab);
+
         static bool isDisplaySet();
         static void setDisplay();
 

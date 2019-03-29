@@ -152,7 +152,7 @@ void CFrmUserCode::onBackSpace()
     if( nLen > 0 )
     {
         sCode = sCode.left(nLen - 1);
-        ui->edCode->setText(sCode);        
+        ui->edCode->setText(sCode);
         ui->btn_Return->setEnabled(sCode.length() > 0);
     }
 }
