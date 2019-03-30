@@ -18,6 +18,7 @@ CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
 
     kcb::SetWindowParams(this);
 
+    m_select_locks.updateCabinetConfig();
     ui->vloSelectLocks->addWidget(&m_select_locks);
 
     connect(&m_select_locks, &SelectLocksWidget::NotifyClose, this, &CFrmSelectLocks::reject);

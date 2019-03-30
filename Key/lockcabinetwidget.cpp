@@ -20,11 +20,14 @@ static const QString css_pushed = "QPushButton[checkable=true]:enabled {color:\"
 
 LockCabinetWidget::LockCabinetWidget(QWidget *parent) :
     QWidget(parent),
-    m_cabinet_info(KeyCodeBoxSettings::getCabinetsInfo()),
-    m_num_cabs(m_cabinet_info.size()),
-    m_cabs(m_num_cabs),
-    m_current_cab(0),
+    m_cabinet_info(0),
+    m_num_cabs(-1),
+    m_selected_locks(0),
+    m_cabs(0),
+    m_current_cab(-1),
     m_mapper(* new QSignalMapper(this)),
+    m_default_stylesheet(""),
+    m_is_configured(false),
     ui(new Ui::LockCabinetWidget)
 {
     ui->setupUi(this);
@@ -36,12 +39,53 @@ LockCabinetWidget::LockCabinetWidget(QWidget *parent) :
     for (int ii = 0; ii < m_lock_buttons.length(); ++ii)
     {
         QPushButton *btn = m_lock_buttons[ii];
+        btn->setDisabled(true);
         connect(btn, SIGNAL(clicked()), &m_mapper, SLOT(map()));
         m_mapper.setMapping(btn, ii);
     }
     connect(&m_mapper, SIGNAL(mapped(int)), this, SLOT(lockSelected(int)));
 
-    // Initialize the cabs/locks state
+    ui->pbSelectAll->setDisabled(true);
+    ui->pbClearAll->setDisabled(true);
+    ui->cbSelectedCabinet->setDisabled(true);
+
+    updateCabinetConfig();
+
+}
+
+LockCabinetWidget::~LockCabinetWidget()
+{
+    kcb::ClassAllocation::DestructorMsg(this);
+    delete ui;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool LockCabinetWidget::isConfigured()
+{
+    return m_is_configured;
+}
+
+void LockCabinetWidget::updateCabinetConfig()
+{
+    KCB_DEBUG_ENTRY;
+
+    m_is_configured = false;
+
+    m_cabinet_info = KeyCodeBoxSettings::getCabinetsInfo();
+    if (m_cabinet_info.count() == 0)
+    {
+        KCB_DEBUG_EXIT;
+        return;
+    }
+
+    ui->cbSelectedCabinet->clear();
+    ui->cbSelectedCabinet->setEnabled(true);
+
+    m_num_cabs = m_cabinet_info.size();
+    m_cabs.resize(m_num_cabs);
+    m_current_cab = 0;
+
     for (int ii = 0; ii < m_cabs.length(); ++ii)
     {
         quint8 start = m_cabinet_info[ii].start;
@@ -63,19 +107,24 @@ LockCabinetWidget::LockCabinetWidget(QWidget *parent) :
                     arg(start, 3, 10, QChar('0')).
                     arg(stop, 3, 10, QChar('0')));
     };
-}
 
-LockCabinetWidget::~LockCabinetWidget()
-{
-    kcb::ClassAllocation::DestructorMsg(this);
-    delete ui;
-}
+    ui->pbSelectAll->setEnabled(true);
+    ui->pbClearAll->setEnabled(true);
 
-//-------------------------------------------------------------------------------------------------
+    m_is_configured = true;
+
+    KCB_DEBUG_EXIT;
+}
 
 QString LockCabinetWidget::getSelectedCabinet()
 {
-    return m_cabinet_info[m_current_cab].model;
+    QString model("");
+
+    if (m_current_cab >= 0)
+    {
+        model = m_cabinet_info[m_current_cab].model;
+    }
+    return model;
 }
 
 QString LockCabinetWidget::getSelectedLocks()
@@ -117,6 +166,12 @@ void LockCabinetWidget::setSelectedCabinet(const QString& cab, const QString& lo
 void LockCabinetWidget::setSelectedLocks(QString locks)
 {
     Q_ASSERT_X(locks != "", Q_FUNC_INFO, "invalid locks (empty string)");
+
+    if (!isConfigured())
+    {
+        KCB_DEBUG_TRACE("Lock Cabinet is not configured");
+        return;
+    }
 
     QVector<QString> locks_vtr;
     int  cab_index;
@@ -179,6 +234,7 @@ void LockCabinetWidget::clrWarning()
 
 void LockCabinetWidget::setEnabledLocks(QString locks)
 {
+    KCB_DEBUG_ENTRY;
     Q_ASSERT_X(locks != "", Q_FUNC_INFO, "invalid locks (empty string)");
 
     QVector<QString> locks_vtr;
@@ -190,6 +246,7 @@ void LockCabinetWidget::setEnabledLocks(QString locks)
     foreach (auto lock, locks_vtr)
     {
         CalcLockCabIndecies(lock, cab_index, lock_index);
+        KCB_DEBUG_TRACE("lock" << lock << "cab_index" << cab_index << "lock_index" << lock_index);
         if (cab_index >= 0 && lock_index >= 0)
         {
             m_cabs[cab_index].enabled[lock_index] = true;
@@ -197,6 +254,7 @@ void LockCabinetWidget::setEnabledLocks(QString locks)
     }
 
     updateUi();
+    KCB_DEBUG_EXIT;
 }
 
 void LockCabinetWidget::enableAllLocks()
@@ -209,10 +267,12 @@ void LockCabinetWidget::enableAllLocks()
 
 void LockCabinetWidget::disableAllLocks()
 {
+    KCB_DEBUG_ENTRY;
     for (int ii = 0; ii < m_cabs.count(); ++ii)
     {
         enableDisableLocksInCabinet(ii, false);
     }
+    KCB_DEBUG_EXIT;
 }
 
 // Private Slots ----------------------------------------------------------------------------------
@@ -237,6 +297,12 @@ void LockCabinetWidget::on_cbSelectedCabinet_currentIndexChanged(int index)
 void LockCabinetWidget::lockSelected(int lock_index)
 {
     Q_ASSERT_X(lock_index >= 0 && lock_index < MAX_NUM_LOCKS_PER_CABINET, Q_FUNC_INFO, "lock_index out of range");
+
+    if (lock_index < 0 || lock_index > MAX_NUM_LOCKS_PER_CABINET)
+    {
+        KCB_WARNING_TRACE("Index" << lock_index << "out of range");
+        return;
+    }
 
     bool checked = m_lock_buttons[lock_index]->isChecked();
     m_cabs[m_current_cab].states[lock_index] = checked;
@@ -263,6 +329,11 @@ void LockCabinetWidget::lockSelected(int lock_index)
 
 void LockCabinetWidget::updateUi()
 {
+    if (m_current_cab < 0)
+    {
+        return;
+    }
+    
     CAB_STATE* p_cab = &m_cabs[m_current_cab];
     quint8 start = m_cabinet_info[m_current_cab].start;
     quint8 stop = m_cabinet_info[m_current_cab].stop;
@@ -286,6 +357,11 @@ void LockCabinetWidget::updateUi()
 
 void LockCabinetWidget::selectClearAllLocks(bool select_clear)
 {
+    if (m_current_cab < 0)
+    {
+        return;
+    }
+    
     CAB_STATE* p_cab = &m_cabs[m_current_cab];
     quint8 start = m_cabinet_info[m_current_cab].start;
     quint8 stop = m_cabinet_info[m_current_cab].stop;
@@ -320,9 +396,17 @@ void LockCabinetWidget::selectClearAllLocks(bool select_clear)
     updateUi();
 }
 
-void LockCabinetWidget::enableDisableLocksInCabinet(quint8 cab_index, bool enable_disable)
+void LockCabinetWidget::enableDisableLocksInCabinet(qint8 cab_index, bool enable_disable)
 {
+    KCB_DEBUG_ENTRY;
+
     Q_ASSERT_X(cab_index < m_num_cabs, Q_FUNC_INFO, "cab_index out of range");
+    if (m_num_cabs < 0 || cab_index < 0 || cab_index > (m_num_cabs - 1))
+    {
+        KCB_DEBUG_EXIT;
+        return;
+    }
+    
     CAB_STATE* p_cab = &m_cabs[cab_index];
     quint8 start = m_cabinet_info[cab_index].start;
     quint8 stop = m_cabinet_info[cab_index].stop;
@@ -342,11 +426,16 @@ void LockCabinetWidget::enableDisableLocksInCabinet(quint8 cab_index, bool enabl
     }
 
     updateUi();
+    KCB_DEBUG_EXIT;
 }
 
-void LockCabinetWidget::clrLocksInCabinet(quint8 cab_index)
+void LockCabinetWidget::clrLocksInCabinet(qint8 cab_index)
 {
     Q_ASSERT_X(cab_index < m_num_cabs, Q_FUNC_INFO, "cab_index out of range");
+    if (m_num_cabs < 0 || cab_index < 0 || cab_index > (m_num_cabs - 1))
+    {
+        return;
+    }
 
     m_cabs[cab_index].states = QVector<bool>(MAX_NUM_LOCKS_PER_CABINET, false);
 }
@@ -440,10 +529,17 @@ void LockCabinetWidget::RemoveLockFromSelected(const QString lock)
 
 void LockCabinetWidget::CalcLockCabIndecies(const QString lock, int &cab_index, int &lock_index)
 {
+    KCB_DEBUG_ENTRY;
     Q_ASSERT_X(lock != "", Q_FUNC_INFO, "empty string");
 
     quint16 lock_int = lock.toInt();
     Q_ASSERT_X(lock_int >= 1 && lock_int <= MAX_NUM_LOCKS_PER_CABINET, Q_FUNC_INFO, "invalid lock");
+
+    if (m_num_cabs < 0)
+    {
+        KCB_DEBUG_EXIT;
+        return;
+    }
 
     cab_index = -1;
     lock_index = -1;
@@ -453,6 +549,7 @@ void LockCabinetWidget::CalcLockCabIndecies(const QString lock, int &cab_index, 
         quint8 start = m_cabinet_info[ii].start;
         quint8 stop = m_cabinet_info[ii].stop;
 
+        KCB_DEBUG_TRACE("ii" << ii << "start" << start << "lock_int" << lock_int << "stop" << stop);
         if (lock_int >= start && lock_int <= stop)
         {
             cab_index = ii;
@@ -460,4 +557,5 @@ void LockCabinetWidget::CalcLockCabIndecies(const QString lock, int &cab_index, 
             break;
         }
     }
+    KCB_DEBUG_EXIT;
 }

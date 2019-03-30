@@ -47,26 +47,51 @@ SelectLocksWidget::~SelectLocksWidget()
     delete ui;
 }
 
+void SelectLocksWidget::updateCabinetConfig()
+{
+    KCB_DEBUG_ENTRY;
+    m_lock_cab.updateCabinetConfig();
+    KCB_DEBUG_EXIT;
+}
+
 void SelectLocksWidget::setLocks(QString locks)
 {
+    KCB_DEBUG_ENTRY;
     Q_ASSERT(m_role == USER);
     Q_ASSERT(locks != "");
+
+    if (!m_lock_cab.isConfigured())
+    {
+        KCB_DEBUG_TRACE("Lock Cabinet is not configured");
+        return;
+    }
 
     KCB_DEBUG_TRACE("Locks:" << locks);
 
     m_lock_cab.disableAllLocks();
     m_lock_cab.setEnabledLocks(locks);
 
+    KCB_DEBUG_TRACE("after disable/enable locks");
+
     ui->lstSelectedLocks->clear();
     ui->btnOpenSelected->setEnabled(false);
+    KCB_DEBUG_EXIT;
 }
 
 QString SelectLocksWidget::getLocks()
 {
+    KCB_DEBUG_ENTRY;
+    if (!m_lock_cab.isConfigured())
+    {
+        KCB_DEBUG_TRACE("Lock Cabinet is not configured");
+        return QString("");
+    }
+
     QStringList locks;
     QString lock;
     QString str;
     QString cab;
+
     int num_items = ui->lstSelectedLocks->count();
 
     for (int ii = 0; ii < num_items; ++ii)
@@ -76,6 +101,7 @@ QString SelectLocksWidget::getLocks()
         locks.append(QString::number(lock.toInt()));
     }
 
+    KCB_DEBUG_EXIT;
     return locks.join(",");
 }
 

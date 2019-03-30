@@ -26,10 +26,11 @@ class FrmCodeEditMulti : public QDialog
 
         void setValues(CLockState * const state, const QStringList codes_in_use);
         void getValues(CLockState * const state);
-
+        void updateCabinetConfig();
+        
     signals:
         void __OnAdminInfoCodes(QString,QString);
-                       
+
     private slots:
         void on_pbClearCode1_clicked();
         void on_pbClearCode2_clicked();

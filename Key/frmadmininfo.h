@@ -16,7 +16,8 @@
 #include <QFileSystemModel>
 #include <QPointF>
 #include <QList>
-#include <QNetworkInterface>
+#include <QStandardItemModel>
+
 #include "systemcontroller.h"
 #include "clickablelabel.h"
 #include "frmcodeeditmulti.h"
@@ -103,6 +104,7 @@ class CFrmAdminInfo : public QDialog
         void OnOpenLockRequest(QString lock, bool is_user);
         void OnNotifyGenerateReport();    
         void OnDisplayTakeReturnButtons(bool);
+        void OnDiscoverHardwareProgressUpdate(int);
 
     private slots:
         void OnCodes(QString code1, QString code2);
@@ -170,7 +172,14 @@ class CFrmAdminInfo : public QDialog
 
         void on_cbLogLevel_currentIndexChanged(const QString &arg1);
 
-    private:
+        void on_pbDiscoverHardware_clicked();
+        void OnItemChanged(QStandardItem* item);
+
+        void on_pbApplyChanges_clicked();
+
+        void on_pbResetCabinetConfig_clicked();
+
+private:
         Ui::CFrmAdminInfo   *ui;
         CSystemController   *_psysController;
         bool                _bClose;
@@ -215,7 +224,8 @@ class CFrmAdminInfo : public QDialog
             UTIL_ACTION_EXPORT_CODES,
             UTIL_ACTION_EXPORT_LOGS } UTIL_ACTION_TYPE;
 
-        UTIL_ACTION_TYPE    m_util_action;        
+        UTIL_ACTION_TYPE    m_util_action;
+        QStandardItemModel& m_model;
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
 
@@ -257,6 +267,10 @@ class CFrmAdminInfo : public QDialog
         void updateTmpAdminRec();
         void updateAdminForEmail(EMAIL_ADMIN_SELECT email_select);
         QString GetIpStylesheet(bool can_ping, bool can_multicast);
+
+        void DiscoverHardware();
+        void ClearCabinetInfo();
+        void SetCabinetInfo();
         
     protected:
         void touchEvent(QTouchEvent *ev);
