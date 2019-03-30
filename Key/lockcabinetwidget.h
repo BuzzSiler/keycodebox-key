@@ -19,6 +19,7 @@ class LockCabinetWidget : public QWidget
         explicit LockCabinetWidget(QWidget *parent=0);
         ~LockCabinetWidget();
 
+        void updateCabinetConfig();
         QString getSelectedLocks();
         void setSelectedLocks(QString locks);
         void clrAllLocks();
@@ -30,6 +31,7 @@ class LockCabinetWidget : public QWidget
         void clrSelectedLocks(const QString& lock);
         void setWarning();
         void clrWarning();
+        bool isConfigured();
 
     signals:
         void NotifyLockSelected(QString lock, bool is_selected);
@@ -49,20 +51,21 @@ class LockCabinetWidget : public QWidget
         } CAB_STATE;
 
         CABINET_VECTOR m_cabinet_info;
-        quint8 m_num_cabs;
+        qint8 m_num_cabs;
         QVector<QString> m_selected_locks;
         QVector<CAB_STATE> m_cabs;        
-        quint8 m_current_cab;
+        qint8 m_current_cab;
         QList<QPushButton *> m_lock_buttons;
 
         QSignalMapper& m_mapper;
         QString m_default_stylesheet;
+        bool m_is_configured;
         Ui::LockCabinetWidget *ui;
 
         void updateUi();
         void selectClearAllLocks(bool select_clear);
-        void enableDisableLocksInCabinet(quint8 cab_index, bool enable_disable);
-        void clrLocksInCabinet(quint8 cab_index);
+        void enableDisableLocksInCabinet(qint8 cab_index, bool enable_disable);
+        void clrLocksInCabinet(qint8 cab_index);
         void StringToVector(QString str, QVector<QString>& vtr);
         void VectorToString(QVector<QString> vtr, QString& str);
         void AddLockToSelected(const QString lock);

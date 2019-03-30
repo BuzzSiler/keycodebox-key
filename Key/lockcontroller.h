@@ -15,16 +15,9 @@ class SerialPort;
 class CUSBController;
 class CLocksStatus;
 
-/**
- * @brief The CLockController class
- * root@safepak-1:/home/pi# ls -al /dev/serial/by-id | grep -Ei '(USB-Serial.*ttyUSB)'
-lrwxrwxrwx 1 root root  13 Aug  2 19:18 usb-Prolific_Technology_Inc._USB-Serial_Controller_D-if00-port0 -> ../../ttyUSB0
-lrwxrwxrwx 1 root root  13 Aug  3 07:32 usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0 -> ../../ttyUSB2
- */
 class CLockController : public QObject
 {
     Q_OBJECT
-
 
     public:
         explicit CLockController(QObject *parent = 0);
@@ -37,13 +30,16 @@ class CLockController : public QObject
 
         void openLock(uint16_t nLockNum);
         void openLocks(QString lockNums);
-        void openLockWithPulse(uint16_t nLockNum, uint8_t nPulseCount, uint16_t nPulseOnTimeMS, uint16_t nPulseOffTimeMS);
         uint64_t inquireLockStatus(uint8_t unBanks);  // Single bit per Lock up to 64.
 
         CLocksStatus* getLockStatus() { return _plockStatus ? _plockStatus : 0;}
 
+        void detectHardware();
+        void setLockRanges();
+
     signals:
         void __OnLocksStatus(QObject &locksStatus);
+        void DiscoverHardwareProgressUpdate(int);
 
     public slots:
         void OnLocksStatusRequest();
@@ -66,6 +62,7 @@ class CLockController : public QObject
         uint8_t     ENOT_CONNECTED = 0;
         uint8_t     ECONNECTED = 1;
         uint8_t __connectedState = ENOT_CONNECTED;
+        int update_status = 0;
 
     private: // methods
 
@@ -81,8 +78,30 @@ class CLockController : public QObject
         std::string to_hex(uint16_t to_convert);
 
     protected:
+        enum class RESPONSE { OPEN_LOCK, READ_EEPROM };
+
         void readLockStateCmd(uint8_t nLockNum);
         std::string readCommandResponse();
+
+        QByteArray SendCommand(QByteArray &cmd);
+        uint8_t CalcChecksum(QByteArray const &cmd);
+        void SetChecksum(QByteArray &cmd);
+        uint16_t ReadEeprom(uint16_t addr, uint16_t offset);
+        void SetSequenceNumber(QByteArray &msg);
+        uint8_t GetSequenceNumber(QByteArray const &msg);
+        QByteArray CreateReadEepromCommand(uint16_t addr, uint16_t offset);
+        QByteArray CreateOpenLockCommand(uint16_t addr);
+        bool ValidateResponse(RESPONSE type, QByteArray const &command, QByteArray const &response);
+        uint16_t GetEepromResponseValue(RESPONSE type, QByteArray const &response);
+        bool IsResponse(uint8_t control);
+        void ReadBoardEeprom(uint16_t addr);
+        QByteArray CreateSearchNetworkCommand(uint16_t addr);
+        void LocateMaster();
+        uint16_t SearchNetwork(uint16_t addr);
+        bool IsErrorResponse(QByteArray const &response);
+        void ProcessErrorResponse(QByteArray const &response);
+        void SetBoardLockStartStop(uint16_t addr, uint8_t start, uint8_t stop);
+        void UpdateDetectProgress();
 };
 
 

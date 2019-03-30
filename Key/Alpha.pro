@@ -97,6 +97,7 @@ SOURCES += main.cpp\
     codeimporter.cpp \
     logcategory.cpp \
     logger.cpp \
+    cabinetrowdelegate.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -179,6 +180,7 @@ HEADERS  += keycodeboxmain.h \
     codeimporter.h \
     logcategory.h \
     logger.h \
+    cabinetrowdelegate.h \
 
 FORMS    += mainwindow.ui \
     frmusercode.ui \
