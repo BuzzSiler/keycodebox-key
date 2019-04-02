@@ -54,6 +54,7 @@
 
 
 #define ADMIN_TAB_INDEX (0)
+#define UTILITIES_TAB_INDEX (1)
 #define REPORT_TAB_INDEX (2)
 #define CODES_TAB_INDEX (4)
 #define CODE_HISTORY_TAB_INDEX (5)
@@ -1841,6 +1842,10 @@ void CFrmAdminInfo::OnTabSelected(int index)
     else if (index == SYSTEM_TAB_INDEX)
     {
         SetCabinetInfo();
+    }
+    else if (index == UTILITIES_TAB_INDEX)
+    {
+        on_cbActionsSelect_currentIndexChanged(ACTION_INDEX_INSTALL_APP);
     }
 
     if (last_index != REPORT_TAB_INDEX && index == REPORT_TAB_INDEX)
