@@ -115,7 +115,6 @@ void CFrmUserCode::onButtonClick(char key)
             break;
     }
 
-    // Process through controller
     this->__KeyPressed(key);
 }
 
@@ -133,7 +132,7 @@ void CFrmUserCode::onCodeEntered()
         std::exit(1);
     }
 
-    QApplication::processEvents();    
+    QApplication::processEvents();
     if(sCode.length() > 0 )
     {
         SetDisplayCodeEntryControls(false);
@@ -191,10 +190,9 @@ void CFrmUserCode::OnSwipeCode(QString sCode)
 
     ui->edCode->setText(sCode);
     QApplication::processEvents();
-    qDebug() << "Code Entered:" << sCode;
     if(sCode.size() > 0 ) 
     {
-        emit __CodeEntered(sCode);     // Signal that the code was entered.
+        emit __CodeEntered(sCode);
     }
 }
 
@@ -202,9 +200,13 @@ void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
 {
     KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE(sCodeMsg);
+    bool fleetwave_prompt = sCodeMsg == USER_CODE_FLEETWAVE_PROMPT;
+    bool user_code_prompt = sCodeMsg ==  USER_CODE_PROMPT;
+    bool other_prompt = sCodeMsg == "Code 1";
 
-    if (sCodeMsg == "Code 1")
+    KCB_DEBUG_TRACE(sCodeMsg << fleetwave_prompt << user_code_prompt << other_prompt << m_takereturn_state);
+
+    if (fleetwave_prompt || user_code_prompt || other_prompt)
     {
         if (m_takereturn_state)
         {            
@@ -225,8 +227,9 @@ void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
         bool is_openinglocks = sCodeMsg.startsWith(tr("Opening Locks"));
         bool is_cleared = sCodeMsg == "";
         bool is_cancelling = sCodeMsg.startsWith(tr("Cancelling"));
+        bool is_failure = sCodeMsg.startsWith(tr("Incorrect Code"));
 
-        bool enable_controls = (is_thankyou || is_openinglocks || is_cleared || is_cancelling) ? false : true;
+        bool enable_controls = (is_thankyou || is_openinglocks || is_cleared || is_cancelling || is_failure) ? false : true;
         SetDisplayCodeEntryControls(enable_controls); 
         SetDisplayTakeReturnButtons(false);
         OnClearCodeDisplay();
@@ -425,8 +428,8 @@ void CFrmUserCode::on_pbTake_clicked()
 {
     KCB_DEBUG_ENTRY;
     SetDisplayCodeEntryControls(true);
-    ui->pbTake->setDisabled(fleetwave_enabled);
-    ui->pbReturn->setDisabled(fleetwave_enabled);
+    ui->pbTake->setDisabled(true);
+    ui->pbReturn->setDisabled(true);
     kcb::Application::setTakeAccessSelection();
     QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
     ui->edCode->setPlaceholderText(prompt);
@@ -437,8 +440,8 @@ void CFrmUserCode::on_pbReturn_clicked()
 {
     KCB_DEBUG_ENTRY;
     SetDisplayCodeEntryControls(true);
-    ui->pbTake->setDisabled(fleetwave_enabled);
-    ui->pbReturn->setDisabled(fleetwave_enabled);    
+    ui->pbTake->setDisabled(true);
+    ui->pbReturn->setDisabled(true);
     kcb::Application::setReturnAccessSelection();
     QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
     ui->edCode->setPlaceholderText(prompt);

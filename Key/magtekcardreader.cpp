@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "usbprovider.h"
+#include "logger.h"
 
 CMagTekCardReader::CMagTekCardReader(QObject *parent) : 
     QObject(parent),
@@ -45,14 +46,14 @@ bool CMagTekCardReader::floatXInputDevice()
     pF = popen(systemCmd.c_str(), "r");
     if(!pF)
     {
-      qDebug() << "CMagTekCardReader::floatXInputDevice(), failed poppen()";
+      KCB_WARNING_TRACE("failed poppen()");
       return false;
     }
 
     ExtractCommandOutput(pF, sOutput);
     fclose(pF);
 
-    qDebug() << "CMagTekCardReader::floatXInputDevice(), sOutput = " << QString::fromStdString(sOutput);
+    KCB_DEBUG_TRACE("sOutput = " << QString::fromStdString(sOutput));
 
     size_t idPos = sOutput.find(parseToken);
 
@@ -60,7 +61,7 @@ bool CMagTekCardReader::floatXInputDevice()
     {
         xInputId = sOutput.substr(idPos + parseToken.length(), 1);
 
-        qDebug() << "CMagTekCardREader::floatXInputDevice(), float xinput id: " << QString::fromStdString(xInputId);
+        KCB_DEBUG_TRACE("float xinput id: " << QString::fromStdString(xInputId));
 
         floatCmd += xInputId;
         std::system(floatCmd.c_str());
@@ -71,7 +72,7 @@ bool CMagTekCardReader::floatXInputDevice()
 
 bool CMagTekCardReader::openDeviceHandle()
 {
-    qDebug() << "CMagTekCardReader::openDeviceHandle(), searching for hid magnetic card reader usb-c216";
+    KCB_DEBUG_TRACE("searching for hid magnetic card reader usb-c216");
     QString filterString = "usb-c216.*event";
     QString deviceType = "input";
     QString devicePrefix = "event";
@@ -79,7 +80,7 @@ bool CMagTekCardReader::openDeviceHandle()
     std::string sDevNum = UsbProvider::GetMagTekDevicePortString();
     if(sDevNum.empty())
     {
-        qDebug() << "CMagTekCardReader::openDeviceHandle(), parsing of found device string failed";  
+        KCB_DEBUG_TRACE("parsing of found device string failed");
     }
     else
     {
@@ -88,25 +89,23 @@ bool CMagTekCardReader::openDeviceHandle()
     
         if ((fileDescriptor = open(eventPath.c_str(), O_RDONLY)) < 0) 
         {
-            perror("evtest");
+            KCB_WARNING_TRACE("failed to open /dev/input/event");
             return false;
         }
       
         if (ioctl(fileDescriptor, EVIOCGVERSION, &version)) 
         {
-            perror("evtest: can't get version");
+            KCB_WARNING_TRACE("failed to get version");
             return false;
         }
   
-        fprintf(stderr,"evdev input driver version is %d.%d.%d\n",
-          version >> 16, (version >> 8) & 0xff, version & 0xff);
+        KCB_DEBUG_TRACE("evdev input driver version is " << (version >> 16) << "." << ((version >> 8) & 0xff) << "." << (version & 0xff));
   
         ioctl(fileDescriptor, EVIOCGID, id);
-        fprintf(stderr, "Input device ID: bus 0x%x vendor 0x%x product 0x%x version 0x%x\n",
-          id[ID_BUS], id[ID_VENDOR], id[ID_PRODUCT], id[ID_VERSION]);
+        KCB_DEBUG_TRACE("Input device ID: bus" << "0x" << id[ID_BUS] << "vendor 0x" << id[ID_VENDOR] << "product 0x" << id[ID_PRODUCT] << "version 0x" << id[ID_VERSION]);
         
         ioctl(fileDescriptor, EVIOCGNAME(sizeof(name)), name);
-        fprintf(stderr, "Input device name: \"%s\"\n", name);
+        KCB_DEBUG_TRACE("Input device name: " << name);
         
         return floatXInputDevice();
     }
@@ -115,7 +114,7 @@ bool CMagTekCardReader::openDeviceHandle()
 
 bool CMagTekCardReader::initMagTekCardReader()
 {
-  return openDeviceHandle();
+    return openDeviceHandle();
 }
 
 int CMagTekCardReader::codeToInteger(int x)
@@ -126,6 +125,7 @@ int CMagTekCardReader::codeToInteger(int x)
     // 9 -> 8, 10 -> 9
     int characterMap [] = { -1, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
 
+    KCB_DEBUG_EXIT;
     if( (x >= 0) && (x < 12) )
     {
         return characterMap[x];
@@ -138,11 +138,6 @@ bool CMagTekCardReader::isStartCode(int x)
     return ( x == 39 ) ? true : false;
 }
 
-/**
- * @brief CMagTekCardReader::loop
- *  Blocking card read
- * @return
- */
 void CMagTekCardReader::loop()
 {
 
@@ -159,24 +154,27 @@ void CMagTekCardReader::loop()
     {
         readDescriptor = read(fileDescriptor, ev, sizeof(struct input_event) * 1500);
         
-
         if (readDescriptor < (int) sizeof(struct input_event))
         {
-            printf("yyy\n");
-            perror("\nevtest: error reading");
+
+            KCB_CRITICAL_TRACE("Error reading events (incorrect data size)");
             return;
         }
         else
         {
-            for (i = 0; i < (int) (readDescriptor / sizeof(struct input_event)); i++)
-            {        
+            int num_events = (int) (readDescriptor / sizeof(struct input_event));
+
+            for (i = 0; i < num_events; i++)
+            {
+                //KCB_DEBUG_TRACE("type" << ev[i].type << "code" << ev[i].code << "value" << ev[i].value);
+
                 if (ev[i].type == EV_SYN || ev[i].value == 0 )
                 {
                     // ignore these
                 }
                 else if (ev[i].type == EV_MSC && (ev[i].code == MSC_RAW || ev[i].code == MSC_SCAN))
                 {
-                    // ignore these     
+                    // ignore these
                 }
                 else
                 {
@@ -223,25 +221,10 @@ void CMagTekCardReader::loop()
                                     codeElement = currentCode[currentCodeLength - 1 - idx];
                                     finalCode[4 - idx] = codeElement;
                                 }
-                                qDebug() << "\n\tATTENTION: Observed new magstripe code: " << QString::number(finalCode[0]) << QString::number(finalCode[1]) << QString::number(finalCode[2]) << QString::number(finalCode[3]) << QString::number(finalCode[4]);
 
-                                std::string xdotool = "xdotool key ";
-                                std::string tempCmd = xdotool + std::to_string(finalCode[0]);
-                                std::system(tempCmd.c_str());
-                                usleep(50);
-                                tempCmd = xdotool + std::to_string(finalCode[1]);
-                                std::system(tempCmd.c_str());
-                                usleep(50);
-                                tempCmd = xdotool + std::to_string(finalCode[2]);
-                                std::system(tempCmd.c_str());
-                                usleep(50);
-                                tempCmd = xdotool + std::to_string(finalCode[3]);
-                                std::system(tempCmd.c_str());
-                                usleep(50);
-                                tempCmd = xdotool + std::to_string(finalCode[4]);
-                                std::system(tempCmd.c_str());
-                                usleep(50);
-                                
+                                QString code = QString("%1%2%3%4%5").arg(QString::number(finalCode[0])).arg(QString::number(finalCode[1])).arg(QString::number(finalCode[2])).arg(QString::number(finalCode[3])).arg(QString::number(finalCode[4]));
+                                emit __onCardSwipe(code, "");
+
                                 currentCodeLength = 0;
                                 consecutiveZeros = 0;
 
@@ -251,12 +234,6 @@ void CMagTekCardReader::loop()
                     }
                     else
                     {
-                        /*
-                        printf("Event: time %ld.%06ld, type %d, code %d, value %d\n",
-                        ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].type,
-                        ev[i].code,
-                        ev[i].value);
-                        */
                         currentCode[currentCodeLength] = codeToInteger(ev[i].code);
                         currentCodeLength++;
                     }
@@ -269,7 +246,8 @@ void CMagTekCardReader::loop()
 
 void CMagTekCardReader::start()
 {
-    qDebug() << "CMagTekCardReader::start()";
+    KCB_DEBUG_ENTRY;
     loop();
+    KCB_DEBUG_EXIT;
 }
 
