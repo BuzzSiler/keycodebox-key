@@ -179,6 +179,10 @@ class CFrmAdminInfo : public QDialog
 
         void on_pbResetCabinetConfig_clicked();
 
+        void on_cbAutoCodeMode_currentIndexChanged(int index);
+
+        void on_gbAutoCodeEnableDisable_clicked(bool checked);
+
 private:
         Ui::CFrmAdminInfo   *ui;
         CSystemController   *_psysController;

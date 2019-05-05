@@ -2425,3 +2425,98 @@ void CFrmAdminInfo::on_pbResetCabinetConfig_clicked()
     }
     ui->pbDiscoverHardware->setEnabled(true);
 }
+
+void CFrmAdminInfo::on_cbAutoCodeMode_currentIndexChanged(int index)
+{
+    QString message("");
+
+    if (index == 0)
+    {
+        message = tr("AutoCode Generation is in Code 1 Mode."
+                     "\n"
+                     "The following changes will be made:"
+                     "\n"
+                     "\t1. All existing codes will be deleted."
+                     "\n"
+                     "\t2. New codes will be generated for all locks."
+                     "\n"
+                     "\t3. Multi-lock selection will be disabled."
+                     );
+    }
+    else if (index == 1)
+    {
+        message = tr("Auto Code Generation is in Code 2 Mode."
+                     "\n"
+                     "All existing codes with a single code (i.e. Code 1) will be deleted."
+                     "\n"
+                     "All existing codes with double code (i.e. Code 1 and Code 2) will by modified as follows:"
+                     "\n"
+                     "\t1. All 'Code 1' entries will be preserved."
+                     "\n"
+                     "\t2. All 'Code 2' entries will be cleared."
+                     "\n"
+                     "\t3. All associated locks will be removed."
+                     "\n"
+                     "\t4. Multi-lock selection will be disabled.");
+    }
+    else
+    {
+        return;
+    }
+
+    QMessageBox::warning(this,
+                         tr("AutoCode Generation Mode"),
+                         message);
+}
+
+void CFrmAdminInfo::on_gbAutoCodeEnableDisable_clicked(bool checked)
+{
+    if (checked)
+    {
+        int result = QMessageBox::warning(this,
+                             tr("Auto Code Enable"),
+                             tr("You have selected to enable Auto Code Generation."
+                                "\n"
+                                "Continuing will enable the KeyCodeBox system to generate lock codes per the Auto Code Generation parameters."
+                                "\n"
+                                "Existing codes may be modified or deleted and cannot be undone."
+                                "\n\n"
+                                "Do you want to continue?"),
+                             QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
+
+        if (result == QMessageBox::StandardButton::Cancel)
+        {
+            ui->gbAutoCodeEnableDisable->setTitle("Disabled");
+            ui->gbAutoCodeEnableDisable->setChecked(false);
+        }
+        else
+        {
+            ui->gbAutoCodeEnableDisable->setTitle("Enabled");
+            ui->cbAutoCodeMode->setEnabled(true);
+            emit ui->cbAutoCodeMode->currentIndexChanged(0);
+        }
+    }
+    else
+    {
+        int result = QMessageBox::warning(this,
+                             tr("Auto Code Disable"),
+                             tr("You have selected to disable Auto Code Generation."
+                                "\n"
+                                "The KeyCodeBox system will no longer generate lock codes. "
+                                "All existing codes will remain unchanged."
+                                "\n"
+                                "Do you want to continue?"),
+                             QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
+
+        if (result == QMessageBox::StandardButton::Cancel)
+        {
+            ui->gbAutoCodeEnableDisable->setTitle("Enabled");
+            ui->gbAutoCodeEnableDisable->setChecked(true);
+        }
+        else
+        {
+            ui->gbAutoCodeEnableDisable->setTitle("Disabled");
+            ui->cbAutoCodeMode->setEnabled(false);
+        }
+    }
+}
