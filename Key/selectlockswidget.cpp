@@ -39,6 +39,16 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
     connect(&m_timer, &QTimer::timeout, this, &SelectLocksWidget::update);
     m_timer.setSingleShot(true);
 
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        m_lock_cab.OnNotifySingleLockSelection();
+        ui->gbSelectedLocks->setVisible(false);
+    }
+    else
+    {
+        m_lock_cab.OnNotifyMultiLockSelection();
+        ui->gbSelectedLocks->setVisible(true);
+    }
 }
 
 SelectLocksWidget::~SelectLocksWidget()
@@ -278,4 +288,28 @@ void SelectLocksWidget::update()
         ui->lblTimeRemaining->setText(QString::number(m_timeout));
         m_timer.start(TIMEOUT_PERIOD);
     }
+}
+
+void SelectLocksWidget::OnLockSelectionChanged()
+{
+    KCB_DEBUG_ENTRY;
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        KCB_DEBUG_TRACE("setting for single selection");
+        m_lock_cab.OnNotifySingleLockSelection();
+        ui->gbSelectedLocks->setVisible(false);
+    }
+    else if (KeyCodeBoxSettings::IsLockSelectionMulti())
+    {
+        KCB_DEBUG_TRACE("setting for multi selection");
+        m_lock_cab.OnNotifyMultiLockSelection();
+        ui->gbSelectedLocks->setVisible(true);
+    }
+    else
+    {
+        KCB_DEBUG_TRACE("setting for disable selection");
+        m_lock_cab.OnNotifyDisableLockSelection();
+        ui->gbSelectedLocks->setVisible(false);
+    }
+    KCB_DEBUG_EXIT;
 }

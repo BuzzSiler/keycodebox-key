@@ -8,6 +8,8 @@
 #include <QVector>
 #include <QPair>
 
+#include "autocodegenerator.h"
+
 class QJsonParseError;
 
 
@@ -29,6 +31,8 @@ typedef struct cab_info
 
 typedef QVector<CABINET_INFO> CABINET_VECTOR;
 
+enum class SelectionType { DISABLED, SINGLE, MULTI };
+
 typedef struct
 {
     QString address;
@@ -46,6 +50,7 @@ class KeyCodeBoxSettings : public QObject
         static int getNumCabinets();
         static int getLocksPerCabinet(int cab_index);
         static CABINET_VECTOR getCabinetsInfo();
+        static int getTotalLocks();
 
         static void ClearCabinetConfig();
         static void AddCabinet(CABINET_INFO const &cab);
@@ -61,6 +66,23 @@ class KeyCodeBoxSettings : public QObject
         static bool StaticAddressingEnabled();   
         static QString GetVncPort();
         static void SetVncCredentials(QString port, QString password);
+        static void SetLockSelectionSingle();
+        static void SetLockSelectionMulti();
+        static void SetLockSelectionDisabled();
+        static bool IsLockSelectionSingle();
+        static bool IsLockSelectionMulti();
+        static bool IsLockSelectionEnabled();
+        static void EnableAutoCode();
+        static void DisableAutoCode();
+        static bool IsAutoCodeEnabled();
+        static bool IsAutoCodeCommitted();
+
+        static AutoCodeSettings GetAutoCodeSettings();
+        static void setAutoCodeSettings(AutoCodeSettings settings);
+        static void SetAutoCodeNextGenDateTime(const QDateTime& datetime);
+        static QByteArray GetAutoCodeKey();
+        static QString GetAutoCodePassword();
+        static QDateTime GetAutoCodeNextGenDateTime();
 
 
     private:
@@ -73,6 +95,11 @@ class KeyCodeBoxSettings : public QObject
         static void createDefault();
         static void SetEnableStaticAddressing();
         static void ClearEnableStaticAddressing();
+        static void SetLockSelectionType(SelectionType value);
+        static void SetAutoCodeEnableState(bool state);
+        static void SetAutoCodeDefaults();
+        static SelectionType GetLockSelectionType();
+
 };
 
 #endif // KEYCODEBOXSETTINGS_H

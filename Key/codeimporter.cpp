@@ -135,6 +135,7 @@ bool CodeImporter::ImportAsJson(QFile& file, CodeListing& codeListing)
         code->setStartTime(code_obj["starttime"].toString());
         code->setEndTime(code_obj["endtime"].toString());
         code->setAccessType(code_obj["access_type"].toInt());
+        code->setAutoCode(code_obj["autocode"].toInt());
 
         codeListing.addCode(code);
     }
@@ -224,9 +225,9 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
 
             foreach (auto entry, header)
             {
-                index = header.indexOf(entry);                
+                index = header.indexOf(entry);
                 if (index < 0)
-                {                    
+                {
                     KCB_DEBUG_TRACE("Invalid index");
                     continue;
                 }
@@ -274,6 +275,10 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
                 else if (entry == "access_type")
                 {
                     code->setAccessType(value.toInt());
+                }
+                else if (entry == "autocode")
+                {
+                    code->setAutoCode(static_cast<bool>(value.toInt()));
                 }
             }
 

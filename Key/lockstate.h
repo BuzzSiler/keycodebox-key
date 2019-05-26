@@ -1,7 +1,7 @@
 #ifndef CLOCKSTATE_H
 #define CLOCKSTATE_H
 
-#include "stdint-gcc.h"
+//#include "stdint-gcc.h"
 #include <QObject>
 #include <QDateTime>
 #include <QJsonObject>
@@ -10,12 +10,8 @@
 #include <QString>
 #include <QStringList>
 
+#include "kcbcommon.h"
 
-/**
- * @brief The CLockState class
- * This holds essentially an in memory representation of the tblcodes + tblhistory record.
- * May be in table or new.
- */
 class CLockState : public QObject
 {
     Q_OBJECT
@@ -79,7 +75,11 @@ class CLockState : public QObject
 
         virtual void setAccessType(int access_type) { _access_type = access_type; }
         virtual int getAccessType() { return _access_type; }
-        
+
+        virtual void setAutoCode(bool autocode) { _autocode = autocode; }
+        virtual bool getAutoCode() { return _autocode; }
+
+
         virtual void setNew() { _bIsNew = true; }
         virtual void clearIsNew() { _bIsNew = false; }
         virtual void setModified() { _bModified = true; }
@@ -129,6 +129,7 @@ class CLockState : public QObject
         QString     _question2;
         QString     _question3;
         int         _access_type;
+        bool        _autocode;
 };
 
 #endif // CLOCKSTATE_H

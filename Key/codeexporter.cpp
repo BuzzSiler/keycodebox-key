@@ -95,6 +95,7 @@ bool CodeExporter::ExportAsXml(QString filename)
             stream.writeTextElement("starttime", QString("%1").arg(pState->getStartTime().toString(DATETIME_FORMAT)));
             stream.writeTextElement("endtime", QString("%1").arg(pState->getEndTime().toString(DATETIME_FORMAT)));
             stream.writeTextElement("access_type", QString("%1").arg(pState->getAccessType()));
+            stream.writeTextElement("autocode", QString("%1").arg(pState->getAutoCode()));
             stream.writeEndElement();
         }
     }
@@ -129,7 +130,8 @@ bool CodeExporter::ExportAsJson(QString filename)
                     "question3": "", 
                     "starttime": "2018-12-01 18:03:08",
                     "endtime": "2018-12-01 18:03:08",
-                    "access_type": 0
+                    "access_type": 0,
+                    "autocode": false
                 },
                 ...
                 {
@@ -142,7 +144,8 @@ bool CodeExporter::ExportAsJson(QString filename)
                     "question3": "", 
                     "starttime": "2018-12-01 18:03:08",
                     "endtime": "2018-12-01 18:03:08",
-                    "access_type": 0
+                    "access_type": 0,
+                    "autocode": false
                 }
             ]
         }
@@ -167,6 +170,7 @@ bool CodeExporter::ExportAsJson(QString filename)
         code.insert(QString("starttime"), QJsonValue(pState->getStartTime().toString(DATETIME_FORMAT)));
         code.insert(QString("endtime"), QJsonValue(pState->getEndTime().toString(DATETIME_FORMAT)));
         code.insert(QString("access_type"), QJsonValue(pState->getAccessType()));
+        code.insert(QString("autocode"), QJsonValue(pState->getAutoCode()));
 
         codeListing.push_back(QJsonValue(code));
     }
@@ -192,7 +196,7 @@ bool CodeExporter::ExportAsCsv(QString filename)
     QFile file(filename);
     file.open( QIODevice::WriteOnly | QIODevice::Text );
 
-    file.write(QString("locknums,code1,code2,username,question1,question2,question3,starttime,endtime,access_type\n").toUtf8()); 
+    file.write(QString("locknums,code1,code2,username,question1,question2,question3,starttime,endtime,access_type,autocode\n").toUtf8()); 
 
     CLockSet::Iterator itor;
     CLockState *pState;
@@ -203,8 +207,9 @@ bool CodeExporter::ExportAsCsv(QString filename)
         QString group1 = QString("\"%1\",%2,%3,\"%4\"").arg(pState->getLockNums()).arg(pState->getCode1()).arg(pState->getCode2()).arg(pState->getDescription());
         QString group2 = QString("\"%1\",\"%2\",\"%3\"").arg(pState->getQuestion1()).arg(pState->getQuestion2()).arg(pState->getQuestion3());
         QString group3 = QString("%1,%2,%3").arg(pState->getStartTime().toString(DATETIME_FORMAT)).arg(pState->getEndTime().toString(DATETIME_FORMAT)).arg(pState->getAccessType());
-        int num_bytes = file.write(QString("%1,%2,%3\n").arg(group1).arg(group2).arg(group3).toUtf8());
-        KCB_DEBUG_TRACE("text size" << group1.length() + group2.length() + group3.length() << "wrote" << num_bytes);
+        QString group4 = QString("%1").arg(pState->getAutoCode());
+        int num_bytes = file.write(QString("%1,%2,%3,%4\n").arg(group1).arg(group2).arg(group3).arg(group4).toUtf8());
+        KCB_DEBUG_TRACE("text size" << group1.length() + group2.length() + group3.length() << group4.length() << "wrote" << num_bytes);
     }
 
     file.close();

@@ -31,6 +31,9 @@ class FrmCodeEditMulti : public QDialog
     signals:
         void __OnAdminInfoCodes(QString,QString);
 
+    public slots:
+        void OnLockSelectionChanged();
+
     private slots:
         void on_pbClearCode1_clicked();
         void on_pbClearCode2_clicked();
@@ -50,7 +53,11 @@ class FrmCodeEditMulti : public QDialog
 
         void OnNotifyLockSelected(QString lock, bool is_selected);
 
-    private:
+        void on_pbCode1Random_clicked();
+
+        void on_pbCode2Random_clicked();
+
+private:
         typedef struct _tag_code_state
         {
             QString code1;

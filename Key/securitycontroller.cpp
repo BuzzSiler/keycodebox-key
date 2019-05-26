@@ -10,8 +10,6 @@ CSecurityController::CSecurityController(QObject *parent) : QObject(parent),
 {
     initializeSignals();
 
-    // In own thread
-    qDebug() << "CSecurityController(): moveToThread.";
     _modelSecurity.moveToThread(&_securityControlThread);
     _securityControlThread.start();
 }
@@ -112,8 +110,6 @@ void CSecurityController::OnCodeHistoryForDateRange(CLockHistorySet *pLockHistor
 
 void CSecurityController::OnUpdateCodeState(CLockState *rec)
 {
-    KCB_DEBUG_TRACE("emitting __OnUpdateCodeState");
-
     emit __OnUpdateCodeState(rec);
 }
 
@@ -141,16 +137,11 @@ void CSecurityController::CheckAccessCodeTwo(QString code2)
     KCB_DEBUG_EXIT;
 }
 
-/**
- * @brief CSecurityController::CheckFingerprintAccessCodeOne
- * @param code1 - encrypted
- */
 void CSecurityController::CheckFingerprintAccessCodeOne(QString code1)
 {
     // Use the CModelSecurity class
     _sCode1 = code1;
     _sCode2 = "";       // clear code2
-    qDebug() << "CSecurityController::CheckFingerprintAccessCodeOne:" << code1;
 
     emit __VerifyFingerprintCodeOne(code1);       // This should cross thread to the _modelSecurity object
 }
@@ -160,83 +151,67 @@ void CSecurityController::CheckFingerprintAccessCodeTwo(QString code2)
     // Use the CModelSecurity class
     _sCode2 = code2;
 
-    qDebug() << "CSecurityController::CheckFingerprintAccessCodeTwo\n";
     QString sCodeEnc(CEncryption::encryptString(code2));
 
-    emit __VerifyFingerprintCodeTwo(sCodeEnc);       // This should cross thread to the _modelSecurity object
+    emit __VerifyFingerprintCodeTwo(sCodeEnc);
 }
-
 
 void CSecurityController::CheckAdminPassword(QString sPW)
 {
-    qDebug() << "CSecurityController::CheckAdminPassword";
-
     _sAdminPW = sPW;
     QString sCodeEnc(CEncryption::encryptString(_sAdminPW));
-    emit __VerifyAdminPassword(sCodeEnc);       // This should cross thread to the _modelSecurity object
+    emit __VerifyAdminPassword(sCodeEnc);
 }
 
 void CSecurityController::OnRequireAdminPassword()
 {
-    qDebug() << "CSecurityController::OnRequireAdminPassword()";
     emit __OnRequireAdminPassword();
 }
 
 void CSecurityController::OnRequireCodeTwo()
 {
-    qDebug() << "CSecurityController::OnRequireCodeTwo()";
     emit __OnRequireCodeTwo();
 }
 
 void CSecurityController::OnAdminSecurityCheckOk(QString type)
 {
-    qDebug() << "CSecurityController::OnAdminSecurityCheckOk(QString type)";
     emit __OnAdminSecurityCheckOk(type);
 }
 
 void CSecurityController::OnAdminSecurityCheckFailed()
 {
-    qDebug() << "CSecurityController::OnAdminSecurityCheckFailed()";
     emit __OnAdminSecurityCheckFailed();
 }
 
 void CSecurityController::OnSecurityCheckSuccess(QString locks)
 {
     emit __OnSecurityCheckSuccess(locks);
-    //emit __OnCreateHistoryRecordFromLastSuccessfulLogin();
 }
 
 void CSecurityController::OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
     KCB_DEBUG_TRACE(lockNums << "; " << answer1 << "; " << answer2 << "; " << answer3);
     emit __OnSecurityCheckSuccess(lockNums);
-    //emit __OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(answer1, answer2, answer3);
 }
 
 void CSecurityController::OnSecurityCheckedFailed()
 {
-    qDebug() << "CSecurityController::SecurityCheckedFailed()";
     emit __OnSecurityCheckedFailed();
 }
 
 void CSecurityController::OnSecurityCheckTimedOut()
 {
-    qDebug() << "CSecurityController::OnSecurityCheckTimedOut()";
     emit __OnSecurityCheckTimedOut();
 }
 
 void CSecurityController::OnRequestCurrentAdmin()
 {
-    qDebug() << "CSecurityController::OnRequestCurrentAdmin() -> emit __OnRequestCurrentAdmin()";
     emit __OnRequestCurrentAdmin();
 }
 
 void CSecurityController::OnRequestedCurrentAdmin(CAdminRec *admin)
 {
-    qDebug() << "CSecurityController::OnRequestedCurrentAdmin(adminInfo)";
     _pAdminRec = admin;
-
-    qDebug() << "CSecurityController::OnRequestedCurrentAdmin(CAdminRec*) -> emit __OnRequestedCurrentAdmin(CAdminRec*)";
     emit __OnRequestedCurrentAdmin(admin);
 }
 
@@ -248,4 +223,34 @@ void CSecurityController::getAllCodes1(QStringList& codes1)
 void CSecurityController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted)
 {
     _modelSecurity.readAllCodes(lockset, clear_or_encrypted);
+}
+
+void CSecurityController::clearAllCodes()
+{
+    _modelSecurity.clearAllCodes();
+}
+
+void CSecurityController::deleteAllCode1OnlyCodes()
+{
+    _modelSecurity.deleteAllCode1OnlyCodes();
+}
+
+void CSecurityController::clearLockAndCode2ForAllCodes()
+{
+    _modelSecurity.clearLockAndCode2ForAllCodes();
+}
+
+void CSecurityController::addCode(CLockState& state)
+{
+    _modelSecurity.addCode(state);
+}
+
+void CSecurityController::updateCode1(const QString& lock, const QString& code)
+{
+    _modelSecurity.updateCode1(lock, code);
+}
+
+void CSecurityController::updateCode2(const QString& lock, const QString& code)
+{
+    _modelSecurity.updateCode2(lock, code);
 }

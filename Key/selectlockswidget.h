@@ -15,7 +15,7 @@ class QStringList;
 
 class SelectLocksWidget : public QWidget
 {
-        Q_OBJECT
+    Q_OBJECT
 
 
     public:
@@ -36,6 +36,9 @@ class SelectLocksWidget : public QWidget
         void NotifyClose();
         void NotifyOpen();
         void NotifyTimeout();
+
+    public slots:
+        void OnLockSelectionChanged();
 
     private slots:
         void openDoorTimer();

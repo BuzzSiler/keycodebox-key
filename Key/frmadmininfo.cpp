@@ -26,7 +26,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QScreen>
-
+#include <QProgressDialog>
 
 #include "lockset.h"
 #include "lockstate.h"
@@ -51,14 +51,18 @@
 #include "lockcontroller.h"
 
 #include "cabinetrowdelegate.h"
+#include "autocodegenwidget.h"
+#include "autocodegenstatic.h"
 
 
 #define ADMIN_TAB_INDEX (0)
 #define UTILITIES_TAB_INDEX (1)
 #define REPORT_TAB_INDEX (2)
+#define DOORS_TAB_INDEX (3)
 #define CODES_TAB_INDEX (4)
 #define CODE_HISTORY_TAB_INDEX (5)
-#define SYSTEM_TAB_INDEX (6)
+#define AUTOCODE_TAB_INDEX (6)
+#define SYSTEM_TAB_INDEX (7)
 
 #define ACTION_INDEX_INSTALL_APP (0)
 #define ACTION_INDEX_SET_BRANDING_IMAGE (1)
@@ -66,6 +70,9 @@
 #define ACTION_INDEX_IMPORT_CODES (3)
 #define ACTION_INDEX_EXPORT_CODES (4)
 #define ACTION_INDEX_EXPORT_LOGS (5)
+
+#define CODE_SELECTION_SINGLE_INDEX (0)
+#define CODE_SELECTION_MULTI_INDEX (1)
 
 static const QStringList INSTALL_APP_FILTER = {"Alpha*"};
 static const QStringList BRANDING_IMAGE_FILTER = {"*.jpg", "*.jpeg"};
@@ -119,8 +126,8 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     m_report(* new ReportControlWidget(this)),
     m_file_filter{0},
     m_util_action(UTIL_ACTION_INSTALL_APP),
-    m_model(* new QStandardItemModel(0, 6))
-
+    m_model(* new QStandardItemModel(0, 6)),
+    m_autocodegen(* new AutoCodeGenWidget(this))
 {
     ui->setupUi(this);
 
@@ -152,6 +159,24 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     connect(&m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(OnItemChanged(QStandardItem*)));
 
     ui->pbResetCabinetConfig->setDisabled(true);
+
+    bool autocode_enabled = AutoCodeGeneratorStatic::IsEnabled();
+    bool lockselection_enabled = KeyCodeBoxSettings::IsLockSelectionEnabled();
+    bool lockselection_display = !autocode_enabled && lockselection_enabled;
+
+    ui->cbAdminLockSelection->setEnabled(lockselection_display);
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    else if (KeyCodeBoxSettings::IsLockSelectionMulti())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(1);
+    }
+    else
+    {
+        ui->cbAdminLockSelection->setDisabled(true);
+    }
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -174,7 +199,7 @@ CFrmAdminInfo::~CFrmAdminInfo()
     {
         _pworkingSet->clearSet();
         delete _pworkingSet;
-        _pworkingSet = 0;
+        _pworkingSet = nullptr;
     }
 }
 
@@ -222,11 +247,24 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(_psysController, SIGNAL(DiscoverHardwareProgressUpdate(int)), this, SLOT(OnDiscoverHardwareProgressUpdate(int)));
 
+    connect(this, &CFrmAdminInfo::__NotifyLockSelectionChanged, &m_select_locks, &SelectLocksWidget::OnLockSelectionChanged);
+
+    connect(&m_autocodegen, &AutoCodeGenWidget::RequestCodes1, this, &CFrmAdminInfo::OnRequestCodes1);
+
+    connect(&m_autocodegen, &AutoCodeGenWidget::CommitCodes1, this, &CFrmAdminInfo::OnCommitCodes1);
+    connect(&m_autocodegen, &AutoCodeGenWidget::CommitCodes2, this, &CFrmAdminInfo::OnCommitCodes2);
+
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyDisableLockSelection, this, &CFrmAdminInfo::OnNotifyDisableLockSelection);
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyEnableLockSelection, this, &CFrmAdminInfo::OnNotifyEnableLockSelection);
+
 }
 
 void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 {
     _psysController = psysController;
+
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyAutoCodeEnabled, _psysController, &CSystemController::OnNotifyAutoCodeEnabled);
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyAutoCodeDisabled, _psysController, &CSystemController::OnNotifyAutoCodeDisabled);
 
     initializeConnections();
     KCB_DEBUG_TRACE("emit __OnRequestCurrentAdmin");
@@ -251,6 +289,7 @@ void CFrmAdminInfo::show()
         ui->gpAdminInfo->setVisible(true);
         ui->vloSelectLocks->addWidget(&m_select_locks);
         ui->hloReportSettings->addWidget(&m_report);
+        ui->hloAutoCodeGen->addWidget(&m_autocodegen);
         // Force tabwidget to show administrator tab
         emit ui->tabWidget->currentChanged(ADMIN_TAB_INDEX);
     }
@@ -276,9 +315,6 @@ bool CFrmAdminInfo::isInternetTime()
 
     ExtractCommandOutput(pF, sOutput);
     fclose(pF);
-
-    qDebug() << "CFrmAdminInfo::isInternetTime(), " << QString::fromStdString(sOutput);
-    qDebug() << "CFrmAdminInfo::isInternetTime(), " << QString::number(sOutput.find("internetTime"));
 
     if( sOutput.find("internetTime") != std::string::npos )
     {
@@ -626,7 +662,8 @@ void CFrmAdminInfo::insertCodes(CodeListing& codeListing)
                         code->question1(), 
                         code->question2(), 
                         code->question3(),
-                        code->accesstype());
+                        code->accesstype(),
+                        code->autocode());
         HandleCodeUpdate();
 
     }
@@ -993,6 +1030,8 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     int nCol = 0;
     QSet<int> lock_items;
     QTableWidget *table = ui->tblCodesList;
+    bool code1mode = AutoCodeGeneratorStatic::IsCode1Mode();
+    bool code2mode = AutoCodeGeneratorStatic::IsCode2Mode();
 
     table->setRowCount(pSet->getLockMap()->size());
 
@@ -1017,11 +1056,27 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         {
             code1 += tr(" (FP)");
         }
+        else if (pState->getAutoCode())
+        {
+            if (code1mode)
+            {
+                code1 += tr(" (AC)");
+            }
+        }
         table->setItem(nRow, nCol++, new QTableWidgetItem(code1));
         QString code2 = pState->getCode2();
-        if (pState->getAskQuestions())
+        if (code2mode && !code2.isEmpty())
         {
-            code2 += tr(" (Q)");
+            QStringList annotations;
+            if (pState->getAskQuestions())
+            {
+                annotations.append("Q");
+            }
+            if (pState->getAutoCode())
+            {
+                annotations.append("AC");
+            }
+            code2 += QString(" (%1)").arg(annotations.join(","));
         }
         table->setItem(nRow, nCol++, new QTableWidgetItem(code2));
 
@@ -1063,29 +1118,32 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
 void CFrmAdminInfo::setupCodeTableContextMenu() 
 {
+    KCB_DEBUG_ENTRY;
     QTableWidget *table = ui->tblCodesList;
 
-    /* Create a menu for adding, editing, and deleting codes */
     _pTableMenu = new QMenu(table);
 
-    /* Find out what column we are and add an action for that specific column
-           e.g., If we select a cell in the Lock # column then the menu should
-           start with Edit Locks.  Selecting edit locks will bring up a dialog
-           of bank, link, and 32 buttons popuplated with the locks that are 
-           already selected.  User can choose the locks to be associated with 
-           this 'code' or authorization.
+    if (AutoCodeGeneratorStatic::IsCode1Mode())
+    {
+        _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
+    }
+    else if (AutoCodeGeneratorStatic::IsCode2Mode())
+    {
+        _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
+        _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
+        _pTableMenu->addAction(tr("Delete"), this, SLOT(codeDeleteSelection()));
+    }
+    else
+    {
+        _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
+        _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
+        _pTableMenu->addAction(tr("Delete"), this, SLOT(codeDeleteSelection()));
+    }
 
-           Note: Duplicate codes are not allowed.
-    */
-
-    _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
-    _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
-    _pTableMenu->addAction(tr("Delete"), this, SLOT(codeDeleteSelection()));
     connect(table,SIGNAL(cellClicked(int,int)),this,SLOT(OnRowSelected(int, int)));
-
-    /* Create a menu for adding codes and enabling 'limited use' access type codes */
     _pTableMenuAdd = new QMenu(table);
     connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnHeaderSelected(int)));
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
@@ -1382,12 +1440,13 @@ void CFrmAdminInfo::setPStateValues(QString lockNums,
                                     QDateTime dtStart, 
                                     QDateTime dtEnd, 
                                     bool fingerprint1, 
-								    bool fingerprint2,
+                                    bool fingerprint2,
                                     bool askQuestions, 
                                     QString question1, 
                                     QString question2, 
                                     QString question3,
-                                    int access_type)
+                                    int access_type,
+                                    bool autocode)
 {
     _pState->setLockNums(lockNums);
     _pState->setCode1(sAccessCode);
@@ -1427,6 +1486,8 @@ void CFrmAdminInfo::setPStateValues(QString lockNums,
     {
         _pState->setMaxAccess(2);
     }
+
+    _pState->setAutoCode(autocode);
 }
 
 void CFrmAdminInfo::HandleCodeUpdate()
@@ -1592,13 +1653,14 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
 {    
-    /* Originally, the actions were added in setupCodeTableContextMenu but when they were displayed
-       here, the menu was the size of the _pTableMenu.  I couldn't track down why, so I decided to
-       just clear the menu and add what was needed here.  I like the just-in-time approach better
-    */
+    if (AutoCodeGeneratorStatic::IsCode1Mode())
+    {
+        return;
+    }
 
     _pTableMenuAdd->clear();
     _pTableMenuAdd->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
+
     if (nHeader == 5)
     {
         _pTableMenuAdd->addAction(tr("Enable All"), this, SLOT(codeEnableAll()));
@@ -1617,6 +1679,7 @@ void CFrmAdminInfo::checkAndCreateCodeEditForm()
         connect(_pFrmCodeEditMulti, SIGNAL(rejected()), this, SLOT(OnCodeEditReject()));
         connect(_pFrmCodeEditMulti, SIGNAL(accepted()), this, SLOT(OnCodeEditAccept()));
         connect(this, SIGNAL(__OnAdminInfoCodes(QString,QString)), _pFrmCodeEditMulti, SIGNAL(__OnAdminInfoCodes(QString,QString)));
+        connect(this, &CFrmAdminInfo::__NotifyLockSelectionChanged, _pFrmCodeEditMulti, &FrmCodeEditMulti::OnLockSelectionChanged);
     }
 }
 
@@ -1650,24 +1713,17 @@ void CFrmAdminInfo::editCodeByRow(int row)
     
     checkAndCreateCodeEditForm();
 
-    KCB_DEBUG_TRACE("Created CodeEditForm");
-
-    // Get line values
     CLockSet::Iterator itor;
     if (_pState)
     {
-        KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
     int nRow = 0;
-
-    KCB_DEBUG_TRACE("before loop iterator cellClicked");
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
         if(nRow == row)
         {
-            // itor is our man!
             _pState = itor.value();
             break;
         }
@@ -1694,7 +1750,6 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
     KCB_DEBUG_ENTRY;
     checkAndCreateCodeEditForm();
 
-    // Get line values
     CLockSet::Iterator itor;
     if (_pState)
     {
@@ -1709,7 +1764,6 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
     {
         if(nRow == row)
         {
-            // itor is our man!
             _pState = itor.value();
             break;
         }
@@ -1755,11 +1809,10 @@ void CFrmAdminInfo::purgeCodes()
     on_btnReadCodes_clicked();
     displayInTable(_pworkingSet);
 
-    qDebug() << "before loop iterator cellClicked";
+    KCB_DEBUG_TRACE("before loop iterator cellClicked");
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
-        // itor is our man!
         _pState = itor.value();
 
         if(_pState)
@@ -1799,23 +1852,41 @@ void CFrmAdminInfo::on_btnPurgeCodes_clicked()
 {
     KCB_DEBUG_ENTRY;
 
-    on_btnReadCodes_clicked();
-
     int nRC = QMessageBox::warning(this, tr("Verify Remove All Codes"),
                                    tr("All access codes will be removed from the system\nDo you want to continue?"),
                                    QMessageBox::Ok, QMessageBox::Cancel);
     if(nRC == QMessageBox::Ok)
     {
-        KCB_DEBUG_TRACE("Ok Selected");
-        purgeCodes();
-        usleep(50000);
-
+        _psysController->clearAllCodes();
         on_btnReadCodes_clicked();
 
         nRC = QMessageBox::warning(this, tr("Code Removal Success"),
                                    tr("Code Removal is successful!!\nPlease give the codes list a moment to update."),
                                    QMessageBox::Ok);
     }
+}
+
+void CFrmAdminInfo::UpdateAutoCodeDisplay()
+{
+    KCB_DEBUG_ENTRY;
+    if (AutoCodeGeneratorStatic::IsCode1Mode())
+    {
+        KCB_DEBUG_TRACE("updating code1");
+        QStringList codes;
+        _psysController->getAllCodes1(codes);
+        emit m_autocodegen.NotifyCodesUpdate(codes);
+    }
+    else if (AutoCodeGeneratorStatic::IsCode2Mode())
+    {
+        KCB_DEBUG_TRACE("updating code2");
+        emit m_autocodegen.NotifyCodesUpdate(QStringList());
+    }
+    else
+    {
+        // Nothing else to do at this time
+        KCB_DEBUG_TRACE("nothing to do");
+    }
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnTabSelected(int index)
@@ -1842,6 +1913,15 @@ void CFrmAdminInfo::OnTabSelected(int index)
     else if (index == SYSTEM_TAB_INDEX)
     {
         SetCabinetInfo();
+    }
+    else if (index == AUTOCODE_TAB_INDEX)
+    {
+        KCB_DEBUG_TRACE("selected autocode tab");
+        UpdateAutoCodeDisplay();
+        KCB_DEBUG_TRACE("process autocode tab selection");
+    }
+    else if (index == DOORS_TAB_INDEX)
+    {
     }
     else if (index == UTILITIES_TAB_INDEX)
     {
@@ -2426,97 +2506,131 @@ void CFrmAdminInfo::on_pbResetCabinetConfig_clicked()
     ui->pbDiscoverHardware->setEnabled(true);
 }
 
-void CFrmAdminInfo::on_cbAutoCodeMode_currentIndexChanged(int index)
+void CFrmAdminInfo::on_cbAdminLockSelection_currentIndexChanged(int index)
 {
-    QString message("");
-
-    if (index == 0)
+    if (index == CODE_SELECTION_SINGLE_INDEX)
     {
-        message = tr("AutoCode Generation is in Code 1 Mode."
-                     "\n"
-                     "The following changes will be made:"
-                     "\n"
-                     "\t1. All existing codes will be deleted."
-                     "\n"
-                     "\t2. New codes will be generated for all locks."
-                     "\n"
-                     "\t3. Multi-lock selection will be disabled."
-                     );
+        KeyCodeBoxSettings::SetLockSelectionSingle();
+        emit __NotifyLockSelectionChanged();
     }
-    else if (index == 1)
+    else if (index == CODE_SELECTION_MULTI_INDEX)
     {
-        message = tr("Auto Code Generation is in Code 2 Mode."
-                     "\n"
-                     "All existing codes with a single code (i.e. Code 1) will be deleted."
-                     "\n"
-                     "All existing codes with double code (i.e. Code 1 and Code 2) will by modified as follows:"
-                     "\n"
-                     "\t1. All 'Code 1' entries will be preserved."
-                     "\n"
-                     "\t2. All 'Code 2' entries will be cleared."
-                     "\n"
-                     "\t3. All associated locks will be removed."
-                     "\n"
-                     "\t4. Multi-lock selection will be disabled.");
+        KeyCodeBoxSettings::SetLockSelectionMulti();
+        emit __NotifyLockSelectionChanged();
     }
     else
     {
         return;
     }
-
-    QMessageBox::warning(this,
-                         tr("AutoCode Generation Mode"),
-                         message);
+    
 }
 
-void CFrmAdminInfo::on_gbAutoCodeEnableDisable_clicked(bool checked)
+void CFrmAdminInfo::OnRequestCodes1(QStringList& codes)
 {
-    if (checked)
-    {
-        int result = QMessageBox::warning(this,
-                             tr("Auto Code Enable"),
-                             tr("You have selected to enable Auto Code Generation."
-                                "\n"
-                                "Continuing will enable the KeyCodeBox system to generate lock codes per the Auto Code Generation parameters."
-                                "\n"
-                                "Existing codes may be modified or deleted and cannot be undone."
-                                "\n\n"
-                                "Do you want to continue?"),
-                             QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
+    _psysController->getAllCodes1(codes);
+}
 
-        if (result == QMessageBox::StandardButton::Cancel)
-        {
-            ui->gbAutoCodeEnableDisable->setTitle("Disabled");
-            ui->gbAutoCodeEnableDisable->setChecked(false);
-        }
-        else
-        {
-            ui->gbAutoCodeEnableDisable->setTitle("Enabled");
-            ui->cbAutoCodeMode->setEnabled(true);
-            emit ui->cbAutoCodeMode->currentIndexChanged(0);
-        }
-    }
-    else
-    {
-        int result = QMessageBox::warning(this,
-                             tr("Auto Code Disable"),
-                             tr("You have selected to disable Auto Code Generation."
-                                "\n"
-                                "The KeyCodeBox system will no longer generate lock codes. "
-                                "All existing codes will remain unchanged."
-                                "\n"
-                                "Do you want to continue?"),
-                             QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
+void CFrmAdminInfo::setLockStateDefaults(CLockState& state)
+{
+    state.setLockNums("");
+    state.setCode1("");
+    state.setCode2("");
+    state.setDescription("");
+    state.setStartTime(DEFAULT_DATETIME);
+    state.setEndTime(DEFAULT_DATETIME);
+    state.clearFingerprint1();
+    state.clearFingerprint2();
+    state.setAskQuestions(false);
+    state.setQuestion1("");
+    state.setQuestion2("");
+    state.setQuestion3("");
+    state.setMaxAccess(-1); 
+    state.setAccessCount(0);
+    state.setAccessType(0);
+    state.setAutoCode(false);
+}
 
-        if (result == QMessageBox::StandardButton::Cancel)
-        {
-            ui->gbAutoCodeEnableDisable->setTitle("Enabled");
-            ui->gbAutoCodeEnableDisable->setChecked(true);
-        }
-        else
-        {
-            ui->gbAutoCodeEnableDisable->setTitle("Disabled");
-            ui->cbAutoCodeMode->setEnabled(false);
-        }
+void CFrmAdminInfo::OnCommitCodes1(QMap<QString, QString> codes)
+{
+    KCB_DEBUG_TRACE("OnCommitCodes1 called");
+
+    for (int ii = 0; ii < 10; ++ii)
+    {
+        QApplication::processEvents();
     }
+    QProgressDialog progress("Committing codes ...", "", 1, codes.keys().count()+3, this);
+    progress.setCancelButton(nullptr);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setWindowTitle("AutoCode Commit");
+
+    int count = 1;
+    progress.setValue(count);
+    count++;
+    progress.show();
+    QApplication::processEvents();
+    progress.setValue(count);
+    count++;
+    _psysController->clearAllCodes();
+    QApplication::processEvents();
+    progress.setValue(count);
+    count++;
+
+    foreach (auto key, codes.keys())
+    {
+        progress.setValue(count);
+        count++;
+
+        CLockState state;
+        setLockStateDefaults(state);
+        state.setLockNums(key);
+        state.setCode1(codes[key]);
+        state.setAutoCode(true);
+
+        _psysController->addCode(state);
+
+    }
+    progress.setValue(codes.keys().count());
+}
+
+void CFrmAdminInfo::OnCommitCodes2(QMap<QString, QString> codes)
+{
+    Q_UNUSED(codes);
+    _psysController->clearLockAndCode2ForAllCodes();
+}
+
+void CFrmAdminInfo::OnNotifyDisableLockSelection()
+{
+    ui->cbAdminLockSelection->setDisabled(true);
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    else if (KeyCodeBoxSettings::IsLockSelectionMulti())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    emit __NotifyLockSelectionChanged();
+}
+
+void CFrmAdminInfo::OnNotifyEnableLockSelection()
+{
+    ui->cbAdminLockSelection->setEnabled(true);
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    else if (KeyCodeBoxSettings::IsLockSelectionMulti())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    emit __NotifyLockSelectionChanged();
+}
+
+void CFrmAdminInfo::OnUpdateCodes()
+{
+    // The code table has been updated.
+    //     - We need to read the codes for the code display
+    on_btnReadCodes_clicked();
+    //     - We need to read the codes to populate the autocode locks
+    m_autocodegen.UpdateCodes();
 }

@@ -27,6 +27,9 @@ typedef enum {ACCESS_TYPE_ALWAYS=0, ACCESS_TYPE_TIMED=1, ACCESS_TYPE_LIMITED_USE
 #define SECS_IN_12_HOURS (12*SECS_IN_HOUR)
 #define SECS_IN_DAY (24*SECS_IN_HOUR)
 #define SECS_IN_WEEK (7*SECS_IN_DAY)
+#define SECS_IN_MONTH(days_in_month) (days_in_month*SECS_IN_DAY)
+#define SECS_IN_YEAR(days_in_year) (days_in_year*SECS_IN_DAY)
+
 
 static const QDateTime NEVER = QDateTime(QDate(), QTime(0,0));
 static const QDateTime EACH_ACTIVITY = QDateTime(QDate(1,1,1), QTime(0,0));

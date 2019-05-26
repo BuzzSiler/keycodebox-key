@@ -37,6 +37,7 @@ class CFrmAdminInfo;
 
 class SelectLocksWidget;
 class ReportControlWidget;
+class AutoCodeGenWidget;
 
 
 class CFrmAdminInfo : public QDialog
@@ -80,6 +81,7 @@ class CFrmAdminInfo : public QDialog
         void __OnDisplayFingerprintButton(bool state);
         void __OnDisplayShowHideButton(bool state);
         void __OnDisplayTakeReturnButtons(bool state);
+        void __NotifyLockSelectionChanged();
 
     
     public slots:
@@ -105,6 +107,9 @@ class CFrmAdminInfo : public QDialog
         void OnNotifyGenerateReport();    
         void OnDisplayTakeReturnButtons(bool);
         void OnDiscoverHardwareProgressUpdate(int);
+
+        void OnRequestCodes1(QStringList& codes);
+        void OnUpdateCodes();
 
     private slots:
         void OnCodes(QString code1, QString code2);
@@ -179,11 +184,16 @@ class CFrmAdminInfo : public QDialog
 
         void on_pbResetCabinetConfig_clicked();
 
-        void on_cbAutoCodeMode_currentIndexChanged(int index);
+        void on_cbAdminLockSelection_currentIndexChanged(int index);
 
-        void on_gbAutoCodeEnableDisable_clicked(bool checked);
+        void OnCommitCodes1(QMap<QString, QString>);
+        void OnCommitCodes2(QMap<QString, QString>);
 
-private:
+        void OnNotifyDisableLockSelection();
+        void OnNotifyEnableLockSelection();
+
+
+    private:
         Ui::CFrmAdminInfo   *ui;
         CSystemController   *_psysController;
         bool                _bClose;
@@ -230,6 +240,7 @@ private:
 
         UTIL_ACTION_TYPE    m_util_action;
         QStandardItemModel& m_model;
+        AutoCodeGenWidget& m_autocodegen;
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
 
@@ -262,7 +273,8 @@ private:
                             QString question1,
                             QString question2,
                             QString question3,
-                            int access_type);
+                            int access_type,
+                            bool autocode);
         void RunKeyboard(QString& text, bool numbersOnly = false);
         void OnNotifyUsbDrive(QStringList list);
         void setFileFilterFromFormatSelection(const QString filter);
@@ -275,6 +287,8 @@ private:
         void DiscoverHardware();
         void ClearCabinetInfo();
         void SetCabinetInfo();
+        void setLockStateDefaults(CLockState& state);
+        void UpdateAutoCodeDisplay();
         
     protected:
         void touchEvent(QTouchEvent *ev);

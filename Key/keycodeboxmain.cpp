@@ -137,6 +137,7 @@ void MainWindow::SetupAdmin(QObject *psysController)
     connect(_psystemController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfAdminInfo, SLOT(OnDisplayFingerprintButton(bool)));
     connect(_psystemController, SIGNAL(__OnDisplayShowHideButton(bool)), _pfAdminInfo, SLOT(OnDisplayShowHideButton(bool)));
     connect(_psystemController, SIGNAL(__OnDisplayTakeReturnButtons(bool)), _pfAdminInfo, SLOT(OnDisplayTakeReturnButtons(bool)));
+    connect(_psystemController, SIGNAL(__OnUpdateCodes()), _pfAdminInfo, SLOT(OnUpdateCodes()));
     KCB_DEBUG_EXIT;
 }
 
@@ -445,7 +446,7 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
 void MainWindow::OnAdminPasswordCancel()
 {
     KCB_DEBUG_ENTRY;
-    kcb::TurnOnDisplay();    
+    kcb::TurnOnDisplay();
     kkd.hide();
     KCB_DEBUG_EXIT;
 }

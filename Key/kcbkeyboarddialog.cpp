@@ -64,9 +64,9 @@ void KcbKeyboardDialog::ipAddress(bool state)
 
 void KcbKeyboardDialog::ClearText()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_keyboard.clear();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KcbKeyboardDialog::Accept()

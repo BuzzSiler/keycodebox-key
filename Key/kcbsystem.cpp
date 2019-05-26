@@ -85,7 +85,7 @@ namespace kcb
         }
     }
 
-    void GetRpiSerialNumber(QString& serial_number)
+    QString GetRpiSerialNumber()
     {
         QString program = "cat";
         QStringList arguments;
@@ -94,24 +94,53 @@ namespace kcb
         QString stdErr;
         int status;
 
-        serial_number = "Unknown";
-
         ExecuteCommand(program, arguments, stdOut, stdErr, status);
 
         /*
-            pi@raspberrypi:~$ cat /proc/cpuinfo
-            Processor       : ARMv6-compatible processor rev 7 (v6l)
-            BogoMIPS        : 697.95
-            Features        : swp half thumb fastmult vfp edsp java tls
+            $ cat /proc/cpuinfo
+            processor       : 0
+            model name      : ARMv7 Processor rev 4 (v7l)
+            BogoMIPS        : 38.40
+            Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
             CPU implementer : 0x41
             CPU architecture: 7
             CPU variant     : 0x0
-            CPU part        : 0xb76
-            CPU revision    : 7
+            CPU part        : 0xd03
+            CPU revision    : 4
 
-            Hardware        : BCM2708
-            Revision        : 1000002
-            Serial          : 000000000000000d
+            processor       : 1
+            model name      : ARMv7 Processor rev 4 (v7l)
+            BogoMIPS        : 38.40
+            Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
+            CPU implementer : 0x41
+            CPU architecture: 7
+            CPU variant     : 0x0
+            CPU part        : 0xd03
+            CPU revision    : 4
+
+            processor       : 2
+            model name      : ARMv7 Processor rev 4 (v7l)
+            BogoMIPS        : 38.40
+            Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
+            CPU implementer : 0x41
+            CPU architecture: 7
+            CPU variant     : 0x0
+            CPU part        : 0xd03
+            CPU revision    : 4
+
+            processor       : 3
+            model name      : ARMv7 Processor rev 4 (v7l)
+            BogoMIPS        : 38.40
+            Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
+            CPU implementer : 0x41
+            CPU architecture: 7
+            CPU variant     : 0x0
+            CPU part        : 0xd03
+            CPU revision    : 4
+
+            Hardware        : BCM2709
+            Revision        : a22082
+        >>>>Serial          : 00000000fb1e679a<<<<
          */
 
         if (!stdOut.isEmpty())
@@ -121,11 +150,16 @@ namespace kcb
             {
                 if (entry.contains("Serial"))
                 {
-                    serial_number = entry.split(":")[1].trimmed();
-                    break;
+                    KCB_DEBUG_EXIT;
+                    QString value = entry.split(":")[1].trimmed();
+                    return value.remove( QRegExp("^[0]*") );
+                    //return entry.split(":")[1].right(8).trimmed();
                 }
             }
         }
+
+        KCB_DEBUG_EXIT;
+        return QString("");
     }
 
     static QString MatchRegularExpression(QString text, int index, QString regexp)
@@ -332,7 +366,6 @@ namespace kcb
 
     static QString GetDynamicNetworkInfo(NETWORK_INFO_TYPE type)
     {
-        KCB_DEBUG_ENTRY;
         QString result("");
 
         if (type == GATEWAY_ADDRESS)
@@ -348,13 +381,11 @@ namespace kcb
             result = ParseNetworkInfo(type);
         }
 
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     static QString GetNetworkInfo(NETWORK_INFO_TYPE type)
     {
-        KCB_DEBUG_ENTRY;
         if (KeyCodeBoxSettings::StaticAddressingEnabled())
         {
             return GetStaticNetworkInfo(type);
@@ -362,99 +393,77 @@ namespace kcb
         else
         {
             return GetDynamicNetworkInfo(type);
-        }        
+        }
     }
 
     void SetHostAddress(QString const &value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.address = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetHostAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(HOST_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     void SetNetworkMask(QString const &value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.mask = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetNetworkMask()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(NETWORK_MASK);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     void SetBcastAddress(QString const &value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.broadcast = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetBcastAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(BCAST_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     void SetGatewayAddress(QString const &value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.gateway = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetGatewayAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(GATEWAY_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     void SetDnsAddress(QString const & value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.dns = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetDnsAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(DNS_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     QString GetMacAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(MAC_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
@@ -958,6 +967,11 @@ namespace kcb
                 ip_address = ip_display.first;
             }
         }
+    }
+
+    QString GetSystemId()
+    {
+        return QString("keycodebox-%1").arg(GetRpiSerialNumber());
     }
 
 }

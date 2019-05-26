@@ -2,6 +2,9 @@
 #define LOCKCABINETWIDGET_H
 
 #include <QWidget>
+#include <QVector>
+#include <QMap>
+#include <QString>
 #include "keycodeboxsettings.h"
 
 namespace Ui {
@@ -13,7 +16,7 @@ class QPushButton;
 
 class LockCabinetWidget : public QWidget
 {
-        Q_OBJECT
+    Q_OBJECT
 
     public:
         explicit LockCabinetWidget(QWidget *parent=0);
@@ -22,6 +25,9 @@ class LockCabinetWidget : public QWidget
         void updateCabinetConfig();
         QString getSelectedLocks();
         void setSelectedLocks(QString locks);
+        void setLockDisplay(const QMap<QString, QString>& map);
+        QMap<QString, QString> getLockDisplay();
+        void clearLockDisplay();
         void clrAllLocks();
         QString getSelectedCabinet();
         void setEnabledLocks(QString locks);
@@ -32,6 +38,12 @@ class LockCabinetWidget : public QWidget
         void setWarning();
         void clrWarning();
         bool isConfigured();
+        void hideSelectClearAll();
+
+    public slots:
+        void OnNotifySingleLockSelection();
+        void OnNotifyMultiLockSelection();
+        void OnNotifyDisableLockSelection();
 
     signals:
         void NotifyLockSelected(QString lock, bool is_selected);
@@ -53,13 +65,17 @@ class LockCabinetWidget : public QWidget
         CABINET_VECTOR m_cabinet_info;
         qint8 m_num_cabs;
         QVector<QString> m_selected_locks;
-        QVector<CAB_STATE> m_cabs;        
+        QVector<CAB_STATE> m_cabs;
         qint8 m_current_cab;
         QList<QPushButton *> m_lock_buttons;
 
         QSignalMapper& m_mapper;
         QString m_default_stylesheet;
         bool m_is_configured;
+        int m_last_cab_selected;
+        int m_last_state_selected;
+        QMap<QString, QString> m_lock_names;
+
         Ui::LockCabinetWidget *ui;
 
         void updateUi();
@@ -71,6 +87,14 @@ class LockCabinetWidget : public QWidget
         void AddLockToSelected(const QString lock);
         void RemoveLockFromSelected(const QString lock);
         void CalcLockCabIndecies(const QString lock, int& cab_index, int& lock_index);
+        void uncheckAllButtons();
+        void InitLockNameMap();
+
+        void showSelectClearAll();
+        void setSelectedLocksLabelSingle();
+        void setSelectedLocksLabelMulti();
+        void clearSelectedLocksLabel();
+
 };
 
 #endif // LOCKCABINETWIDGET_H

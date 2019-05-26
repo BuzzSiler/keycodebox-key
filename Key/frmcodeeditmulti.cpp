@@ -17,6 +17,7 @@
 #include "kcbkeyboarddialog.h"
 #include "dlgeditquestions.h"
 #include "keycodeboxsettings.h"
+#include "autocodegenstatic.h"
 
 static const QString FP_HOME_DIR = "/home/pi/run/prints/";
 static const QString css_warn = "color: black; background-color: red";
@@ -68,8 +69,8 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     m_access_state_label.hide();
 
     resetQuestions();
-
     updateCabinetConfig();
+    OnLockSelectionChanged();
 
     updateUi();
 }
@@ -392,6 +393,14 @@ void FrmCodeEditMulti::OnNotifyLockSelected(QString lock, bool is_selected)
 {
     Q_UNUSED(lock);
     Q_UNUSED(is_selected);
+
+    auto code2map = AutoCodeGeneratorStatic::GetCurrentCode2Codes();
+
+    if (!code2map.empty())
+    {
+        ui->edCode2->setText(code2map[lock]);
+    }
+
     updateUi();
 }
 
@@ -499,14 +508,23 @@ void FrmCodeEditMulti::updateUi()
                                  (ui->cbAccessType->currentIndex() == ACCESS_TYPE_TIMED) &&
                                  (ui->dtEndAccess->dateTime() > ui->dtStartAccess->dateTime())
                              );
+    bool autocode_enabled = AutoCodeGeneratorStatic::IsEnabled();
+    bool autocode_code1mode = AutoCodeGeneratorStatic::IsCode1Mode();
+    bool autocode_code2mode = AutoCodeGeneratorStatic::IsCode2Mode();
 
+
+    ui->edCode1->setEnabled(code1_is_specified);
+    ui->pbCode1Random->setEnabled(!autocode_enabled && code1_is_specified);
+    ui->spCode1RandomCodeLength->setEnabled(!autocode_enabled && code1_is_specified);
     ui->pbClearCode1->setEnabled(code1_is_specified);
     ui->cbFingerprint->setEnabled(code1_is_specified);
     ui->cbEnableCode2->setEnabled(!fp_is_required && code1_is_specified);
-    ui->edCode2->setEnabled(!fp_is_required && code2_is_required && code1_is_specified);
-    ui->pbClearCode2->setEnabled(!fp_is_required && code2_is_required && code2_is_specified);
-    ui->cbEnableQuestions->setEnabled(!fp_is_required && code2_is_required && code2_is_specified);
-    ui->pbEditQuestions->setEnabled(!fp_is_required && code2_is_specified && questions_required);
+    ui->edCode2->setEnabled(!fp_is_required && code1_is_specified && code2_is_required);
+    ui->pbCode2Random->setEnabled(!autocode_enabled && !fp_is_required && code1_is_specified && code2_is_required);
+    ui->spCode2RandomCodeLength->setEnabled(!autocode_enabled && !fp_is_required && code1_is_specified && code2_is_required);
+    ui->pbClearCode2->setEnabled(!fp_is_required && code1_is_specified && code2_is_specified && code2_is_required);
+    ui->cbEnableQuestions->setEnabled(!fp_is_required && code1_is_specified && code2_is_specified && code2_is_required);
+    ui->pbEditQuestions->setEnabled(!fp_is_required && code1_is_specified && questions_required);
 
     ui->edCode1->setStyleSheet(!code1_is_specified ? css_warn : css_none);
     ui->edCode2->setStyleSheet(!code2_is_valid ? css_warn : css_none);
@@ -528,20 +546,31 @@ void FrmCodeEditMulti::updateUi()
         m_lock_cab.setWarning();
     }
 
-//    KCB_DEBUG_TRACE("Exit Condition:");
-//    KCB_DEBUG_TRACE("\tcode1_is_specified" << code1_is_specified);
-//    KCB_DEBUG_TRACE("\tmin_locks_selected" << min_locks_selected);
-//    KCB_DEBUG_TRACE("\tfp_is_required" << fp_is_required);
-//    KCB_DEBUG_TRACE("\tcode2_is_required" << code2_is_required);
-//    KCB_DEBUG_TRACE("\tcode2_is_specified" << code2_is_specified);
-//    KCB_DEBUG_TRACE("\tquestions_required" << questions_required);
-//    KCB_DEBUG_TRACE("\tquestions_specified" << questions_specified);
-//    KCB_DEBUG_TRACE("\tquestions_valid" << questions_valid);
-//    KCB_DEBUG_TRACE("\tvalid_access_type" << valid_access_type);
-
     bool valid_exit = isModified() && valid_codes_entered && min_locks_selected;
 
     ui->bbSaveCancel->button(QDialogButtonBox::Save)->setEnabled(valid_exit);
+
+    if (autocode_code1mode)
+    {
+        ui->edCode1->setDisabled(autocode_code1mode);
+        ui->pbClearCode1->setDisabled(autocode_code1mode);
+        ui->cbFingerprint->setDisabled(autocode_code1mode);
+        ui->edCode2->setDisabled(autocode_code1mode);
+        ui->pbClearCode2->setDisabled(autocode_code1mode);
+        ui->cbEnableCode2->setDisabled(autocode_code1mode);
+        m_lock_cab.disableAllLocks();
+        m_lock_cab.hideSelectClearAll();
+    }
+    if (autocode_code2mode)
+    {
+        ui->edCode1->setEnabled(autocode_code2mode);
+        ui->pbClearCode1->setEnabled(autocode_code2mode);
+        ui->cbFingerprint->setDisabled(autocode_code2mode);
+        ui->edCode2->setDisabled(autocode_code2mode);
+        ui->pbClearCode2->setDisabled(autocode_code2mode);
+        ui->cbEnableCode2->setDisabled(autocode_code2mode);
+        m_lock_cab.hideSelectClearAll();
+    }
 }
 
 void FrmCodeEditMulti::clrCodeState()
@@ -617,4 +646,37 @@ void FrmCodeEditMulti::on_cbFingerprint_clicked()
     }
 
     updateUi();
+}
+
+void FrmCodeEditMulti::on_pbCode1Random_clicked()
+{
+    QStringList values = kcb::CreateRandomValues(1, ui->spCode1RandomCodeLength->value());
+    ui->edCode1->setText(values[0]);
+    updateUi();
+}
+
+void FrmCodeEditMulti::on_pbCode2Random_clicked()
+{
+    QStringList values = kcb::CreateRandomValues(1, ui->spCode2RandomCodeLength->value());
+    ui->edCode2->setText(values[0]);
+    updateUi();
+}
+
+void FrmCodeEditMulti::OnLockSelectionChanged()
+{
+    KCB_DEBUG_ENTRY;
+
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        m_lock_cab.OnNotifySingleLockSelection();
+    }
+    else if (KeyCodeBoxSettings::IsLockSelectionMulti())
+    {
+        m_lock_cab.OnNotifyMultiLockSelection();
+    }
+    else
+    {
+        m_lock_cab.OnNotifyDisableLockSelection();
+    }
+    KCB_DEBUG_EXIT;
 }

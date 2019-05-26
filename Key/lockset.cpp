@@ -26,79 +26,10 @@ void CLockSet::clearSet()
 
 void CLockSet::addToSet(CLockState *plockState)
 {
-    _mmapLocks.insertMulti(plockState->getLockNums(), plockState);
+    _mmapLocks.insertMulti(QString("%1").arg(plockState->getLockNums(), 2, QChar('0')), plockState);
 }
 
 CLockSet::~CLockSet()
 {
     clearSet();
 }
-
-bool CLockSet::setFromJsonObject(QJsonObject &jsonObj)
-{
-    QJsonArray  ary;
-    QJsonObject obj;
-    QJsonValue  val;
-    QJsonArray::Iterator    itor;
-
-    // Clear
-    clearSet();
-    //
-    try {
-        if((jsonObj[flockset].isUndefined()) || (!jsonObj[flockset].isArray()))
-            return false;
-        val = jsonObj[flockset]; // array of
-        if(val.isArray()) {
-            ary = val.toArray();
-            for(itor = ary.begin(); itor != ary.end(); itor++)
-            {
-                val = *itor;
-                if(val.isObject()) {
-                    obj = val.toObject();
-                    CLockState  *plockState = new CLockState();
-                    plockState->setFromJsonObject(obj);
-                    addToSet(plockState);
-                } else
-                {
-                    qDebug() << "CLockSet::setFromJsonObject(): bad form";
-                }
-            }
-        } else {
-            qDebug() << "CLockSet::setFromJsonObject(): Not a JSON Array";
-        }
-    } catch(std::exception &e) {
-        qDebug() << "ClockSet::setFromJsonObject():" << e.what();
-        return false;
-    }
-
-    return true;
-}
-
-
-bool CLockSet::setFromJsonString(QString strJson)
-{
-    QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
-    QJsonObject     obj;
-    // check validity of the document
-    if(!doc.isNull())
-    {
-        if(doc.isObject())
-        {
-            obj = doc.object();
-            setFromJsonObject(obj);
-        }
-        else
-        {
-            qDebug() << "Document is not an object" << endl;
-            return false;
-        }
-    }
-    else
-    {
-        qDebug() << "Invalid JSON...\n" << strJson << endl;
-        return false;
-    }
-    return true;
-}
-
-

@@ -48,11 +48,9 @@ CModelSecurity::~CModelSecurity()
 
 void CModelSecurity::OnReadLockSet(QString LockNums, QDateTime start, QDateTime end)
 {
-    // KCB_DEBUG_ENTRY;
     CLockSet    *pLockSet;
 
     _ptblCodes->selectCodeSet(LockNums, start, end, &pLockSet, true);
-    // qDebug() << "Selected locks:" << LockNums;
     emit __OnLockSet(pLockSet);
 }
 
@@ -427,7 +425,7 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                                              question2,
                                              question3);
         KCB_DEBUG_TRACE("Locks" << lockNums);
-		if (result == KCB_SUCCESS && lockNums != "")
+        if (result == KCB_SUCCESS && lockNums != "")
         {
             KCB_DEBUG_TRACE(lockNums);
 
@@ -738,4 +736,53 @@ void CModelSecurity::OnRequestCurrentAdmin()
 void CModelSecurity::getAllCodes1(QStringList& codes1)
 {
     _ptblCodes->getAllCodes1(codes1);
+}
+
+void CModelSecurity::clearAllCodes()
+{
+    _ptblCodes->clearAllCodes();
+}
+
+void CModelSecurity::deleteAllCode1OnlyCodes()
+{
+    _ptblCodes->deleteAllCode1OnlyCodes();
+}
+
+void CModelSecurity::clearLockAndCode2ForAllCodes()
+{
+    _ptblCodes->clearLockAndCode2ForAllCodes();
+}
+
+void CModelSecurity::addCode(CLockState& state)
+{
+    _ptblCodes->addLockCode(state.getLockNums(), 
+                            state.getCode1(), 
+                            state.getCode2(), 
+                            state.getStartTime(), 
+                            state.getEndTime(), 
+                            state.getFingerprint1(),
+                            state.getFingerprint2(), 
+                            state.getAskQuestions(), 
+                            state.getQuestion1(), 
+                            state.getQuestion2(), 
+                            state.getQuestion3(),
+                            state.getStatus(), 
+                            state.getDescription(), 
+                            state.getSequence(), 
+                            state.getSequenceOrder(),
+                            state.getMaxAccess(), 
+                            state.getMaxRetry(), 
+                            state.getAccessType(), 
+                            state.getAccessCount(), 
+                            state.getAutoCode());
+}
+
+void CModelSecurity::updateCode1(const QString& lock, const QString& code)
+{
+     _ptblCodes->updateCode1(lock, code);
+}
+
+void CModelSecurity::updateCode2(const QString& lock, const QString& code)
+{
+     _ptblCodes->updateCode2(lock, code);
 }

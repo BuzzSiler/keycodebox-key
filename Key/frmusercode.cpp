@@ -57,7 +57,7 @@ void CFrmUserCode::initialize()
 void CFrmUserCode::mousePressEvent(QMouseEvent* event)
 {
     QScreen *screen = QApplication::primaryScreen();
-    KCB_DEBUG_TRACE(event->x() << event->y() << screen->availableGeometry());
+    // KCB_DEBUG_TRACE(event->x() << event->y() << screen->availableGeometry());
 
     int right = screen->availableGeometry().right();
     int top = screen->availableGeometry().top();
