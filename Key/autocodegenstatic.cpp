@@ -22,17 +22,13 @@ namespace AutoCodeGeneratorStatic
 
     AutoCodeGenerator::CodeMap CreateCodeMapAndStoreNextGenDateTime(const AutoCodeParams& params)
     {
-        KCB_DEBUG_ENTRY;
         QPair<AutoCodeGenerator::CodeMap, QDateTime> result = AutoCodeGenerator::CreateCodeMap(params);
-        KCB_DEBUG_TRACE("next gen" << result.second);
         KeyCodeBoxSettings::SetAutoCodeNextGenDateTime(result.second);
-        KCB_DEBUG_EXIT;
         return result.first;
     }
 
     AutoCodeGenerator::CodeMap GetCurrentCode2Codes()
     {
-        KCB_DEBUG_ENTRY;
         QByteArray key = KeyCodeBoxSettings::GetAutoCodeKey();
         QString password = KeyCodeBoxSettings::GetAutoCodePassword();
         AutoCodeParams acp = AutoCodeGenerator::ParamsFromSecureKey(key, password);
@@ -45,36 +41,29 @@ namespace AutoCodeGeneratorStatic
                 AutoCodeMapCache = result.first;
                 AutoCodeCache = true;
             }
-            KCB_DEBUG_EXIT;
             return AutoCodeMapCache;
         }
 
-        KCB_DEBUG_EXIT;
         return AutoCodeGenerator::CodeMap();
     }
 
     int SecsToNextGen(const QDateTime& datetime)
     {
-        KCB_DEBUG_ENTRY;
         QDateTime next_gen = KeyCodeBoxSettings::GetAutoCodeNextGenDateTime();
-        KCB_DEBUG_EXIT;
         return datetime.secsTo(next_gen);
     }
 
     AutoCodeGenerator::CodeMap GenerateCodeMap()
     {
-        KCB_DEBUG_ENTRY;
         QByteArray key = KeyCodeBoxSettings::GetAutoCodeKey();
         QString password = KeyCodeBoxSettings::GetAutoCodePassword();
         AutoCodeParams params = AutoCodeGenerator::ParamsFromSecureKey(key, password);
-        KCB_DEBUG_EXIT;
         AutoCodeGenerator::CodeMap result = AutoCodeGeneratorStatic::CreateCodeMapAndStoreNextGenDateTime(params);
         return result;
     }
 
     bool IsCode1Mode()
     {
-        KCB_DEBUG_ENTRY;
         AutoCodeSettings acs = KeyCodeBoxSettings::GetAutoCodeSettings();
         if (!acs.enabled)
         {
@@ -84,13 +73,11 @@ namespace AutoCodeGeneratorStatic
         QJsonObject json = AutoCodeGenerator::JsonFromSecureKey(acs.key.toUtf8(), acs.password);
         AutoCodeParams params = AutoCodeGenerator::JsonToParams(json);
 
-        KCB_DEBUG_EXIT;
         return acs.enabled && static_cast<CodeMode>(params.code_mode) == CodeMode::CODE_MODE_1;
     }
 
     bool IsCode2Mode()
     {
-        KCB_DEBUG_ENTRY;
         AutoCodeSettings acs = KeyCodeBoxSettings::GetAutoCodeSettings();
         if (!acs.enabled)
         {
@@ -100,7 +87,6 @@ namespace AutoCodeGeneratorStatic
         QJsonObject json = AutoCodeGenerator::JsonFromSecureKey(acs.key.toUtf8(), acs.password);
         AutoCodeParams params = AutoCodeGenerator::JsonToParams(json);
 
-        KCB_DEBUG_EXIT;
         return acs.enabled && static_cast<CodeMode>(params.code_mode) == CodeMode::CODE_MODE_2;
     }
 

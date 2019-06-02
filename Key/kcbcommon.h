@@ -23,10 +23,13 @@ typedef enum {ACCESS_TYPE_ALWAYS=0, ACCESS_TYPE_TIMED=1, ACCESS_TYPE_LIMITED_USE
 #define FIELD_INDEX(query, fld_name) (query.record().indexOf(fld_name))
 #define QUERY_VALUE(q, fld_name)  q.value(FIELD_INDEX(q, fld_name))
 
-#define SECS_IN_HOUR (60*60)
+#define SECS_IN_MINUTE (60)
+#define SECS_IN_HOUR (60*SECS_IN_MINUTE)
 #define SECS_IN_12_HOURS (12*SECS_IN_HOUR)
-#define SECS_IN_DAY (24*SECS_IN_HOUR)
-#define SECS_IN_WEEK (7*SECS_IN_DAY)
+#define HOURS_IN_DAY (24)
+#define SECS_IN_DAY (HOURS_IN_DAY*SECS_IN_HOUR)
+#define DAYS_IN_WEEK (7)
+#define SECS_IN_WEEK (DAYS_IN_WEEK*SECS_IN_DAY)
 #define SECS_IN_MONTH(days_in_month) (days_in_month*SECS_IN_DAY)
 #define SECS_IN_YEAR(days_in_year) (days_in_year*SECS_IN_DAY)
 

@@ -273,8 +273,7 @@ class CFrmAdminInfo : public QDialog
                             QString question1,
                             QString question2,
                             QString question3,
-                            int access_type,
-                            bool autocode);
+                            int access_type);
         void RunKeyboard(QString& text, bool numbersOnly = false);
         void OnNotifyUsbDrive(QStringList list);
         void setFileFilterFromFormatSelection(const QString filter);

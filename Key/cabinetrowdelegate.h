@@ -22,6 +22,9 @@ class CabinetRowDelegate : public QStyledItemDelegate
             const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
         void SetRange(int lower_bound, int upper_bound);
+
+    private slots:
+        void commitAndCloseEditor(int index);
 };
 
 #endif //CABINETROWDELEGATE_H

@@ -609,5 +609,52 @@ QString KeyCodeBoxSettings::GetAutoCodePassword()
     return acs.password;
 }
 
+bool KeyCodeBoxSettings::GetInternetTimeSetting()
+{
+    KCB_DEBUG_ENTRY;
+    JsonFromFile();
 
+    bool result = false;
+    
+    if (m_json_obj.contains("internetTime"))
+    {
+        result = m_json_obj["internetTime"].toBool();
+    }
+    else
+    {
+        SetInternetTimeSetting(false);
+    }
 
+    return result;
+}
+
+void KeyCodeBoxSettings::SetInternetTimeSetting(bool value)
+{
+    JsonFromFile();
+
+    if (m_json_obj.contains("internetTime"))
+    {
+        m_json_obj["internetTime"] = QJsonValue(value);
+    }
+    else
+    {
+        m_json_obj.insert(QString("internetTime"), QJsonValue(value));
+    }
+
+    JsonToFile();
+}
+
+bool KeyCodeBoxSettings::IsInternetTimeEnabled()
+{
+    return GetInternetTimeSetting();
+}
+
+void KeyCodeBoxSettings::EnableInternetTime()
+{
+    SetInternetTimeSetting(true);
+}
+
+void KeyCodeBoxSettings::DisableInternetTime()
+{
+    SetInternetTimeSetting(false);
+}

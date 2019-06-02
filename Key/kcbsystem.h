@@ -50,6 +50,10 @@ namespace kcb
     QString IpAddrSubnetMaskToCidr(QString ip_addr, QString subnet_mask);
     void GetIpAddressAndStatus(QString &ip_address, bool &can_ping, bool &can_multicast);
     QString GetSystemId();
+    void EnableInternetTime();
+    void DisableInternetTime();
+    void SetDateTime(const QDateTime& datetime);
+    void SetTimeZone(const QString& timezone);
 
 }
 #endif // KCBSYSTEM_H

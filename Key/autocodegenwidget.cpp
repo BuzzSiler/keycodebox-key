@@ -89,24 +89,18 @@ AutoCodeGenWidget::AutoCodeGenWidget(QWidget *parent) :
     KCB_DEBUG_ENTRY;
     ui->setupUi(this);
 
-    // AutoCodeGeneratorStatic::Test();
-    // CEncryption::Test();
-
     ui->pgbAutoCodeCommit->setVisible(false);
 
-    KCB_DEBUG_TRACE("Initialize lock cabinet");
     InitLockCabinet();
 
     if (AutoCodeGeneratorStatic::IsEnabled())
     {
-        KCB_DEBUG_TRACE("Enabling auto code");
         EnableAutoCode();
 
         AutoCodeGenerator::CodeMap map;
         map = ProcessCommittedAutoCodeSettings(map);
         map = ProcessEnabledAutoCodeSettings(map);
         
-        KCB_DEBUG_TRACE("auto code codes" << map);
         m_lock_cabinet.setLockDisplay(map);
     }
     else
@@ -114,7 +108,6 @@ AutoCodeGenWidget::AutoCodeGenWidget(QWidget *parent) :
         DisableAutoCode();
     }
 
-    KCB_DEBUG_TRACE("initializing controls");
     InitControls();
 
     m_init = false;
@@ -139,7 +132,6 @@ bool AutoCodeGenWidget::IsCode2Mode()
 
 AutoCodeGenerator::CodeMap& AutoCodeGenWidget::RequestCodesFromDatabase(AutoCodeGenerator::CodeMap& map)
 {
-    KCB_DEBUG_ENTRY;
     if (IsCode1Mode())
     {
         QStringList codes;
@@ -151,40 +143,33 @@ AutoCodeGenerator::CodeMap& AutoCodeGenWidget::RequestCodesFromDatabase(AutoCode
             map[QString::number(ii + 1)] = codes[ii];
         }
     }
-    KCB_DEBUG_EXIT;
     return map;
 }
 
 AutoCodeGenerator::CodeMap& AutoCodeGenWidget::RequestActiveCodes(AutoCodeGenerator::CodeMap& map)
 {
-    KCB_DEBUG_ENTRY;
     QPair<AutoCodeGenerator::CodeMap, QDateTime> result = AutoCodeGenerator::CreateCodeMap(m_params);
     map = result.first;
-    KCB_DEBUG_EXIT;
     return map;
 }
 
 AutoCodeGenerator::CodeMap& AutoCodeGenWidget::ProcessCommittedAutoCodeSettings(AutoCodeGenerator::CodeMap& map)
 {
-    KCB_DEBUG_ENTRY;
     if (m_settings.enabled && m_settings.committed)
     {
         map = RequestCodesFromDatabase(map);
         map = RequestActiveCodes(map);
     }
-    KCB_DEBUG_EXIT;
 
     return map;
 }
 
 AutoCodeGenerator::CodeMap& AutoCodeGenWidget::ProcessEnabledAutoCodeSettings(AutoCodeGenerator::CodeMap& map)
 {
-    KCB_DEBUG_ENTRY;
     if (m_settings.enabled && !m_settings.committed)
     {
         map = AutoCodeGeneratorStatic::CreateCodeMapAndStoreNextGenDateTime(m_params);
     }
-    KCB_DEBUG_EXIT;
     return map;
 }
 
@@ -207,23 +192,18 @@ void AutoCodeGenWidget::ShowQrCode(const QString& data)
 
 void AutoCodeGenWidget::InitLockCabinet()
 {
-    KCB_DEBUG_ENTRY;
     m_lock_cabinet.OnNotifyDisableLockSelection();
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::InitControls()
 {
-    KCB_DEBUG_ENTRY;
     ui->vloAutoCodeActiveCodes->addWidget(&m_lock_cabinet);
     ui->pbAutoCodeGenerate->setDisabled(true);
     ui->pbAutoCodeCommit->setDisabled(true);
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::on_cbAutoCodeMode_currentIndexChanged(int index)
 {
-    KCB_DEBUG_TRACE("index" << index);
     QString message("");
 
     if (index == 0)
@@ -236,7 +216,7 @@ void AutoCodeGenWidget::on_cbAutoCodeMode_currentIndexChanged(int index)
     }
     else
     {
-        KCB_DEBUG_EXIT;
+        KCB_DEBUG_TRACE("Invalid index");
         return;
     }
 
@@ -248,13 +228,11 @@ void AutoCodeGenWidget::on_cbAutoCodeMode_currentIndexChanged(int index)
     }
 
     updateUi();
-    KCB_DEBUG_EXIT;
 }
 
 
 void AutoCodeGenWidget::EnableAutoCode()
 {
-    KCB_DEBUG_ENTRY;
     KeyCodeBoxSettings::EnableAutoCode();
     LoadAutoCodeSettings();
     ui->gbAutoCodeEnableDisable->setTitle("Enabled");
@@ -264,12 +242,10 @@ void AutoCodeGenWidget::EnableAutoCode()
     ui->cbAutoCodeMode->setEnabled(true);
     emit NotifyDisableLockSelection();
     emit NotifyAutoCodeEnabled();
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::DisableAutoCode()
 {
-    KCB_DEBUG_ENTRY;
     KeyCodeBoxSettings::DisableAutoCode();
     LoadAutoCodeSettings();
     m_lock_cabinet.clearLockDisplay();
@@ -280,7 +256,6 @@ void AutoCodeGenWidget::DisableAutoCode()
     ShowQrCode("");
     emit NotifyEnableLockSelection();
     emit NotifyAutoCodeDisabled();
-    KCB_DEBUG_EXIT;
 }
 
 int AutoCodeGenWidget::GetUnitIndex()
@@ -298,7 +273,6 @@ int AutoCodeGenWidget::GetUnitIndex()
 
 void AutoCodeGenWidget::LoadAutoCodeSettings()
 {
-    KCB_DEBUG_ENTRY;
     m_settings = KeyCodeBoxSettings::GetAutoCodeSettings();
     ui->leAutoCodePassword->setText(m_settings.password);
 
@@ -316,26 +290,20 @@ void AutoCodeGenWidget::LoadAutoCodeSettings()
 
     m_params.numcodes = KeyCodeBoxSettings::getTotalLocks();
     m_params.id = kcb::GetSystemId();
-
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::StoreAutoCodeSettings()
 {
-    KCB_DEBUG_ENTRY;
     m_settings.password = ui->leAutoCodePassword->text();
     m_settings.email = ui->cbAutoCodeEmailKey->isChecked();
 
     KeyCodeBoxSettings::setAutoCodeSettings(m_settings);
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::UpdateAutoCodeSettings()
 {
-    KCB_DEBUG_ENTRY;
     StoreAutoCodeSettings();
     LoadAutoCodeSettings();
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::UpdateAutoCodeParams()
@@ -351,7 +319,6 @@ void AutoCodeGenWidget::UpdateAutoCodeParams()
 
 void AutoCodeGenWidget::on_pbAutoCodeGenerate_clicked()
 {
-    KCB_DEBUG_ENTRY;
     DisplayParams(m_params);
     if (ui->leAutoCodePassword->text().isEmpty())
     {
@@ -361,7 +328,6 @@ void AutoCodeGenWidget::on_pbAutoCodeGenerate_clicked()
                                 "\n"
                                 "Please enter a password (1 to 20 characters)."),
                             QMessageBox::StandardButton::Ok);
-        KCB_DEBUG_EXIT;
         return;
     }
     ui->pbAutoCodeGenerate->setDisabled(true);
@@ -402,7 +368,6 @@ void AutoCodeGenWidget::on_pbAutoCodeGenerate_clicked()
 
     LoadAutoCodeSettings();
     ui->pbAutoCodeCommit->setEnabled(true);
-    KCB_DEBUG_EXIT;
 }
 
 bool AutoCodeGenWidget::WarnAutoCodeCommit()
@@ -419,8 +384,8 @@ bool AutoCodeGenWidget::WarnAutoCodeCommit()
                          QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
 
     // Note: This loop is contrary to "best practices", but for some reason the message box
-    // remains visible for some time after a button is pressed.  The goal is to have the 
-    // message box removed before leaving this method.
+    // remains visible for some time after a button is pressed.  The goal is to force the 
+    // message box to be removed before leaving this method.
     if (result == QMessageBox::StandardButton::Ok)
     {
         for (int ii = 0; ii < 100; ++ii)
@@ -462,7 +427,6 @@ void AutoCodeGenWidget::HandleAutoCodeCommit()
 
 void AutoCodeGenWidget::on_pbAutoCodeCommit_clicked()
 {
-    KCB_DEBUG_ENTRY;
     bool commit = WarnAutoCodeCommit();
     if (commit)
     {
@@ -470,17 +434,14 @@ void AutoCodeGenWidget::on_pbAutoCodeCommit_clicked()
         SendAutoCodeEmail();
         emit NotifyAutoCodeEnabled();
     }
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::OnLockSelectionChanged()
 {
-    KCB_DEBUG_ENTRY;
     if (AutoCodeGeneratorStatic::IsEnabled())
     {
         m_lock_cabinet.OnNotifyDisableLockSelection();
     }
-    KCB_DEBUG_EXIT;
 }
 
 bool AutoCodeGenWidget::WarnAutoCodeEnable()
@@ -554,8 +515,6 @@ void AutoCodeGenWidget::HandleAutoCodeDisable()
 
 void AutoCodeGenWidget::on_gbAutoCodeEnableDisable_clicked(bool checked)
 {
-    KCB_DEBUG_ENTRY;
-
     if (checked)
     {
         HandleAutoCodeEnable();
@@ -564,7 +523,6 @@ void AutoCodeGenWidget::on_gbAutoCodeEnableDisable_clicked(bool checked)
     {
         HandleAutoCodeDisable();
     }
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::on_cbAutoCodePeriod_currentIndexChanged(int index)
@@ -598,7 +556,6 @@ void AutoCodeGenWidget::on_cbAutoCodePeriodUnits_currentIndexChanged(int index)
 
 void AutoCodeGenWidget::updateUi()
 {
-    KCB_DEBUG_ENTRY;
     bool autocode_enabled = ui->gbAutoCodeEnableDisable->isChecked();
     bool units_changed = m_params.units != ui->cbAutoCodePeriodUnits->currentText().toInt();
     bool code_len_changed = m_params.codelength != ui->spAutoCodeCodeLength->value();
@@ -614,7 +571,6 @@ void AutoCodeGenWidget::updateUi()
 
     ui->pbAutoCodeGenerate->setEnabled(modified);
     ui->leAutoCodePassword->setStyleSheet((autocode_enabled && password_empty) ? css_warn : css_none);
-    KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::on_cbAutoCodeEmailKey_clicked()

@@ -83,6 +83,9 @@ class KeyCodeBoxSettings : public QObject
         static QByteArray GetAutoCodeKey();
         static QString GetAutoCodePassword();
         static QDateTime GetAutoCodeNextGenDateTime();
+        static bool IsInternetTimeEnabled();
+        static void EnableInternetTime();
+        static void DisableInternetTime();
 
 
     private:
@@ -99,6 +102,8 @@ class KeyCodeBoxSettings : public QObject
         static void SetAutoCodeEnableState(bool state);
         static void SetAutoCodeDefaults();
         static SelectionType GetLockSelectionType();
+        static void SetInternetTimeSetting(bool value);
+        static bool GetInternetTimeSetting();
 
 };
 

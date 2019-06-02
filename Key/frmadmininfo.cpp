@@ -304,24 +304,7 @@ int CFrmAdminInfo::getDisplayPowerDownTimeout()
 
 bool CFrmAdminInfo::isInternetTime()
 {
-    FILE *pF;
-    std::string sOutput = "";
-
-    pF = popen(CMD_LIST_SYSTEM_FLAGS, "r");
-    if(!pF)
-    {
-        qDebug() << "failed to list system flags";
-    }
-
-    ExtractCommandOutput(pF, sOutput);
-    fclose(pF);
-
-    if( sOutput.find("internetTime") != std::string::npos )
-    {
-        return true;
-    }
-
-    return false;
+    return KeyCodeBoxSettings::IsInternetTimeEnabled();
 }
 
 void CFrmAdminInfo::initialize()
@@ -346,11 +329,13 @@ void CFrmAdminInfo::initialize()
 
     setupCodeTableContextMenu();
 
-    if( isInternetTime() )
+    bool is_internettime = isInternetTime();
+    if( is_internettime )
     {
         ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
-        ui->dtSystemTime->setDisabled(true);
-        ui->cbInternetTime->setChecked(true);
+        ui->dtSystemTime->setDisabled(is_internettime);
+        ui->cbInternetTime->setChecked(is_internettime);
+        ui->btnSetTime->setDisabled(is_internettime);
     }
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabSelected(int)));
@@ -464,15 +449,7 @@ void CFrmAdminInfo::setTimeZone()
 {
     KCB_DEBUG_ENTRY;
 
-    QString unlink = QString("sudo unlink /etc/localtime");
-    QString link = QString("sudo ln -s /usr/share/zoneinfo/") + ui->cbTimeZone->currentText() + QString(" /etc/localtime");
-
-    qDebug() << "timezone change: ";
-    qDebug() << unlink;
-    qDebug() << link;
-
-    std::system(unlink.toStdString().c_str());
-    std::system(link.toStdString().c_str());
+    kcb::SetTimeZone(ui->cbTimeZone->currentText());
 
     if(ui->cbInternetTime->isChecked())
     {
@@ -662,8 +639,7 @@ void CFrmAdminInfo::insertCodes(CodeListing& codeListing)
                         code->question1(), 
                         code->question2(), 
                         code->question3(),
-                        code->accesstype(),
-                        code->autocode());
+                        code->accesstype());
         HandleCodeUpdate();
 
     }
@@ -891,44 +867,31 @@ void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
 
 void CFrmAdminInfo::on_cbInternetTime_clicked()
 {
-    // Internet time set checked
-    if(ui->cbInternetTime->isChecked())
+    bool is_checked = ui->cbInternetTime->isChecked();
+    ui->btnSetTime->setDisabled(is_checked);
+    ui->dtSystemTime->setDisabled(is_checked);
+    ui->cbTimeZone->setDisabled(is_checked);
+
+    if (ui->cbInternetTime->isChecked())
     {
-        //we check this flag in keycodeboxmain.cpp
-        std::system("touch /home/pi/run/internetTime.flag");
+        KeyCodeBoxSettings::EnableInternetTime();
 
+        kcb::EnableInternetTime();
         setTimeZone();
-        ui->dtSystemTime->setDisabled(true);
-        // update system time here
-        KCB_DEBUG_TRACE("ntp ON");
-        std::system("sudo /etc/init.d/ntp stop");
-
-        QCoreApplication::processEvents();
-        KCB_DEBUG_TRACE("ntpd -s");
-        std::system("sudo ntpd -s");
-        KCB_DEBUG_TRACE("ntp OFF");
-
-        QCoreApplication::processEvents();
-
-        std::system("sudo /etc/init.d/ntp start");
-        KCB_DEBUG_TRACE("setting datetime text");
-        ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
     }
     else
     {
-        std::system("rm -rf /home/pi/run/internetTime.flag");
-        ui->dtSystemTime->setDisabled(false);
-        ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
+        KeyCodeBoxSettings::DisableInternetTime();
+        kcb::DisableInternetTime();
     }
+
+    ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
 }
 
 void CFrmAdminInfo::on_btnSetTime_clicked()
 {
-    if( !isInternetTime() )
-    {
-        setTime();
-        setTimeZone();
-    }
+    setTime();
+    setTimeZone();
 }
 
 void CFrmAdminInfo::OnCloseAdmin() 
@@ -1398,14 +1361,7 @@ void CFrmAdminInfo::OnNotifyGenerateReport()
 
 void CFrmAdminInfo::setTime()
 {
-    // setTime
-    QDateTime   dt = ui->dtSystemTime->dateTime();
-    QString updateTime = "sudo ntpq -p";
-    QString sDate = QString("sudo date ") + dt.toString("MMddhhmmyyyy.ss");
-    std::system(updateTime.toStdString().c_str());
-    std::system(sDate.toStdString().c_str());
-    KCB_DEBUG_TRACE("system time:" << sDate);
-    std::system("sudo hwclock --systohc");    // Set the hardware clock
+    kcb::SetDateTime(ui->dtSystemTime->dateTime());
 }
 
 void CFrmAdminInfo::OnCodeEditClose()
@@ -1445,8 +1401,7 @@ void CFrmAdminInfo::setPStateValues(QString lockNums,
                                     QString question1, 
                                     QString question2, 
                                     QString question3,
-                                    int access_type,
-                                    bool autocode)
+                                    int access_type)
 {
     _pState->setLockNums(lockNums);
     _pState->setCode1(sAccessCode);
@@ -1486,8 +1441,6 @@ void CFrmAdminInfo::setPStateValues(QString lockNums,
     {
         _pState->setMaxAccess(2);
     }
-
-    _pState->setAutoCode(autocode);
 }
 
 void CFrmAdminInfo::HandleCodeUpdate()
@@ -1916,9 +1869,7 @@ void CFrmAdminInfo::OnTabSelected(int index)
     }
     else if (index == AUTOCODE_TAB_INDEX)
     {
-        KCB_DEBUG_TRACE("selected autocode tab");
         UpdateAutoCodeDisplay();
-        KCB_DEBUG_TRACE("process autocode tab selection");
     }
     else if (index == DOORS_TAB_INDEX)
     {

@@ -27,8 +27,6 @@ class Code
         int accesstype() const {return m_accesstype;}
         void setAccessType(const int& value) {m_accesstype = value;}
         bool askquestion() const {return m_ask_question;}
-        void setAutoCode(const bool& value) {m_autocode = value;}
-        bool autocode() { return m_autocode; }
 
         void print() const;
 
@@ -44,7 +42,6 @@ class Code
         QString m_endtime;
         int m_accesstype;
         bool m_ask_question;
-        bool m_autocode;
 };
 
 #endif

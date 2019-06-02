@@ -974,4 +974,41 @@ namespace kcb
         return QString("keycodebox-%1").arg(GetRpiSerialNumber());
     }
 
+    void EnableInternetTime()
+    {
+        // The following code works with init.d ntp service
+        std::system("sudo /etc/init.d/ntp stop");
+        std::system("sudo ntpd -s");
+        std::system("sudo /etc/init.d/ntp start");
+
+        // The following code works with systemd via timedatectl
+        // See this thread and kcb-config/scripts/kcb-ntpsetup.sh
+        // info on systemd configuration.
+        // When the image is updated to remove init.d and use only systemd
+        // this code can be incorporated.
+        // std::system("sudo timedatectl set-ntp true");
+    }
+
+    void DisableInternetTime()
+    {
+        std::system("sudo /etc/init.d/ntp stop");
+        // std::system("sudo timedatectl set-ntp false");
+    }
+
+    void SetDateTime(const QDateTime& datetime)
+    {
+        QString updateTime = "sudo ntpq -p";
+        QString sysDate("sudo date %1");
+        sysDate.arg(datetime.toString("MMddhhmmyyyy.ss"));
+        std::system(sysDate.toStdString().c_str());
+        std::system("sudo hwclock --systohc");
+    }
+
+    void SetTimeZone(const QString& timezone)
+    {
+        QString unlink = QString("sudo unlink /etc/localtime");
+        QString link = QString("sudo ln -s /usr/share/zoneinfo/%1 %2").arg(timezone).arg(QString(" /etc/localtime"));
+        std::system(unlink.toStdString().c_str());
+        std::system(link.toStdString().c_str());
+    }
 }

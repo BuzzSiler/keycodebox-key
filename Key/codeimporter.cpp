@@ -13,7 +13,9 @@
 #include "codeelement.h"
 
 
-CodeImporter::CodeImporter(CodeImportExportUtil::CODEFORMAT format, const QString& root_path, CodeImportExportUtil::CODESECURITY security)
+CodeImporter::CodeImporter(CodeImportExportUtil::CODEFORMAT format, 
+                           const QString& root_path, 
+                           CodeImportExportUtil::CODESECURITY security)
     :
     m_format(format),
     m_root_path(root_path),
@@ -27,7 +29,6 @@ CodeImporter::~CodeImporter()
 
 bool CodeImporter::import(CodeListing& codeListing)
 {
-    KCB_DEBUG_ENTRY;
     bool result = false;
 
     QFile file(m_root_path);
@@ -60,7 +61,8 @@ bool CodeImporter::import(CodeListing& codeListing)
     }
 
     file.close();
-    KCB_DEBUG_EXIT;
+    result = true;
+
     return result;
 }
 
@@ -78,8 +80,6 @@ bool CodeImporter::ImportAsXml(QFile& file, CodeListing& codeListing)
 
 bool CodeImporter::ImportAsJson(QFile& file, CodeListing& codeListing)
 {
-    KCB_DEBUG_ENTRY;
-
     QJsonParseError jsonError;
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &jsonError);
     if (jsonError.error != QJsonParseError::NoError)
@@ -112,8 +112,6 @@ bool CodeImporter::ImportAsJson(QFile& file, CodeListing& codeListing)
 
     QJsonArray codes = root_obj["codes"].toArray();
 
-    KCB_DEBUG_TRACE("found" << codes.count() << "codes");
-
     foreach (const QJsonValue & value, codes) 
     {
         QJsonObject code_obj = value.toObject();
@@ -135,18 +133,15 @@ bool CodeImporter::ImportAsJson(QFile& file, CodeListing& codeListing)
         code->setStartTime(code_obj["starttime"].toString());
         code->setEndTime(code_obj["endtime"].toString());
         code->setAccessType(code_obj["access_type"].toInt());
-        code->setAutoCode(code_obj["autocode"].toInt());
 
         codeListing.addCode(code);
     }
 
-    KCB_DEBUG_EXIT;
     return true;
 }
 
 bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
 {
-    KCB_DEBUG_ENTRY;
     QStringList header;
     bool first_line = true;
 
@@ -159,7 +154,6 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
     while (!in.atEnd()) 
     {
         line = in.readLine();
-        KCB_DEBUG_TRACE("line:" << line);
         QRegularExpressionMatchIterator iter = regex.globalMatch(line, 0);
         line.clear();
 
@@ -174,7 +168,6 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
                 header.append(match.captured(regex.captureCount() - 1));
 
             }
-            KCB_DEBUG_TRACE("header:" << header);
             num_fields = header.count();
         }
         else
@@ -208,10 +201,8 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
                 {
                     field = match.captured(2);
                 }                    
-                KCB_DEBUG_TRACE("field" << field << "(" << field.isEmpty() << ")");
                 record.append(field);
             }
-            KCB_DEBUG_TRACE("record" << record);
 
             if (record.count() != num_fields)
             {
@@ -233,8 +224,6 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
                 }
 
                 value = record[index];
-
-                KCB_DEBUG_TRACE("Entry" << entry << "Index" << index << "Value" << value);
 
                 if (entry == "locknums")
                 {
@@ -276,10 +265,6 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
                 {
                     code->setAccessType(value.toInt());
                 }
-                else if (entry == "autocode")
-                {
-                    code->setAutoCode(static_cast<bool>(value.toInt()));
-                }
             }
 
             codeListing.addCode(code);
@@ -290,7 +275,6 @@ bool CodeImporter::ImportAsCsv(QFile& file, CodeListing& codeListing)
     // provided when the importer was created, i.e., m_security.
     codeListing.setEncrypted(m_security == CodeImportExportUtil::ENCRYPTED_SECURITY);
     
-    KCB_DEBUG_EXIT;
     return true;
 }
 
