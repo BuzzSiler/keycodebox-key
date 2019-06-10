@@ -151,10 +151,6 @@ class CFrmAdminInfo : public QDialog
         void on_treeViewCopy_clicked(const QModelIndex &index);
         void onCopyRootPathChanged(QString path);
         void onCopyModelDirectoryLoaded(QString path);
-        void on_btnCopyFile_clicked();
-
-        void on_btnCopyFileBrandingImage_clicked();
-        void on_btnCopyFileBrandingImageReset_clicked();
 
         void on_btnRebootSystem_clicked();
         void on_btnPurgeCodes_clicked();
@@ -241,6 +237,7 @@ class CFrmAdminInfo : public QDialog
         UTIL_ACTION_TYPE    m_util_action;
         QStandardItemModel& m_model;
         AutoCodeGenWidget& m_autocodegen;
+        int m_last_index;
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
 
@@ -288,7 +285,10 @@ class CFrmAdminInfo : public QDialog
         void SetCabinetInfo();
         void setLockStateDefaults(CLockState& state);
         void UpdateAutoCodeDisplay();
-        
+        void OnUtilActionInstallApp();
+        void OnUtilActionSetBrandingImage();
+        void OnUtilActionDefaultBrandingImage();
+
     protected:
         void touchEvent(QTouchEvent *ev);
         bool eventFilter(QObject *target, QEvent *event);

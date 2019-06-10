@@ -1,11 +1,13 @@
 #include "keycodeboxmain.h"
 #include "ui_mainwindow.h"
 
+#include <iostream>
+#include <cstdlib>
+
 #include <QDateTime>
 #include <QProcess>
 #include <QScreen>
-#include <iostream>
-#include <cstdlib>
+#include <QThread>
 
 #include "usbcontroller.h"
 #include "lockcontroller.h"
@@ -13,9 +15,7 @@
 #include "frmadmininfo.h"
 #include "frmusercode.h"
 #include "frmadminpassword.h"
-
 #include "encryption.h"
-
 #include "hidreader.h"
 #include "magtekcardreader.h"
 #include "systemcontroller.h"
@@ -23,19 +23,9 @@
 #include "logger.h"
 #include "kcbsystem.h"
 #include "kcbkeyboarddialog.h"
+#include "keycodeboxsettings.h"
 
 MainWindow      *gpmainWindow;
-
-void MainWindow::ExtractCommandOutput(FILE *pF, std::string &rtnStr)
-{
-    char cChar = '\0';
-
-    while(!feof(pF))
-    {
-        cChar = fgetc(pF);
-        rtnStr += cChar;
-    }
-}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _psystemController(new CSystemController(this)),
     kkd(*new KcbKeyboardDialog(this, true))
 {
+    qDebug() << QThread::currentThreadId();
+
     ui->setupUi(this);
 
     LOG_TRACE_DEBUG("starting application");
@@ -62,11 +54,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     if( _pPixmap->isNull() )
     {
-        qDebug() << "Failed to load image, loading backup!";
+        KCB_DEBUG_TRACE("Failed to load image, loading backup!");
 
         _pPixmap = new QPixmap("/home/pi/kcb-config/images/alpha_logo_touch.jpg");
         if(_pPixmap->isNull()) {
-            qDebug() << "Failed to load image!";
+            KCB_DEBUG_TRACE("Failed to load image!");
         }
     }
 
@@ -84,6 +76,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QDateTime currdt = QDateTime::currentDateTime();
     QDateTime dt = CEncryption::roundDateTime(10, currdt);
 
+    _psystemController = new CSystemController(/* moveToThread - DO NOT SET PARENT */);
+
+
     connect(_psystemController, SIGNAL(__OnDisplayCodeDialog(QObject*)), this, SLOT(OnDisplayCodeDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayUserCodeTwoDialog(QObject*)), this, SLOT(OnDisplayUserCodeTwoDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayAdminPasswordDialog(QObject*)), this, SLOT(OnDisplayAdminPasswordDialog(QObject*)));
@@ -94,27 +89,26 @@ MainWindow::MainWindow(QWidget *parent) :
     // When the touch screen is touched, we want to 
     //     - notify the system controller
     //     - stop the display power down timer
-    connect(this, SIGNAL(__TouchScreenTouched()), _psystemController, SLOT(OnTouchScreenTouched()));    
+    connect(this, SIGNAL(__TouchScreenTouched()), _psystemController, SLOT(OnTouchScreenTouched()));
     connect(this, SIGNAL(__TouchScreenTouched()), _pdisplayPowerDown, SLOT(stop()));
     // When the display is powered up, we want to start the display power down timer
     connect(this, SIGNAL(__DisplayPoweredOn()), this, SLOT(OnDisplayPoweredOn()));
     // When the display power down timer expires, we want to power down the display
-    connect(_pdisplayPowerDown, SIGNAL(timeout()), this, SLOT(OnDisplayPowerDown()));    
+    connect(_pdisplayPowerDown, SIGNAL(timeout()), this, SLOT(OnDisplayPowerDown()));
 
     connect(_psystemController, SIGNAL(__OnDisplayTimeoutScreen()), this, SLOT(OnDisplayTimeoutScreen()));
 
     connect(_psystemController, SIGNAL(__onUserCodeOne(QString)), this, SLOT(OnUserCodeOne(QString)));
-    connect(_psystemController, SLOT(__onUserCodeTwo(QString)), this, SLOT(OnUserCodeTwo(QString)));
+    connect(_psystemController, SIGNAL(__onUserCodeTwo(QString)), this, SLOT(OnUserCodeTwo(QString)));
 
     connect(_psystemController, SIGNAL(__onUserFingerprintCodeOne(QString)), this, SLOT(OnUserFingerprintCodeOne(QString)));
-    connect(_psystemController, SLOT(__onUserFingerprintCodeTwo(QString)), this, SLOT(OnUserFingerprintCodeTwo(QString)));
+    connect(_psystemController, SIGNAL(__onUserFingerprintCodeTwo(QString)), this, SLOT(OnUserFingerprintCodeTwo(QString)));
 
     _psystemController->setMainWindow(this);
     _sysControlThread.setSystemController(_psystemController);
 
     gpmainWindow = this;
 
-    KCB_DEBUG_TRACE("moveToThread");
     _psystemController->moveToThread(&_sysControlThread);
     SetupAdmin(_psystemController);
     _sysControlThread.start();
@@ -124,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::SetupAdmin(QObject *psysController)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (!_pfAdminInfo)
     {
         _pfAdminInfo = new CFrmAdminInfo(this);
@@ -138,35 +132,16 @@ void MainWindow::SetupAdmin(QObject *psysController)
     connect(_psystemController, SIGNAL(__OnDisplayShowHideButton(bool)), _pfAdminInfo, SLOT(OnDisplayShowHideButton(bool)));
     connect(_psystemController, SIGNAL(__OnDisplayTakeReturnButtons(bool)), _pfAdminInfo, SLOT(OnDisplayTakeReturnButtons(bool)));
     connect(_psystemController, SIGNAL(__OnUpdateCodes()), _pfAdminInfo, SLOT(OnUpdateCodes()));
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 bool MainWindow::isInternetTime()
 {
-    FILE *pF;
-    std::string sOutput = "";
-    QString flagListCmd = "ls /home/pi/run/* | grep 'flag'";
-
-    pF = popen(flagListCmd.toStdString().c_str(), "r");
-    if(!pF)
-    {
-        qDebug() << "failed to list system flags";
-    }
-
-    ExtractCommandOutput(pF, sOutput);
-    fclose(pF);
-
-    qDebug() << "MainWindow::isInternetTime(), " << QString::fromStdString(sOutput);
-    qDebug() << "MainWindow::isInternetTime(), " << QString::number(sOutput.find("internetTime"));
-
-    if( sOutput.find("internetTime") != std::string::npos )
-        return true;
-
-    qDebug() << "MainWindow::isInternetTime(), internetTime FALSE";
-    return false;
+    return KeyCodeBoxSettings::IsInternetTimeEnabled();
 }
 
-void MainWindow::initialize() {
+void MainWindow::initialize() 
+{
     _pfUsercode = 0;
     _pfAdminInfo = 0;
     _pdFingerprint = 0;
@@ -177,13 +152,7 @@ void MainWindow::initialize() {
 
     if( isInternetTime() )
     {
-        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp ON";
-        std::system("sudo /etc/init.d/ntp stop");
-
-        QCoreApplication::processEvents();
-        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntpd -s";
-        std::system("sudo ntpd -s");
-        qDebug() << "CFrmAdminInfo::on_cbInternetTime_clicked(), ntp OFF";
+        kcb::EnableInternetTime();
     }
 }
 
@@ -217,7 +186,7 @@ void MainWindow::OnDisplayPoweredOn()
 
 void MainWindow::OnImageClicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (kcb::isDisplayPowerOn())
     {
         emit gpmainWindow->__TouchScreenTouched();
@@ -228,12 +197,12 @@ void MainWindow::OnImageClicked()
 
         emit gpmainWindow->__DisplayPoweredOn();
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayTimeoutScreen()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     // hide any open screens to show the touch screen to start
     if(_pfUsercode) 
@@ -257,15 +226,14 @@ void MainWindow::OnDisplayTimeoutScreen()
 
     OnDisplayPoweredOn();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayCodeDialog(QObject *psysController)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if(!_pfUsercode)
     {
-        KCB_DEBUG_TRACE("new CFrmUserCode");
         _pfUsercode = new CFrmUserCode(this);
         connect(psysController, SIGNAL(__OnClearEntry()), _pfUsercode, SLOT(OnClearCodeDisplay()));
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
@@ -308,7 +276,6 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
     }
     else
     {
-        KCB_DEBUG_TRACE("hiding all forms except user code");
         hideFormsExcept(_pfUsercode);
 
         disconnect(_pfUsercode, SIGNAL(__CodeEntered(QString)), psysController, 0);
@@ -321,12 +288,12 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
     _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());
     _pfUsercode->SetDisplayTakeReturnButtons(_psystemController->getDisplayTakeReturnButtons());
     _pfUsercode->show();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if(!_pfUsercode) 
     {
         _pfUsercode = new CFrmUserCode(this);
@@ -354,7 +321,7 @@ void MainWindow::OnDisplayUserCodeTwoDialog(QObject *psysController)
     _pfUsercode->SetDisplayShowHideButton(_psystemController->getDisplayShowHideButton());    
     _pfUsercode->SetDisplayTakeReturnButtons(_psystemController->getDisplayTakeReturnButtons());  
     _pfUsercode->show();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
@@ -364,7 +331,7 @@ void MainWindow::OnDisplayThankYouDialog(QObject *psysController)
 
 void MainWindow::hideFormsExcept(QDialog * pfrm) 
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (&kkd != pfrm)
     {
         kkd.hide();
@@ -382,12 +349,12 @@ void MainWindow::hideFormsExcept(QDialog * pfrm)
     pfrm->activateWindow();
     pfrm->raise();
     pfrm->setFocus();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     bool result = kcb::isVncConnectionActive();
     if (result)
     {
@@ -403,7 +370,7 @@ void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
     hideFormsExcept(&kkd);
     kkd.resetPassword();  
     kkd.show();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 /**
@@ -413,22 +380,21 @@ void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
  */
 void MainWindow::OnAdminSecurityCheckFailed()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     kkd.invalidPassword();
     kkd.show();
     hideFormsExcept(&kkd);
 
-    // Start a timer for 5 seconds default
     QTimer::singleShot(5000, this, SLOT(ResetKeyboard()));
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::ResetKeyboard()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     kkd.resetPassword();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
@@ -445,27 +411,25 @@ void MainWindow::OnDisplayAdminMainDialog(QObject *psysController)
 
 void MainWindow::OnAdminPasswordCancel()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     kcb::TurnOnDisplay();
     kkd.hide();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnUserCodeCancel()
 {
-    KCB_DEBUG_ENTRY;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnUserCodeOne(QString sCode1)
 {
-    qDebug() << "MainWindow::OnUserCodeTwo" << sCode1;
     emit __onCode(sCode1);
 }
 
 void MainWindow::OnUserCodeTwo(QString sCode2)
 {
-    qDebug() << "MainWindow::OnUserCodeTwo" << sCode2;
     emit __onCode(sCode2);
 }
 
@@ -488,31 +452,31 @@ void MainWindow::OnEnrollFingerprintDialog(QString sCode)
 {
     Q_UNUSED(sCode);
 
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     _pdFingerprint->show();
     _pdFingerprint->setDefaultStage(1);
     _pdFingerprint->setMessage("");
     _pdFingerprint->setOkDisabled(true);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnQuestionUserDialog(QString lockNum, QString question1, QString question2, QString question3)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     // Needed to force all other windows hidden.  This is a kludge -- hopefully temporary
     hideFormsExcept(_pQuestions);
     _pQuestions->setValues(lockNum, question1, question2, question3);
     // Needed to force the questions dialog to the top
     _pQuestions->raise();
     _pQuestions->show();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void MainWindow::OnQuestionUserDialogClose()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _pQuestions->hide();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }

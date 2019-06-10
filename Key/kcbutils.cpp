@@ -17,7 +17,7 @@ namespace kcb
 
     void ClassAllocation::DestructorMsg(const QString& value)
     {
-        qDebug() << DESTRUCTOR_MSG.arg(value);
+        KCB_DEBUG_TRACE(DESTRUCTOR_MSG.arg(value));
     }
 
     void ClassAllocation::DestructorMsg(const QObject * const object)
@@ -44,7 +44,7 @@ namespace kcb
 
     QPixmap CreateQrCode(const QByteArray& data)
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
         QString stdOut;
         QString stdErr;
         int status;
@@ -55,10 +55,8 @@ namespace kcb
         {
             if (QFile::exists("/home/pi/kcb-config/scripts/qrcode.png"))
             {
-                KCB_DEBUG_TRACE("create new qrcode");
                 if (QFile::exists("/home/pi/kcb-config/scripts/qrcode.png"))
                 {
-                    KCB_DEBUG_TRACE("empty pixmap");
                     QPixmap pm = QPixmap("/home/pi/kcb-config/scripts/qrcode.png", "PNG");
                     QFile::remove("/home/pi/kcb-config/scripts/qrcode.png");
                     return pm;

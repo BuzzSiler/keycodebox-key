@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QPair>
 #include <QJsonDocument>
+#include <QJsonArray>
 
 #include "kcbcommon.h"
 
@@ -24,7 +25,7 @@ CodeExporter::~CodeExporter()
 
 bool CodeExporter::Export(QString filename)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     bool result = false;
 
     QString datetime = QDateTime::currentDateTime().toString(REPORT_FILE_FORMAT);
@@ -51,7 +52,7 @@ bool CodeExporter::Export(QString filename)
         default:
             KCB_DEBUG_TRACE("Invalid format requested");
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return result;
 }
 
@@ -166,6 +167,7 @@ bool CodeExporter::ExportAsCsv(QString filename)
         QString group2 = QString("\"%1\",\"%2\",\"%3\"").arg(pState->getQuestion1()).arg(pState->getQuestion2()).arg(pState->getQuestion3());
         QString group3 = QString("%1,%2,%3").arg(pState->getStartTime().toString(DATETIME_FORMAT)).arg(pState->getEndTime().toString(DATETIME_FORMAT)).arg(pState->getAccessType());
         int num_bytes = file.write(QString("%1,%2,%3,%4\n").arg(group1).arg(group2).arg(group3).toUtf8());
+        Q_UNUSED(num_bytes);
     }
 
     file.close();

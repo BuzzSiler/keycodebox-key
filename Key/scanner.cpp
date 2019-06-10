@@ -95,18 +95,18 @@ Reader 0: HID OMNIKEY 5427 CK (010100534841353633015B4923175730) 00 00
 
     if (is_omnikey5427_reader)
     {
-        KCB_DEBUG_TRACE("OMNIKEY5427 Reader Detected");
+        // KCB_DEBUG_TRACE("OMNIKEY5427 Reader Detected");
     }
 
     QString card_state = is_card_inserted_removed ? "Card Inserted" : "Card Removed";
-    KCB_DEBUG_TRACE(card_state);
+    // KCB_DEBUG_TRACE(card_state);
 
     QString atr_state = is_valid_atr ? "Valid ATR" : "Invalid ATR";
-    KCB_DEBUG_TRACE(atr_state);
+    // KCB_DEBUG_TRACE(atr_state);
 
     if (is_omnikey5427_reader && is_card_inserted_removed && is_valid_atr)
     {
-        KCB_DEBUG_TRACE("Everything is good.  Go get the UID");
+        // KCB_DEBUG_TRACE("Everything is good.  Go get the UID");
 
         QProcess proc;
         proc.start(QString("opensc-tool"), QStringList() << "-s" << "ffca000000");

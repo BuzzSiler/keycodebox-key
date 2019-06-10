@@ -1,4 +1,5 @@
 #include "modelsecurity.h"
+
 #include <sqlite3.h>
 #include <sqlite3ext.h>
 #include "encryption.h"
@@ -9,6 +10,7 @@
 #include <QTextStream>
 #include <QIODevice>
 #include <QDateTime>
+
 #include "kcbcommon.h"
 #include "kcbapplication.h"
 #include "kcbsystem.h"
@@ -20,14 +22,12 @@ static bool fleetwave_enabled;
 void CModelSecurity::openDatabase()
 {
     _DB = QSqlDatabase::addDatabase( "QSQLITE", "SQLITE" );
-    // Get the app directory
     QString sPath = "/home/pi/run/Alpha.db";
-    qDebug() << "Path:" << sPath;
     _DB.setDatabaseName(sPath);
 
     if( !_DB.open() )
     {
-        qDebug() << _DB.lastError();
+        KCB_DEBUG_TRACE(_DB.lastError());
         qFatal( "Failed to connect." );
     }
 }
@@ -35,9 +35,7 @@ void CModelSecurity::openDatabase()
 CModelSecurity::CModelSecurity(QObject *parent) : QObject(parent)
 {
     initialize();
-
-    qDebug( "Connected!" );
-
+    KCB_DEBUG_TRACE( "Connected!" );
     fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
 }
 
@@ -49,19 +47,16 @@ CModelSecurity::~CModelSecurity()
 void CModelSecurity::OnReadLockSet(QString LockNums, QDateTime start, QDateTime end)
 {
     CLockSet    *pLockSet;
-
     _ptblCodes->selectCodeSet(LockNums, start, end, &pLockSet, true);
     emit __OnLockSet(pLockSet);
 }
 
 void CModelSecurity::readAllCodes(CLockSet **lockset, bool clear_or_encrypted)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QString locknums("*");
-
     _ptblCodes->selectCodeSet(locknums, DEFAULT_DATE_TIME, QDateTime::currentDateTime(), lockset, clear_or_encrypted);
-
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end)
@@ -102,7 +97,6 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 
 void CModelSecurity::OnUpdateCodeState(CLockState *rec)
 {
-    KCB_DEBUG_ENTRY;
     bool bSuccess = _ptblCodes->updateCode(rec);
 
     emit __OnUpdatedCodeState(bSuccess);
@@ -170,9 +164,7 @@ void CModelSecurity::setupTables()
 
 void CModelSecurity::OnVerifyCodeOne(QString code)
 {
-    KCB_DEBUG_TRACE(code);
-
-    _type = "";  // "User" or "Admin" or "Assist" or ""
+    _type = "";
 
     _type = _ptblAdmin->isAccessCode(code);
     if(_type == "Admin" || _type == "Assist")
@@ -187,18 +179,15 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
             if ( kcb::Application::isTakeSelection() )
             {
                 QString lockNum;
-                KCB_DEBUG_TRACE("(CHEVIN) Received Take Code request" << code);
                 KCB_DEBUG_TRACE("(CHEVIN) Requesting authorization ...");
                 fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendTakeRequest(code, lockNum);
                 if (result == fleetwave::FLEETWAVE_OK)
                 {
                     emit __OnSecurityCheckSuccess(lockNum);
 
-                    KCB_DEBUG_TRACE("(CHEVIN) Lock opened ... Sending Confirmation to Chevin");
                     result = fleetwave::SendTakeComplete(code, lockNum);
                     if (result == fleetwave::FLEETWAVE_OK)
                     {
-                        KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Take Complete");
                     }
                 }
 
@@ -227,17 +216,14 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                 QString question2;
                 QString question3;
 
-                KCB_DEBUG_TRACE("(CHEVIN) Received Return Code Request" << code);
                 KCB_DEBUG_TRACE("(CHEVIN) Requesting Chevin to authorize ...");
                 fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendReturnRequest(code, lockNum, question1, question2, question3);
                 if (result == fleetwave::FLEETWAVE_OK)
                 {
-                    KCB_DEBUG_TRACE("(CHEVIN) Success send Return Request");
                     emit __QuestionUserDialog(lockNum,
                                             question1,
                                             question2,
                                             question3);
-                    KCB_DEBUG_TRACE("(CHEVIN) Return from __QuestionUserDialog");
                 }
                 else if (result == fleetwave::FLEETWAVE_ERROR)
                 {
@@ -271,13 +257,10 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
             QString sCodeEnc = CEncryption::encryptString(code);
             QString lockNums;
 
-            KCB_DEBUG_TRACE("Encrypted Code" << sCodeEnc);
-
             int result = _ptblCodes->checkCodeOne(sCodeEnc,
                                                 bSecondCodeRequired,
                                                 bFingerprintRequired,
                                                 lockNums);
-            KCB_DEBUG_TRACE("Result" << result << "Locks" << lockNums);
             if( result == KCB_SUCCESS && lockNums != "" )
             {
                 // need to check if fingerprint security is enabled
@@ -313,7 +296,6 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                         {
                             emit __OnSecurityCheckedFailed();
                         }
-                        KCB_DEBUG_TRACE("fingerprint required");
                         return;
                     }
 
@@ -327,15 +309,13 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
         }
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 {
     // Check the DB
     _type = "";  // "User" or "Admin" or "Assist"
-
-    qDebug() << "CModelSecurity::OnVerifyFingerprintCodeOne. Code:" << code;
 
     _type = _ptblAdmin->isAccessCode(code);
     if(_type == "Admin" || _type == "Assist") 
@@ -389,8 +369,6 @@ void CModelSecurity::OnVerifyFingerprintCodeOne(QString code)
 
 void CModelSecurity::OnVerifyCodeTwo(QString code)
 {
-    KCB_DEBUG_TRACE(code);
-
     bool bFingerprintRequired = false;
     QString codeOne;
     bool bAskQuestions = false;
@@ -414,8 +392,6 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
     {
         QString lockNums;
 
-        KCB_DEBUG_TRACE("code1" << codeOne << "code2" << code);
-
         int result = _ptblCodes->checkCodeTwo(code,
                                              bFingerprintRequired,
                                              codeOne,
@@ -424,10 +400,8 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                                              question1,
                                              question2,
                                              question3);
-        KCB_DEBUG_TRACE("Locks" << lockNums);
         if (result == KCB_SUCCESS && lockNums != "")
         {
-            KCB_DEBUG_TRACE(lockNums);
 
             //we need to check if a fingerprint directory already exists,
             // if they do, do not attempt enrollmesnt
@@ -441,31 +415,25 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
 
                 if ( !QDir( QString("%1%2.%3").arg("/home/pi/run/prints/").arg(codeOne).arg(code) ).exists() )
                 {
-                    KCB_DEBUG_TRACE("fp check success" << codeOne << "." << code);
                     emit __EnrollFingerprintDialog(codeOne + "." + code);
                     emit __EnrollFingerprint(codeOne + "." + code);
                 }
                 else
                 {
-                    KCB_DEBUG_TRACE("fp check failed");
+                    // KCB_DEBUG_TRACE("fp check failed");
                     emit __OnSecurityCheckedFailed();
                 }
 
                 return;
             }
 
-            KCB_DEBUG_TRACE("bAskQuestions" << bAskQuestions);
             if ( bAskQuestions && kcb::Application::isReturnSelection() )
             {
-                qDebug() << "QUESTION1: " << question1;
-                qDebug() << "QUESTION2: " << question2;
-                qDebug() << "QUESTION3: " << question3;
-
                 emit __QuestionUserDialog(lockNums,question1,question2,question3);
             }
             else
             {
-                KCB_DEBUG_TRACE("check success" << lockNums);
+                // KCB_DEBUG_TRACE("check success" << lockNums);
                 emit __OnSecurityCheckSuccess(lockNums);
             }
         }
@@ -476,12 +444,12 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
         }
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     
     emit __OnSecurityCheckSuccessWithAnswers(lockNums, answer1, answer2, answer3);
 
@@ -490,7 +458,7 @@ void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString 
         fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendReturnComplete(lockNums, answer1, answer2, answer3);
         if (result == fleetwave::FLEETWAVE_OK)
         {
-            KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Return Complete");
+            // KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Return Complete");
         }
         else if (result == fleetwave::FLEETWAVE_ERROR)
         {
@@ -509,12 +477,11 @@ void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString 
         }
     }
     
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnQuestionUserCancelled()
 {
-    KCB_DEBUG_ENTRY;
     _ptblCodes->updateLockboxState(_ptblCodes->_lastIDS, true);
 }
 
@@ -558,21 +525,18 @@ void CModelSecurity::OnVerifyFingerprintCodeTwo(QString code)
             emit __OnSecurityCheckedFailed();
         }
     }
-    // Might have timed out and cleared the _type
 }
 
 void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     int ids = _ptblCodes->getLastSuccessfulIDS();
 
-    KCB_DEBUG_TRACE("Ids" << ids);
     if(ids != -1)
     {
         int         nVal;
         CLockSet    *pLockSet;
-        // Build the lock set for this lock num
         _ptblCodes->selectCodeSet(ids, &pLockSet);
 
         CLockHistoryRec lockHistoryRec;
@@ -592,21 +556,19 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLogin()
             KCB_DEBUG_TRACE("Error has more than 1 record");
         }
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QString answer1, QString answer2, QString answer3)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     int ids = _ptblCodes->getLastSuccessfulIDS();
-    KCB_DEBUG_TRACE("Ids" << ids);
 
     if(ids != -1)
     {
         int         nVal;
         CLockSet    *pLockSet;
-        // Build the lock set for this lock num
         _ptblCodes->selectCodeSet(ids, &pLockSet);
 
         CLockHistoryRec lockHistoryRec;
@@ -626,24 +588,19 @@ void CModelSecurity::OnCreateHistoryRecordFromLastSuccessfulLoginWithAnswers(QSt
             KCB_DEBUG_TRACE("Error has more than 1 record");
         }
     }
-    KCB_DEBUG_EXIT;
-    
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer1, QString answer2, QString answer3)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     
-    KCB_DEBUG_TRACE(locknums);
-        
     int ids = _ptblCodes->getLastSuccessfulIDS();
-    KCB_DEBUG_TRACE("Ids" << ids);
     if(ids != -1)
     {
-        qDebug() << "lastSuccessfulIDS ids" << ids << "locks" << locknums;
+        // qDebug() << "lastSuccessfulIDS ids" << ids << "locks" << locknums;
         int         nVal;
         CLockSet    *pLockSet;
-        // Build the lock set for this lock num
         _ptblCodes->selectCodeSet(ids, &pLockSet);
 
         CLockHistoryRec *plockHistoryRec;
@@ -652,7 +609,7 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
         for(CLockSet::Iterator itor = pLockSet->begin(); itor != pLockSet->end(); itor++) 
         {
             nVal++;
-            qDebug() << "count" << nVal;
+            // qDebug() << "count" << nVal;
             pState = itor.value();
             plockHistoryRec = new CLockHistoryRec();
             plockHistoryRec->setFromLockState(*pState);
@@ -671,8 +628,8 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
             if (kcb::HasCamera())
             {
                 QByteArray image_bytes = kcb::GetImageAsByteArray();
-                KCB_DEBUG_TRACE("Getting image bytes:" << image_bytes.count());
-                KCB_DEBUG_TRACE("Setting image");
+                // KCB_DEBUG_TRACE("Getting image bytes:" << image_bytes.count());
+                // KCB_DEBUG_TRACE("Setting image");
                 plockHistoryRec->setImage(image_bytes);                
             }
 
@@ -695,19 +652,19 @@ void CModelSecurity::RequestLastSuccessfulLogin(QString locknums, QString answer
         }
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     CLockHistorySet *pLockHistorySet;
     _ptblCodeHistory->selectLockCodeHistorySet(QString(""), dtStart, dtEnd, &pLockHistorySet);
     if (pLockHistorySet)
     {
         emit __OnCodeHistoryForDateRange(pLockHistorySet);
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnVerifyAdminPassword(QString code)
@@ -723,14 +680,13 @@ void CModelSecurity::OnVerifyAdminPassword(QString code)
             emit __OnAdminSecurityCheckFailed();
         }
     }
-    // Might have timed out and cleared the _type
 }
 
 void CModelSecurity::OnRequestCurrentAdmin()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     emit __OnRequestedCurrentAdmin(&_ptblAdmin->getCurrentAdmin());
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::getAllCodes1(QStringList& codes1)

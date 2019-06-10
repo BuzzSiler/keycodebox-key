@@ -30,6 +30,7 @@ class AutoCodeGenWidget : public QWidget
         void NotifyAutoCodeEnabled();
         void NotifyAutoCodeDisabled();
         void NotifyCodesUpdate(const QStringList& codes = QStringList());
+        void NotifyAutoCodeEmailUpdate(const QString& key);
 
     public slots:
         void OnLockSelectionChanged();

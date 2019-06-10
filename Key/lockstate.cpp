@@ -1,9 +1,8 @@
-#include <QJsonObject>
-#include <QJsonValue>
-#include <QJsonDocument>
+#include <exception>
+
 #include <QString>
 #include <QVector>
-#include <exception>
+
 #include "lockstate.h"
 #include "tblcodes.h"
 #include "kcbcommon.h"
@@ -63,201 +62,33 @@ CLockState::CLockState(QObject *parent) :
 {
 }
 
-QJsonObject &CLockState::jsonRecord(QJsonObject &json)
-{
-    json.insert(JSON_VALUE(IDS, _ids));
-    json.insert(SEQUENCE, QJsonValue(_sequence));
-    json.insert(SEQUENCE_ORDER, QJsonValue(_sequence_order));
-    json.insert(LOCKNUMS, QJsonValue(_lock_nums)); 
-    json.insert(DESCRIPTION, QJsonValue(_description));
-    json.insert(CODE1, QJsonValue(_code1));
-    json.insert(CODE2, QJsonValue(_code2));    
-    json.insert(STARTTIME, QJsonValue(_starttime.toString(DATETIME_FORMAT)));    
-    json.insert(ENDTIME, QJsonValue(_endtime.toString(DATETIME_FORMAT)));    
-    json.insert(STATUS, QJsonValue(_status));
-    json.insert(ACCESS_COUNT, QJsonValue(_access_count));
-    json.insert(RETRY_COUNT, QJsonValue(_retry_count));
-    json.insert(MAX_ACCESS, QJsonValue(_max_access));
-    json.insert(MAX_RETRY, QJsonValue(_max_retry));
 
-    json.insert(MODIFIED, QJsonValue(_bModified));
-    json.insert(DELETE, QJsonValue(_bMarkForDeletion));
 
-    json.insert(FINGERPRINT1, QJsonValue(_bFingerprint1));
-    json.insert(FINGERPRINT2, QJsonValue(_bFingerprint2));
-
-    json.insert(ASK_QUESTIONS, QJsonValue(_bAskQuestions));
-    json.insert(QUESTION1, QJsonValue(_question1));
-    json.insert(QUESTION2, QJsonValue(_question2));
-    json.insert(QUESTION3, QJsonValue(_question3));
-    json.insert(ACCESS_TYPE, QJsonValue(_access_type));
-    
-    return json;
-}
-
-QString CLockState::jsonRecordAsString()
-{
-    QJsonObject jsonObj;
-    jsonObj = this->jsonRecord(jsonObj);
-    QJsonDocument doc(jsonObj);
-    QString str(doc.toJson(QJsonDocument::Compact));
-    return str;
-}
-        
-bool CLockState::setFromJsonObject(QJsonObject jsonObj)
-{
-    try 
-    {
-        if(!jsonObj.value(IDS).isUndefined())
-		{
-            _ids = jsonObj.value(IDS).toInt();
-		}
-        if(!jsonObj.value(SEQUENCE).isUndefined())
-		{
-            _sequence = jsonObj.value(SEQUENCE).toString();
-		}
-        if(!jsonObj.value(SEQUENCE_ORDER).isUndefined())
-		{
-            _sequence_order = jsonObj.value(SEQUENCE_ORDER).toInt();
-		}
-        if(!jsonObj.value(LOCKNUMS).isUndefined())
-		{
-            _lock_nums = jsonObj.value(LOCKNUMS).toString();
-		}
-        if(!jsonObj.value(DESCRIPTION).isUndefined())
-		{
-            _description = jsonObj.value(DESCRIPTION).toString();
-		}
-        if(!jsonObj.value(CODE1).isUndefined())
-		{
-            _code1 = jsonObj.value(CODE1).toString();
-		}
-        if(!jsonObj.value(CODE2).isUndefined())
-		{
-            _code2 = jsonObj.value(CODE2).toString();
-		}
-        if(!jsonObj.value(STARTTIME).isUndefined())
-		{
-            _starttime.fromString(jsonObj.value(STARTTIME).toString(), DATETIME_FORMAT);
-		}
-        if(!jsonObj.value(ENDTIME).isUndefined())
-		{
-            _endtime.fromString(jsonObj.value(ENDTIME).toString(), DATETIME_FORMAT);
-		}
-        if(!jsonObj.value(STATUS).isUndefined())
-		{
-            _status = jsonObj.value(STATUS).toString();
-		}
-        if(!jsonObj.value(ACCESS_COUNT).isUndefined())
-		{
-            _access_count = jsonObj.value(ACCESS_COUNT).toInt();
-		}
-        if(!jsonObj.value(RETRY_COUNT).isUndefined())
-		{
-            _retry_count = jsonObj.value(RETRY_COUNT).toInt();
-		}
-        if(!jsonObj.value(MAX_ACCESS).isUndefined())
-		{
-            _max_access = jsonObj.value(MAX_ACCESS).toInt();
-		}
-        if(!jsonObj.value(MAX_RETRY).isUndefined())
-		{
-            _max_retry = jsonObj.value(MAX_RETRY).toInt();
-		}
-        if(!jsonObj.value(MODIFIED).isUndefined())
-		{
-            _bModified = jsonObj.value(MODIFIED).toBool();
-		}
-        if(!jsonObj.value(DELETE).isUndefined())
-		{
-            _bMarkForDeletion = jsonObj.value(DELETE).toBool();
-		}
-        if(!jsonObj.value(FINGERPRINT1).isUndefined())
-		{
-            _bFingerprint1 = jsonObj.value(FINGERPRINT1).toBool();
-		}
-        if(!jsonObj.value(FINGERPRINT2).isUndefined())
-		{
-            _bFingerprint2 = jsonObj.value(FINGERPRINT2).toBool();
-		}
-        if(!jsonObj.value(ASK_QUESTIONS).isUndefined())
-		{
-            _bAskQuestions = jsonObj.value(ASK_QUESTIONS).toBool();
-		}
-        if(!jsonObj.value(QUESTION1).isUndefined())
-		{
-            _question1 = jsonObj.value(QUESTION1).toString();
-		}
-        if(!jsonObj.value(QUESTION2).isUndefined())
-		{
-            _question2 = jsonObj.value(QUESTION2).toString();
-		}
-        if(!jsonObj.value(QUESTION3).isUndefined())
-		{
-            _question3 = jsonObj.value(QUESTION3).toString();
-		}
-        if(!jsonObj.value(ACCESS_TYPE).isUndefined())
-		{
-            _access_type = jsonObj.value(ACCESS_TYPE).toInt();
-		}
-    } 
-    catch(std::exception &e) 
-    {
-        qDebug() << "CLockState::setFromJsonObject():" << e.what();
-        return false;
-    }
-
-    return true;
-}
-
-bool CLockState::setFromJsonString(QString strJson)
-{
-    QJsonDocument doc = QJsonDocument::fromJson(strJson.toUtf8());
-    // check validity of the document
-    if(!doc.isNull())
-    {
-        if(doc.isObject())
-        {
-            setFromJsonObject(doc.object());
-        }
-        else
-        {
-            qDebug() << "Document is not an object" << endl;
-            return false;
-        }
-    }
-    else
-    {
-        qDebug() << "Invalid JSON...\n" << strJson << endl;
-        return false;
-    }
-    return true;
-}
 
 void CLockState::show()
 {
-    qDebug() << "       Id: " << _ids;
-    qDebug() << "      Seq: " << _sequence;
-    qDebug() << "Seq Order: " << _sequence_order;
-    qDebug() << " LockNums: " << _lock_nums;
-    qDebug() << "     Desc: " << _description;
-    qDebug() << "    Code1: " << _code1;
-    qDebug() << "    Code2: " << _code2;
-    qDebug() << "    Start: " << _starttime.toString();
-    qDebug() << "      End: " << _endtime.toString();
-    qDebug() << "     Stat: " << _status;
-    qDebug() << "      FP1: " << _bFingerprint1;
-    qDebug() << "      FP2: " << _bFingerprint2;
-    qDebug() << "      Ask: " << _bAskQuestions;
-    qDebug() << "       Q1: " << _question1;
-    qDebug() << "       Q2: " << _question2;
-    qDebug() << "       Q3: " << _question3;
-    qDebug() << "       AT: " << _access_type;
-    qDebug() << "       AC: " << _access_count;
-    qDebug() << "       MA: " << _max_access;
-    qDebug() << "       MR: " << _max_retry;
-    qDebug() << "       RC: " << _retry_count;
-    qDebug() << "    IsNew: " << _bIsNew;
-    qDebug() << "      MOD: " << _bModified;
-    qDebug() << "      MFD: " << _bMarkForDeletion;
+    KCB_DEBUG_TRACE("       Id: " << _ids);
+    KCB_DEBUG_TRACE("      Seq: " << _sequence);
+    KCB_DEBUG_TRACE("Seq Order: " << _sequence_order);
+    KCB_DEBUG_TRACE(" LockNums: " << _lock_nums);
+    KCB_DEBUG_TRACE("     Desc: " << _description);
+    KCB_DEBUG_TRACE("    Code1: " << _code1);
+    KCB_DEBUG_TRACE("    Code2: " << _code2);
+    KCB_DEBUG_TRACE("    Start: " << _starttime.toString());
+    KCB_DEBUG_TRACE("      End: " << _endtime.toString());
+    KCB_DEBUG_TRACE("     Stat: " << _status);
+    KCB_DEBUG_TRACE("      FP1: " << _bFingerprint1);
+    KCB_DEBUG_TRACE("      FP2: " << _bFingerprint2);
+    KCB_DEBUG_TRACE("      Ask: " << _bAskQuestions);
+    KCB_DEBUG_TRACE("       Q1: " << _question1);
+    KCB_DEBUG_TRACE("       Q2: " << _question2);
+    KCB_DEBUG_TRACE("       Q3: " << _question3);
+    KCB_DEBUG_TRACE("       AT: " << _access_type);
+    KCB_DEBUG_TRACE("       AC: " << _access_count);
+    KCB_DEBUG_TRACE("       MA: " << _max_access);
+    KCB_DEBUG_TRACE("       MR: " << _max_retry);
+    KCB_DEBUG_TRACE("       RC: " << _retry_count);
+    KCB_DEBUG_TRACE("    IsNew: " << _bIsNew);
+    KCB_DEBUG_TRACE("      MOD: " << _bModified);
+    KCB_DEBUG_TRACE("      MFD: " << _bMarkForDeletion);
 }

@@ -206,8 +206,8 @@ static void TestSecsNextGen(const AutoCodeParams& params, const QString&  text, 
     QDateTime dt = acg.NextGenDateTime();
     KeyCodeBoxSettings::SetAutoCodeNextGenDateTime(dt);
 
-    KCB_DEBUG_TRACE("next gen(" << text <<")" << acg.NextGenDateTime());
-    KCB_DEBUG_TRACE("secs to next gen" << AutoCodeGeneratorStatic::SecsToNextGen(datetime));
+    // KCB_DEBUG_TRACE("next gen(" << text <<")" << acg.NextGenDateTime());
+    // KCB_DEBUG_TRACE("secs to next gen" << AutoCodeGeneratorStatic::SecsToNextGen(datetime));
 }
 
 

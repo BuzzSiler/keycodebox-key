@@ -86,7 +86,7 @@ AutoCodeGenWidget::AutoCodeGenWidget(QWidget *parent) :
     m_params({}),
     ui(new Ui::AutoCodeGenWidget)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     ui->setupUi(this);
 
     ui->pgbAutoCodeCommit->setVisible(false);
@@ -111,7 +111,7 @@ AutoCodeGenWidget::AutoCodeGenWidget(QWidget *parent) :
     InitControls();
 
     m_init = false;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 AutoCodeGenWidget::~AutoCodeGenWidget()
@@ -374,13 +374,13 @@ bool AutoCodeGenWidget::WarnAutoCodeCommit()
 {
     int result = QMessageBox::warning(this,
                          tr("AutoCode Apply"),
-                         tr("IMPORTANT: The AutoCode settings will now be applied."
+                         tr("The AutoCode settings will now be applied."
+                            "\n\n"
+                            "WARNING: These changes cannot be undone."
+                            "\n\n"
+                            "Press Ok, to accept and apply these settings"
                             "\n"
-                            "These changes cannot be undone."
-                            "\n"
-                            "To accept and apply these settings, press Ok"
-                            "\n"
-                            "To cancel and abort applying these settings, press Cancel"),
+                            "Press Cancel, to cancel applying these settings"),
                          QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
 
     // Note: This loop is contrary to "best practices", but for some reason the message box
@@ -400,7 +400,7 @@ void AutoCodeGenWidget::SendAutoCodeEmail()
 {
     if (ui->cbAutoCodeEmailKey->isChecked())
     {
-        // if email is checked, then send an email with the encrypted key
+        emit NotifyAutoCodeEmailUpdate(m_settings.key);
     }
 }
 
@@ -431,8 +431,8 @@ void AutoCodeGenWidget::on_pbAutoCodeCommit_clicked()
     if (commit)
     {
         HandleAutoCodeCommit();
-        SendAutoCodeEmail();
         emit NotifyAutoCodeEnabled();
+        SendAutoCodeEmail();
     }
 }
 
@@ -450,11 +450,14 @@ bool AutoCodeGenWidget::WarnAutoCodeEnable()
                             tr("AutoCode Enable"),
                             tr("You have selected to enable AutoCode Generation."
                             "\n"
-                            "Continuing will enable the KeyCodeBox system to generate lock codes per the AutoCode Generation parameters."
+                            "Continuing will enable the KeyCodeBox system to generate new lock codes based on the AutoCode Generation settings."
+                            "\n\n"
+                            "Warning: Enabling AutoCode Generation may result in existing codes being modified or deleted."
                             "\n"
-                            "Existing codes may be modified or deleted and cannot be undone."
-                            "\n"
-                            "No changes will be made until the 'Apply' button is pressed."
+                            "It is recommended existing codes be backed up using Code Export before continuing."
+                            "\n\n"
+                            "No changes will be committed until the 'Apply' button is pressed."
+                            "Once committed, these changes cannot be undone."
                             "\n\n"
                             "Do you want to continue?"),
                             QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
@@ -469,8 +472,9 @@ bool AutoCodeGenWidget::WarnAutoCodeDisable()
                             tr("You have selected to disable AutoCode Generation."
                             "\n"
                             "The KeyCodeBox system will no longer generate lock codes. "
+                            "\n\n"
                             "All existing codes will remain unchanged."
-                            "\n"
+                            "\n\n"
                             "Do you want to continue?"),
                             QMessageBox::StandardButton::Ok | QMessageBox::StandardButton::Cancel);
 
@@ -509,8 +513,8 @@ void AutoCodeGenWidget::HandleAutoCodeDisable()
     else
     {
         EnableAutoCode();
-        updateUi();
     }
+    updateUi();
 }
 
 void AutoCodeGenWidget::on_gbAutoCodeEnableDisable_clicked(bool checked)
@@ -564,10 +568,9 @@ void AutoCodeGenWidget::updateUi()
     bool password_empty = ui->leAutoCodePassword->text().isEmpty();
     bool period_changed = m_params.period != INDEX_TO_VALUE(ui->cbAutoCodePeriod->currentIndex());
     bool codemode_changed = m_params.code_mode != INDEX_TO_VALUE(ui->cbAutoCodeMode->currentIndex());
-    bool email_changed = m_settings.email != ui->cbAutoCodeEmailKey->isChecked();
 
-    KCB_DEBUG_TRACE(units_changed << code_len_changed << startofday_changed << password_changed << period_changed << codemode_changed << email_changed);
-    bool modified = units_changed || code_len_changed || startofday_changed || password_changed || period_changed || codemode_changed || email_changed;
+    // KCB_DEBUG_TRACE(units_changed << code_len_changed << startofday_changed << password_changed << period_changed << codemode_changed);
+    bool modified = units_changed || code_len_changed || startofday_changed || password_changed || period_changed || codemode_changed;
 
     ui->pbAutoCodeGenerate->setEnabled(modified);
     ui->leAutoCodePassword->setStyleSheet((autocode_enabled && password_empty) ? css_warn : css_none);
@@ -575,7 +578,18 @@ void AutoCodeGenWidget::updateUi()
 
 void AutoCodeGenWidget::on_cbAutoCodeEmailKey_clicked()
 {
-    updateUi();
+    if (ui->cbAutoCodeEmailKey->isChecked())
+    {
+        KeyCodeBoxSettings::EnableAutoCodeEmail();
+        if (m_settings.enabled && m_settings.committed)
+        {
+            emit NotifyAutoCodeEmailUpdate(m_settings.key);
+        }
+    }
+    else
+    {
+        KeyCodeBoxSettings::DisableAutoCodeEmail();
+    }
 }
 
 QString AutoCodeGenWidget::RunKeyboard(const QString& text)

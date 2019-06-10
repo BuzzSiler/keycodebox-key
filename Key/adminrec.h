@@ -3,7 +3,6 @@
 
 #include <QString>
 #include <QObject>
-#include <QJsonObject>
 #include <QDateTime>
 #include "kcbcommon.h"
 
@@ -50,31 +49,13 @@ public:
     QString getSMTPServer() { return smtp_server; }
     void setSMTPServer(QString smtpserver) { smtp_server = smtpserver; }
 
-    bool getDisplayFingerprintButton() { 
-        KCB_DEBUG_ENTRY; 
-        bool result = show_fingerprint;
-        KCB_DEBUG_TRACE("fp" << result);
-        KCB_DEBUG_EXIT; 
-        return result;
-    }
+    bool getDisplayFingerprintButton() { return show_fingerprint; }
     void setDisplayFingerprintButton(bool showFingerprint) { show_fingerprint = showFingerprint; }
 
-    bool getDisplayShowHideButton() { 
-        KCB_DEBUG_ENTRY; 
-        bool result = show_password;
-        KCB_DEBUG_TRACE("sh" << result);
-        KCB_DEBUG_EXIT; 
-        return result;
-    }
+    bool getDisplayShowHideButton() { return show_password; }
     void setDisplayShowHideButton(bool showPassword) { show_password = showPassword; }
 
-    bool getDisplayTakeReturnButtons() { 
-        KCB_DEBUG_ENTRY; 
-        bool result = show_takereturn;
-        KCB_DEBUG_TRACE("tr" << result);
-        KCB_DEBUG_EXIT; 
-        return result;
-    }
+    bool getDisplayTakeReturnButtons() { return show_takereturn; }
     void setDisplayTakeReturnButtons(bool showTakeReturn) { show_takereturn = showTakeReturn; }
 
     int getSMTPPort() { return smtp_port; }

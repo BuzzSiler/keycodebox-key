@@ -2,7 +2,6 @@
 #define CHIDREADER_H
 
 #include <QObject>
-//#include <usb.h>
 
 #include <sys/ioctl.h>
 #include <strings.h>
@@ -44,10 +43,6 @@ public:
     QString readHIDReader();
     void readHIDReaderLoop();
     int parseHIDReaderCodes(QString sCardData, QString *pcode1, QString *pcode2);
-
-    void testOne();
-
-    void TestTwo();
 
 signals:
     void __onHIDSwipeCodes(QString sCode1, QString sCode2);

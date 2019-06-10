@@ -2,6 +2,7 @@
 #include <QtGlobal>
 #include <QApplication>
 #include <QtCore>
+#include <QThread>
 
 #include "logger.h"
 #include "kcbsystem.h"
@@ -18,6 +19,8 @@ int main(int argc, char *argv[])
     // Note: This function may invoke a reboot
     kcb::SetupDisplay();
     
+    qDebug() << QThread::currentThreadId();
+
     MainWindow w;
     return a.exec();
 }

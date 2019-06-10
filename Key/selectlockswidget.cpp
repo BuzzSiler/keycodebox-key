@@ -1,11 +1,13 @@
 #include "selectlockswidget.h"
 #include "ui_selectlockswidget.h"
+
 #include <QDebug>
 #include <QList>
 #include <QAbstractButton>
 #include <QSignalMapper>
 #include <QVector>
 #include <QTimer>
+
 #include "lockcabinetwidget.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
@@ -59,14 +61,14 @@ SelectLocksWidget::~SelectLocksWidget()
 
 void SelectLocksWidget::updateCabinetConfig()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_lock_cab.updateCabinetConfig();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void SelectLocksWidget::setLocks(QString locks)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     Q_ASSERT(m_role == USER);
     Q_ASSERT(locks != "");
 
@@ -76,21 +78,21 @@ void SelectLocksWidget::setLocks(QString locks)
         return;
     }
 
-    KCB_DEBUG_TRACE("Locks:" << locks);
+    // KCB_DEBUG_TRACE("Locks:" << locks);
 
     m_lock_cab.disableAllLocks();
     m_lock_cab.setEnabledLocks(locks);
 
-    KCB_DEBUG_TRACE("after disable/enable locks");
+    // KCB_DEBUG_TRACE("after disable/enable locks");
 
     ui->lstSelectedLocks->clear();
     ui->btnOpenSelected->setEnabled(false);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 QString SelectLocksWidget::getLocks()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (!m_lock_cab.isConfigured())
     {
         KCB_DEBUG_TRACE("Lock Cabinet is not configured");
@@ -111,7 +113,7 @@ QString SelectLocksWidget::getLocks()
         locks.append(QString::number(lock.toInt()));
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return locks.join(",");
 }
 
@@ -292,24 +294,24 @@ void SelectLocksWidget::update()
 
 void SelectLocksWidget::OnLockSelectionChanged()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (KeyCodeBoxSettings::IsLockSelectionSingle())
     {
-        KCB_DEBUG_TRACE("setting for single selection");
+        // KCB_DEBUG_TRACE("setting for single selection");
         m_lock_cab.OnNotifySingleLockSelection();
         ui->gbSelectedLocks->setVisible(false);
     }
     else if (KeyCodeBoxSettings::IsLockSelectionMulti())
     {
-        KCB_DEBUG_TRACE("setting for multi selection");
+        // KCB_DEBUG_TRACE("setting for multi selection");
         m_lock_cab.OnNotifyMultiLockSelection();
         ui->gbSelectedLocks->setVisible(true);
     }
     else
     {
-        KCB_DEBUG_TRACE("setting for disable selection");
+        // KCB_DEBUG_TRACE("setting for disable selection");
         m_lock_cab.OnNotifyDisableLockSelection();
         ui->gbSelectedLocks->setVisible(false);
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }

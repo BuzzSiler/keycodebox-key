@@ -74,26 +74,26 @@ void CSecurityController::initializeSignals()
 
 void CSecurityController::RequestLastSuccessfulLogin(QString locknums)
 {
-    KCB_DEBUG_ENTRY;
-    KCB_DEBUG_TRACE(locknums);
+    // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_TRACE(locknums);
     emit __RequestLastSuccessfulLogin(locknums, "", "", "");
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3)
 {
-    KCB_DEBUG_ENTRY;
-    KCB_DEBUG_TRACE("Answer1" << answer1 << "Answer2" << answer2 << "Answer3" << answer3);    
+    // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_TRACE("Answer1" << answer1 << "Answer2" << answer2 << "Answer3" << answer3);    
     emit __RequestLastSuccessfulLogin(locknums, answer1, answer2, answer3);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
-    KCB_DEBUG_ENTRY;
-    KCB_DEBUG_TRACE(pLockHistory->getLockNums());
+    // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_TRACE(pLockHistory->getLockNums());
     emit __OnLastSuccessfulLogin(pLockHistory);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QDateTime dtEnd)
@@ -103,9 +103,9 @@ void CSecurityController::OnRequestCodeHistoryForDateRange(QDateTime dtStart, QD
 
 void CSecurityController::OnCodeHistoryForDateRange(CLockHistorySet *pLockHistorySet)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     emit __OnCodeHistoryForDateRange(pLockHistorySet);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::OnUpdateCodeState(CLockState *rec)
@@ -115,26 +115,26 @@ void CSecurityController::OnUpdateCodeState(CLockState *rec)
 
 void CSecurityController::CheckAccessCodeOne(QString code1)
 {
-    KCB_DEBUG_TRACE(code1);
+    // KCB_DEBUG_TRACE(code1);
 
     // Use the CModelSecurity class
     _sCode1 = code1;
     _sCode2 = "";       // clear code2
 
     emit __VerifyCodeOne(code1);       // This should cross thread to the _modelSecurity object
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::CheckAccessCodeTwo(QString code2)
 {
-    KCB_DEBUG_TRACE(code2);
+    // KCB_DEBUG_TRACE(code2);
 
     _sCode2 = code2;
 
     QString sCodeEnc(CEncryption::encryptString(code2));
 
     emit __VerifyCodeTwo(sCodeEnc);       // This should cross thread to the _modelSecurity object
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::CheckFingerprintAccessCodeOne(QString code1)
@@ -190,7 +190,7 @@ void CSecurityController::OnSecurityCheckSuccess(QString locks)
 
 void CSecurityController::OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
-    KCB_DEBUG_TRACE(lockNums << "; " << answer1 << "; " << answer2 << "; " << answer3);
+    // KCB_DEBUG_TRACE(lockNums << "; " << answer1 << "; " << answer2 << "; " << answer3);
     emit __OnSecurityCheckSuccess(lockNums);
 }
 

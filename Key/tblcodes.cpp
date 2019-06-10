@@ -1,17 +1,19 @@
+#include "tblcodes.h"
+
 #include <QObject>
 #include <QTime>
 #include <QDateTime>
 #include <QString>
-#include "tblcodes.h"
+
 #include "encryption.h"
 #include "kcbcommon.h"
 
 CTblCodes::CTblCodes(QSqlDatabase *db)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _pDB = db;
     initialize();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 bool CTblCodes::isExpired(int access_type, int access_count, int max_access)
@@ -69,7 +71,7 @@ QSqlQuery CTblCodes::createQuery(QStringList column_list,
         sql += QString(" %1").arg(orderby);
     }
 
-    qDebug() << "SQL:" << sql;
+    // KCB_DEBUG_TRACE("SQL:" << sql);
 
     if ( !query.prepare(sql) )
     {
@@ -87,9 +89,9 @@ int CTblCodes::checkCodeOne(QString code,
                             bool &bFingerprintRequired, 
                             QString &lockNums )
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE("code1" << code);
+    // KCB_DEBUG_TRACE("code1" << code);
 
     QDateTime time = QDateTime::currentDateTime();
     code = CEncryption::decryptString(code);
@@ -134,18 +136,18 @@ int CTblCodes::checkCodeOne(QString code,
         
         sCode1 = CEncryption::decryptString(sCode1);
 
-        KCB_DEBUG_TRACE("Code1" << sCode1 << "Code" << code << "Locks" << lockNums);
+        // KCB_DEBUG_TRACE("Code1" << sCode1 << "Code" << code << "Locks" << lockNums);
 
         if( sCode1 == code ) 
         {
-            KCB_DEBUG_TRACE("codes match");
+            // KCB_DEBUG_TRACE("codes match");
             
             /* Check for expiration */
-            KCB_DEBUG_TRACE("Access Type" << access_type << "Access Count" << access_count << "Max Accesss" << max_access);
+            // KCB_DEBUG_TRACE("Access Type" << access_type << "Access Count" << access_count << "Max Accesss" << max_access);
             if (isExpired(access_type, access_count, max_access))
             {
-                KCB_DEBUG_TRACE("expired" << lockNums);
-                KCB_DEBUG_EXIT;
+                // KCB_DEBUG_TRACE("expired" << lockNums);
+                // KCB_DEBUG_EXIT;
                 return KCB_FAILED;
             }
 
@@ -167,13 +169,13 @@ int CTblCodes::checkCodeOne(QString code,
                 incrementAccessCount(ids);
             }
 
-            KCB_DEBUG_EXIT;
+            // KCB_DEBUG_EXIT;
             return KCB_SUCCESS;
         }
     }
 
     KCB_DEBUG_TRACE("failed - no match found");
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return KCB_FAILED;
 }
 
@@ -191,9 +193,9 @@ int CTblCodes::checkCodeTwo(QString code,
                             QString &question2, 
                             QString &question3)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     
-    KCB_DEBUG_TRACE("code1" << codeOne << "code2" << code);
+    // KCB_DEBUG_TRACE("code1" << codeOne << "code2" << code);
 
     QDateTime time = QDateTime::currentDateTime();
     code = CEncryption::decryptString(code);
@@ -241,22 +243,22 @@ int CTblCodes::checkCodeTwo(QString code,
         question2 = QUERY_VALUE(qry, "question2").toString();
         question3 = QUERY_VALUE(qry, "question3").toString();
 
-        KCB_DEBUG_TRACE("Code1" << sCode1 << "Code2" << sCode2 << "Locks" << lockNums);
+        // KCB_DEBUG_TRACE("Code1" << sCode1 << "Code2" << sCode2 << "Locks" << lockNums);
 
         sCode1 = CEncryption::decryptString(sCode1);
         sCode2 = CEncryption::decryptString(sCode2);
 
         if( sCode1 == _sCodeOne && sCode2 == code)
         {
-            KCB_DEBUG_TRACE("codes match");
+            // KCB_DEBUG_TRACE("codes match");
 
             _lastIDS = ids;
 
             /* Check for expiration */
             if (isExpired(access_type, access_count, max_access))
             {
-                KCB_DEBUG_TRACE("expired" << lockNums);
-                KCB_DEBUG_EXIT;
+                // KCB_DEBUG_TRACE("expired" << lockNums);
+                // KCB_DEBUG_EXIT;
                 return KCB_FAILED;
             }
 
@@ -406,7 +408,7 @@ void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry,
 
 void CTblCodes::selectCodeSet(QString &lockNums, QDateTime start, QDateTime end, CLockSet **pLockSet, bool clear_or_encrypted)
 {
-    KCB_DEBUG_TRACE("lockNums" << lockNums << "start" << start.toString() << "end" << end.toString() << "pLockSet");
+    // KCB_DEBUG_TRACE("lockNums" << lockNums << "start" << start.toString() << "end" << end.toString() << "pLockSet");
 
     *pLockSet = 0;
 
@@ -508,7 +510,7 @@ void CTblCodes::selectCodeSet(QString &lockNums, QDateTime start, QDateTime end,
 
 void CTblCodes::selectCodeSet(int ids, CLockSet **pLockSet, bool clear_or_encrypted)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     *pLockSet = 0;
 
@@ -544,7 +546,6 @@ bool CTblCodes::tableExists()
 
 bool CTblCodes::columnExists(QString column)
 {
-    qDebug() << "CTblCodes::fingerprintColumnExists()";
     QStringList::iterator  itor;
     QSqlQuery qry(*_pDB);
     bool foundColumn = false;
@@ -561,18 +562,19 @@ bool CTblCodes::columnExists(QString column)
             {
                 if( qry.value(1).toString().compare(column) == 0 )
                 {
-                    qDebug() << "CTblCodes::fingerprintColumnExists(), found column: " << column;
-
                     foundColumn = true;
                     break;
                 }
             }
         }
         else
-            qDebug() << qry.lastError();
-
-    } else {
-        std::cout << "Either _pDB is NULL or _pDB is not open\n";
+        {
+            KCB_DEBUG_TRACE(qry.lastError());
+        }
+    } 
+    else 
+    {
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
     }
     return foundColumn;
 }
@@ -791,7 +793,7 @@ int CTblCodes::addLockCode(QString locknums, QString code1, QString code2,
 
 bool CTblCodes::createTestDefault()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QString s = CEncryption::encryptString("192837");
     QString     encCode1(s);
     s = CEncryption::encryptString("2837465");
@@ -842,7 +844,7 @@ void CTblCodes::currentTimeFormat(QString format, QString strBuffer, int nExpect
 
 bool CTblCodes::readTestDefault()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QSqlQuery query(*_pDB);
     QString sql = "SELECT sequence, sequence_order, "
@@ -908,7 +910,7 @@ bool CTblCodes::deleteCode(CLockState &rec)
 
 bool CTblCodes::resetCodeLimitedUse(CLockState &rec)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     if (rec.getID() == -1)
     {
@@ -936,7 +938,7 @@ bool CTblCodes::resetCodeLimitedUse(CLockState &rec)
 
 bool CTblCodes::updateLockboxState(int fids, bool lockstate)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
@@ -960,7 +962,7 @@ bool CTblCodes::updateLockboxState(int fids, bool lockstate)
 
 bool CTblCodes::updateAskQuestions(int fids, bool askQuestions)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
@@ -985,7 +987,7 @@ bool CTblCodes::updateAskQuestions(int fids, bool askQuestions)
 
 bool CTblCodes::updateQuestion(int fids, QString which_question, QString value)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
@@ -1009,37 +1011,37 @@ bool CTblCodes::updateQuestion(int fids, QString which_question, QString value)
 
 bool CTblCodes::updateQuestion1(int fids, QString question)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     bool result = updateQuestion(fids, "question1", question);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return result;
 }
 
 bool CTblCodes::updateQuestion2(int fids, QString question)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     bool result = updateQuestion(fids, "question2", question);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return result;
 }
 
 bool CTblCodes::updateQuestion3(int fids, QString question)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     bool result = updateQuestion(fids, "question3", question);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return result;
 }
 
 bool CTblCodes::updateRecord(CLockState &rec)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
@@ -1095,7 +1097,7 @@ bool CTblCodes::updateRecord(CLockState &rec)
 
 bool CTblCodes::updateCode(CLockState *prec)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     
     if(prec->isMarkedForDeletion()) 
     {
@@ -1165,7 +1167,7 @@ bool CTblCodes::updateCodeSet(CLockSet &codeSet)
     {
         if ( !_pDB->commit() )
         {
-            KCB_DEBUG_TRACE("committed successfully.");
+            // KCB_DEBUG_TRACE("committed successfully.");
         }
     }
     return bRC;
@@ -1173,7 +1175,7 @@ bool CTblCodes::updateCodeSet(CLockSet &codeSet)
 
 bool CTblCodes::incrementAccessCount(int fids)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE ") + TABLENAME +
             " SET " + QString("access_count = access_count + 1 "
@@ -1195,7 +1197,7 @@ bool CTblCodes::incrementAccessCount(int fids)
 
 void CTblCodes::getAllCodes(const QString& which_code, QStringList& codes)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     // Create a query to return all code1 entries
     QStringList column_list;
@@ -1220,9 +1222,9 @@ void CTblCodes::getAllCodes(const QString& which_code, QStringList& codes)
         codes.append(CEncryption::decryptString(code_enc));
     } while (qry.next());
 
-    KCB_DEBUG_TRACE(codes);
+    // KCB_DEBUG_TRACE(codes);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CTblCodes::getAllCodes1(QStringList& codes1)
@@ -1283,7 +1285,7 @@ void CTblCodes::updateCode(const QString& lock, const QString& code, const QStri
     QSqlQuery qry(*_pDB);
     QString sql = QString("UPDATE %1 SET %2=:code WHERE lockNums=:lock").arg(TABLENAME).arg(which_code);
 
-    KCB_DEBUG_TRACE("updating lock" << lock << "code" << code << "code mode" << which_code);
+    // KCB_DEBUG_TRACE("updating lock" << lock << "code" << code << "code mode" << which_code);
 
     qry.prepare(sql);
     qry.bindValue(":code", CEncryption::encryptString(code));

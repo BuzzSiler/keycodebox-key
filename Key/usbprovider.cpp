@@ -1,7 +1,10 @@
 #include "usbprovider.h"
-#include "usbcontroller.h"
+
 #include <QDebug>
+
+#include "usbcontroller.h"
 #include "serialport.h"
+#include "logger.h"
 
 #define SP_BAUD_RATE (19200)
 #define SP_WRITE_TIMEOUT (500)
@@ -33,57 +36,42 @@ void UsbProvider::Initialize()
 
 std::string UsbProvider::GetLockControllerDeviceString()
 {
-    qDebug() << "searching for USB->serial adapter version 1...";
-    // Check for more than one Serial Cable -- we can't tell them apart at the USB-Serial level.
     int nCountDevs = m_ctrl->CountDevicePorts(_sDeviceType, _sFilterString0);
     if ( nCountDevs > 1 ) 
     {
-        // Can't continue
-        qDebug() << "More than one USB->serial adapter found. Will need to reconcile.\n";
+        KCB_DEBUG_TRACE("More than one USB->serial adapter found. Will need to reconcile.");
         return nullptr;
     }
 
     std::string sDevNum = m_ctrl->getDevicePortString(_sDeviceType, _sFilterString0, _sFindDevicePrefix);
 
-    qDebug() << "initController() sDevNum:" << sDevNum.c_str() << "\t";
-
     // check for the alternative usb-serial converter type
     if(sDevNum.empty())
     {
-        qDebug() << "USB->serial adapter version 1 not found, searching for version 2...";
         nCountDevs = m_ctrl->CountDevicePorts(_sDeviceType, _sFilterString1);
         if ( nCountDevs > 1 ) 
         {
-            // Can't continue
-            qDebug() << "More than one USB->serial adapter found. Will need to reconcile.\n";
+            KCB_DEBUG_TRACE("More than one USB->serial adapter found. Will need to reconcile.");
             return nullptr;
         }
         sDevNum = m_ctrl->getDevicePortString(_sDeviceType, _sFilterString1, _sFindDevicePrefix);
-        qDebug() << "initController() sDevNum:" << sDevNum.c_str() << "\t";
     }
 
-    // check for the alternative FTDI usb-serial converter type
     if(sDevNum.empty())
     {
-        qDebug() << "USB->serial adapter version 2 not found, searching for version 3...";
         nCountDevs = m_ctrl->CountDevicePorts(_sDeviceType, _sFilterString2);
         if ( nCountDevs > 1 ) 
         {
-            // Can't continue
-            qDebug() << "More than one USB->serial adapter found. Will need to reconcile.\n";
+            KCB_DEBUG_TRACE("More than one USB->serial adapter found. Will need to reconcile.");
             return nullptr;
         }
         sDevNum = m_ctrl->getDevicePortString(_sDeviceType, _sFilterString2, _sFindDevicePrefix);
-        qDebug() << "initController() sDevNum:" << sDevNum.c_str() << "\t";
     }
 
     if(!sDevNum.empty())
     {
         std::string sDevice = "/dev/ttyUSB";
         sDevice += sDevNum;
-
-        qDebug() << "\tsDevice:" << sDevice.c_str();
-
         return sDevice;
     }
 
@@ -111,8 +99,7 @@ std::string UsbProvider::GetMagTekDevicePortString()
     int nCountDevs = m_ctrl->CountDevicePorts(deviceType, filterString);
     if ( nCountDevs > 1 ) 
     {
-        // Can't continue
-        qDebug() << "CMagTekCardReader::openDeviceHandle(), More than one hid magnetic card reader usb-c216 found. Will need to reconcile.\n";
+        KCB_DEBUG_TRACE("More than one hid magnetic card reader usb-c216 found. Will need to reconcile.");
         return "";
     }
   

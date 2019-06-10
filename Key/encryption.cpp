@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QByteArray>
 #include "simplecrypt.h"
+#include "logger.h"
 
 CEncryption::CEncryption()
 {
@@ -42,7 +43,7 @@ QByteArray CEncryption::decryptWithKey(const QByteArray& data, const quint64 key
 
 QDateTime &CEncryption::roundDateTime(int res, QDateTime &datetime)
 {
-    qDebug() << "datetime in:" << datetime.toString("yyyy-MM-dd HH:mm:ss");
+    // KCB_DEBUG_TRACE("datetime in:" << datetime.toString("yyyy-MM-dd HH:mm:ss"));
 
     // res is in minutes
     int resSecs = res * 60;
@@ -54,7 +55,7 @@ QDateTime &CEncryption::roundDateTime(int res, QDateTime &datetime)
     hourLater.setTime_t(roundUnit + resSecs); // set finish time to
     datetime = start;
 
-    qDebug() << "datetime rounded:" << datetime.toString("yyyy-MM-dd HH:mm:ss");
+    // KCB_DEBUG_TRACE("datetime rounded:" << datetime.toString("yyyy-MM-dd HH:mm:ss"));
 
     return datetime;
 }

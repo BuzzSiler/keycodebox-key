@@ -13,19 +13,19 @@
 
 void DisplayParams(const AutoCodeParams& params)
 {
-    KCB_DEBUG_TRACE("params");
-    KCB_DEBUG_TRACE("\tcode_mode" << params.code_mode);
-    KCB_DEBUG_TRACE("\tnumcodes" << params.numcodes);
-    KCB_DEBUG_TRACE("\tcodelength" << params.codelength);
-    KCB_DEBUG_TRACE("\tperiod" << params.period);
-    KCB_DEBUG_TRACE("\tunits" << params.units);
-    KCB_DEBUG_TRACE("\tstartofday" << params.startofday);
-    KCB_DEBUG_TRACE("\tid" << params.id);
+    // KCB_DEBUG_TRACE("params");
+    // KCB_DEBUG_TRACE("\tcode_mode" << params.code_mode);
+    // KCB_DEBUG_TRACE("\tnumcodes" << params.numcodes);
+    // KCB_DEBUG_TRACE("\tcodelength" << params.codelength);
+    // KCB_DEBUG_TRACE("\tperiod" << params.period);
+    // KCB_DEBUG_TRACE("\tunits" << params.units);
+    // KCB_DEBUG_TRACE("\tstartofday" << params.startofday);
+    // KCB_DEBUG_TRACE("\tid" << params.id);
 }
 
 void DisplayJson(const QJsonObject& json)
 {
-    KCB_DEBUG_TRACE("json" << kcb::JsonToString(json));
+    // KCB_DEBUG_TRACE("json" << kcb::JsonToString(json));
 }
 
 AutoCodeGenerator::AutoCodeGenerator(const AutoCodeParams& params) :

@@ -19,8 +19,13 @@ QJsonObject KeyCodeBoxSettings::m_json_obj = QJsonObject();
 QString KeyCodeBoxSettings::m_filename = SETTINGS_FULL_PATH;
 CABINET_VECTOR KeyCodeBoxSettings::m_cabinet_info = CABINET_VECTOR(0);
 
-static QString const DEFAULT_KCB_SETTINGS = QString("{\"enable_fleetwave\":false,\"cabinets\":[],\"code_selection\":1,\"display\": false}");
-
+static QString const DEFAULT_KCB_SETTINGS = QString(
+    "{"
+    "\"enable_fleetwave\":false,"
+    "\"cabinets\":[],\"lock_selection\":1,"
+    "\"display\": false,"
+    "\"internetTime\": false"
+    "}");
 
 void KeyCodeBoxSettings::createDefault()
 {
@@ -77,16 +82,16 @@ void KeyCodeBoxSettings::JsonToFile()
 
 bool KeyCodeBoxSettings::isFleetwaveEnabled()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
     bool value = m_json_obj["enable_fleetwave"].toBool();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return value;
 }
 
 CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
 
     QJsonArray cabArray = m_json_obj["cabinets"].toArray();
@@ -118,23 +123,23 @@ CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
     //     KCB_DEBUG_TRACE(entry.model << entry.num_locks << entry.start << entry.stop << entry.sw_version << entry.addr);
     // }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return m_cabinet_info;
 }
 
 int KeyCodeBoxSettings::getNumCabinets()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     getCabinetsInfo();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return m_cabinet_info.count();
 }
 
 int KeyCodeBoxSettings::getLocksPerCabinet(int cab_index)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     getCabinetsInfo();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return m_cabinet_info[cab_index].num_locks;
 }
 
@@ -155,7 +160,7 @@ int KeyCodeBoxSettings::getTotalLocks()
 
 void KeyCodeBoxSettings::ClearCabinetConfig()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
 
     if (m_json_obj.contains("cabinets"))
@@ -165,12 +170,12 @@ void KeyCodeBoxSettings::ClearCabinetConfig()
 
     JsonToFile();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KeyCodeBoxSettings::AddCabinet(CABINET_INFO const &cab)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QJsonObject cabinet;
     cabinet.insert(QString("model"), QJsonValue(cab.model));
     cabinet.insert(QString("num_locks"), QJsonValue(cab.num_locks));
@@ -196,21 +201,21 @@ void KeyCodeBoxSettings::AddCabinet(CABINET_INFO const &cab)
 
     JsonToFile();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 bool KeyCodeBoxSettings::isDisplaySet()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
     bool value = m_json_obj["display"].toBool();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return value;
 }
 
 void KeyCodeBoxSettings::setDisplay()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
     if (m_json_obj.contains("display"))
     {
@@ -221,7 +226,7 @@ void KeyCodeBoxSettings::setDisplay()
         m_json_obj.insert(QString("display"), QJsonValue(true));
     }
     JsonToFile();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KeyCodeBoxSettings::setNetworkingSettings(NETWORK_SETTINGS const & settings)
@@ -375,44 +380,44 @@ QString KeyCodeBoxSettings::GetVncPort()
         }
     }
 
-    KCB_DEBUG_TRACE("result" << result);
+    // KCB_DEBUG_TRACE("result" << result);
     return result;
 }
 
 void KeyCodeBoxSettings::SetVncCredentials(QString port, QString password)
 {
-    KCB_DEBUG_TRACE(port << password);
+    // KCB_DEBUG_TRACE(port << password);
 
     std::system("rm /home/pi/kcb-config/config/vnc_creds.txt");
     QString command = QString("echo '|%1 %2|' > /home/pi/kcb-config/config/vnc_creds.txt").arg(port).arg(password);
-    KCB_DEBUG_TRACE(command);
+    // KCB_DEBUG_TRACE(command);
     std::system(command.toStdString().c_str());
 }
 
 SelectionType KeyCodeBoxSettings::GetLockSelectionType()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
 
     SelectionType result = SelectionType::SINGLE;
     
-    if (m_json_obj.contains("code_selection"))
+    if (m_json_obj.contains("lock_selection"))
     {
-        result = static_cast<SelectionType>(m_json_obj["code_selection"].toInt());
+        result = static_cast<SelectionType>(m_json_obj["lock_selection"].toInt());
     }
     else
     {
-        KCB_DEBUG_TRACE("settings selection to single because object not found");
+        // KCB_DEBUG_TRACE("settings selection to single because object not found");
         SetLockSelectionType(SelectionType::SINGLE);
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return result;
 }
 
 void KeyCodeBoxSettings::SetLockSelectionType(SelectionType value)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
 
     if (m_json_obj.contains("lock_selection"))
@@ -425,28 +430,28 @@ void KeyCodeBoxSettings::SetLockSelectionType(SelectionType value)
     }
 
     JsonToFile();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KeyCodeBoxSettings::SetLockSelectionSingle()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     SetLockSelectionType(SelectionType::SINGLE);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KeyCodeBoxSettings::SetLockSelectionMulti()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     SetLockSelectionType(SelectionType::MULTI);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KeyCodeBoxSettings::SetLockSelectionDisabled()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     SetLockSelectionType(SelectionType::DISABLED);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 bool KeyCodeBoxSettings::IsLockSelectionSingle()
@@ -466,7 +471,7 @@ bool KeyCodeBoxSettings::IsLockSelectionEnabled()
 
 void KeyCodeBoxSettings::setAutoCodeSettings(AutoCodeSettings settings)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
 
     QJsonObject autocode;
@@ -496,12 +501,12 @@ void KeyCodeBoxSettings::setAutoCodeSettings(AutoCodeSettings settings)
     m_json_obj.insert(QString("autocode"), QJsonValue(autocode));
     
     JsonToFile();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 AutoCodeSettings KeyCodeBoxSettings::GetAutoCodeSettings()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
 
     AutoCodeSettings acs;
@@ -518,7 +523,7 @@ AutoCodeSettings KeyCodeBoxSettings::GetAutoCodeSettings()
         acs.nextgendatetime = temp["next_gen_datetime"].toString();
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return acs;
 }
 
@@ -536,13 +541,13 @@ void KeyCodeBoxSettings::SetAutoCodeDefaults()
 
 void KeyCodeBoxSettings::SetAutoCodeEnableState(bool state)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     AutoCodeSettings acs = GetAutoCodeSettings();
     acs.enabled = state;
     setAutoCodeSettings(acs);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KeyCodeBoxSettings::EnableAutoCode()
@@ -559,33 +564,33 @@ void KeyCodeBoxSettings::DisableAutoCode()
 
 bool KeyCodeBoxSettings::IsAutoCodeEnabled()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     AutoCodeSettings acs = GetAutoCodeSettings();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return acs.enabled;
 }
 
 bool KeyCodeBoxSettings::IsAutoCodeCommitted()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     AutoCodeSettings acs = GetAutoCodeSettings();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return acs.committed;
 }
 
 void KeyCodeBoxSettings::SetAutoCodeNextGenDateTime(const QDateTime& datetime)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     AutoCodeSettings acs = GetAutoCodeSettings();
     acs.nextgendatetime = datetime.toString(DATETIME_FORMAT);
     setAutoCodeSettings(acs);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 QDateTime KeyCodeBoxSettings::GetAutoCodeNextGenDateTime()
@@ -593,6 +598,20 @@ QDateTime KeyCodeBoxSettings::GetAutoCodeNextGenDateTime()
     AutoCodeSettings acs = GetAutoCodeSettings();
 
     return QDateTime::fromString(acs.nextgendatetime, DATETIME_FORMAT);
+}
+
+void KeyCodeBoxSettings::EnableAutoCodeEmail()
+{
+    AutoCodeSettings acs = GetAutoCodeSettings();
+    acs.email = true;
+    setAutoCodeSettings(acs);
+}
+
+void KeyCodeBoxSettings::DisableAutoCodeEmail()
+{
+    AutoCodeSettings acs = GetAutoCodeSettings();
+    acs.email = false;
+    setAutoCodeSettings(acs);
 }
 
 QByteArray KeyCodeBoxSettings::GetAutoCodeKey()
@@ -611,7 +630,7 @@ QString KeyCodeBoxSettings::GetAutoCodePassword()
 
 bool KeyCodeBoxSettings::GetInternetTimeSetting()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     JsonFromFile();
 
     bool result = false;

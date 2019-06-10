@@ -83,6 +83,8 @@ class KeyCodeBoxSettings : public QObject
         static QByteArray GetAutoCodeKey();
         static QString GetAutoCodePassword();
         static QDateTime GetAutoCodeNextGenDateTime();
+        static void EnableAutoCodeEmail();
+        static void DisableAutoCodeEmail();
         static bool IsInternetTimeEnabled();
         static void EnableInternetTime();
         static void DisableInternetTime();

@@ -131,6 +131,7 @@ class CSystemController : public QObject
         void __RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3);
         void __OnSendTestEmail(int select_type);
         void __OnUpdateCodes();
+        void __OnAutoCodeEmail(const QString& key);
         
     public slots:
         void TrigQuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(lockNums, question1, question2, question3);}
@@ -226,8 +227,16 @@ class CSystemController : public QObject
         void OnCardSwipe(QString sCode1, QString sCode2);
         void OnFingerSwipe(QString sCode1, QString sCode2);
         void OnAutoCodeTimeout();
+        void OnAutoCodeEmail(const QString& key);
 
     private:
+        struct EmailParts
+        {
+            QString subject;
+            QString body;
+        };
+
+
         QThread                 *_pInitThread;
         QThread                 _threadReport;
         QThread                 _threadHID, _threadCardReader;
@@ -271,7 +280,9 @@ class CSystemController : public QObject
         void stopTimeoutTimer();
         void initializeReaders();
         QString getCodeToUse(QString code1, QString code2);
-        void sendEmailReport(QDateTime access, QString desc, QString lockNums);
+        void sendEmail(const QString& subject, const QString& body);
+        EmailParts CreateReportEmail(QDateTime access, QString desc, QString lockNums);
+        EmailParts CreateAutoCodeEmail(const QString& key);
 };
 
 #endif // CSYSTEMCONTROLLER_H

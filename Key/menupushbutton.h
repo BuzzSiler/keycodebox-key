@@ -16,7 +16,6 @@ public:
 
 protected:
     virtual void mouseReleaseEvent(QMouseEvent *ev) {
-        qDebug() << "CMenuPushButton::mouseReleaseEvent()";
         QMenu MyMenu(this);
         MyMenu.addActions(this->actions());
         MyMenu.exec(ev->globalPos());

@@ -117,11 +117,9 @@ class CSecurityController : public QObject
         }
         
         void OnReadLockSet(QString nLockNum, QDateTime start, QDateTime end) { 
-            qDebug() << "SLOT: SecurityController -> OnReadLockSet";
             emit __OnReadLockSet(nLockNum, start, end); 
         }
         void OnLockSet(CLockSet *pSet) { 
-            qDebug() << "SLOT: SecurityController -> OnLockSet";
             emit __OnLockSet(pSet); 
         }
 
@@ -136,7 +134,6 @@ class CSecurityController : public QObject
         void OnCodeHistoryForDateRange(CLockHistorySet *pLockHistorySet);
 
         void    OnUpdateCurrentAdmin(CAdminRec *adminInfo) {
-            qDebug() << "CSecurityController::OnUpdateCurrentAdmin(adminInfo)";
             _pAdminRec = adminInfo;
             emit __UpdateCurrentAdmin(adminInfo);
         }

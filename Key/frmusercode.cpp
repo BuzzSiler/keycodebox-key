@@ -120,10 +120,9 @@ void CFrmUserCode::onButtonClick(char key)
 
 void CFrmUserCode::onCodeEntered()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QString sCode = ui->edCode->text();
-    KCB_DEBUG_TRACE("Code Entered:" << sCode);
 
     QString quit_code = QStringLiteral("123456789987654321");
     if (sCode == quit_code)
@@ -140,7 +139,7 @@ void CFrmUserCode::onCodeEntered()
 
         emit __CodeEntered(sCode);
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::onBackSpace()
@@ -169,16 +168,15 @@ void CFrmUserCode::OnEnableKeyboard(bool bEnable)
 
 void CFrmUserCode::OnClearCodeDisplay()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     ui->btn_Return->setDisabled(true);
     ui->edCode->clear();
     ui->edCode->setText("");
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnSwipeCode(QString sCode)
 {
-    KCB_DEBUG_TRACE(sCode);
     if (fleetwave_enabled)
     {
         if (!kcb::Application::isTakeSelection() && !kcb::Application::isReturnSelection())
@@ -198,13 +196,13 @@ void CFrmUserCode::OnSwipeCode(QString sCode)
 
 void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     bool fleetwave_prompt = sCodeMsg == USER_CODE_FLEETWAVE_PROMPT;
     bool user_code_prompt = sCodeMsg ==  USER_CODE_PROMPT;
     bool other_prompt = sCodeMsg == "Code 1";
 
-    KCB_DEBUG_TRACE(sCodeMsg << fleetwave_prompt << user_code_prompt << other_prompt << m_takereturn_state);
+    // KCB_DEBUG_TRACE(sCodeMsg << fleetwave_prompt << user_code_prompt << other_prompt << m_takereturn_state);
 
     if (fleetwave_prompt || user_code_prompt || other_prompt)
     {
@@ -235,7 +233,7 @@ void CFrmUserCode::OnNewCodeMessage(QString sCodeMsg)
         OnClearCodeDisplay();
         ui->edCode->setPlaceholderText(sCodeMsg);
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::on_btn_1_clicked()
@@ -358,7 +356,7 @@ void CFrmUserCode::SetDisplayShowHideButton(bool state)
 
 void CFrmUserCode::show()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QDialog::show();
 
     SetDisplayTakeReturnButtons(m_takereturn_state);
@@ -375,83 +373,79 @@ void CFrmUserCode::show()
         OnEnableKeyboard(true);
     }
     
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::SetDisplayTakeReturnButtons(bool state)
 {
-    KCB_DEBUG_ENTRY;    
-    KCB_DEBUG_TRACE("TakeReturn state" << state);
+    // KCB_DEBUG_ENTRY;
     m_takereturn_state = state;
     ui->pbTake->setEnabled(state);
     ui->pbReturn->setEnabled(state);
     ui->pbTake->setVisible(state);
     ui->pbReturn->setVisible(state);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::SetDisplayCodeEntryControls(bool state)
 {
-    KCB_DEBUG_ENTRY;
-    KCB_DEBUG_TRACE("CodeEntryControls state" << state);
+    // KCB_DEBUG_ENTRY;
 
     bool keypad_state = fleetwave_enabled ? false : state;
     ui->grpKeypad->setEnabled(keypad_state);
     
     ui->btnShowHideCode->setEnabled(state);
     ui->btnIdentifyFingerPrint->setEnabled(state);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayFingerprintButton(bool state)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_fp_state = state;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayShowHideButton(bool state)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_showhide_state = state;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::OnDisplayTakeReturnButtons(bool state)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_takereturn_state = state;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::on_pbTake_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     SetDisplayCodeEntryControls(true);
     ui->pbTake->setDisabled(true);
     ui->pbReturn->setDisabled(true);
     kcb::Application::setTakeAccessSelection();
     QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
     ui->edCode->setPlaceholderText(prompt);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::on_pbReturn_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     SetDisplayCodeEntryControls(true);
     ui->pbTake->setDisabled(true);
     ui->pbReturn->setDisabled(true);
     kcb::Application::setReturnAccessSelection();
     QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
     ui->edCode->setPlaceholderText(prompt);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmUserCode::EnterAdminControl()
 {
-    KCB_DEBUG_TRACE("Admin Button Pressed");
-
     QMessageBox msgbox;
 
     msgbox.setWindowTitle(tr("Administrator"));
@@ -472,7 +466,6 @@ void CFrmUserCode::EnterAdminControl()
         {
             mode = "Assist";
         }
-        KCB_DEBUG_TRACE("Setting mode to " << mode);
         emit __CodeEntered(mode);
     }
 }

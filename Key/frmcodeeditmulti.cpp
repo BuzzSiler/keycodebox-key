@@ -83,9 +83,9 @@ FrmCodeEditMulti::~FrmCodeEditMulti()
 
 void FrmCodeEditMulti::updateCabinetConfig()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_lock_cab.updateCabinetConfig();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void FrmCodeEditMulti::resetQuestions()
@@ -98,7 +98,7 @@ void FrmCodeEditMulti::resetQuestions()
 
 void FrmCodeEditMulti::setValues(CLockState * const state, const QStringList codes_in_use)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     resetQuestions();
     m_codes_in_use = codes_in_use;
@@ -664,7 +664,7 @@ void FrmCodeEditMulti::on_pbCode2Random_clicked()
 
 void FrmCodeEditMulti::OnLockSelectionChanged()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     if (KeyCodeBoxSettings::IsLockSelectionSingle())
     {
@@ -678,5 +678,5 @@ void FrmCodeEditMulti::OnLockSelectionChanged()
     {
         m_lock_cab.OnNotifyDisableLockSelection();
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }

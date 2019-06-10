@@ -57,13 +57,13 @@ void CLockController::initController()
     }
     else
     {
-        qDebug() << "USB->serial adapter not found";
+        KCB_DEBUG_TRACE("USB->serial adapter not found");
     }
 }
 
 void CLockController::ReadBoardEeprom(uint16_t addr)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     // Read Board Data
     // PIC18F46K22 allocated EEPROM locations in Code V1.17.
     //      EEPROM_Door_Address_Start   ;D'0000' ;First Door Address located here; 2 bytes
@@ -85,16 +85,16 @@ void CLockController::ReadBoardEeprom(uint16_t addr)
     UpdateDetectProgress();
     value = ReadEeprom(addr, 36);
     uint16_t board_addr = SWAP_BYTES(value);
-    value = ReadEeprom(addr, 38);
-    uint16_t broadcast_addr = SWAP_BYTES(value);
-    uint16_t fixed_data = ReadEeprom(addr, 44);
 
-    KCB_DEBUG_TRACE("Door Start Address" << door_start_addr);
-    KCB_DEBUG_TRACE("Door End Address" << door_end_addr);
-    KCB_DEBUG_TRACE("Software Version" << hex << software_version);
-    KCB_DEBUG_TRACE("Board Addr" << hex << board_addr);
-    KCB_DEBUG_TRACE("Broadcast Addr" << hex << broadcast_addr);
-    KCB_DEBUG_TRACE("Fixed Data" << hex << fixed_data);
+    // value = ReadEeprom(addr, 38);
+    // uint16_t broadcast_addr = SWAP_BYTES(value);
+    // uint16_t fixed_data = ReadEeprom(addr, 44);
+    // KCB_DEBUG_TRACE("Door Start Address" << door_start_addr);
+    // KCB_DEBUG_TRACE("Door End Address" << door_end_addr);
+    // KCB_DEBUG_TRACE("Software Version" << hex << software_version);
+    // KCB_DEBUG_TRACE("Board Addr" << hex << board_addr);
+    // KCB_DEBUG_TRACE("Broadcast Addr" << hex << broadcast_addr);
+    // KCB_DEBUG_TRACE("Fixed Data" << hex << fixed_data);
 
     int num_locks = (door_end_addr - door_start_addr) + 1;
 
@@ -107,12 +107,12 @@ void CLockController::ReadBoardEeprom(uint16_t addr)
                                         arg(minor, 2, 10, QChar('0')),
                                     QString("%1").arg(board_addr, 4, 16, QChar('0'))});
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 QByteArray CLockController::CreateSearchNetworkCommand(uint16_t addr)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QByteArray command(9, 0x00);
 
     command[0] = 0x5D;
@@ -125,7 +125,7 @@ QByteArray CLockController::CreateSearchNetworkCommand(uint16_t addr)
     control_byte |= SEND_MSG_ON_FORWARD_LOOP;
     command[4] = control_byte;
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return command;
 }
 
@@ -180,7 +180,7 @@ void CLockController::LocateMaster()
     uint16_t addr;
     uint16_t global_addr = GLOBAL_ADDRESS;
     addr = SearchNetwork(global_addr);
-    KCB_DEBUG_TRACE("address" << hex << addr);
+    // KCB_DEBUG_TRACE("address" << hex << addr);
     UpdateDetectProgress();
 
     if (addr != 0)
@@ -190,7 +190,7 @@ void CLockController::LocateMaster()
         for (int ii = 1; ii < 5; ++ii)
         {
             addr = SearchNetwork(global_addr + ii);
-            KCB_DEBUG_TRACE("address" << addr);
+            // KCB_DEBUG_TRACE("address" << addr);
             UpdateDetectProgress();
             if (addr == 0 || addresses[0] == addr)
             {
@@ -203,7 +203,7 @@ void CLockController::LocateMaster()
     UpdateDetectProgress();
     KeyCodeBoxSettings::ClearCabinetConfig();
 
-    KCB_DEBUG_TRACE("board address" << addresses);
+    // KCB_DEBUG_TRACE("board address" << addresses);
     int start = 1;
     int stop = 32;
     foreach (auto ba, addresses)
@@ -220,7 +220,7 @@ void CLockController::LocateMaster()
 
 QByteArray CLockController::SendCommand(QByteArray &cmd)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QByteArray response(9, 0x00);
     if (isConnected())
     {
@@ -229,13 +229,13 @@ QByteArray CLockController::SendCommand(QByteArray &cmd)
         (void) _pport->WriteData(cmd);
         (void) _pport->ReadData(response);
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return response;
 }
 
 void CLockController::SetSequenceNumber(QByteArray &msg)
 {
-    KCB_DEBUG_TRACE("sequence number" << seqNum);
+    // KCB_DEBUG_TRACE("sequence number" << seqNum);
     uint8_t ctrl_seq_num = static_cast<uint8_t>(msg[4]);
     ctrl_seq_num |= seqNum;
     msg[4] = static_cast<char>(ctrl_seq_num);
@@ -440,7 +440,7 @@ std::string CLockController::to_hex(uint16_t to_convert)
 
 QByteArray CLockController::CreateReadEepromCommand(uint16_t addr, uint16_t offset)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QByteArray command(9, 0x00);
 
     command[0] = 0x5D;
@@ -459,13 +459,13 @@ QByteArray CLockController::CreateReadEepromCommand(uint16_t addr, uint16_t offs
     command[5] = inttohex.bytes.byte_low;
     command[6] = inttohex.bytes.byte_high;
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return command;
 }
 
 QByteArray CLockController::CreateOpenLockCommand(uint16_t addr)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QByteArray command(9, 0x00);
 
     command[0] = 0x5D;
@@ -483,7 +483,7 @@ QByteArray CLockController::CreateOpenLockCommand(uint16_t addr)
     command[5] = 0x01;
     command[6] = 0x20;
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return command;
 }
 
@@ -499,7 +499,7 @@ uint16_t CLockController::GetEepromResponseValue(RESPONSE type, QByteArray const
 
 uint16_t CLockController::ReadEeprom(uint16_t addr, uint16_t offset)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QByteArray command = CreateReadEepromCommand(addr, offset);
     QByteArray response = SendCommand(command);
     bool is_valid = ValidateResponse(RESPONSE::READ_EEPROM, command, response);
@@ -513,24 +513,24 @@ uint16_t CLockController::ReadEeprom(uint16_t addr, uint16_t offset)
     KCB_DEBUG_TRACE("Invalid response");
     return 0;
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CLockController::openLock(uint16_t nLockNum)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QByteArray command = CreateOpenLockCommand(nLockNum);
     QByteArray response = SendCommand(command);
 
     ValidateResponse(RESPONSE::OPEN_LOCK, command, response);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CLockController::openLocks(QString lockNums)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     // lockNums is a string representation of a list of locks to be opened
     //    e.g. 1,2,5,16,22,23,30
     //    - If a single lock is specified, there will be no commas
@@ -551,7 +551,7 @@ void CLockController::openLocks(QString lockNums)
     {
         openLock(lockNums.toInt());
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 /**
@@ -572,7 +572,6 @@ void CLockController::openLocks(QString lockNums)
  */
 void CLockController::readLockStateCmd(uint8_t nLockNum)
 {
-    qDebug() << "CLockController::readLockStateCmd";
     if(this->isConnected())
     {
         unsigned char commands[9] = { 0x5D, 0x8A, 0x01, 0x00, 0xC8, 0x00, 0x00, 0x00, 0x53 };
@@ -584,17 +583,17 @@ void CLockController::readLockStateCmd(uint8_t nLockNum)
             nchksum += commands[i];
         }
 
-        qDebug() << "  checksum:" << QString::number(nchksum) << "\n";
+        // KCB_DEBUG_TRACE("checksum:" << QString::number(nchksum));
 
         commands[8] = (unsigned char)nchksum;
 
-        qDebug() << "Command: ";
-        for(uint i=0;i<sizeof(commands);i++)
-        {
-            qDebug() << QString("%1").arg(commands[i], 2, 16, QChar('0'));
+        // qDebug() << "Command: ";
+        // for(uint i=0;i<sizeof(commands);i++)
+        // {
+        //     qDebug() << QString("%1").arg(commands[i], 2, 16, QChar('0'));
            
-        }
-        qDebug() << "\n";
+        // }
+        // qDebug() << "\n";
 
         _pport->WriteData(QByteArray((char *) commands, 9));
     }
@@ -610,7 +609,7 @@ std::string CLockController::readCommandResponse()
     {
         QByteArray data;
         nCount = _pport->ReadData(data);
-        rsp = QString(data).toStdString();        
+        rsp = QString(data).toStdString();
     }
 
     if (nCount < 9) 
@@ -623,22 +622,12 @@ std::string CLockController::readCommandResponse()
 }
 
 
-/**
- * @brief CLockController::inquireLockStatus
- * @param unBanks
- * @return
- *
- * Read the board to determine which lock solenoids are attached to the board.
- */
 uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
 {
     uint64_t        un64Locks = 0;
     uint64_t        un64ShiftValue = 0;
     unsigned char   ucLocks[2];
     std::string sResponse;
-
-    qDebug() << "CLockController::inquireLockStatus";
-    qDebug() << "Lock State(1):";
 
     if( unBanks > 4 ) 
     {
@@ -647,42 +636,39 @@ uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
 
     for(int i=0;i<unBanks;i++)
     {
-        readLockStateCmd(i*16+1);   // Read locks 1-16, 17-32, 33-48,  or 49-64
+        readLockStateCmd(i*16+1);
         try 
         {
             sResponse = this->readCommandResponse();
         } 
         catch (const std::runtime_error &e)
         {
-            qDebug() << "inquireLockStatus() runtime error:\t" << e.what();
+            KCB_DEBUG_TRACE("runtime error" << e.what());
             _un64LockLocks = 0xFFFFFFFFFFFFFFFF;
             return _un64LockLocks;
         }
-        qDebug() << "Command Response Count:" << sResponse.length();
-        qDebug() << "Hex Response:";
-        for(uint j=0;j<sResponse.length();j++)
-        {
-            qDebug() << QString("%1").arg(sResponse[j], 2, 16, QChar('0'));
-        }
+        // for(uint j=0;j<sResponse.length();j++)
+        // {
+        //     qDebug() << QString("%1").arg(sResponse[j], 2, 16, QChar('0'));
+        // }
 
-        qDebug() << "\n";
+        // qDebug() << "\n";
 
-        // Populate to 64 bit unsigned return value
         ucLocks[0] = (unsigned char)sResponse[6];
         ucLocks[1] = (unsigned char)sResponse[7];
 
         // Print out for test/check now
-        qDebug() << "Locks[" << i*16+1 << "+]:";
-        for(uint8_t n=0;n<8;n++) 
-        {
-            qDebug() << ((ucLocks[0] & (0x01 << n)) != 0x00 ? '1' : '0');
-        }
-        qDebug() << ":";
-        for(uint8_t n=0;n<8;n++) 
-        {
-            qDebug() << ((ucLocks[1] & (0x01 << n)) != 0x00 ? '1' : '0');
-        }
-        qDebug() << "\n";
+        // qDebug() << "Locks[" << i*16+1 << "+]:";
+        // for(uint8_t n=0;n<8;n++) 
+        // {
+        //     qDebug() << ((ucLocks[0] & (0x01 << n)) != 0x00 ? '1' : '0');
+        // }
+        // qDebug() << ":";
+        // for(uint8_t n=0;n<8;n++) 
+        // {
+        //     qDebug() << ((ucLocks[1] & (0x01 << n)) != 0x00 ? '1' : '0');
+        // }
+        // qDebug() << "\n";
 
         un64ShiftValue = ucLocks[0];
         un64Locks = un64Locks | (un64ShiftValue << (i*2)*8);
@@ -718,12 +704,12 @@ void CLockController::detectHardware()
 
 void CLockController::setLockRanges()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     CABINET_VECTOR cabinets = KeyCodeBoxSettings::getCabinetsInfo();
 
     foreach (auto cab, cabinets)
     {
-        KCB_DEBUG_TRACE("cab start" << cab.start << "cab stop" << cab.stop << "total" << cab.num_locks);
+        // KCB_DEBUG_TRACE("cab start" << cab.start << "cab stop" << cab.stop << "total" << cab.num_locks);
 
         bool ok;
         int addr = cab.addr.toInt(&ok, 16);
@@ -737,5 +723,5 @@ void CLockController::setLockRanges()
         }
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
