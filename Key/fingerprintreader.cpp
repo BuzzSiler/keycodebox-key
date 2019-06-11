@@ -89,7 +89,7 @@ bool CFingerprintReader::openDeviceHandle()
 
     if( r )
     {
-        KCB_DEBUG_TRACE("Opening Device FAILED");
+        KCB_DEBUG_TRACE("Fingerprint Reader device not found");
         return false;
     }
 

@@ -17,7 +17,7 @@ SerialPort::SerialPort(const QString& portName, int baudRate, int writeTimeout, 
     if (!m_port.open(QIODevice::ReadWrite)) 
     {
         KCB_CRITICAL_TRACE(QString("Can't open %1, error code %2").arg(portName).arg(m_port.error()));
-    }        
+    }
 }
 
 SerialPort::~SerialPort()
@@ -35,7 +35,7 @@ int SerialPort::WriteData(const QByteArray &request)
     }
     else
     {
-        KCB_CRITICAL_TRACE("Timeout occurred while writing to serial port");
+        KCB_CRITICAL_TRACE("Serial port timeout");
     }
     
     return (int) num_bytes;
@@ -52,11 +52,11 @@ int SerialPort::ReadData(QByteArray& response)
             response += m_port.readAll();
         }
 
-        KCB_DEBUG_TRACE("ReadData:" << response.toHex());
+        // KCB_DEBUG_TRACE("ReadData:" << response.toHex());
     }
     else
     {
-        KCB_CRITICAL_TRACE("Timeout occurred while reading from serial port");
+        KCB_CRITICAL_TRACE("Serial port timeout");
     }
     
     // KCB_DEBUG_TRACE("ReadData size: " << response.size());

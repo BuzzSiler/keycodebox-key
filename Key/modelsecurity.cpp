@@ -21,6 +21,8 @@ static bool fleetwave_enabled;
 
 void CModelSecurity::openDatabase()
 {
+    // KCB_DEBUG_ENTRY;
+    QSqlDatabase::removeDatabase("SQLITE");
     _DB = QSqlDatabase::addDatabase( "QSQLITE", "SQLITE" );
     QString sPath = "/home/pi/run/Alpha.db";
     _DB.setDatabaseName(sPath);
@@ -30,6 +32,8 @@ void CModelSecurity::openDatabase()
         KCB_DEBUG_TRACE(_DB.lastError());
         qFatal( "Failed to connect." );
     }
+
+    // KCB_DEBUG_EXIT;
 }
 
 CModelSecurity::CModelSecurity(QObject *parent) : QObject(parent)
@@ -115,6 +119,8 @@ void CModelSecurity::initialize()
 
 void CModelSecurity::removeCreatedObjects()
 {
+    QSqlDatabase::removeDatabase("SQLITE");
+
     if(_ptblCodes) 
     {
         delete _ptblCodes;

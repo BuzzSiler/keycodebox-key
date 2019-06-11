@@ -992,6 +992,8 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
     table->setRowCount(pSet->getLockMap()->size());
 
+//    table->setSortingEnabled(false);
+
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
@@ -1056,9 +1058,11 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         nRow++;
     }
 
+//    table->setSortingEnabled(true);
+
     // Note: We want the entries in the combo box to be in numeric order
     // We gather the locks using a set to remove duplicates.  Unfortunately
-    // sets cannot be sorted, so we convert to a list, so and add to the
+    // sets cannot be sorted, so we convert to a list and add to the
     // combo box.
     QList<int> lock_items_list(lock_items.toList());
     qSort(lock_items_list.begin(), lock_items_list.end());
@@ -1599,7 +1603,13 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 }
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
-{    
+{
+    // A header column click must handle different modes of operation
+    //    - sort columns table content if column is correct column, i.e.
+    //         autocode enabled
+    //             code mode 1 - line, locks, username or code #1 selected
+    //
+
     if (AutoCodeGeneratorStatic::IsCode1Mode())
     {
         return;

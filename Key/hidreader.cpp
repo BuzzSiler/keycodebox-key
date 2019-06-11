@@ -88,7 +88,7 @@ bool CHWKeyboardReader::openDeviceHandle()
     } 
     else 
     {
-        KCB_DEBUG_TRACE("failed to open hid");
+        KCB_DEBUG_TRACE("Keyboard Reader HID device not found");
         return false;
     }
     return false;

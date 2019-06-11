@@ -112,19 +112,17 @@ int CTblCodes::checkCodeOne(QString code,
 
     if (!qry.exec())
     {
-        qDebug() << qry.lastError().text() << qry.lastQuery();
+        KCB_WARNING_TRACE(qry.lastError().text() << qry.lastQuery());
         return KCB_FAILED;
     }
 
     // Note: Duplicate code1 entries are not allowed.  So, we can return on the first match
 
-    KCB_DEBUG_TRACE("Active" << qry.isActive() << "Select" << qry.isSelect());
+    // KCB_DEBUG_TRACE("Active" << qry.isActive() << "Select" << qry.isSelect());
 
     while (qry.next())
     {
 
-        KCB_DEBUG_TRACE("qry.next");
-        
         auto ids = QUERY_VALUE(qry, "ids").toInt();
         auto sCode1 = QUERY_VALUE(qry, "code1").toString();
         auto sCode2 = QUERY_VALUE(qry, "code2").toString();
@@ -215,11 +213,11 @@ int CTblCodes::checkCodeTwo(QString code,
 
     if(!qry.exec())
     {
-        qDebug() << qry.lastError().text() << qry.lastQuery();
+        KCB_WARNING_TRACE(qry.lastError().text() << qry.lastQuery());
         return KCB_FAILED;
     }
 
-    KCB_DEBUG_TRACE("Active" << qry.isActive() << "Select" << qry.isSelect());
+    // KCB_DEBUG_TRACE("Active" << qry.isActive() << "Select" << qry.isSelect());
 
     if(!qry.first())
     {
@@ -332,7 +330,6 @@ void CTblCodes::execSelectCodeSetQuery(QStringList lockNumsList, QSqlQuery& qry,
 
     *pLockSet = new CLockSet();
 
-    qDebug() << "Retrieving at least first record that was found!";
     do
     {
 
@@ -591,11 +588,9 @@ void CTblCodes::initialize()
     QString column6 = "question3";
     QString column7 = "autocode";
 
-    qDebug() << columnExists(column);
-
     if(!tableExists())
     {
-        qDebug() << "Table does not Exist";
+        KCB_DEBUG_TRACE("Table does not Exist");
         createTable();
     }
 
@@ -655,11 +650,7 @@ void CTblCodes::createTable()
 
         if( !qry.exec() )
         {
-            qDebug() << qry.lastError();
-        }
-        else
-        {
-            qDebug() << "Table created!";
+            KCB_WARNING_TRACE("error" << qry.lastError());
         }
     } 
     else 
@@ -671,10 +662,8 @@ void CTblCodes::createTable()
 
 void CTblCodes::createColumn(QString column, QString fieldType)
 {
-    qDebug() << "CTblCodes::createColumn\n";
     if( _pDB && _pDB->isOpen() ) 
     {
-        std::cout << "Creating table \n";
         QSqlQuery qry(*_pDB);
 
         QString sql("ALTER TABLE  ");
@@ -688,16 +677,12 @@ void CTblCodes::createColumn(QString column, QString fieldType)
 
         if( !qry.exec() )
         {
-            qDebug() << qry.lastError();
-        }
-        else
-        {
-            qDebug() << "Table altered!";
+            KCB_WARNING_TRACE("error" << qry.lastError());
         }
     } 
     else 
     {
-        std::cout << "Either _pDB is NULL or _pDB is not open\n";
+        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
     }
 }
 

@@ -401,13 +401,12 @@ bool CTblAdmin::updateAdmin(QString name, QString email, QString phone,
 
     if( !qry.exec() ) 
     {
-        qDebug() << "CTblAdmin::updateAdmin():" << qry.lastError();
+        KCB_WARNING_TRACE("last error" << qry.lastError());
         return false;
     }
     else 
     {
         _pDB->commit();
-        qDebug() << "Updated Admin! SMTP Server:" << smtpserver << ":" << QVariant(smtpport).toString();
         readAdmin();
         return true;
     }
@@ -486,7 +485,7 @@ bool CTblAdmin::columnExists(QString column)
         }
         else
         {
-            qDebug() << qry.lastError();
+            KCB_WARNING_TRACE("error" << qry.lastError());
         }
 
     } 
@@ -524,11 +523,7 @@ void CTblAdmin::createColumn(QString column, QString fieldType, QString value)
 
         if( !qry.exec() )
         {
-            qDebug() << qry.lastError();
-        }
-        else
-        {
-            qDebug() << "Table altered!";
+            KCB_WARNING_TRACE("error" << qry.lastError());
         }
     } 
     else 
@@ -578,11 +573,11 @@ int CTblAdmin::queryCommonFields(const QStringList& common_fields, QMap<QString,
 
     if (!query.exec())
     {
-        qDebug() << query.lastError().text() << query.lastQuery();
+        KCB_WARNING_TRACE("error" << query.lastError().text() << query.lastQuery());
         return KCB_FAILED;
     }
 
-    KCB_DEBUG_TRACE("Active" << query.isActive() << "Select" << query.isSelect());
+    // KCB_DEBUG_TRACE("Active" << query.isActive() << "Select" << query.isSelect());
 
     while (query.next())
     {
@@ -606,7 +601,7 @@ int CTblAdmin::dropTable()
     
     query.setForwardOnly(true);
 
-    qDebug() << "SQL:" << sql;
+    // KCB_DEBUG_TRACE("SQL:" << sql);
 
     if ( !query.prepare(sql) )
     {
@@ -616,7 +611,7 @@ int CTblAdmin::dropTable()
 
     if ( !query.exec() )
     {
-        qDebug() << query.lastError().text() << query.lastQuery();
+        KCB_WARNING_TRACE(query.lastError().text() << query.lastQuery());
         return KCB_FAILED;
     }
 

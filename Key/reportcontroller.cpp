@@ -378,8 +378,7 @@ void CReportController::RemoveOldReports(QDateTime dtDelete)
     // KCB_DEBUG_ENTRY;
     KCB_DEBUG_TRACE("Deleting files older than" << dtDelete);
 
-    Q_ASSERT_X(_padminInfo != nullptr, Q_FUNC_INFO, "admin is null");
-    if (_padminInfo)
+    if (_bCurrentAdminRetrieved)
     {
         //   Get a list of reports from the report directory sorted by date/time
         QDir dir(_padminInfo->getReportDirectory());
@@ -406,19 +405,24 @@ void CReportController::RemoveOldReports(QDateTime dtDelete)
 void CReportController::OnCheckIfReportingTimeEvent()
 {
     // KCB_DEBUG_ENTRY;
-    QDateTime   dtNow = QDateTime::currentDateTime();
-    QDateTime dtReportStart, dtReportEnd, dtDelete;
-    
-    if(timetoSendReport(dtNow, dtReportStart, dtReportEnd)) 
+
+    if (_bCurrentAdminRetrieved)
     {
-        _dtLastReportDate = QDateTime::currentDateTime();
-        assembleAndSendCodeRecordsForReportDate(dtReportStart, dtReportEnd);
+        QDateTime   dtNow = QDateTime::currentDateTime();
+        QDateTime dtReportStart, dtReportEnd, dtDelete;
+        
+        if(timetoSendReport(dtNow, dtReportStart, dtReportEnd)) 
+        {
+            _dtLastReportDate = QDateTime::currentDateTime();
+            assembleAndSendCodeRecordsForReportDate(dtReportStart, dtReportEnd);
+        }
+        else if (timetoDeleteOldReports(dtNow, dtDelete))
+        {
+            _dtLastDeleteDate = QDateTime::currentDateTime();
+            RemoveOldReports(dtDelete);
+        }
     }
-    else if (timetoDeleteOldReports(dtNow, dtDelete))
-    {
-        _dtLastDeleteDate = QDateTime::currentDateTime();
-        RemoveOldReports(dtDelete);
-    }
+
     // KCB_DEBUG_EXIT;
 }
 

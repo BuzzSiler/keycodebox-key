@@ -33,8 +33,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _psystemController(new CSystemController(this)),
     kkd(*new KcbKeyboardDialog(this, true))
 {
-    qDebug() << QThread::currentThreadId();
-
     ui->setupUi(this);
 
     LOG_TRACE_DEBUG("starting application");
@@ -54,11 +52,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     if( _pPixmap->isNull() )
     {
-        KCB_DEBUG_TRACE("Failed to load image, loading backup!");
+        KCB_DEBUG_TRACE("Loading default branding image");
 
         _pPixmap = new QPixmap("/home/pi/kcb-config/images/alpha_logo_touch.jpg");
-        if(_pPixmap->isNull()) {
-            KCB_DEBUG_TRACE("Failed to load image!");
+        if(_pPixmap->isNull()) 
+        {
+            KCB_DEBUG_TRACE("Failed to load default branding image");
         }
     }
 

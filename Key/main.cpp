@@ -19,8 +19,6 @@ int main(int argc, char *argv[])
     // Note: This function may invoke a reboot
     kcb::SetupDisplay();
     
-    qDebug() << QThread::currentThreadId();
-
     MainWindow w;
     return a.exec();
 }

@@ -602,6 +602,7 @@ void CLockController::readLockStateCmd(uint8_t nLockNum)
 
 std::string CLockController::readCommandResponse()
 {
+    // KCB_DEBUG_ENTRY;
     std::string rsp = "";
     int  nCount = 0;
 
@@ -609,15 +610,17 @@ std::string CLockController::readCommandResponse()
     {
         QByteArray data;
         nCount = _pport->ReadData(data);
-        rsp = QString(data).toStdString();
+        if (nCount >= 9)
+        {
+            rsp = QString(data).toStdString();
+        }
+        else
+        {
+            KCB_WARNING_TRACE("Invalid response length" << nCount);
+        }
     }
 
-    if (nCount < 9) 
-    {
-        // it must have timed out.
-        KCB_DEBUG_TRACE("Didn't get enough bytes");
-        throw std::runtime_error("Read timed out!");
-    }
+    // KCB_DEBUG_EXIT;
     return rsp;
 }
 

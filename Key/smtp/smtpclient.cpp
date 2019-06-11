@@ -22,6 +22,8 @@
 #include <QFileInfo>
 #include <QByteArray>
 
+#include "logger.h"
+
 
 /* [1] Constructors and destructors */
 
@@ -248,8 +250,9 @@ bool SmtpClient::connectToHost()
 
             ((QSslSocket*) socket)->startClientEncryption();
 
-            if (!((QSslSocket*) socket)->waitForEncrypted(connectionTimeout)) {
-                qDebug() << ((QSslSocket*) socket)->errorString();
+            if (!((QSslSocket*) socket)->waitForEncrypted(connectionTimeout)) 
+            {
+                KCB_WARNING_TRACE(((QSslSocket*) socket)->errorString());
                 emit smtpError(ConnectionTimeoutError);
                 return false;
             }
