@@ -13,7 +13,8 @@ namespace AutoCodeGeneratorStatic
     bool IsNextGenDateTime(const QDateTime& datetime)
     {
         QDateTime next_gen = KeyCodeBoxSettings::GetAutoCodeNextGenDateTime();
-        if (datetime > next_gen)
+        quint64 secs = datetime.secsTo(next_gen);
+        if (secs >= 0)
         {
             return true;
         }
