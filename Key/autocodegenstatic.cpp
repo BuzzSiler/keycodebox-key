@@ -13,8 +13,8 @@ namespace AutoCodeGeneratorStatic
     bool IsNextGenDateTime(const QDateTime& datetime)
     {
         QDateTime next_gen = KeyCodeBoxSettings::GetAutoCodeNextGenDateTime();
-        quint64 secs = datetime.secsTo(next_gen);
-        if (secs >= 0)
+        qint64 msecs = datetime.msecsTo(next_gen);
+        if (msecs <= 0)
         {
             return true;
         }
@@ -48,10 +48,10 @@ namespace AutoCodeGeneratorStatic
         return AutoCodeGenerator::CodeMap();
     }
 
-    int SecsToNextGen(const QDateTime& datetime)
+    int MsecsToNextGen(const QDateTime& datetime)
     {
         QDateTime next_gen = KeyCodeBoxSettings::GetAutoCodeNextGenDateTime();
-        return datetime.secsTo(next_gen);
+        return datetime.msecsTo(next_gen);
     }
 
     AutoCodeGenerator::CodeMap GenerateCodeMap()
@@ -206,9 +206,6 @@ static void TestSecsNextGen(const AutoCodeParams& params, const QString&  text, 
     QStringList codes = acg.Generate(datetime);
     QDateTime dt = acg.NextGenDateTime();
     KeyCodeBoxSettings::SetAutoCodeNextGenDateTime(dt);
-
-    // KCB_DEBUG_TRACE("next gen(" << text <<")" << acg.NextGenDateTime());
-    // KCB_DEBUG_TRACE("secs to next gen" << AutoCodeGeneratorStatic::SecsToNextGen(datetime));
 }
 
 

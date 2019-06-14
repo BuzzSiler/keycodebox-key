@@ -1275,9 +1275,9 @@ void CSystemController::OnAutoCodeTimeout()
             OnAutoCodeEmail(QString(KeyCodeBoxSettings::GetAutoCodeKey()));
         }
 
-        int secs = AutoCodeGeneratorStatic::SecsToNextGen(QDateTime::currentDateTime());
-        KCB_DEBUG_TRACE("secs to next gen" << secs);
-        _autoCodeTimer.start( qMin(secs, 60) * 1000);
+        int msecs = AutoCodeGeneratorStatic::MsecsToNextGen(QDateTime::currentDateTime());
+        KCB_DEBUG_TRACE("secs/msecs to next gen" << msecs/1000 << msecs%1000);
+        _autoCodeTimer.start( qMin(msecs, 60000) );
     }
     else
     {

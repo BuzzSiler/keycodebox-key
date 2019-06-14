@@ -42,24 +42,24 @@ static const QString CODE1_MODE_MSG = QObject::tr("AutoCode Generation is in Cod
                      "\n"
                      "The following changes will be made:"
                      "\n"
-                     "\t1. All existing codes will be deleted."
+                     "  1. All existing codes will be deleted."
                      "\n"
-                     "\t2. New codes will be generated for all locks."
+                     "  2. New codes will be generated for all locks."
                      "\n"
-                     "\t3. Multi-lock selection will be disabled."
+                     "  3. Multi-lock selection will be disabled."
                      );
 
 static const QString CODE2_MODE_MSG = QObject::tr("AutoCode Generation is in Code 2 Mode."
                      "\n"
                      "All existing codes will be preserved and modified as follows:"
                      "\n"
-                     "\t1. All associated locks for all codes will be cleared."
+                     "  1. All associated locks for all codes will be cleared."
                      "\n"
-                     "\t2. All 'Code1' codes will remain unchanged."
+                     "  2. All 'Code1' codes will remain unchanged."
                      "\n"
-                     "\t3. All 'Code2' codes will have the 'code2' field cleared."
+                     "  3. All 'Code2' codes will have 'code2' cleared."
                      "\n"
-                     "\t4. Multi-lock selection will be disabled.");
+                     "  4. Multi-lock selection will be disabled.");
 
 static const AutoCodePeriodSetting AUTOCODE_PERIOD_SETTINGS[] = {
     {

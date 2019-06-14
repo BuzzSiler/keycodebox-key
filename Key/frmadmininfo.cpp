@@ -964,6 +964,20 @@ void CFrmAdminInfo::createCodeTableHeader()
     // KCB_DEBUG_EXIT;
 }
 
+QStringList CFrmAdminInfo::FormatLocks(const QString& locks)
+{
+    QStringList formatted_locks;
+
+    foreach (const auto& lock, locks.split(','))
+    {
+        if (!lock.isEmpty())
+        {
+            formatted_locks.append(QString("%0").arg(lock, 3, QChar('0')));
+        }
+    }
+    return formatted_locks;
+}
+
 void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 {
     // KCB_DEBUG_ENTRY;
@@ -985,30 +999,29 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     _pworkingSet = pSet;
     int nRow = 0;
     int nCol = 0;
-    QSet<int> lock_items;
+    QStringList lock_filter_items;
     QTableWidget *table = ui->tblCodesList;
     bool code1mode = AutoCodeGeneratorStatic::IsCode1Mode();
     bool code2mode = AutoCodeGeneratorStatic::IsCode2Mode();
 
     table->setRowCount(pSet->getLockMap()->size());
 
-//    table->setSortingEnabled(false);
+    ui->tblCodesList->setSortingEnabled(false);
 
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
 
-        // Locks can be single or comma-separated.
         QString locks = pState->getLockNums();
-        QStringList sl = locks.split(',');
-        foreach (auto s, sl)
-        {
-            lock_items.insert(s.toInt());
-        }
+        QStringList sl = FormatLocks(locks);
+        // Note: lock items are collected during the iteration of the codes
+        // to populate the locks filter drop down (see after iteration loop)
+        lock_filter_items.append(sl);
 
         nCol = 0;
-        table->setItem(nRow, nCol++, new QTableWidgetItem(QVariant(nRow + 1).toString()));
-        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getLockNums()));
+        QString row_value = QString("%0").arg(QVariant(nRow + 1).toString(), 3, QChar('0'));
+        table->setItem(nRow, nCol++, new QTableWidgetItem(row_value));
+        table->setItem(nRow, nCol++, new QTableWidgetItem(sl.join(',')));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getDescription()));
         QString code1 = pState->getCode1();
         if (pState->getFingerprint1())
@@ -1058,18 +1071,16 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         nRow++;
     }
 
-//    table->setSortingEnabled(true);
+    ui->tblCodesList->setSortingEnabled(true);
 
     // Note: We want the entries in the combo box to be in numeric order
     // We gather the locks using a set to remove duplicates.  Unfortunately
     // sets cannot be sorted, so we convert to a list and add to the
     // combo box.
-    QList<int> lock_items_list(lock_items.toList());
-    qSort(lock_items_list.begin(), lock_items_list.end());
-    foreach (auto i, lock_items_list)
-    {
-        ui->cbLockNum->addItem(QString::number(i));
-    }
+    QSet<QString> unique_filter_items = QSet<QString>::fromList(lock_filter_items);
+    QList<QString> sorted_filter_items(unique_filter_items.toList());
+    qSort(sorted_filter_items.begin(), sorted_filter_items.end());
+    ui->cbLockNum->addItems(QStringList(sorted_filter_items));
 
     _codesInUse.clear();
     _psysController->getAllCodes1(_codesInUse);
@@ -1317,18 +1328,27 @@ void CFrmAdminInfo::codeCellSelected( int row, int col)
 
 void CFrmAdminInfo::on_btnReadCodes_clicked()
 {
-    // KCB_DEBUG_ENTRY;
-
     QDateTime dtStart = ui->dtStartCodeList->dateTime();
     QDateTime dtEnd = ui->dtEndCodeList->dateTime();
     QString locks = ui->cbLockNum->currentText();
-
-    // KCB_DEBUG_TRACE(locks);
-
     if (locks == tr("All Locks"))
     {
         locks = "*";
     }
+    else if (locks.contains(QChar(',')))
+    {
+        QStringList sl;
+        foreach (const auto& l, locks.split(','))
+        {
+            sl.append(QString::number(l.toInt()));
+        }
+        locks = sl.join(',');
+    }
+    else
+    {
+        locks = QString::number(locks.toInt());
+    }
+
     emit __OnReadLockSet(locks, dtStart, dtEnd);
 }
 
@@ -1604,28 +1624,18 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
 {
-    // A header column click must handle different modes of operation
-    //    - sort columns table content if column is correct column, i.e.
-    //         autocode enabled
-    //             code mode 1 - line, locks, username or code #1 selected
-    //
-
-    if (AutoCodeGeneratorStatic::IsCode1Mode())
-    {
-        return;
-    }
-
-    _pTableMenuAdd->clear();
-    _pTableMenuAdd->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
+    KCB_DEBUG_ENTRY;
 
     if (nHeader == 5)
     {
+        _pTableMenuAdd->clear();
         _pTableMenuAdd->addAction(tr("Enable All"), this, SLOT(codeEnableAll()));
+        _pTableMenuAdd->show();
+        QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
+        _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenuAdd->width(), _pTableMenuAdd->height());
     }
-    _pTableMenuAdd->show();
 
-    QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
-    _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenuAdd->width(), _pTableMenuAdd->height());
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::checkAndCreateCodeEditForm()
@@ -1875,7 +1885,6 @@ void CFrmAdminInfo::OnTabSelected(int index)
     }
     else if (index == UTILITIES_TAB_INDEX)
     {
-        on_cbActionsSelect_currentIndexChanged(ACTION_INDEX_INSTALL_APP);
     }
 
     if (m_last_index != REPORT_TAB_INDEX && index == REPORT_TAB_INDEX)
@@ -2372,7 +2381,6 @@ void CFrmAdminInfo::SetCabinetInfo()
 
 void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
 {
-
     int col = item->column();
     int row = item->row();
 

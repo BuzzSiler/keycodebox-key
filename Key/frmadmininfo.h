@@ -288,6 +288,7 @@ class CFrmAdminInfo : public QDialog
         void OnUtilActionInstallApp();
         void OnUtilActionSetBrandingImage();
         void OnUtilActionDefaultBrandingImage();
+        QStringList FormatLocks(const QString& locks);
 
     protected:
         void touchEvent(QTouchEvent *ev);
