@@ -47,6 +47,7 @@ class LockCabinetWidget : public QWidget
 
     signals:
         void NotifyLockSelected(QString lock, bool is_selected);
+        void NotifyNoLocksSelected();
 
     private slots:
         void on_pbSelectAll_clicked();
@@ -75,6 +76,7 @@ class LockCabinetWidget : public QWidget
         int m_last_cab_selected;
         int m_last_state_selected;
         QMap<QString, QString> m_lock_names;
+        bool m_dont_ask_no_lock_msgbox;
 
         Ui::LockCabinetWidget *ui;
 

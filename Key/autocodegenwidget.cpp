@@ -166,7 +166,7 @@ AutoCodeGenerator::CodeMap& AutoCodeGenWidget::ProcessCommittedAutoCodeSettings(
 
 AutoCodeGenerator::CodeMap& AutoCodeGenWidget::ProcessEnabledAutoCodeSettings(AutoCodeGenerator::CodeMap& map)
 {
-    if (m_settings.enabled && !m_settings.committed)
+    if (m_settings.enabled && !m_settings.committed && !m_settings.password.isEmpty())
     {
         map = AutoCodeGeneratorStatic::CreateCodeMapAndStoreNextGenDateTime(m_params);
     }
@@ -450,13 +450,14 @@ bool AutoCodeGenWidget::WarnAutoCodeEnable()
                             tr("AutoCode Enable"),
                             tr("You have selected to enable AutoCode Generation."
                             "\n"
-                            "Continuing will enable the KeyCodeBox system to generate new lock codes based on the AutoCode Generation settings."
+                            "Continuing will enable the KeyCodeBox system to generate lock codes based on the AutoCode Generation settings."
                             "\n\n"
                             "Warning: Enabling AutoCode Generation may result in existing codes being modified or deleted."
                             "\n"
                             "It is recommended existing codes be backed up using Code Export before continuing."
                             "\n\n"
-                            "No changes will be committed until the 'Apply' button is pressed."
+                            "No changes will be committed until the 'Commit' button is pressed."
+                            "\n"
                             "Once committed, these changes cannot be undone."
                             "\n\n"
                             "Do you want to continue?"),
@@ -573,6 +574,7 @@ void AutoCodeGenWidget::updateUi()
     bool modified = units_changed || code_len_changed || startofday_changed || password_changed || period_changed || codemode_changed;
 
     ui->pbAutoCodeGenerate->setEnabled(modified);
+    ui->pbAutoCodeCommit->setDisabled(modified);
     ui->leAutoCodePassword->setStyleSheet((autocode_enabled && password_empty) ? css_warn : css_none);
 }
 
@@ -640,26 +642,9 @@ void AutoCodeGenWidget::on_pbAutoCodeRandomPassword_clicked()
     updateUi();
 }
 
-void AutoCodeGenWidget::OnNotifyCodesUpdate(const QStringList& codes)
-{
-    if (codes.isEmpty())
-    {
-        QPair<AutoCodeGenerator::CodeMap, QDateTime> result = AutoCodeGenerator::CreateCodeMap(m_params);
-        m_lock_cabinet.setLockDisplay(result.first);
-    }
-    else
-    {
-        QMap<QString, QString> map;
-        for (int ii=0; ii < codes.count(); ++ii)
-        {
-            map[QString::number(ii + 1)] = codes[ii];
-        }
-        m_lock_cabinet.setLockDisplay(map);
-    }
-}
-
 void AutoCodeGenWidget::UpdateCodes()
 {
+    // KCB_DEBUG_ENTRY;
     QStringList codes;
     if (IsCode1Mode())
     {
@@ -681,5 +666,5 @@ void AutoCodeGenWidget::UpdateCodes()
     {
         KCB_DEBUG_TRACE("Invalid code mode settings");
     }
-
+    // KCB_DEBUG_EXIT;
 }

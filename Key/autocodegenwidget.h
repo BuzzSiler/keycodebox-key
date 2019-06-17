@@ -48,7 +48,6 @@ class AutoCodeGenWidget : public QWidget
         void on_cbAutoCodePeriodUnits_currentIndexChanged(int index);
         void on_cbAutoCodeEmailKey_clicked();
         void on_pbAutoCodeRandomPassword_clicked();
-        void OnNotifyCodesUpdate(const QStringList& codes);
 
     private:
         LockCabinetWidget& m_lock_cabinet;

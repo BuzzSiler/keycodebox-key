@@ -58,7 +58,8 @@ CLockState::CLockState(QObject *parent) :
     _question1(""),
     _question2(""),
     _question3(""),
-    _access_type(ACCESS_TYPE_ALWAYS)
+    _access_type(ACCESS_TYPE_ALWAYS),
+    _autocode(false)
 {
 }
 
@@ -91,4 +92,5 @@ void CLockState::show()
     KCB_DEBUG_TRACE("    IsNew: " << _bIsNew);
     KCB_DEBUG_TRACE("      MOD: " << _bModified);
     KCB_DEBUG_TRACE("      MFD: " << _bMarkForDeletion);
+    KCB_DEBUG_TRACE(" AutoCode: " << _autocode);
 }

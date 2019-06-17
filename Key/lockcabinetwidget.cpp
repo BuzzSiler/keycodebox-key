@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QSignalMapper>
 #include <QFontMetrics>
+#include <QMessageBox>
+#include <QCheckBox>
 
 #include <algorithm>
 
@@ -33,6 +35,7 @@ LockCabinetWidget::LockCabinetWidget(QWidget *parent) :
     m_last_cab_selected(-1),
     m_last_state_selected(-1),
     m_lock_names({}),
+    m_dont_ask_no_lock_msgbox(false),
     ui(new Ui::LockCabinetWidget)
 {
     ui->setupUi(this);
@@ -202,7 +205,6 @@ void LockCabinetWidget::clrAllLocks()
     }
 
     m_selected_locks.clear();
-
     updateUi();
 }
 
@@ -388,26 +390,26 @@ void LockCabinetWidget::lockSelected(int lock_index)
         }
     }
 
-    // KCB_DEBUG_TRACE("After Single selection check");
-    // KCB_DEBUG_TRACE("states" << m_cabs[0].states << "enabled" << m_cabs[0].enabled << "lock index" << lock_index << "is checked" << m_lock_buttons[lock_index]->isChecked());
     bool checked = m_lock_buttons[lock_index]->isChecked();
     m_cabs[m_current_cab].states[lock_index] = checked;
-    // KCB_DEBUG_TRACE("cabs" << m_cabs[0].states << m_cabs[0].enabled);
     
     QString lock = QString::number(m_cabinet_info[m_current_cab].start + lock_index);
 
     if (checked)
     {
-        // KCB_DEBUG_TRACE("calling AddLockToSelected");
         AddLockToSelected(lock);
     }
     else
     {
-        // KCB_DEBUG_TRACE("calling RemoveLockFromSelected");
         RemoveLockFromSelected(lock);
     }
 
     emit NotifyLockSelected(lock, checked);
+
+    if (m_selected_locks.isEmpty())
+    {
+        emit NotifyNoLocksSelected();
+    }
 }
 
 void LockCabinetWidget::setLockDisplay(const QMap<QString, QString>& map)
@@ -445,7 +447,7 @@ void LockCabinetWidget::updateUi()
     // KCB_DEBUG_ENTRY;
     if (m_current_cab < 0)
     {
-        // KCB_DEBUG_EXIT;
+        KCB_DEBUG_TRACE("invalid cabinet index");
         return;
     }
     
@@ -461,7 +463,6 @@ void LockCabinetWidget::updateUi()
             m_lock_buttons[ii]->setChecked(p_cab->states[ii]);
             m_lock_buttons[ii]->setEnabled(p_cab->enabled[ii]);
             QString lock_name = m_lock_names[QString::number(start + ii)];
-            // KCB_DEBUG_TRACE("lock name" << lock_name << "lock key" << start+ii);
             m_lock_buttons[ii]->setText(lock_name);
         }
         else
@@ -470,6 +471,7 @@ void LockCabinetWidget::updateUi()
             m_lock_buttons[ii]->setEnabled(false);
         }
     }
+
     // KCB_DEBUG_EXIT;
 }
 

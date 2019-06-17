@@ -178,6 +178,7 @@ void CReportController::processLockCodeHistoryReport(QFile *pFile,
 void CReportController::assembleAndSendCodeRecordsForReportDate(QDateTime dtStart, QDateTime dtEnd)
 {
     // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_TRACE("sending report from" << dtStart << dtEnd);
     emit __RequestCodeHistoryForDateRange(dtStart, dtEnd);
     // KCB_DEBUG_EXIT;
 }
@@ -242,7 +243,7 @@ bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart
     QFile       *pFile = NULL;
 
     qint64 numSecsSinceLastReport = _dtLastReportDate.secsTo(now);
-    KCB_DEBUG_TRACE("Seconds since last report" << numSecsSinceLastReport);
+    // KCB_DEBUG_TRACE("Seconds since last report" << numSecsSinceLastReport);
 
     if (IS_HOURLY(dtFreq))
     {
@@ -322,7 +323,7 @@ bool CReportController::timetoDeleteOldReports(QDateTime dtNow, QDateTime& dtDel
 
     QDateTime dtFreq = _padminInfo->getDefaultReportDeleteFreq();
     quint64 numDays = _dtLastDeleteDate.daysTo(dtNow);
-    KCB_DEBUG_TRACE(QString("%1 days since last deletion").arg(QString::number(numDays)));
+    // KCB_DEBUG_TRACE(QString("%1 days since last deletion").arg(QString::number(numDays)));
 
     if (IS_DAILY(dtFreq))
     {

@@ -101,6 +101,7 @@ class CTblCodes
         void clearAllCodes();
         void deleteAllCode1OnlyCodes();
         void clearLockAndCode2ForAllCodes();
+        void clearAutoCodeForAllCodes();
         void updateCode1(const QString& lock, const QString& code);
         void updateCode2(const QString& lock, const QString& code);
 

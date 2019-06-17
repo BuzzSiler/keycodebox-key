@@ -190,6 +190,9 @@ void CSecurityController::OnSecurityCheckSuccess(QString locks)
 
 void CSecurityController::OnSecurityCheckSuccessWithAnswers(QString lockNums, QString answer1, QString answer2, QString answer3)
 {
+    Q_UNUSED(answer1);
+    Q_UNUSED(answer2);
+    Q_UNUSED(answer3);
     // KCB_DEBUG_TRACE(lockNums << "; " << answer1 << "; " << answer2 << "; " << answer3);
     emit __OnSecurityCheckSuccess(lockNums);
 }
@@ -238,6 +241,12 @@ void CSecurityController::deleteAllCode1OnlyCodes()
 void CSecurityController::clearLockAndCode2ForAllCodes()
 {
     _modelSecurity.clearLockAndCode2ForAllCodes();
+}
+
+void CSecurityController::clearAutoCodeForAllCodes()
+{
+    KCB_DEBUG_ENTRY;
+    _modelSecurity.clearAutoCodeForAllCodes();
 }
 
 void CSecurityController::addCode(CLockState& state)

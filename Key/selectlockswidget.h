@@ -37,9 +37,6 @@ class SelectLocksWidget : public QWidget
         void NotifyOpen();
         void NotifyTimeout();
 
-    public slots:
-        void OnLockSelectionChanged();
-
     private slots:
         void openDoorTimer();
         void OnNotifyLockSelected(QString lock, bool is_selected);

@@ -24,7 +24,7 @@ class FrmCodeEditMulti : public QDialog
         explicit FrmCodeEditMulti(QWidget *parent = 0);
         ~FrmCodeEditMulti();
 
-        void setValues(CLockState * const state, const QStringList codes_in_use);
+        void setValues(CLockState * const state, const QStringList& codes1_in_use, const QStringList& codes2_in_use);
         void getValues(CLockState * const state);
         void updateCabinetConfig();
         
@@ -33,6 +33,7 @@ class FrmCodeEditMulti : public QDialog
 
     public slots:
         void OnLockSelectionChanged();
+        void OnNotifyNoLocksSelected();
 
     private slots:
         void on_pbClearCode1_clicked();
@@ -50,14 +51,11 @@ class FrmCodeEditMulti : public QDialog
         void on_cbEnableQuestions_stateChanged(int state);
         void on_pbEditQuestions_clicked();
         void on_cbFingerprint_clicked();
-
         void OnNotifyLockSelected(QString lock, bool is_selected);
-
         void on_pbCode1Random_clicked();
-
         void on_pbCode2Random_clicked();
 
-private:
+    private:
         typedef struct _tag_code_state
         {
             QString code1;
@@ -74,17 +72,20 @@ private:
             bool fp_deleted;
             quint8 access_type;
             QString locks;
+            bool autocode;
         } CODE_STATE;
 
         QVector<QString> m_questions;
         LockCabinetWidget& m_lock_cab;
         CClickableLineEdit *m_p_line_edit;
         CODE_STATE m_code_state;
-        QStringList m_codes_in_use;
+        QStringList m_codes1_in_use;
+        QStringList m_codes2_in_use;
         bool m_initialized;
         Ui::FrmCodeEditMulti *ui;
         QLabel& m_access_type_label;
         QLabel& m_access_state_label;
+        bool m_warn_no_locks_selected;
 
         void updateAccessType(int index);
         void updateUi();
@@ -93,9 +94,7 @@ private:
         void resetQuestions();
         void disableCode2();
         void disableQuestions();
-
-
-
+        void warn_no_locks_selected();
 };
 
 #endif // FRMCODEEDITMULTI_H

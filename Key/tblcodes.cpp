@@ -766,7 +766,8 @@ int CTblCodes::addLockCode(QString locknums, QString code1, QString code2,
     {
         QVariant var = qry.lastInsertId();
         if(var.isValid())
-        {    int nId = var.toInt();
+        {    
+            int nId = var.toInt();
             return nId;
         }
         else
@@ -1083,19 +1084,25 @@ bool CTblCodes::updateRecord(CLockState &rec)
 bool CTblCodes::updateCode(CLockState *prec)
 {
     // KCB_DEBUG_ENTRY;
+
+    // prec->show();
     
     if(prec->isMarkedForDeletion()) 
     {
+        KCB_DEBUG_TRACE("marked for deletion");
         return deleteCode(*prec);
     } 
     else if (prec->isMarkedForReset())
-    {        
-        return resetCodeLimitedUse(*prec);        
+    {
+        KCB_DEBUG_TRACE("reset limited use");
+        return resetCodeLimitedUse(*prec);
     }
     else 
     {
+        // KCB_DEBUG_TRACE("get id" << prec->getID());
         if(prec->getID() == -1 ) 
         {
+            // addLockCode returns -1 if there is a failure and a non-zero positive number if successfull
             int nId = addLockCode(prec->getLockNums(),prec->getCode1(),prec->getCode2(),
                                   prec->getStartTime(), prec->getEndTime(),
                                   prec->getFingerprint1(), prec->getFingerprint2(),
@@ -1103,26 +1110,28 @@ bool CTblCodes::updateCode(CLockState *prec)
                                   prec->getStatus(), prec->getDescription(),
                                   prec->getSequence(), prec->getSequenceOrder(), prec->getMaxAccess(), prec->getMaxRetry(),
                                   prec->getAccessType(), prec->getAccessCount());
-            if(nId != -1 )
-            {
-                return false;
-            } 
-            else 
+            if (nId > 0)
             {
                 prec->setID(nId);
                 return true;
+            } 
+            else 
+            {
+                KCB_DEBUG_TRACE("invalid id" << nId);
+                return false;
             }
         }
-
-        if (prec->getID() > 0) 
+        else if (prec->getID() > 0) 
         {
             if (prec->isModified())
             {
+                KCB_DEBUG_TRACE("update record");
                 updateRecord(*prec);
             }
         }
     }
 
+    // KCB_DEBUG_EXIT;
     return true;
 }
 
@@ -1260,6 +1269,20 @@ void CTblCodes::clearLockAndCode2ForAllCodes()
     {
     } 
     else 
+    {
+        KCB_DEBUG_TRACE("failed");
+    }
+}
+
+void CTblCodes::clearAutoCodeForAllCodes()
+{
+    KCB_DEBUG_ENTRY;
+    QSqlQuery qry(*_pDB);
+    QString sql = QString("UPDATE %1 SET autocode = 0").arg(TABLENAME);
+
+    qry.prepare(sql);
+    bool result = qry.exec();
+    if (!result)
     {
         KCB_DEBUG_TRACE("failed");
     }

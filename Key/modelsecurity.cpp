@@ -101,9 +101,10 @@ void CModelSecurity::OnUpdateCurrentAdmin(CAdminRec *adminInfo)
 
 void CModelSecurity::OnUpdateCodeState(CLockState *rec)
 {
+    // KCB_DEBUG_ENTRY;
     bool bSuccess = _ptblCodes->updateCode(rec);
-
     emit __OnUpdatedCodeState(bSuccess);
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::initialize()
@@ -713,6 +714,11 @@ void CModelSecurity::deleteAllCode1OnlyCodes()
 void CModelSecurity::clearLockAndCode2ForAllCodes()
 {
     _ptblCodes->clearLockAndCode2ForAllCodes();
+}
+
+void CModelSecurity::clearAutoCodeForAllCodes()
+{
+    _ptblCodes->clearAutoCodeForAllCodes();
 }
 
 void CModelSecurity::addCode(CLockState& state)

@@ -17,6 +17,7 @@ namespace AutoCodeGeneratorStatic
     bool IsCode1Mode();
     bool IsCode2Mode();
     bool IsEnabled();
+    bool IsCommitted();
     void CreateAndStoreSecureKey(const AutoCodeParams& params, const QString& password);
 
 }

@@ -316,12 +316,15 @@ void CSystemController::OnCardSwipe(QString sCode1, QString sCode2)
 
     if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
     {
+        KCB_DEBUG_TRACE("Code 1 entry");
         emit __onUserCodeOne(sCodeToUse);
     } 
     else if( _systemState == EUserCodeTwo) 
     {
+        KCB_DEBUG_TRACE("Code 2 entry");
         emit __onUserCodeTwo(sCode2);
     }
+
     // Always emit this -- s.b.going to the AdminInfo screen only.
     emit __onUserCodes(sCodeToUse, sCode2);
 }
@@ -332,10 +335,12 @@ void CSystemController::OnFingerSwipe(QString sCode1, QString sCode2)
 
     if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
     {
+        KCB_DEBUG_TRACE("Code 1 entry");
         emit __onUserFingerprintCodeOne(sCodeToUse);
     } 
     else if( _systemState == EUserCodeTwo) 
     {
+        KCB_DEBUG_TRACE("Code 2 entry");
         emit __onUserFingerprintCodeTwo(sCode2);
     }
     // Always emit this -- s.b.going to the AdminInfo screen only.
@@ -346,10 +351,12 @@ void CSystemController::OnHIDCard(QString sCode1, QString sCode2)
 {
     if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
     {
+        KCB_DEBUG_TRACE("Code 1 entry");
         emit __onUserCodeOne(sCode1);
     } 
     else if( _systemState == EUserCodeTwo) 
     {
+        KCB_DEBUG_TRACE("Code 2 entry");
         emit __onUserCodeTwo(sCode2);
     }
     emit __onUserCodes(sCode1, sCode2);
@@ -425,27 +432,31 @@ void CSystemController::OnIdentifiedFingerprint(QString sCode, QString sCode2)
 void CSystemController::OnCodeEntered(QString sCode)
 {
     EnrollFingerprintResetStageCount();
+    KCB_DEBUG_ENTRY;
     _securityController.CheckAccessCodeOne(sCode);
 }
 
 void CSystemController::OnCodeEnteredTwo(QString sCode)
 {
+    KCB_DEBUG_ENTRY;
     _securityController.CheckAccessCodeTwo(sCode);
 }
 
 void CSystemController::OnFingerprintCodeEntered(QString sCode)
 {
+    KCB_DEBUG_ENTRY;
     _securityController.CheckFingerprintAccessCodeOne(sCode);
 }
 
 void CSystemController::OnFingerprintCodeEnteredTwo(QString sCode)
 {
+    KCB_DEBUG_ENTRY;
     _securityController.CheckFingerprintAccessCodeTwo(sCode);
 }
 
 void CSystemController::OnAdminPasswordEntered(QString sPW)
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
     _securityController.CheckAdminPassword(sPW);
     // KCB_DEBUG_EXIT;
 }
@@ -506,6 +517,7 @@ void CSystemController::OnAdminSecurityCheckOk(QString type)
 
 void CSystemController::OnAdminSecurityCheckFailed()
 {
+    KCB_DEBUG_ENTRY;
     emit __OnCodeMessage(tr("Incorrect Password"));
     emit __OnClearEntry();
     emit __AdminSecurityCheckFailed();
@@ -521,7 +533,7 @@ void CSystemController::OnAdminPasswordCancel()
 
 void CSystemController::OnUserCodeCancel()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
 
     emit __OnCodeMessage(tr("Cancelling ..."));
     stopTimeoutTimer();
@@ -535,7 +547,7 @@ void CSystemController::OnUserCodeCancel()
 
 void CSystemController::OnOpenLockRequest(QString lockNum)
 {
-    // KCB_DEBUG_TRACE(lockNum);
+    KCB_DEBUG_TRACE(lockNum);
     kcb::TakeAndStorePicture();
     _LockController.openLocks(lockNum);
 }
@@ -575,7 +587,7 @@ void CSystemController::OnReadLockStatus()
 void CSystemController::OnSecurityCheckSuccess(QString locks)
 {    
     // KCB_DEBUG_ENTRY;
-    // KCB_DEBUG_TRACE(locks);
+    KCB_DEBUG_TRACE(locks);
 
     if (_pdFingerprintVerify)
     {
@@ -824,6 +836,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
 
     if ( refreshAdminDeviceList )
     {
+        KCB_DEBUG_ENTRY;
         emit __OnFoundNewStorageDevice(device0, device1);
     }
 
@@ -1244,7 +1257,7 @@ void CSystemController::addCode(CLockState& state)
 
 void CSystemController::OnAutoCodeTimeout()
 {
-    if (AutoCodeGeneratorStatic::IsEnabled())
+    if (AutoCodeGeneratorStatic::IsCommitted())
     {
         if (AutoCodeGeneratorStatic::IsNextGenDateTime(QDateTime::currentDateTime()))
         {
@@ -1276,6 +1289,7 @@ void CSystemController::OnAutoCodeTimeout()
         }
 
         int msecs = AutoCodeGeneratorStatic::MsecsToNextGen(QDateTime::currentDateTime());
+
         KCB_DEBUG_TRACE("secs/msecs to next gen" << msecs/1000 << msecs%1000);
         _autoCodeTimer.start( qMin(msecs, 60000) );
     }
@@ -1296,6 +1310,7 @@ void CSystemController::OnNotifyAutoCodeEnabled()
 void CSystemController::OnNotifyAutoCodeDisabled()
 {
     // KCB_DEBUG_ENTRY;
+    _securityController.clearAutoCodeForAllCodes();
     _autoCodeTimer.stop();
     // KCB_DEBUG_EXIT;
 }
