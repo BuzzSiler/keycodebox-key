@@ -27,6 +27,7 @@
 #include <QFile>
 #include <QScreen>
 #include <QProgressDialog>
+#include <QColor>
 
 #include "lockset.h"
 #include "lockstate.h"
@@ -178,6 +179,8 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     {
         ui->cbAdminLockSelection->setDisabled(true);
     }
+
+    ui->tblCodesList->setSortingEnabled(true);
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -247,8 +250,6 @@ void CFrmAdminInfo::initializeConnections()
     connect( ui->cbUsbDrives, SIGNAL(currentIndexChanged(QString) ), this, SLOT(on_cbUsbDrives_currentIndexChanged(QString) ) );
 
     connect(_psysController, SIGNAL(DiscoverHardwareProgressUpdate(int)), this, SLOT(OnDiscoverHardwareProgressUpdate(int)));
-
-    connect(this, &CFrmAdminInfo::__NotifyLockSelectionChanged, &m_select_locks, &SelectLocksWidget::OnLockSelectionChanged);
 
     connect(&m_autocodegen, &AutoCodeGenWidget::RequestCodes1, this, &CFrmAdminInfo::OnRequestCodes1);
 
@@ -1008,9 +1009,16 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 
     ui->tblCodesList->setSortingEnabled(false);
 
+    _codes1InUse.clear();
+    _codes2InUse.clear();
+
+    QStringList annotations;
+
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
+
+        // pState->show();
 
         QString locks = pState->getLockNums();
         QStringList sl = FormatLocks(locks);
@@ -1023,34 +1031,70 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
         table->setItem(nRow, nCol++, new QTableWidgetItem(row_value));
         table->setItem(nRow, nCol++, new QTableWidgetItem(sl.join(',')));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getDescription()));
+
+
+        annotations.clear();
         QString code1 = pState->getCode1();
+        bool code1_duplicate = _codes1InUse.contains(code1);
+        _codes1InUse.append(code1);
+        if (code1_duplicate)
+        {
+            annotations.append("Dup");
+        }
+
         if (pState->getFingerprint1())
         {
-            code1 += tr(" (FP)");
+            annotations.append("FP");
         }
         else if (pState->getAutoCode())
         {
             if (code1mode)
             {
-                code1 += tr(" (AC)");
+                annotations.append("AC");
             }
         }
-        table->setItem(nRow, nCol++, new QTableWidgetItem(code1));
-        QString code2 = pState->getCode2();
-        if (code2mode && !code2.isEmpty())
+
+        if (annotations.count())
         {
-            QStringList annotations;
+            code1 += QString(" (%1)").arg(annotations.join(","));
+        }
+
+        auto code1_item = new QTableWidgetItem(code1);
+        table->setItem(nRow, nCol++, code1_item);
+
+        annotations.clear();
+        QString code2 = pState->getCode2();
+        bool code2_duplicate = false;
+        if (!code2.isEmpty())
+        {
+            code2_duplicate = _codes2InUse.contains(code2);
+            _codes2InUse.append(code2);
+            if (code2_duplicate)
+            {
+                annotations.append("Dup");
+            }
+
+            if (pState->getAutoCode())
+            {
+                if (code2mode)
+                {
+                    annotations.append("AC");
+                }
+            }
+
             if (pState->getAskQuestions())
             {
                 annotations.append("Q");
             }
-            if (pState->getAutoCode())
-            {
-                annotations.append("AC");
-            }
+        }
+
+        if (annotations.count())
+        {
             code2 += QString(" (%1)").arg(annotations.join(","));
         }
-        table->setItem(nRow, nCol++, new QTableWidgetItem(code2));
+
+        auto code2_item = new QTableWidgetItem(code2);
+        table->setItem(nRow, nCol++, code2_item);
 
         if (pState->getAccessType() == ACCESS_TYPE_ALWAYS)
         {
@@ -1068,6 +1112,14 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
             table->setItem(nRow, nCol++, new QTableWidgetItem(pState->isActive() ? tr("ACTIVE") : tr("DISABLED")));
         }
 
+        if (code1_duplicate || code2_duplicate)
+        {
+            for (int col = 0; col < table->columnCount(); ++col)
+            {
+                table->item(nRow, col)->setBackground(QColor(255,255,0));
+            }
+        }
+
         nRow++;
     }
 
@@ -1082,19 +1134,13 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     qSort(sorted_filter_items.begin(), sorted_filter_items.end());
     ui->cbLockNum->addItems(QStringList(sorted_filter_items));
 
-    _codesInUse.clear();
-    _psysController->getAllCodes1(_codesInUse);
 
     // KCB_DEBUG_EXIT();
 }
 
-void CFrmAdminInfo::setupCodeTableContextMenu() 
+void CFrmAdminInfo::updateCodeTableContextMenu()
 {
-    // KCB_DEBUG_ENTRY;
-    QTableWidget *table = ui->tblCodesList;
-
-    _pTableMenu = new QMenu(table);
-
+    _pTableMenu->clear();
     if (AutoCodeGeneratorStatic::IsCode1Mode())
     {
         _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
@@ -1111,10 +1157,16 @@ void CFrmAdminInfo::setupCodeTableContextMenu()
         _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
         _pTableMenu->addAction(tr("Delete"), this, SLOT(codeDeleteSelection()));
     }
+}
 
-    connect(table,SIGNAL(cellClicked(int,int)),this,SLOT(OnRowSelected(int, int)));
-    _pTableMenuAdd = new QMenu(table);
-    connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnHeaderSelected(int)));
+void CFrmAdminInfo::setupCodeTableContextMenu()
+{
+    // KCB_DEBUG_ENTRY;
+    _pTableMenu = new QMenu(ui->tblCodesList);
+    connect(ui->tblCodesList, SIGNAL(cellClicked(int,int)), this, SLOT(OnRowSelected(int, int)));
+    updateCodeTableContextMenu();
+    _pTableMenuAdd = new QMenu(ui->tblCodesList);
+    connect(ui->tblCodesList->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnHeaderSelected(int)));
     // KCB_DEBUG_EXIT;
 }
 
@@ -1172,8 +1224,11 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     CLockHistoryRec  *pState;
     QSet<int> lock_items;
     
+
     auto itor = _phistoryWorkingSet->getIterator();
 
+    table->setSortingEnabled(false);
+    
     while (itor.hasNext())
     {
         pState = itor.next();
@@ -1211,6 +1266,8 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
         nRow++;
     }
 
+    table->setSortingEnabled(true);
+
     // Note: We want the entries in the combo box to be in numeric order
     // We gather the locks using a set to remove duplicates.  Unfortunately
     // sets cannot be sorted, so we convert to a list, so and add to the
@@ -1221,13 +1278,14 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     {
         ui->cbLockNumHistory->addItem(QString::number(i));
     }
+
     // KCB_DEBUG_EXIT;
     
 }
 
 void CFrmAdminInfo::codeDeleteSelection()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
 
     int nRC = QMessageBox::warning(this, tr("Verify Delete"),
                                    tr("Do you want to delete the selected code?"),
@@ -1236,21 +1294,14 @@ void CFrmAdminInfo::codeDeleteSelection()
     {
         deleteCodeByRow(_nRowSelected);
     }
-    // KCB_DEBUG_EXIT;
-}
-
-void CFrmAdminInfo::codeAddNew()
-{
-    // KCB_DEBUG_ENTRY;
-    addCodeByRow();
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::codeInitNew()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
     addCodeByRow();
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::codeEnableAll()
@@ -1299,7 +1350,6 @@ void CFrmAdminInfo::codeEnableAll()
 
 void CFrmAdminInfo::codeEditSelection()
 {
-    // KCB_DEBUG_TRACE(QVariant(_nRowSelected).toString());
     editCodeByRow(_nRowSelected);
 }
 
@@ -1400,6 +1450,7 @@ void CFrmAdminInfo::OnCodeEditAccept()
     // KCB_DEBUG_ENTRY;
     if (_pFrmCodeEditMulti)
     {
+        _pState->setAutoCode(AutoCodeGeneratorStatic::IsCode1Mode() || AutoCodeGeneratorStatic::IsCode2Mode());
         _pFrmCodeEditMulti->getValues(_pState);
         _pFrmCodeEditMulti->hide();
         HandleCodeUpdate();
@@ -1463,7 +1514,7 @@ void CFrmAdminInfo::setPStateValues(QString lockNums,
 
 void CFrmAdminInfo::HandleCodeUpdate()
 {
-    _pState->show();
+    // _pState->show();
 
     if(_pState->isNew())
     {
@@ -1552,7 +1603,7 @@ void CFrmAdminInfo::OnRowSelected(int row, int column)
 {
     Q_UNUSED(column);
     _nRowSelected = row;
-    // KCB_DEBUG_TRACE(_nRowSelected);
+    updateCodeTableContextMenu();
     _pTableMenu->show();
 
     QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
@@ -1624,8 +1675,6 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
 {
-    KCB_DEBUG_ENTRY;
-
     if (nHeader == 5)
     {
         _pTableMenuAdd->clear();
@@ -1634,8 +1683,6 @@ void CFrmAdminInfo::OnHeaderSelected(int nHeader)
         QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
         _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenuAdd->width(), _pTableMenuAdd->height());
     }
-
-    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::checkAndCreateCodeEditForm()
@@ -1659,7 +1706,7 @@ void CFrmAdminInfo::addCodeByRow()
     CLockSet::Iterator itor;
     if (_pState)
     {
-        // KCB_DEBUG_TRACE("Freeing _pState");
+        KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
 
@@ -1669,15 +1716,25 @@ void CFrmAdminInfo::addCodeByRow()
         _pworkingSet = new CLockSet();
     }
 
-    _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
+    // _pState->show();
+
+    _pFrmCodeEditMulti->setValues(_pState, _codes1InUse, _codes2InUse);
     _pFrmCodeEditMulti->show();
     // KCB_DEBUG_EXIT;
 }
 
+QString CFrmAdminInfo::StripAnnotations(const QString& text)
+{
+    // Code Annotations
+    //    xx...xx (...)
+    // Find the left parenthesis index
+    // Take the left N characters where N is index-1
+    int index = text.indexOf(QChar('('));
+    return text.left(index - 1);
+}
+
 void CFrmAdminInfo::editCodeByRow(int row)
 {
-    // KCB_DEBUG_TRACE(row);
-    
     checkAndCreateCodeEditForm();
 
     CLockSet::Iterator itor;
@@ -1685,56 +1742,70 @@ void CFrmAdminInfo::editCodeByRow(int row)
     {
         _pState = 0;
     }
-    int nRow = 0;
+
+    QTableWidgetItem* username_item = ui->tblCodesList->item(row, 2);
+    QTableWidgetItem* code1_item = ui->tblCodesList->item(row, 3);
+    QTableWidgetItem* code2_item = ui->tblCodesList->item(row, 4);
+
+    QString code1 = StripAnnotations(code1_item->text());
+    QString code2 = StripAnnotations(code2_item->text());
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
-        if(nRow == row)
+        _pState = itor.value();
+        if (_pState->getDescription() == username_item->text() &&
+            _pState->getCode1() == code1 &&
+            _pState->getCode2() == code2)
         {
-            _pState = itor.value();
             break;
         }
-        nRow++;
     }
 
     if(_pState)
     {
-        _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
+        _pFrmCodeEditMulti->setValues(_pState, _codes1InUse, _codes2InUse);
         _pFrmCodeEditMulti->show();
     }
     else
     {
+        // Q: Does this branch ever occurr?  How is it possible to edit a row for which
+        // there is no code entry?
+        KCB_WARNING_TRACE("Editing code that is not part of working set");
         _pState = createNewLockState();
         _pworkingSet->addToSet(_pState);
 
-        _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
+        _pFrmCodeEditMulti->setValues(_pState, _codes1InUse, _codes2InUse);
         _pFrmCodeEditMulti->show();
     }
 }
 
 void CFrmAdminInfo::deleteCodeByRow(int row)
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
     checkAndCreateCodeEditForm();
 
     CLockSet::Iterator itor;
     if (_pState)
     {
-        // KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
-    int nRow = 0;
 
-    // KCB_DEBUG_TRACE("before loop iterator cellClicked");
+    QTableWidgetItem* username_item = ui->tblCodesList->item(row, 2);
+    QTableWidgetItem* code1_item = ui->tblCodesList->item(row, 3);
+    QTableWidgetItem* code2_item = ui->tblCodesList->item(row, 4);
+
+    QString code1 = StripAnnotations(code1_item->text());
+    QString code2 = StripAnnotations(code2_item->text());
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
-        if(nRow == row)
+        _pState = itor.value();
+        if (_pState->getDescription() == username_item->text() &&
+            _pState->getCode1() == code1 &&
+            _pState->getCode2() == code2)
         {
-            _pState = itor.value();
             break;
         }
-        nRow++;
     }
 
     if(_pState)
@@ -1751,7 +1822,7 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
         }
         emit __OnUpdateCodeState(_pState);
     }
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::purgeCodes()
@@ -2507,7 +2578,7 @@ void CFrmAdminInfo::setLockStateDefaults(CLockState& state)
     state.setMaxAccess(-1); 
     state.setAccessCount(0);
     state.setAccessType(0);
-    state.setAutoCode(false);
+    state.setAutoCode(AutoCodeGeneratorStatic::IsCode1Mode() || AutoCodeGeneratorStatic::IsCode2Mode());
 }
 
 void CFrmAdminInfo::OnCommitCodes1(QMap<QString, QString> codes)

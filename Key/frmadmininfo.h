@@ -116,7 +116,6 @@ class CFrmAdminInfo : public QDialog
         void OnLockStatusUpdated(CLocksStatus *pLocksStatus);
 
         void codeDeleteSelection();
-        void codeAddNew();
         void codeInitNew();
         void codeEnableAll();
         void codeEditSelection();
@@ -163,7 +162,7 @@ class CFrmAdminInfo : public QDialog
         void OnCodeEditAccept();
 
         void on_pbNetworkSettings_clicked();
-		void codeHistoryTableCellSelected( int row, int col);
+        void codeHistoryTableCellSelected( int row, int col);
 
         void on_cbActionsSelect_currentIndexChanged(int index);
         void on_btnActionExecute_clicked();
@@ -222,7 +221,8 @@ class CFrmAdminInfo : public QDialog
         EMAIL_ADMIN_SELECT  _testEmail;
 
         SelectLocksWidget&  m_select_locks;
-        QStringList         _codesInUse;
+        QStringList         _codes1InUse;
+        QStringList         _codes2InUse;
         ReportControlWidget& m_report;
         QStringList         m_file_filter;
 
@@ -289,6 +289,8 @@ class CFrmAdminInfo : public QDialog
         void OnUtilActionSetBrandingImage();
         void OnUtilActionDefaultBrandingImage();
         QStringList FormatLocks(const QString& locks);
+        void updateCodeTableContextMenu();
+        QString StripAnnotations(const QString& text);
 
     protected:
         void touchEvent(QTouchEvent *ev);
