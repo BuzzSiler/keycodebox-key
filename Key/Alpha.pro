@@ -98,6 +98,9 @@ SOURCES += main.cpp\
     logcategory.cpp \
     logger.cpp \
     cabinetrowdelegate.cpp \
+    autocodegenwidget.cpp \
+    autocodegenerator.cpp \
+    autocodegenstatic.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -181,6 +184,9 @@ HEADERS  += keycodeboxmain.h \
     logcategory.h \
     logger.h \
     cabinetrowdelegate.h \
+    autocodegenwidget.h \
+    autocodegenerator.h \
+    autocodegenstatic.h \
 
 FORMS    += mainwindow.ui \
     frmusercode.ui \
@@ -198,7 +204,8 @@ FORMS    += mainwindow.ui \
     kcbkeyboarddialog.ui \
     reportcontrolwidget.ui \
     dlgdownloadreports.ui \
-    frmnetworksettings.ui
+    frmnetworksettings.ui \
+    autocodegenwidget.ui
     
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/debug/ -lqsqlite

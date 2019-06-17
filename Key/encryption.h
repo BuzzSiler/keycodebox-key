@@ -2,6 +2,7 @@
 #define CENCRYPTION_H
 
 #include <string>
+#include <QtGlobal>
 
 class QString;
 class QDateTime;
@@ -18,8 +19,8 @@ public:
     static QByteArray hashed(QString strToHash);
     static QString encryptString(QString strIn);
     static QString decryptString(QString strIn);
-    static std::string encryptDecryptOld(int nVal, std::string toEncrypt);
-    static std::string encryptDecryptOld(int nVal, std::string toEncrypt, std::string key);
+    static QByteArray encryptWithKey(const QByteArray& data, const quint64 key);
+    static QByteArray decryptWithKey(const QByteArray& data, const quint64 key);
     static QDateTime &roundDateTime(int res, QDateTime &datetime);
 
 };

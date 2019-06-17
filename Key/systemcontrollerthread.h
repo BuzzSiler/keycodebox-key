@@ -8,21 +8,17 @@
 class CSystemControllerThread : public QThread
 {
     Q_OBJECT
-public:
-    CSystemControllerThread(QObject *parent = 0);
+    public:
+        CSystemControllerThread(QObject *parent = 0);
 
-private:
-    CSystemController   *_psystemControllerObj;
-    QTimer              *_ptimer;
+    private:
+        CSystemController   *_psystemControllerObj;
+        QTimer              *_ptimer;
 
-    // QThread interface
-protected:
-//    void run();
-
-public:
-    void setSystemController(CSystemController *obj) {
-        _psystemControllerObj = obj;
-    }
+    public:
+        void setSystemController(CSystemController *obj) {
+            _psystemControllerObj = obj;
+        }
 };
 
 

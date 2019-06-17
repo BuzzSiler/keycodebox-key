@@ -46,11 +46,6 @@ class CLockHistoryRec : public CLockState
         QString getQuestion2() { return CLockState::getQuestion2(); }
         QString getQuestion3() { return CLockState::getQuestion3(); }
 
-        virtual QJsonObject &jsonRecord(QJsonObject &json);
-        virtual QString jsonRecordAsString();
-
-        virtual bool setFromJsonObject(QJsonObject jsonObj);
-        virtual bool setFromJsonString(QString strJson);
 
         void setFromLockState(CLockState &lockState);
         void setLockNums(QString locknums) { _lockNums = locknums; };

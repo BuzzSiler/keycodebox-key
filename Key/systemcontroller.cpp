@@ -1,14 +1,16 @@
+#include "systemcontroller.h"
+
+// #include <iostream>
+#include <sstream>
+
 #include <QDebug>
 #include <QThread>
 #include <QCoreApplication>
 #include <QTimer>
-
 #include <QString>
 #include <QAbstractSocket>
 #include <QMetaEnum>
-#include <iostream>
-#include <sstream>
-#include "systemcontroller.h"
+
 #include "frmusercode.h"
 #include "encryption.h"
 #include "usbcontroller.h"
@@ -23,6 +25,7 @@
 #include "omnikey5427ckreader.h"
 #include "keycodeboxsettings.h"
 #include "kcbsystem.h"
+#include "autocodegenstatic.h"
 
 static bool fleetwave_enabled;
 
@@ -40,7 +43,8 @@ CSystemController::CSystemController(QObject *parent) :
     _systemStateDisplay(ENone),
     _pfUsercode(0),
     _pdFingerprintVerify(0),
-    _ptimer(0)
+    _ptimer(0),
+    _autoCodeTimer(* new QTimer(this))
 {
     Q_UNUSED(parent);
 
@@ -69,11 +73,10 @@ void CSystemController::initialize(QThread *pthread)
 
     if( _LCDGraphicsController.isLCDAttached() ) 
     {
-        qDebug() << "CSystemController::initialize moveToThread.";
         _LCDGraphicsController.setBrightness(75);
     }
 
-    qDebug() << "Starting up KeyCodeBox Alpha " << VERSION;
+    KCB_DEBUG_TRACE("Starting up KeyCodeBox Alpha " << VERSION);
 
     UsbProvider::Initialize();
     initializeSecurityConnections();
@@ -81,33 +84,37 @@ void CSystemController::initialize(QThread *pthread)
     initializeReportController();
     initializeReaders();
 
+    connect(this, &CSystemController::__OnAutoCodeEmail, this, &CSystemController::OnAutoCodeEmail);
+
+
+    _autoCodeTimer.setSingleShot(true);
+    connect(&_autoCodeTimer, &QTimer::timeout, this, &CSystemController::OnAutoCodeTimeout);
+    _autoCodeTimer.start(1000);
+
 }
 
 void CSystemController::TrigEnrollFingerprint(QString sCode)
 {
-    qDebug() << "CSystemController::TrigEnrollFingerprint(), code: " << sCode;
     if(_fingerprintReader)
     {
         _fingerprintReader->initEnrollment(sCode);
     }
-    KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(15000);
 }
 
 void CSystemController::EnrollFingerprintDialogCancel()
 {
-    qDebug() << "CSystemController::EnrollFingerprintCancel()";
+    // KCB_DEBUG_ENTRY;
     if(_fingerprintReader)
     {
         _fingerprintReader->cancelEnrollment();
     }
-    KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(1000);
 }
 
 void CSystemController::EnrollFingerprintResetStageCount()
 {
-    qDebug() << "CSystemController::EnrollFingerprintResetStageCount()";
+    // KCB_DEBUG_ENTRY;
     if(_fingerprintReader)
     {
         _fingerprintReader->resetEnrollmentStage();
@@ -116,20 +123,19 @@ void CSystemController::EnrollFingerprintResetStageCount()
 
 void CSystemController::OnVerifyFingerprint()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(10000);
     if(_fingerprintReader)
     {
         _fingerprintReader->initVerify();
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnVerifyFingerprintDialogCancel()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if(_fingerprintReader)
     {
         _fingerprintReader->cancelVerify();
@@ -139,31 +145,30 @@ void CSystemController::OnVerifyFingerprintDialogCancel()
         _pdFingerprintVerify->hide();
     }    
     
-    KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnFingerprintVerifyComplete(bool result, QString message) 
 { 
-    KCB_DEBUG_ENTRY;
-
-    KCB_DEBUG_TRACE("Result" << result << "Message" << message);
+    // KCB_DEBUG_ENTRY;
 
     emit __onUpdateVerifyFingerprintDialog(result, message); 
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnReadLockSet(QString LockNums, QDateTime start, QDateTime end) 
 { 
-    qDebug() << "SLOT: System Controller -> OnReadLockSet";
+    // KCB_DEBUG_ENTRY;
     emit __OnReadLockSet(LockNums, start, end); 
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnLockSet(CLockSet *pSet) 
 { 
-    qDebug() << "SLOT: System Controller -> OnLockSet";
+    // KCB_DEBUG_ENTRY;
     emit __OnLockSet(pSet); 
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::TrigQuestionUser(QString lockNums, QString question1, QString question2, QString question3)
@@ -172,24 +177,24 @@ void CSystemController::TrigQuestionUser(QString lockNums, QString question1, QS
     Q_UNUSED(question1);
     Q_UNUSED(question2);
     Q_UNUSED(question3);
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     stopTimeoutTimer();
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::AnswerUserSave(QString lockNums, QString question1, QString question2, QString question3)
 {
-    KCB_DEBUG_ENTRY;
-    KCB_DEBUG_TRACE("emitting " << lockNums << ", " << question1 << ", " << question2 << ", " << question3);
+    // KCB_DEBUG_ENTRY;
     _answer1 = question1;
     _answer2 = question2;
     _answer3 = question3;
     _answers_provided = true;
     emit __onQuestionUserAnswers(lockNums, question1, question2, question3);
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::QuestionUserCancel()
 {
-    KCB_DEBUG_TRACE("Timeout Active");
     startTimeoutTimer(1000);
     emit __onQuestionUserCancel();
 }
@@ -197,20 +202,18 @@ void CSystemController::QuestionUserCancel()
 void CSystemController::initializeReaders()
 {
 
-    // MagTek Reader
     _pmagTekReader = new CMagTekCardReader();
-    if(_pmagTekReader->initMagTekCardReader()) // hardcoded VID & PID
+    if(_pmagTekReader->initMagTekCardReader())
     {
         connect(_pmagTekReader, SIGNAL(__onCardSwipe(QString,QString)), this, SLOT(OnCardSwipe(QString,QString)));
         _pmagTekReader->moveToThread(&_threadCardReader);
 
         connect(&_threadCardReader, SIGNAL(started()), _pmagTekReader, SLOT(start()));
         _threadCardReader.start();
-        qDebug() << "MagTekReader found and started";
     }
     else 
     {
-        qDebug() << "No MagTekReader found";
+        KCB_DEBUG_TRACE("No MagTekReader found");
     }
 
     bool hid_reader_found = false;
@@ -218,16 +221,16 @@ void CSystemController::initializeReaders()
     if( _phidReader->initHIDReader(0x04d8, 0x0055) )
     {
         hid_reader_found = true;
-        qDebug() << "RF 0x04d8:0x0055 HID Reader Found and started";
+        KCB_DEBUG_TRACE("RF 0x04d8:0x0055 HID Reader Found and started");
     }
     else if( _phidReader->initHIDReader(0x076b, 0x5428) )
     {
         hid_reader_found = true;
-        qDebug() << "RF 0x076b:0x5428 HID Reader Found and started";
+        KCB_DEBUG_TRACE("RF 0x076b:0x5428 HID Reader Found and started");
     }
     else
     {
-        qDebug() << "No RF HID Reader found";
+        KCB_DEBUG_TRACE("No RF HID Reader found");
     }
                 
     if (hid_reader_found)
@@ -243,7 +246,7 @@ void CSystemController::initializeReaders()
 
     if( _fingerprintReader->initFingerprintReader())
     {
-        qDebug() << "Fingerprint reader found and started";
+        KCB_DEBUG_TRACE("Fingerprint reader found and started");
         connect(_fingerprintReader, SIGNAL(__onFingerprintStageComplete(int, int, QString)), this, SLOT(OnFingerprintStageComplete(int, int, QString)));
         connect(_fingerprintReader, SIGNAL(__onVerifyFingerprintComplete(bool, QString)), this, SLOT(OnFingerprintVerifyComplete(bool, QString)));
         connect(&_securityController, SIGNAL(__TrigEnrollFingerprint(QString)), this, SLOT(TrigEnrollFingerprint(QString)));
@@ -281,21 +284,18 @@ void CSystemController::initializeReaders()
 
 void CSystemController::OnVerifyFingerprintDialog()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE("FPVerify" << _pdFingerprintVerify);
     Q_ASSERT_X(_pdFingerprintVerify != nullptr, Q_FUNC_INFO, "FPVerify is null");
     
     if (_pdFingerprintVerify)
     {
-        KCB_DEBUG_TRACE("Showing FingerprintVerifier dialog");
         _pdFingerprintVerify->show();
         _pdFingerprintVerify->setMessage("");
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
-// On a card swipe. If the first code is empty, then use the 2nd code.
 QString CSystemController::getCodeToUse(QString code1, QString code2) 
 {
     code1 = code1.trimmed();
@@ -314,17 +314,17 @@ void CSystemController::OnCardSwipe(QString sCode1, QString sCode2)
 {
     QString sCodeToUse = getCodeToUse(sCode1, sCode2);
 
-    qDebug() << "CSystemController::OnCardSwipe(" << sCodeToUse << ")";
     if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
     {
-        qDebug() << "...ETimeoutScreen || EUserCodeOne:" << sCodeToUse;
+        KCB_DEBUG_TRACE("Code 1 entry");
         emit __onUserCodeOne(sCodeToUse);
     } 
     else if( _systemState == EUserCodeTwo) 
     {
-        qDebug() << "... EUserCodeTwo: " << sCode2;
+        KCB_DEBUG_TRACE("Code 2 entry");
         emit __onUserCodeTwo(sCode2);
     }
+
     // Always emit this -- s.b.going to the AdminInfo screen only.
     emit __onUserCodes(sCodeToUse, sCode2);
 }
@@ -333,15 +333,14 @@ void CSystemController::OnFingerSwipe(QString sCode1, QString sCode2)
 {
     QString sCodeToUse = getCodeToUse(sCode1, sCode2);
 
-    qDebug() << "CSystemController::OnFingerSwipe(" << sCodeToUse << ")";
     if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
     {
-        qDebug() << "...ETimeoutScreen || EUserCodeOne:" << sCodeToUse;
+        KCB_DEBUG_TRACE("Code 1 entry");
         emit __onUserFingerprintCodeOne(sCodeToUse);
     } 
     else if( _systemState == EUserCodeTwo) 
     {
-        qDebug() << "... EUserCodeTwo: " << sCode2;
+        KCB_DEBUG_TRACE("Code 2 entry");
         emit __onUserFingerprintCodeTwo(sCode2);
     }
     // Always emit this -- s.b.going to the AdminInfo screen only.
@@ -350,19 +349,16 @@ void CSystemController::OnFingerSwipe(QString sCode1, QString sCode2)
 
 void CSystemController::OnHIDCard(QString sCode1, QString sCode2)
 {
-    qDebug() << "CSystemController::OnHIDCard(" << sCode1 << ", " << sCode2 << ")";
-
     if(_systemState == ETimeoutScreen || _systemState == EUserCodeOne) 
     {
-        qDebug() << "...ETimeoutScreen || EUserCodeOne:" << sCode1;
+        KCB_DEBUG_TRACE("Code 1 entry");
         emit __onUserCodeOne(sCode1);
     } 
     else if( _systemState == EUserCodeTwo) 
     {
-        qDebug() << "... EUserCodeTwo: " << sCode2;
+        KCB_DEBUG_TRACE("Code 2 entry");
         emit __onUserCodeTwo(sCode2);
     }
-    // Always emit the two -- s.b.going to the AdminInfo screen only
     emit __onUserCodes(sCode1, sCode2);
 }
 
@@ -384,9 +380,6 @@ void CSystemController::initializeReportController()
 
 void CSystemController::initializeSecurityConnections()
 {
-    qDebug() << "CSystemController::initializeSecurityConnections moveToThread.";
-    //    _securityController.moveToThread(_pSecurityThread);
-
     connect(&_securityController, SIGNAL(__OnRequireAdminPassword()), this, SLOT(OnRequireAdminPassword()));
     connect(&_securityController, SIGNAL(__OnRequireCodeTwo()), this, SLOT(OnRequireCodeTwo()));
     connect(&_securityController, SIGNAL(__OnAdminSecurityCheckOk(QString)), this, SLOT(OnAdminSecurityCheckOk(QString)));
@@ -419,14 +412,11 @@ void CSystemController::initializeSecurityConnections()
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), &_securityController, SLOT(OnUpdateCodeState(CLockState*)));
     connect(&_securityController, SIGNAL(__OnUpdatedCodeState(bool)), this, SLOT(OnUpdatedCodeState(bool)));
 
-
     emit __OnRequestCurrentAdmin();
 }
 
 void CSystemController::initializeLockController()
 {
-    qDebug() << "CSystemController::initializeLockController moveToThread.";
-
     _LockController.initController();
     
     emit __OnLockStatusUpdated(_LockController.getLockStatus());
@@ -434,52 +424,33 @@ void CSystemController::initializeLockController()
 
 void CSystemController::OnIdentifiedFingerprint(QString sCode, QString sCode2)
 {
-    KCB_DEBUG_ENTRY;
-    KCB_DEBUG_TRACE("Time: " << QTime::currentTime().toString());
-    qDebug() << "OnCardSwipe() -> " << sCode << "," << sCode2;
+    // KCB_DEBUG_ENTRY;
     this->OnFingerSwipe(sCode, sCode2);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnCodeEntered(QString sCode)
 {
-    KCB_DEBUG_TRACE(sCode);
-
-    //force enrollment step count reset
     EnrollFingerprintResetStageCount();
-
+    KCB_DEBUG_ENTRY;
     _securityController.CheckAccessCodeOne(sCode);
 }
 
 void CSystemController::OnCodeEnteredTwo(QString sCode)
 {
-    KCB_DEBUG_TRACE(sCode);
-
-    //if( _securityController.CheckAccessCodeTwoFingerprint() )
-    //  check to see if the directory exists with fingerprintreader class
-    //  if it doesn't:
-    //  emit fingerprint dialog for enrollment, else do nothing
-    // else
-
+    KCB_DEBUG_ENTRY;
     _securityController.CheckAccessCodeTwo(sCode);
 }
 
 void CSystemController::OnFingerprintCodeEntered(QString sCode)
 {
-    qDebug() << "SystemController::OnFingerprintCodeEntered:" << sCode;
-
-    //if( _securityController.CheckAccessCodeOneFingerprint() )
-    //  check to see ifi the directory exists with fingerprintreader class
-    //  if it doesn't:
-    //  emit fingerprint dialog for enrollment, else do nothing
-    // else
-
+    KCB_DEBUG_ENTRY;
     _securityController.CheckFingerprintAccessCodeOne(sCode);
 }
 
 void CSystemController::OnFingerprintCodeEnteredTwo(QString sCode)
 {
-    KCB_DEBUG_TRACE("code" << sCode);
+    KCB_DEBUG_ENTRY;
     _securityController.CheckFingerprintAccessCodeTwo(sCode);
 }
 
@@ -487,44 +458,43 @@ void CSystemController::OnAdminPasswordEntered(QString sPW)
 {
     KCB_DEBUG_ENTRY;
     _securityController.CheckAdminPassword(sPW);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _padminInfo = adminInfo;
     _bCurrentAdminRetrieved = true;
 
-    KCB_DEBUG_TRACE("emit __OnRequestedCurrentAdmin(CAdminRec*)");
     emit __OnRequestedCurrentAdmin(adminInfo);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnAdminDialogClosed()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _systemState = EUserCodeOne;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequireAdminPassword()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _systemState = EAdminPassword;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequireCodeTwo()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _systemState = EUserCodeTwo;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnAdminSecurityCheckOk(QString type)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     // Note: If take/return is enabled, then we have to select either take or return
     // to get access to enter the admin code in order to access the admin features.
@@ -542,11 +512,12 @@ void CSystemController::OnAdminSecurityCheckOk(QString type)
         _systemState = EAdminMain;
     }
     emit __OnClearEntry();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnAdminSecurityCheckFailed()
 {
+    KCB_DEBUG_ENTRY;
     emit __OnCodeMessage(tr("Incorrect Password"));
     emit __OnClearEntry();
     emit __AdminSecurityCheckFailed();
@@ -554,10 +525,10 @@ void CSystemController::OnAdminSecurityCheckFailed()
 
 void CSystemController::OnAdminPasswordCancel()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _systemState = EUserCodeOne;
     emit __OnClearEntry();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnUserCodeCancel()
@@ -566,13 +537,12 @@ void CSystemController::OnUserCodeCancel()
 
     emit __OnCodeMessage(tr("Cancelling ..."));
     stopTimeoutTimer();
-    // emit __OnClearEntry();
 
     _systemState = EPasswordTimeout;
     _systemStateDisplay = ENone;
 
     startTimeoutTimer(1000);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnOpenLockRequest(QString lockNum)
@@ -584,13 +554,12 @@ void CSystemController::OnOpenLockRequest(QString lockNum)
 
 void CSystemController::reportActivity(QString locknums)
 {
-    // Check the frequency & send an email if it's each event
     _bCurrentAdminRetrieved = false;
     emit __OnRequestCurrentAdmin();
 
     if (_answers_provided)
     {
-        KCB_DEBUG_TRACE("Answer1" << _answer1 << "Answer2" << _answer2 << "Answer3" << _answer3);
+        // KCB_DEBUG_TRACE("Answer1" << _answer1 << "Answer2" << _answer2 << "Answer3" << _answer3);
         emit __RequestLastSuccessfulLoginWithAnswers(locknums, _answer1, _answer2, _answer3);
         _answers_provided = false;
         _answer1 = "";
@@ -617,7 +586,7 @@ void CSystemController::OnReadLockStatus()
 
 void CSystemController::OnSecurityCheckSuccess(QString locks)
 {    
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     KCB_DEBUG_TRACE(locks);
 
     if (_pdFingerprintVerify)
@@ -629,7 +598,7 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
 
     if (locks.contains(','))
     {
-        KCB_DEBUG_TRACE("Multi Lock");
+        // KCB_DEBUG_TRACE("Multi Lock");
 
         CFrmSelectLocks sl;
 
@@ -653,14 +622,14 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
     }
     else
     {
-        KCB_DEBUG_TRACE("Single Lock");
+        // KCB_DEBUG_TRACE("Single Lock");
         _locks = locks;
         OnOpenLockRequest(locks);
     }
 
     reportActivity(_locks);
     _systemState = EThankYou;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnSecurityCheckedFailed()
@@ -675,7 +644,7 @@ void CSystemController::OnSecurityCheckedFailed()
 
 void CSystemController::resetCodeMessage()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if(_systemState == EUserCodeOne) 
     {
         QString prompt = fleetwave_enabled ? USER_CODE_FLEETWAVE_PROMPT : USER_CODE_PROMPT;
@@ -685,7 +654,7 @@ void CSystemController::resetCodeMessage()
     {
         emit __OnCodeMessage(USER_CODE_CODE2_PROMPT);
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnSecurityCheckTimedOut()
@@ -697,7 +666,7 @@ void CSystemController::OnSecurityCheckTimedOut()
 
 void CSystemController::resetToTimeoutScreen()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     stopTimeoutTimer();
     _systemState = ETimeoutScreen;
 
@@ -713,13 +682,14 @@ void CSystemController::resetToTimeoutScreen()
     {
         _pdFingerprintVerify->hide();
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnRequestCurrentAdmin()
 {
-    qDebug() << "CSystemController::OnRequestCurrentAdmin() -> call _securityController.OnRequestCurrentAdmin()";
+    // KCB_DEBUG_ENTRY;
     _securityController.OnRequestCurrentAdmin();
+    // KCB_DEBUG_EXIT;
 }
 
 bool CSystemController::getDisplayFingerprintButton()
@@ -763,7 +733,6 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
     cmdF = popen(listCmd.c_str(), "r");
     if(!cmdF)
     {
-        qDebug() << "failed to open popen(listCmd, 'r');\n";
         return -1;
     }
 
@@ -821,7 +790,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
 
     if( (existingDeviceCount > 1) )
     {
-        KCB_DEBUG_TRACE("Existing Device Count" << existingDeviceCount);
+        // KCB_DEBUG_TRACE("Existing Device Count" << existingDeviceCount);
         return existingDeviceCount;
     }
 
@@ -867,6 +836,7 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
 
     if ( refreshAdminDeviceList )
     {
+        KCB_DEBUG_ENTRY;
         emit __OnFoundNewStorageDevice(device0, device1);
     }
 
@@ -875,8 +845,8 @@ int CSystemController::watchUSBStorageDevices(char mountedDevices[2][40], int mo
 
 void CSystemController::start()
 {
+    // KCB_DEBUG_ENTRY;
     initialize(QThread::currentThread());
-    qDebug() << "CSystemController::start()";
     char mountedDevices[2][40] = {};
     int mountedDeviceCount = 0;
     int count = 0;
@@ -908,7 +878,7 @@ void CSystemController::start()
 
 void CSystemController::OnTouchScreenTouched() 
 {
-    _systemState = EUserCodeOne;    
+    _systemState = EUserCodeOne;
 }
 
 void CSystemController::looprun()
@@ -946,7 +916,6 @@ void CSystemController::looprun()
             emit __OnCodeMessage("Code 1");
             emit __OnDisplayCodeDialog(this);
 
-            KCB_DEBUG_TRACE("EUserCodeOne Timeout Active");
             startTimeoutTimer(30000);
         }
     }
@@ -964,7 +933,6 @@ void CSystemController::looprun()
             QString str = QString("<%1>").arg(tr("Please Enter Second Code"));
             emit __OnCodeMessage(str);
 
-            KCB_DEBUG_TRACE("EUserCodeTwo Timeout Active");
             startTimeoutTimer(20000);
         }
     }
@@ -989,7 +957,6 @@ void CSystemController::looprun()
             _systemStateDisplay = EThankYou;
             stopTimeoutTimer();
 
-            // Convert the list of locks into a string
             QString locks_str;
             if (!_locks.contains(','))
             {
@@ -1033,7 +1000,7 @@ void CSystemController::looprun()
 
 void CSystemController::stopTimeoutTimer()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if(_ptimer) 
     {
         if(_ptimer->isActive())
@@ -1043,14 +1010,14 @@ void CSystemController::stopTimeoutTimer()
         delete _ptimer;
         _ptimer = 0;
     }
-    KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::startTimeoutTimer(int duration)
 {
-    qDebug() << "SingleShot timer " << QVariant(duration).toString();
-    KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
+    // KCB_DEBUG_TRACE("SingleShot timer " << QVariant(duration).toString());
+    // KCB_DEBUG_TRACE("Time:" << QTime::currentTime().toString());
     
     if(!_ptimer) 
     {
@@ -1066,9 +1033,41 @@ void CSystemController::RequestLastSuccessfulLogin(QString locknums)
     emit __RequestLastSuccessfulLogin(locknums);
 }
 
-void CSystemController::sendEmailReport(QDateTime access, QString desc, QString lockNums)
+CSystemController::EmailParts CSystemController::CreateReportEmail(QDateTime access, QString desc, QString lockNums)
 {
-    KCB_DEBUG_TRACE("Sending email");
+    QString subject = tr("Lock Box Event");
+
+    QString body = QString("%1 #%2").arg(tr("Lock")).arg(lockNums);
+
+    if( desc.size() > 0 )
+    {
+        body += QString(" [%1]").arg(desc);
+    }
+
+    body += QString(" %1 %2").arg(tr("was accessed at")).arg(access.toString("MM/dd/yyyy HH:mm:ss"));
+
+    return CSystemController::EmailParts{subject, body};
+}
+
+CSystemController::EmailParts CSystemController::CreateAutoCodeEmail(const QString& key)
+{
+    QString body = QString("KeyCodeBox has generated new codes."
+                           "\n\n"
+                           "%1").arg(key);
+    return CSystemController::EmailParts{tr("KeyCodeBox AutoCode Update"), body};
+}
+
+void CSystemController::OnAutoCodeEmail(const QString& key)
+{
+    // KCB_DEBUG_ENTRY;
+    auto parts = CreateAutoCodeEmail(key);
+    sendEmail(parts.subject, parts.body);
+    // KCB_DEBUG_EXIT;
+}
+
+void CSystemController::sendEmail(const QString& subject, const QString& body)
+{
+    // KCB_DEBUG_ENTRY;
 
     QString SMTPSvr = DEFAULT_SMTP_SERVER;
     int SMTPPort = DEFAULT_SMTP_PORT;
@@ -1093,25 +1092,15 @@ void CSystemController::sendEmailReport(QDateTime access, QString desc, QString 
     }
 
     QString to = _padminInfo->getAdminEmail();
-    QString subject = tr("Lock Box Event");
 
-    QString body = QString("%1 #%2").arg(tr("Lock")).arg(lockNums);
-
-    if( desc.size() > 0 )
-    {
-        body += QString(" [%1]").arg(desc);
-    }
-
-    body += QString(" %1 %2").arg(tr("was accessed at")).arg(access.toString("MM/dd/yyyy HH:mm:ss"));
-
-    qDebug() << "Calling __OnSendEmail() from:" << from << endl << " to:" << to << endl << " subject:" << subject << endl << " body:" << body;
     emit __OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, NULL );
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory)
 {
-    KCB_DEBUG_ENTRY;
-    KCB_DEBUG_TRACE(pLockHistory->getLockNums());
+    // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_TRACE(pLockHistory->getLockNums());
     
     int nCount = 0;
     while(!_bCurrentAdminRetrieved && nCount < 25) 
@@ -1131,8 +1120,10 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
         if (IS_EVERY_ACTIVITY(dtFreq))
         {
             if (_padminInfo->getReportViaEmail())
-            {                
-                sendEmailReport(dtAccess, sDesc, LockNums);
+            {
+                auto email = CreateReportEmail(dtAccess, sDesc, LockNums);
+                //sendEmailReport(dtAccess, sDesc, LockNums);
+                sendEmail(email.subject, email.body);
             }
 
             if (_padminInfo->getReportToFile())
@@ -1145,9 +1136,9 @@ void CSystemController::OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHisto
     } 
     else 
     {
-        qDebug() << "OnLastSuccessfulLoginRequest() No admin record yet!";
+        KCB_DEBUG_TRACE("No admin record yet!");
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnBrightnessChanged(int nValue)
@@ -1160,7 +1151,7 @@ void CSystemController::OnBrightnessChanged(int nValue)
 
 void CSystemController::OnSendTestEmail(int select_type)
 {
-    KCB_DEBUG_TRACE("Sending Test Email (" << select_type << ")");
+    // KCB_DEBUG_TRACE("Sending Test Email (" << select_type << ")");
 
     QString SMTPSvr;
     int SMTPPort;
@@ -1214,7 +1205,7 @@ void CSystemController::OnSendTestEmail(int select_type)
     }
     else
     {
-        qDebug() << "Invalid test type" << select_type;
+        KCB_DEBUG_TRACE("Invalid test type" << select_type);
         return;
     }
 
@@ -1239,7 +1230,101 @@ void CSystemController::DiscoverHardware()
 
 void CSystemController::UpdateLockRanges()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _LockController.setLockRanges();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
+}
+
+void CSystemController::clearAllCodes()
+{
+    _securityController.clearAllCodes();
+}
+
+void CSystemController::deleteAllCode1OnlyCodes()
+{
+    _securityController.deleteAllCode1OnlyCodes();
+}
+
+void CSystemController::clearLockAndCode2ForAllCodes()
+{
+    _securityController.clearLockAndCode2ForAllCodes();
+}
+
+void CSystemController::addCode(CLockState& state)
+{
+    _securityController.addCode(state);
+}
+
+void CSystemController::OnAutoCodeTimeout()
+{
+    if (AutoCodeGeneratorStatic::IsCommitted())
+    {
+        if (AutoCodeGeneratorStatic::IsNextGenDateTime(QDateTime::currentDateTime()))
+        {
+            KCB_DEBUG_TRACE("generating new codes");
+            bool is_code1_mode = AutoCodeGeneratorStatic::IsCode1Mode();
+            bool is_code2_mode = AutoCodeGeneratorStatic::IsCode2Mode();
+
+            AutoCodeGenerator::CodeMap map = AutoCodeGeneratorStatic::GenerateCodeMap();
+            QMapIterator<QString, QString> i(map);
+            while (i.hasNext())
+            {
+                i.next();
+                if (is_code1_mode)
+                {
+                    _securityController.updateCode1(i.key(), i.value());
+                }
+                else if (is_code2_mode)
+                {
+                    _securityController.updateCode2(i.key(), i.value());
+                }
+                else
+                {
+                    KCB_DEBUG_TRACE("Invalid code mode");
+                }
+            }
+
+            emit __OnUpdateCodes();
+            OnAutoCodeEmail(QString(KeyCodeBoxSettings::GetAutoCodeKey()));
+        }
+
+        int msecs = AutoCodeGeneratorStatic::MsecsToNextGen(QDateTime::currentDateTime());
+
+        KCB_DEBUG_TRACE("secs/msecs to next gen" << msecs/1000 << msecs%1000);
+        _autoCodeTimer.start( qMin(msecs, 60000) );
+    }
+    else
+    {
+        KCB_DEBUG_TRACE("AutoCode is disabled");
+    }
+}
+
+void CSystemController::OnNotifyAutoCodeEnabled()
+{
+    // KCB_DEBUG_ENTRY;
+    _autoCodeTimer.stop();
+    OnAutoCodeTimeout();
+    // KCB_DEBUG_EXIT;
+}
+
+void CSystemController::OnNotifyAutoCodeDisabled()
+{
+    // KCB_DEBUG_ENTRY;
+    _securityController.clearAutoCodeForAllCodes();
+    _autoCodeTimer.stop();
+    // KCB_DEBUG_EXIT;
+}
+
+void CSystemController::OnNotifyAdminRequested()
+{
+    // KCB_DEBUG_ENTRY;
+    _ptimer->stop();
+    // KCB_DEBUG_EXIT;
+}
+
+void CSystemController::OnNotifyAdminCancelled()
+{
+    // KCB_DEBUG_ENTRY;
+    _ptimer->start();
+    // KCB_DEBUG_EXIT;
 }

@@ -37,7 +37,7 @@ void CardReader::ParseStdOut()
     QByteArray output;
     output = m_proc.readAllStandardOutput();
 
-    KCB_DEBUG_TRACE("Card Reader Output: " << output);
+    // KCB_DEBUG_TRACE("Card Reader Output: " << output);
 
     bool not_none = !output.contains("None");
     bool not_empty = !output.trimmed().isEmpty();

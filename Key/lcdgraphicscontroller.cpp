@@ -31,7 +31,6 @@ void CLCDGraphicsController::setBrightness(unsigned int unValue)
     }
 
     sCmd = std::string("sudo bash -c 'echo ") + std::to_string(unValue) + " > /sys/class/backlight/rpi_backlight/brightness'";
-    qDebug() << sCmd.c_str();
     system(sCmd.c_str());
 }
 

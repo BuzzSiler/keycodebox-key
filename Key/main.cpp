@@ -2,6 +2,7 @@
 #include <QtGlobal>
 #include <QApplication>
 #include <QtCore>
+#include <QThread>
 
 #include "logger.h"
 #include "kcbsystem.h"

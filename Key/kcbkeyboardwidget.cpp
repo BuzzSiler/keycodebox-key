@@ -111,11 +111,9 @@ void KcbKeyboardWidget::OnTextChanged(QString text)
     updateUi();
 }
 
-void KcbKeyboardWidget::setValue(const QString value,
-                                 const QStringList codes_in_use)
+void KcbKeyboardWidget::setValue(const QString& value,
+                                 const QStringList& codes_in_use)
 {
-    KCB_DEBUG_ENTRY;
-
     m_codes_in_use.clear();
     if (codes_in_use.count())
     {
@@ -123,7 +121,7 @@ void KcbKeyboardWidget::setValue(const QString value,
     }
     m_value = value;
     ui->edText->setText(value);
-    updateUi();    
+    updateUi();
 }
 
 QString KcbKeyboardWidget::getValue()
@@ -155,7 +153,6 @@ void KcbKeyboardWidget::updateValue(QString value)
 
 void KcbKeyboardWidget::digitClicked(QString value)
 {
-    KCB_DEBUG_TRACE("value" << value);
     updateValue(value);
 }
 
@@ -180,7 +177,7 @@ void KcbKeyboardWidget::alphaClicked(QString value)
 
 void KcbKeyboardWidget::controlClicked(QString value)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (value == tr("Back"))
     {
         QString value = ui->edText->text();
@@ -218,6 +215,7 @@ void KcbKeyboardWidget::controlClicked(QString value)
     }
 
     updateUi();
+    // KCB_DEBUG_EXIT;
 }
 
 void KcbKeyboardWidget::updateUi()
@@ -227,27 +225,34 @@ void KcbKeyboardWidget::updateUi()
 
 void KcbKeyboardWidget::OnReturnClicked()
 {
-    KCB_DEBUG_ENTRY;
-    // Disallow duplicate codes
+    // KCB_DEBUG_ENTRY;
     if (m_codes_in_use.contains(ui->edText->text()))
     {
-        (void) QMessageBox::warning(this,
+        auto result = QMessageBox::warning(this,
                                     tr( "Duplicate Code Detected" ),
                                     tr( "You have entered a code that is already in use.\n"
-                                        "Duplicate codes for 'Code 1' are not allowed.\n"
-                                        "Please enter a different code."),
-                                    QMessageBox::Ok);
+                                        "Note: Unexpected behavior may occur with duplicate values."
+                                        "\n\n"
+                                        "For 'Code 1' only codes, a unique value for 'Code 1' is recommended.\n"
+                                        "For 'Code 2' codes, the 'Code 1' value may be a duplicate; however, "
+                                        "the 'Code 2' value should be unique."
+                                        "\n\n"
+                                        "Do you want to continue?"
+                                    ),
+                                    QMessageBox::Ok, QMessageBox::Cancel);
+        if (result == QMessageBox::Cancel)
+        {
+            KCB_DEBUG_ENTRY;
+            return;
+        }
     }
-    else
-    {
-        KCB_DEBUG_TRACE("Emitting NotifyEnter");
-        emit NotifyEnter();
-    }
+    emit NotifyEnter();
+    // KCB_DEBUG_EXIT;
 }
 
 void KcbKeyboardWidget::resetPassword()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     // Note: passwords can be empty so enable the enter button
     ui->pbCtrlReturn->setEnabled(m_for_password);
 
@@ -262,18 +267,18 @@ void KcbKeyboardWidget::resetPassword()
     ui->wgAlpha->setEnabled(true);
     ui->wgDigit->setEnabled(true);
     ui->wgControl->setEnabled(true);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KcbKeyboardWidget::invalidPassword()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     ui->wgAlpha->setDisabled(true);
     ui->wgDigit->setDisabled(true);
     ui->wgControl->setDisabled(true);
     ui->edText->setPlaceholderText(tr("Incorrect Password"));
     ui->edText->setText("");
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KcbKeyboardWidget::on_pbCtrlShowHide_clicked()

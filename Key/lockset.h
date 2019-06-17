@@ -18,12 +18,6 @@ class CLockSet : public QObject
         ~CLockSet();
         void clearSet();
 
-        QJsonArray &jsonArraySet(QJsonObject &json);
-        QString jsonArrayAsStringObject();
-
-        bool setFromJsonObject(QJsonObject &jsonObj);
-        bool setFromJsonString(QString strJson);
-
         const QMultiMap<QString, CLockState*>*  getLockMap() { return &_mmapLocks; }
 
 

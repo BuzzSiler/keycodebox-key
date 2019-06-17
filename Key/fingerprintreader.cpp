@@ -1,5 +1,5 @@
 #include "fingerprintreader.h"
-#include <QDebug>
+
 #include <iostream>
 #include <libfprint/fprint.h>
 #include <time.h>
@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <QDebug>
+
+#include "logger.h"
 
 struct fp_dev *fpdev = NULL;
 struct fp_dscv_print **fp_dscv_prints = NULL;
@@ -40,28 +44,23 @@ static void dev_open_cb(struct fp_dev *dev, int status, void *user_data)
 
     fpdev = dev;
     drv = fp_dev_get_driver(fpdev);
-    qDebug() << "CFingerprintReader::openDeviceHandle(), Device ready to use!";
-    qDebug() << "CFingerprintReader::openDeviceHandle(), Driver: '" << fp_driver_get_full_name(drv) << "'";
+    KCB_DEBUG_TRACE(fp_driver_get_full_name(drv));
 
     if (fp_dev_supports_imaging(fpdev))
     {
-        qDebug() << "CFingerprintReader::openDeviceHandle(), IS an imaging device!";
+        KCB_DEBUG_TRACE("IS an imaging device!");
     }
     else
     {
-        qDebug() << "CFingerprintReader::openDeviceHandle(), IS NOT an imaging device!";
+        KCB_DEBUG_TRACE("IS NOT an imaging device!");
     }
 
     enroll_stages = fp_dev_get_nr_enroll_stages(fpdev);
-    qDebug() << "CFingerprintReader::openDeviceHandle(), Required enroll stages: " << QString::number(enroll_stages);
+    KCB_DEBUG_TRACE("Required enroll stages: " << QString::number(enroll_stages));
 }
 
 bool CFingerprintReader::openDeviceHandle()
 {
-    // Open the device using the VID, PID,
-    // and optionally the Serial number.
-    // _handle = hid_open(VID, PID, NULL);
-
     struct fp_dscv_dev **discovered_devs;
     struct fp_dscv_dev *ddev;
 
@@ -71,22 +70,17 @@ bool CFingerprintReader::openDeviceHandle()
     discovered_devs = fp_discover_devs();
     if( !(sizeof(discovered_devs) / sizeof(discovered_devs[0])) )
     {
-        qDebug() << "CFingerprintReader::openDeviceHandle(), No fingerprint devices found..";
+        KCB_DEBUG_TRACE("No fingerprint devices found");
         return false;
     }
 
     int count = 0;
-    //struct fp_driver *drv;
     for(i=0; (ddev=discovered_devs[i]); i++)
     {
-        //drv = fp_dscv_dev_get_driver(ddev);
         (void)fp_dscv_dev_get_driver(ddev);
-        // for now, we'll just stop on one
         count++;
         break;
     }
-
-    qDebug() << "CFingerprintReader::openDeviceHandle(), Opening Device..";
 
     if( count )
     {
@@ -95,7 +89,7 @@ bool CFingerprintReader::openDeviceHandle()
 
     if( r )
     {
-        qDebug() << "CFingerprintReader::openDeviceHandle(), Opening Device FAILED";
+        KCB_DEBUG_TRACE("Fingerprint Reader device not found");
         return false;
     }
 
@@ -105,7 +99,6 @@ bool CFingerprintReader::openDeviceHandle()
 //thread start method, may not use this
 void CFingerprintReader::start()
 {
-    qDebug() << "CFingerprintReader::start()";
     while(1) 
     {
         //readCardReaderLoop();
@@ -124,9 +117,6 @@ bool CFingerprintReader::initFingerprintReader()
 
 void CFingerprintReader::handleEvents()
 {
-    //    fp_handle_events() - blocks for a few moments
-    //    fp_handle_events_timeout(struct timeval) - blocks on timeout
-    //  * fp_handle_events_timeout(struct timeval), tv_*=0 - nonblocking call
     struct timeval tv;
     tv.tv_sec = 0;
     tv.tv_usec = 0;
@@ -143,8 +133,8 @@ void CFingerprintReader::enrollStageCb(struct fp_dev *dev, int result,
 
     Q_UNUSED(dev);
 
-    if (result < 0) {
-        //edlg_cancel_enroll(result);
+    if (result < 0) 
+    {
         return;
     }
 
@@ -170,7 +160,7 @@ void CFingerprintReader::enrollStageCb(struct fp_dev *dev, int result,
         case FP_ENROLL_PASS:
             tmp = "";
             current_enroll_stage++;
-            qDebug() << "CFingerprintReader::enrollStageCB(), Step " << QString::number(current_enroll_stage) << " of " << QString::number(enroll_stages);
+            KCB_DEBUG_TRACE("Step " << QString::number(current_enroll_stage) << " of " << QString::number(enroll_stages));
             break;
         case FP_ENROLL_FAIL:
             tmp = tr("<b>Enrollment failed!</b>");
@@ -197,7 +187,6 @@ void CFingerprintReader::enrollStageCb(struct fp_dev *dev, int result,
         {
             unsigned char *buf;
             size_t len;
-            //fp_print_data_save(enroll_data, RIGHT_INDEX);
 
             prependPath = "/home/pi/run/prints/";
 
@@ -238,7 +227,9 @@ bool CFingerprintReader::initEnrollment(QString sCode)
     access_code = sCode;
     result = fp_async_enroll_start(fpdev, enrollStageCb, this);
     if (result < 0 )
+    {
         return false;
+    }
     return true;
 }
 
@@ -246,13 +237,10 @@ void CFingerprintReader::enrollCancelCb(struct fp_dev *dev, void *user_data)
 {
     Q_UNUSED(dev);
     Q_UNUSED(user_data);
-    qDebug() << "CFingerprintReader::enrollCancelCb()";
 }
 
 bool CFingerprintReader::cancelEnrollment()
 {
-    qDebug() << "CFingerprintReader::cancelEnrollment()";
-
     current_enroll_stage = 1;
 
     int result = 0;
@@ -274,13 +262,10 @@ void CFingerprintReader::verifyCancelCb(struct fp_dev *dev, void *user_data)
 {
     Q_UNUSED(dev);
     Q_UNUSED(user_data);
-    qDebug() << "CFingerprintReader::verifyCancelCb()";
 }
 
 bool CFingerprintReader::cancelVerify()
 {
-    qDebug() << "CFingerprintReader::cancelVerify()";
-
     int result = 0;
 
     result = fp_async_identify_stop(fpdev, verifyCancelCb, NULL);
@@ -293,8 +278,6 @@ bool CFingerprintReader::cancelVerify()
 
 void CFingerprintReader::identifyCb(struct fp_dev *dev, int result, size_t match_offset, struct fp_img *img, void *user_data)
 {
-    qDebug() << "CFingerprintReader::verifyCb()";
-
     Q_UNUSED(dev);
     Q_UNUSED(img);
 
@@ -334,8 +317,6 @@ void CFingerprintReader::identifyCb(struct fp_dev *dev, int result, size_t match
 
     if( retryScan )
     {
-        qDebug() << "retying";
-        //fp_print_data_load(fpdev, RIGHT_INDEX, &enroll_data);
         result = fp_async_identify_start(fpdev, print_gallery, identifyCb, (CFingerprintReader *)user_data);
     }
 
@@ -385,8 +366,6 @@ const char *CFingerprintReader::buildSavePath(QString sCode)
 
 bool CFingerprintReader::loadEnrollData(QString sCode)
 {
-    qDebug() << "CFingerprintReader::loadEnrollData(), sCode: " << sCode;
-
     QByteArray ba = sCode.toLatin1();
     const char *full_path = ba.data();
     unsigned char *buf;
@@ -410,10 +389,6 @@ bool CFingerprintReader::loadEnrollData(QString sCode)
 
 bool CFingerprintReader::initVerify()
 {
-    qDebug() << "CFingerprintReader::InitVerify()";
-
-    //build list of all enrolldata we have
-
     QDirIterator it("/home/pi/run/prints/", QStringList() << "*", QDir::Files, QDirIterator::Subdirectories);
     int count = 0;
     QString currentDir;
@@ -430,7 +405,6 @@ bool CFingerprintReader::initVerify()
     {
         currentDir = it.next();
         loadPath = currentDir.mid(20,100);
-        qDebug() << "PRINT INDEX: " << QString::number(count) << " " << loadPath;
         this->loadEnrollData(currentDir);
 
         print_gallery[count] = enroll_data;

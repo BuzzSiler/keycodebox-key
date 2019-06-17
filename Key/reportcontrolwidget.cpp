@@ -93,7 +93,6 @@ void ReportControlWidget::setValues(CAdminRec& adminInfo)
     }
 
     m_delete_freq = adminInfo.getDefaultReportDeleteFreq();
-    KCB_DEBUG_TRACE(m_delete_freq.toString());
     if (dir_default || on_usb_drive)
     {
         int index = m_delete_frequencies.indexOf(m_delete_freq);
@@ -145,7 +144,7 @@ void ReportControlWidget::getValues(CAdminRec& adminInfo)
         Q_ASSERT_X(index >= 0 && index <= m_delete_frequencies.count(), Q_FUNC_INFO, "delete frequency index out of range");
         deleteFreq = m_delete_frequencies[index];
     }
-    KCB_DEBUG_TRACE(m_delete_freq.toString());
+    // KCB_DEBUG_TRACE(m_delete_freq.toString());
     adminInfo.setDefaultReportDeleteFreq(deleteFreq);
 
     // KCB_DEBUG_EXIT;
@@ -164,7 +163,7 @@ void ReportControlWidget::OnNotifyUsbDrive(QStringList drives)
 {
     // KCB_DEBUG_ENTRY;
     m_usb_drives = drives;
-    KCB_DEBUG_TRACE("drives" << m_usb_drives);
+    // KCB_DEBUG_TRACE("drives" << m_usb_drives);
 
     if (m_usb_drives.count() == 0)
     {
@@ -207,7 +206,6 @@ void ReportControlWidget::on_gbAutoReport_toggled(bool state)
     int index = ui->cbFrequency->findText("None");
     if (index > -1)
     {
-        KCB_DEBUG_TRACE("Removing None" << index);
         ui->cbFrequency->removeItem(index);
     }
 
@@ -228,7 +226,6 @@ void ReportControlWidget::on_gbAutoReport_toggled(bool state)
     }
     else
     {
-        KCB_DEBUG_TRACE("Adding None");
         ui->cbFrequency->insertItem(0, "None");
         index = 0;
         dt = DEFAULT_DATETIME;
@@ -358,7 +355,7 @@ void ReportControlWidget::on_lvAvailableReports_clicked(const QModelIndex &index
     // KCB_DEBUG_ENTRY;
     bool enable = false;
     auto state = Qt::CheckState(m_lv_model.data(index, Qt::CheckStateRole).toInt());
-    KCB_DEBUG_TRACE(state);
+    // KCB_DEBUG_TRACE(state);
     if (state == Qt::Checked)
     {
         enable = true;
@@ -629,12 +626,12 @@ void ReportControlWidget::updateUi()
 
 void ReportControlWidget::on_pbReportUnmountDrive_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     ui->lvAvailableReports->setModel(nullptr);
     m_lv_model.disconnect();
-    KCB_DEBUG_TRACE("Unmounting");
+    // KCB_DEBUG_TRACE("Unmounting");
     kcb::UnmountUsb(ui->cbUsbDrives->currentText());
     ui->cbStoreToUsbDrive->setChecked(false);
     updateUi();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }

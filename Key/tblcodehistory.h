@@ -4,6 +4,7 @@
 #include <QtSql>
 #include <QtDebug>
 #include <QByteArray>
+
 #include "lockstate.h"
 #include "lockhistoryrec.h"
 #include "lockhistoryset.h"
@@ -27,8 +28,6 @@ class CTblCodeHistory
 
         bool updateRecord(CLockHistoryRec &rec);
         void selectLockCodeHistorySet(QString LockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet);
-        bool updateLockCodeHistorySet(CLockHistorySet &lockHistorySet);
-        bool updateLockCodeHistorySet(QJsonObject &jsonObj);
         void selectLastLockCodeHistorySet(QString &LockNums, QDateTime &start, QDateTime &end, CLockHistorySet **pLockHistorySet);
 
 

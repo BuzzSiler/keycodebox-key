@@ -59,6 +59,12 @@
        <layout class="QHBoxLayout" name="hloCode1">
         <item>
          <widget class="QLabel" name="lblCode1">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -74,7 +80,7 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="font">
@@ -88,11 +94,40 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pbCode1Random">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Random</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spCode1RandomCodeLength">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>4</number>
+          </property>
+          <property name="maximum">
+           <number>7</number>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pbClearCode1">
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="font">
@@ -162,6 +197,12 @@
        <layout class="QHBoxLayout" name="hloCode2">
         <item>
          <widget class="QLabel" name="lblCode2">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -177,7 +218,7 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="font">
@@ -191,11 +232,40 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pbCode2Random">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Random</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spCode2RandomCodeLength">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>4</number>
+          </property>
+          <property name="maximum">
+           <number>7</number>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pbClearCode2">
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="font">
@@ -262,6 +332,12 @@
        <layout class="QHBoxLayout" name="hloUsername">
         <item>
          <widget class="QLabel" name="lblUsername">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -277,7 +353,7 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="font">
@@ -295,7 +371,7 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>30</height>
+            <height>40</height>
            </size>
           </property>
           <property name="font">

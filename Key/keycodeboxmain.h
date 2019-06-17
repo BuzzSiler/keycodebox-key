@@ -51,7 +51,6 @@ class MainWindow : public QMainWindow
         ~MainWindow();
 
         static void OnImageClicked();
-        void ExtractCommandOutput(FILE *pF, std::string &rtnStr);
         bool isInternetTime();
         
     signals:

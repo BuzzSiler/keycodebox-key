@@ -46,31 +46,31 @@ namespace kcb
 
         clearAccessSelection();
 
-        KCB_DEBUG_TRACE("Getting Access Selection" << selection);
+        // KCB_DEBUG_TRACE("Getting Access Selection" << selection);
 
         return selection;
     }
 
     void Application::clearAccessSelection()
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
         m_selection = ACCESS_NONE;
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
     }
 
     bool Application::isTakeSelection()
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
         bool result = m_selection == ACCESS_TAKE;
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return result;
     }
 
     bool Application::isReturnSelection()
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
         bool result = m_selection == ACCESS_RETURN;
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return result;
     }
 

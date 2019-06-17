@@ -1,18 +1,20 @@
+#include "tblcodehistory.h"
+
 #include <QtGlobal>
 #include <QTime>
 #include <QDateTime>
 #include <QDebug>
-#include "tblcodehistory.h"
+
 #include "lockhistoryrec.h"
 #include "kcbcommon.h"
 #include "kcbapplication.h"
 
 CTblCodeHistory::CTblCodeHistory(QSqlDatabase *db) 
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _pDB = db;
     initialize();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 QSqlQuery CTblCodeHistory::createQuery(QStringList column_list,
@@ -23,7 +25,7 @@ QSqlQuery CTblCodeHistory::createQuery(QStringList column_list,
                                  // planned.
                                  QString condition)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database is null");
     Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
@@ -43,14 +45,14 @@ QSqlQuery CTblCodeHistory::createQuery(QStringList column_list,
         sql += QString(" %1").arg(where);
     }
 
-    qDebug() << "SQL:" << sql;
+    // KCB_DEBUG_TRACE("SQL:" << sql);
 
     if( !query.prepare(sql) )
     {
         KCB_WARNING_TRACE("prepare failed" << query.lastError());
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 
     return query;
 }
@@ -75,12 +77,12 @@ void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistory
         return;
     }
     
-    KCB_DEBUG_TRACE("Retrieving at least first record that was found!");
+    // KCB_DEBUG_TRACE("Retrieving at least first record that was found!");
 
     *pLockHistorySet = new CLockHistorySet();
 
     do
-    {                    
+    {
         auto ids = QUERY_VALUE(qry, "ids").toInt();
         auto seq = QUERY_VALUE(qry, "sequence").toString();
         auto seq_order = QUERY_VALUE(qry, "sequence_order").toInt();
@@ -132,7 +134,7 @@ void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistory
         pLockHistoryRec->setQuestion2(answer2);
         pLockHistoryRec->setQuestion3(answer3);
 
-		pLockHistoryRec->setImage(image);
+        pLockHistoryRec->setImage(image);
         (*pLockHistorySet)->addToSet(*pLockHistoryRec);
         
     } while (qry.next());
@@ -140,10 +142,10 @@ void CTblCodeHistory::execSelectCodeHistorySetQuery(QSqlQuery& qry, CLockHistory
 
 void CTblCodeHistory::selectLockCodeHistorySet(QString lockNums, QDateTime start, QDateTime end, CLockHistorySet **pLockHistorySet)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     *pLockHistorySet = 0;
 
-    KCB_DEBUG_TRACE(lockNums);
+    // KCB_DEBUG_TRACE(lockNums);
 
     QStringList columns_list;
     columns_list << "ids" << "sequence" << "sequence_order";
@@ -215,7 +217,7 @@ bool CTblCodeHistory::tableExists()
 
 bool CTblCodeHistory::columnExists(QString column)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
     
@@ -223,14 +225,14 @@ bool CTblCodeHistory::columnExists(QString column)
     QSqlQuery qry(*_pDB);
     bool foundColumn = false;
 
-    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+    // KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
     Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
 
     if( _pDB && _pDB->isOpen() )
     {
-        QString sql("PRAGMA TABLE_INFO(codes);");
+        QString sql(QString("PRAGMA TABLE_INFO(%1);").arg(TABLENAME));
 
         qry.prepare( sql );
 
@@ -240,7 +242,7 @@ bool CTblCodeHistory::columnExists(QString column)
             {
                 if( qry.value(1).toString().compare(column) == 0 )
                 {
-                    qDebug() << "CTblCodeHistory::columnExists(), found column: " << column;
+                    // KCB_DEBUG_TRACE("found column: " << column);
 
                     foundColumn = true;
                     break;
@@ -248,28 +250,31 @@ bool CTblCodeHistory::columnExists(QString column)
             }
         }
         else
-            qDebug() << qry.lastError();
-
+        {
+            KCB_DEBUG_TRACE(qry.lastError());
+        }
     } 
     else 
     {
         KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
     }
+
+    // KCB_DEBUG_EXIT;
     return foundColumn;
 }
 
 void CTblCodeHistory::createColumn(QString column, QString fieldType)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+    // KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
     Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
     
     if( _pDB && _pDB->isOpen() ) 
     {
-        KCB_DEBUG_TRACE("Creating table");
+        // KCB_DEBUG_TRACE("Creating table");
         QSqlQuery qry(*_pDB);
 
         QString sql("ALTER TABLE  ");
@@ -283,11 +288,7 @@ void CTblCodeHistory::createColumn(QString column, QString fieldType)
 
         if( !qry.exec() )
         {
-            qDebug() << qry.lastError();
-        }
-        else
-        {
-            qDebug() << "Table altered!";
+            KCB_DEBUG_TRACE(qry.lastError());
         }
     } 
     else 
@@ -298,14 +299,15 @@ void CTblCodeHistory::createColumn(QString column, QString fieldType)
 
 void CTblCodeHistory::initialize()
 {
+    // KCB_DEBUG_ENTRY;
     if(!tableExists())
     {
-        qDebug() << "Table does not Exist";
+        KCB_DEBUG_TRACE("Table does not Exist");
         createTable();
     }
     if(!tableExists())
     {
-        qDebug() << "Failed to cretae CodeHistory table.";
+        KCB_DEBUG_TRACE("Failed to create CodeHistory table.");
     }
 
     QString image_column = "image";
@@ -313,21 +315,21 @@ void CTblCodeHistory::initialize()
     if(!columnExists(image_column))
     {
         createColumn(image_column, "BLOB");
-    }            
+    }
 }
 
 void CTblCodeHistory::createTable()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
+    // KCB_DEBUG_TRACE("Opening Database" << _pDB << _pDB->isOpen());
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
     Q_ASSERT_X(_pDB->isOpen(), Q_FUNC_INFO, "database is not open");
     
     if( _pDB && _pDB->isOpen() ) 
     {
-        KCB_DEBUG_TRACE("Creating table");
+        // KCB_DEBUG_TRACE("Creating table");
         QSqlQuery qry(*_pDB);
 
         QString sql("CREATE TABLE IF NOT EXISTS ");
@@ -339,23 +341,19 @@ void CTblCodeHistory::createTable()
                " retry_count integer, max_access integer, max_retry integer,"
                " access_time DATETIME, admin_notification_sent BOOL,"
                 " user_notification_email text, user_notification_sent BOOL,"
-				"answer1 text, answer2 text, answer3 text,"
-				"image BLOB)";
+                "answer1 text, answer2 text, answer3 text,"
+                "image BLOB)";
 
         qry.prepare( sql );
 
         if( !qry.exec() )
         {
-            qDebug() << qry.lastError();
-        }
-        else
-        {
-            qDebug() << "Table created!";
+            KCB_WARNING_TRACE(qry.lastError());
         }
     } 
     else 
     {
-        KCB_DEBUG_TRACE("Either _pDB is NULL or _pDB is not open");
+        KCB_WARNING_TRACE("Either _pDB is NULL or _pDB is not open");
     }
 
 }
@@ -381,10 +379,10 @@ bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QStrin
                                          bool adminNotificationSent, QString userNotificationEmail,
                                          bool userNotificationSent, QByteArray image)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE("Adding Locks to History" << locknums);
-    KCB_DEBUG_TRACE("image size" << image.count());
+    // KCB_DEBUG_TRACE("Adding Locks to History" << locknums);
+    // KCB_DEBUG_TRACE("image size" << image.count());
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + TABLENAME +
                 QString(" (sequence, sequence_order, "
@@ -394,15 +392,15 @@ bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QStrin
                         "retry_count, max_access, max_retry,"
                         "access_time, admin_notification_sent,"
                         "user_notification_email, user_notification_sent,"
-					    "image)"
+                        "image)"
                         " VALUES (:seqDesc, :seqOrder, :lockNums, :desc, :codeOne, "
                         " :codeTwo, :accessSelection, "
                         " :start, :end, :stat, 0, 0, :maxAccess, :maxRetry, "
                         " :accessTime, :adminNotificationSent, "
                         " :userEmail, :userNotificationSent,"
-						" :image)" ));
+                        " :image)" ));
 
-    qDebug() << "Query:" << qry.lastQuery();
+    // KCB_DEBUG_TRACE("Query:" << qry.lastQuery());
 
     qry.bindValue(":seqDesc", sequence);
     qry.bindValue(":seqOrder", sequenceNum);
@@ -425,13 +423,11 @@ bool CTblCodeHistory::addLockCodeHistory(QString locknums, QString code1, QStrin
 
     if( !qry.exec() ) 
     {
-        qDebug() << "CTblCodeHistory::addLockCodeHistory():" << qry.lastError();
-        qDebug() << "Query After:" << qry.lastQuery();
+        KCB_DEBUG_TRACE("error" << qry.lastError() << "query" << qry.lastQuery());
         return false;
     }
     else 
     {
-        qDebug( "Inserted!" );
         return true;
     }
 }
@@ -457,12 +453,12 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString co
                                                     bool userNotificationSent, QString answer1, QString answer2, QString answer3,
                                                     QByteArray image)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
-    KCB_DEBUG_TRACE("Adding Locks w/ Answers to History" << locknums);
-    KCB_DEBUG_TRACE("Answer1" << answer1 << "Answer2" << answer2 << "Answer3" << answer3);
+    // KCB_DEBUG_TRACE("Adding Locks w/ Answers to History" << locknums);
+    // KCB_DEBUG_TRACE("Answer1" << answer1 << "Answer2" << answer2 << "Answer3" << answer3);
 
     QSqlQuery qry(*_pDB);
     qry.prepare(QString("INSERT INTO ") + TABLENAME +
@@ -479,9 +475,9 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString co
                         " :accessTime, :adminNotificationSent, "
                         " :userEmail, :userNotificationSent, "
                         " :answer1, :answer2, :answer3,"
-						" :image)" ));
+                        " :image)" ));
 
-    qDebug() << "Query:" << qry.lastQuery();
+    // KCB_DEBUG_TRACE("Query:" << qry.lastQuery());
 
     qry.bindValue(":seqDesc", sequence);
     qry.bindValue(":seqOrder", sequenceNum);
@@ -506,13 +502,11 @@ bool CTblCodeHistory::addLockCodeHistoryWithAnswers(QString locknums, QString co
 
     if( !qry.exec() ) 
     {
-        qDebug() << "CTblCodeHistory::addLockCodeHistory():" << qry.lastError();
-        qDebug() << "Query After:" << qry.lastQuery();
+        KCB_DEBUG_TRACE("error" << qry.lastError() << "query" << qry.lastQuery());
         return false;
     }
     else 
     {
-        qDebug( "Inserted!" );
         return true;
     }
 }
@@ -538,7 +532,7 @@ void CTblCodeHistory::currentTimeFormat(QString format, QString strBuffer, int n
 
 bool CTblCodeHistory::readTestDefault()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
@@ -571,9 +565,6 @@ bool CTblCodeHistory::readTestDefault()
             strptime(query.value(fldStart).toDateTime().toString(DATETIME_FORMAT).toStdString().c_str(), "yyyy-MM-dd %H:%M:%S", &tm);
             strptime(query.value(fldEnd).toDateTime().toString(DATETIME_FORMAT).toStdString().c_str(), "yyyy-MM-dd %H:%M:%S", &tm);
 
-            qDebug() << "CTblCodeHistory::readTestDefault(): Code1:" << code1 << " len:" << code1.size();
-            qDebug() << "CTblCodeHistory::readTestDefault(): Code2:" << code2 << " len:" << code2.size();
-
             return true;
         }
     }
@@ -582,7 +573,7 @@ bool CTblCodeHistory::readTestDefault()
 
 bool CTblCodeHistory::deleteLockCodeHistory(CLockHistoryRec &rec)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
@@ -622,7 +613,7 @@ bool CTblCodeHistory::deleteLockCodeHistory(CLockHistoryRec &rec)
 
 bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(_pDB != nullptr, Q_FUNC_INFO, "database pointer is null");
 
@@ -634,7 +625,7 @@ bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
                               "retry_count=:retryCount, max_access=:maxAccess, max_retry=:maxRetry,"
                               "access_time=:accessTime, admin_notification_sent=:adminNotificationSent,"
                               "user_notification_email=:userNotificationEmail, user_notification_sent=:userNotificationSent,"
-							  "image=:image"
+                              "image=:image"
                               " WHERE ids=:fids");
 
     qry.prepare(sql);
@@ -657,60 +648,19 @@ bool CTblCodeHistory::updateRecord(CLockHistoryRec &rec)
     qry.bindValue(":userNotificationSent", rec.getUserNotificationSent() );
 
     qry.bindValue(":image", rec.getImage() );
-
     qry.bindValue(":fids", rec.getID());
 
-    if(qry.exec()) 
+    if(qry.exec())
     {
         return true;
     } 
-    else 
+    else
     {
-        qDebug() << "CTblCodeHistory::updateRecord() failed";
+        KCB_DEBUG_TRACE("error" << qry.lastError() << "query" << qry.lastQuery());
         return false;
     }
 }
 
-bool CTblCodeHistory::updateLockCodeHistorySet(CLockHistorySet &lockHistorySet)
-{
-    bool    bRC = true;
-
-    _pDB->transaction();
-
-    auto itor = lockHistorySet.getIterator();
-
-    while (itor.hasNext())
-    {
-        bRC = updateRecord(*(itor.next()));
-    }
-
-
-    if( !bRC ) 
-    {
-        qDebug() << "CTbleCodes::updateCodeSet() failed!";
-        _pDB->rollback();
-    } 
-    else 
-    {
-        qDebug() << "CTbleCodes::updateCodeSet() succeeded. Committing...";
-        if( !_pDB->commit() )
-        {
-            qDebug() << "CTbleCodes::updateCodeSet() committed successfully.";
-        }
-    }
-    return bRC;
-}
-
-bool CTblCodeHistory::updateLockCodeHistorySet(QJsonObject &jsonObj)
-{
-    CLockHistorySet    lockHistorySet;
-    if(!lockHistorySet.setFromJsonObject(jsonObj))
-    {
-        qDebug() << "CTblCodeHistory::updateCodes(): invalid JSON Object Codeset";
-    }
-    // Valid set
-    return updateLockCodeHistorySet(lockHistorySet);
-}
 
 //-------------------------------------------------------------------------------------------------
 // EOF

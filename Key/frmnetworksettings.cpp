@@ -52,7 +52,7 @@ void FrmNetworkSettings::setValues(int vncPort, QString vncPassword, QString smt
     ui->lblIpDnsValue->setText(ip_state.dns);
     ui->lblMacAddressValue->setText(kcb::GetMacAddress());
 
-    KCB_DEBUG_TRACE("is static" << ip_state.is_static);
+    // KCB_DEBUG_TRACE("is static" << ip_state.is_static);
     ui->cbAddressingType->setCurrentIndex(ip_state.is_static ? IP_ADDRESSING_STATIC_IP : IP_ADDRESSING_DHCP);
 
     // SMTP Values
@@ -163,7 +163,7 @@ void FrmNetworkSettings::on_lblSmtpPasswordValue_clicked()
 
 void FrmNetworkSettings::on_cbAddressingType_currentIndexChanged(int index)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     bool is_static = index == IP_ADDRESSING_STATIC_IP;
 
@@ -214,7 +214,7 @@ void FrmNetworkSettings::on_cbAddressingType_currentIndexChanged(int index)
 
     updateUi();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void FrmNetworkSettings::on_lblIpAddressValue_clicked()
@@ -239,9 +239,9 @@ void FrmNetworkSettings::on_lblIpGatewayValue_clicked()
 
 void FrmNetworkSettings::on_lblIpDnsValue_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     HandleIpSettingClick(*ui->lblIpDnsValue);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void FrmNetworkSettings::HandleIpSettingClick(CClickableLabel& label)
@@ -284,7 +284,7 @@ void FrmNetworkSettings::updateUi()
 
 void FrmNetworkSettings::on_bbNetworkingOkCancel_accepted()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     if (ui->cbAddressingType->currentIndex() == IP_ADDRESSING_STATIC_IP)
     {
@@ -330,7 +330,7 @@ void FrmNetworkSettings::on_bbNetworkingOkCancel_accepted()
         ip_state.is_static ? kcb::EnableStaticAddressing() : kcb::DisableStaticAddressing();
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void FrmNetworkSettings::on_bbNetworkingOkCancel_rejected()

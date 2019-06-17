@@ -53,7 +53,7 @@ bool CMagTekCardReader::floatXInputDevice()
     ExtractCommandOutput(pF, sOutput);
     fclose(pF);
 
-    KCB_DEBUG_TRACE("sOutput = " << QString::fromStdString(sOutput));
+    // KCB_DEBUG_TRACE("sOutput = " << QString::fromStdString(sOutput));
 
     size_t idPos = sOutput.find(parseToken);
 
@@ -61,7 +61,7 @@ bool CMagTekCardReader::floatXInputDevice()
     {
         xInputId = sOutput.substr(idPos + parseToken.length(), 1);
 
-        KCB_DEBUG_TRACE("float xinput id: " << QString::fromStdString(xInputId));
+        // KCB_DEBUG_TRACE("float xinput id: " << QString::fromStdString(xInputId));
 
         floatCmd += xInputId;
         std::system(floatCmd.c_str());
@@ -72,7 +72,7 @@ bool CMagTekCardReader::floatXInputDevice()
 
 bool CMagTekCardReader::openDeviceHandle()
 {
-    KCB_DEBUG_TRACE("searching for hid magnetic card reader usb-c216");
+    // KCB_DEBUG_TRACE("searching for hid magnetic card reader usb-c216");
     QString filterString = "usb-c216.*event";
     QString deviceType = "input";
     QString devicePrefix = "event";
@@ -99,13 +99,13 @@ bool CMagTekCardReader::openDeviceHandle()
             return false;
         }
   
-        KCB_DEBUG_TRACE("evdev input driver version is " << (version >> 16) << "." << ((version >> 8) & 0xff) << "." << (version & 0xff));
+        // KCB_DEBUG_TRACE("evdev input driver version is " << (version >> 16) << "." << ((version >> 8) & 0xff) << "." << (version & 0xff));
   
         ioctl(fileDescriptor, EVIOCGID, id);
-        KCB_DEBUG_TRACE("Input device ID: bus" << "0x" << id[ID_BUS] << "vendor 0x" << id[ID_VENDOR] << "product 0x" << id[ID_PRODUCT] << "version 0x" << id[ID_VERSION]);
+        // KCB_DEBUG_TRACE("Input device ID: bus" << "0x" << id[ID_BUS] << "vendor 0x" << id[ID_VENDOR] << "product 0x" << id[ID_PRODUCT] << "version 0x" << id[ID_VERSION]);
         
         ioctl(fileDescriptor, EVIOCGNAME(sizeof(name)), name);
-        KCB_DEBUG_TRACE("Input device name: " << name);
+        // KCB_DEBUG_TRACE("Input device name: " << name);
         
         return floatXInputDevice();
     }
@@ -125,7 +125,7 @@ int CMagTekCardReader::codeToInteger(int x)
     // 9 -> 8, 10 -> 9
     int characterMap [] = { -1, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     if( (x >= 0) && (x < 12) )
     {
         return characterMap[x];
@@ -246,8 +246,8 @@ void CMagTekCardReader::loop()
 
 void CMagTekCardReader::start()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     loop();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 

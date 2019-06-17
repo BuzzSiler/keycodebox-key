@@ -26,7 +26,8 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QScreen>
-
+#include <QProgressDialog>
+#include <QColor>
 
 #include "lockset.h"
 #include "lockstate.h"
@@ -51,14 +52,18 @@
 #include "lockcontroller.h"
 
 #include "cabinetrowdelegate.h"
+#include "autocodegenwidget.h"
+#include "autocodegenstatic.h"
 
 
 #define ADMIN_TAB_INDEX (0)
 #define UTILITIES_TAB_INDEX (1)
 #define REPORT_TAB_INDEX (2)
+#define DOORS_TAB_INDEX (3)
 #define CODES_TAB_INDEX (4)
 #define CODE_HISTORY_TAB_INDEX (5)
-#define SYSTEM_TAB_INDEX (6)
+#define AUTOCODE_TAB_INDEX (6)
+#define SYSTEM_TAB_INDEX (7)
 
 #define ACTION_INDEX_INSTALL_APP (0)
 #define ACTION_INDEX_SET_BRANDING_IMAGE (1)
@@ -66,6 +71,9 @@
 #define ACTION_INDEX_IMPORT_CODES (3)
 #define ACTION_INDEX_EXPORT_CODES (4)
 #define ACTION_INDEX_EXPORT_LOGS (5)
+
+#define CODE_SELECTION_SINGLE_INDEX (0)
+#define CODE_SELECTION_MULTI_INDEX (1)
 
 static const QStringList INSTALL_APP_FILTER = {"Alpha*"};
 static const QStringList BRANDING_IMAGE_FILTER = {"*.jpg", "*.jpeg"};
@@ -119,8 +127,9 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     m_report(* new ReportControlWidget(this)),
     m_file_filter{0},
     m_util_action(UTIL_ACTION_INSTALL_APP),
-    m_model(* new QStandardItemModel(0, 6))
-
+    m_model(* new QStandardItemModel(0, 6)),
+    m_autocodegen(* new AutoCodeGenWidget(this)),
+    m_last_index(0)
 {
     ui->setupUi(this);
 
@@ -152,6 +161,26 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     connect(&m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(OnItemChanged(QStandardItem*)));
 
     ui->pbResetCabinetConfig->setDisabled(true);
+
+    bool autocode_enabled = AutoCodeGeneratorStatic::IsEnabled();
+    bool lockselection_enabled = KeyCodeBoxSettings::IsLockSelectionEnabled();
+    bool lockselection_display = !autocode_enabled && lockselection_enabled;
+
+    ui->cbAdminLockSelection->setEnabled(lockselection_display);
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    else if (KeyCodeBoxSettings::IsLockSelectionMulti())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(1);
+    }
+    else
+    {
+        ui->cbAdminLockSelection->setDisabled(true);
+    }
+
+    ui->tblCodesList->setSortingEnabled(true);
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -174,7 +203,7 @@ CFrmAdminInfo::~CFrmAdminInfo()
     {
         _pworkingSet->clearSet();
         delete _pworkingSet;
-        _pworkingSet = 0;
+        _pworkingSet = nullptr;
     }
 }
 
@@ -222,14 +251,25 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(_psysController, SIGNAL(DiscoverHardwareProgressUpdate(int)), this, SLOT(OnDiscoverHardwareProgressUpdate(int)));
 
+    connect(&m_autocodegen, &AutoCodeGenWidget::RequestCodes1, this, &CFrmAdminInfo::OnRequestCodes1);
+
+    connect(&m_autocodegen, &AutoCodeGenWidget::CommitCodes1, this, &CFrmAdminInfo::OnCommitCodes1);
+    connect(&m_autocodegen, &AutoCodeGenWidget::CommitCodes2, this, &CFrmAdminInfo::OnCommitCodes2);
+
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyDisableLockSelection, this, &CFrmAdminInfo::OnNotifyDisableLockSelection);
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyEnableLockSelection, this, &CFrmAdminInfo::OnNotifyEnableLockSelection);
+
 }
 
 void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 {
     _psysController = psysController;
 
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyAutoCodeEnabled, _psysController, &CSystemController::OnNotifyAutoCodeEnabled);
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyAutoCodeDisabled, _psysController, &CSystemController::OnNotifyAutoCodeDisabled);
+    connect(&m_autocodegen, &AutoCodeGenWidget::NotifyAutoCodeEmailUpdate, _psysController, &CSystemController::__OnAutoCodeEmail);
+
     initializeConnections();
-    KCB_DEBUG_TRACE("emit __OnRequestCurrentAdmin");
     emit __OnRequestCurrentAdmin();
     emit __OnReadDoorLocksState();
 }
@@ -237,7 +277,7 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 void CFrmAdminInfo::show()
 {
     QDialog::show();
-    KCB_DEBUG_TRACE("Admin type is: " << _psysController->getAdminType());
+    // KCB_DEBUG_TRACE("Admin type is: " << _psysController->getAdminType());
     if(_psysController->getAdminType() == "Assist")
     {
         ui->tabUtilities->setEnabled(false);
@@ -251,6 +291,7 @@ void CFrmAdminInfo::show()
         ui->gpAdminInfo->setVisible(true);
         ui->vloSelectLocks->addWidget(&m_select_locks);
         ui->hloReportSettings->addWidget(&m_report);
+        ui->hloAutoCodeGen->addWidget(&m_autocodegen);
         // Force tabwidget to show administrator tab
         emit ui->tabWidget->currentChanged(ADMIN_TAB_INDEX);
     }
@@ -265,27 +306,7 @@ int CFrmAdminInfo::getDisplayPowerDownTimeout()
 
 bool CFrmAdminInfo::isInternetTime()
 {
-    FILE *pF;
-    std::string sOutput = "";
-
-    pF = popen(CMD_LIST_SYSTEM_FLAGS, "r");
-    if(!pF)
-    {
-        qDebug() << "failed to list system flags";
-    }
-
-    ExtractCommandOutput(pF, sOutput);
-    fclose(pF);
-
-    qDebug() << "CFrmAdminInfo::isInternetTime(), " << QString::fromStdString(sOutput);
-    qDebug() << "CFrmAdminInfo::isInternetTime(), " << QString::number(sOutput.find("internetTime"));
-
-    if( sOutput.find("internetTime") != std::string::npos )
-    {
-        return true;
-    }
-
-    return false;
+    return KeyCodeBoxSettings::IsInternetTimeEnabled();
 }
 
 void CFrmAdminInfo::initialize()
@@ -310,11 +331,13 @@ void CFrmAdminInfo::initialize()
 
     setupCodeTableContextMenu();
 
-    if( isInternetTime() )
+    bool is_internettime = isInternetTime();
+    if( is_internettime )
     {
         ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
-        ui->dtSystemTime->setDisabled(true);
-        ui->cbInternetTime->setChecked(true);
+        ui->dtSystemTime->setDisabled(is_internettime);
+        ui->cbInternetTime->setChecked(is_internettime);
+        ui->btnSetTime->setDisabled(is_internettime);
     }
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabSelected(int)));
@@ -383,19 +406,16 @@ void CFrmAdminInfo::populateTimeZoneSelection(QComboBox *cbox)
     std::string parsedString = "";
 
     cbox->clear();
-    // Fill in combo box.
     QList<QByteArray> ids = QTimeZone::availableTimeZoneIds();
     foreach (QByteArray id, ids) 
     {
         cbox->addItem(id);
     }
 
-    qDebug() << "DFrmAdminInfo::populateTimeZoneSelection(...): setting current timezone";
-
     pF = popen(CMD_READ_TIME_ZONE, "r");
     if(!pF)
     {
-        qDebug() << "failed to parse timezone string";
+        KCB_DEBUG_TRACE("failed to parse timezone string");
     }
 
     ExtractCommandOutput(pF, sOutput);
@@ -426,33 +446,25 @@ void CFrmAdminInfo::populateTimeZoneSelection(QComboBox *cbox)
 
 void CFrmAdminInfo::setTimeZone()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    QString unlink = QString("sudo unlink /etc/localtime");
-    QString link = QString("sudo ln -s /usr/share/zoneinfo/") + ui->cbTimeZone->currentText() + QString(" /etc/localtime");
-
-    qDebug() << "timezone change: ";
-    qDebug() << unlink;
-    qDebug() << link;
-
-    std::system(unlink.toStdString().c_str());
-    std::system(link.toStdString().c_str());
+    kcb::SetTimeZone(ui->cbTimeZone->currentText());
 
     if(ui->cbInternetTime->isChecked())
     {
         ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::onRootPathChanged(QString path)
 {
-    qDebug() << "Root path loaded" << path;
+    Q_UNUSED(path);
 }
 
 void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QStringList sFilter)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if(_pcopymodel)
     {
         delete _pcopymodel;
@@ -503,17 +515,17 @@ void CFrmAdminInfo::populateFileCopyWidget(QString sDirectory, QStringList sFilt
     ui->treeViewCopy->header()->resizeSection(3, 75);
     ui->treeViewCopy->header()->setStretchLastSection(false);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::onCopyRootPathChanged(QString path)
 {
-    qDebug() << "Root path loaded" << path;
+    Q_UNUSED(path);
 }
 
 void CFrmAdminInfo::onCopyModelDirectoryLoaded(QString path)
 {
-    KCB_DEBUG_TRACE("loaded" << path);
+    Q_UNUSED(path);
     if (_pcopymodel)
     {
         _pcopymodel->sort(0, Qt::AscendingOrder);
@@ -538,9 +550,9 @@ void CFrmAdminInfo::on_treeViewCopy_clicked(const QModelIndex &index)
     //KCB_DEBUG_EXIT;
 }
 
-void CFrmAdminInfo::on_btnCopyFile_clicked()
+void CFrmAdminInfo::OnUtilActionInstallApp()
 {
-    KCB_DEBUG_TRACE(_copyDirectory);
+    // KCB_DEBUG_TRACE(_copyDirectory);
 
     bool result = kcb::UpdateAppFile(_copyDirectory);
 
@@ -556,7 +568,7 @@ void CFrmAdminInfo::on_btnCopyFile_clicked()
 
 void CFrmAdminInfo::insertCodes(CodeListing& codeListing)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     //codeListing.print();
 
@@ -630,12 +642,12 @@ void CFrmAdminInfo::insertCodes(CodeListing& codeListing)
         HandleCodeUpdate();
 
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
-void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
+void CFrmAdminInfo::OnUtilActionSetBrandingImage()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QString createCmd = " cp '";
     int nRC = QMessageBox::warning(this, tr("Set New Branding Image"),
@@ -647,12 +659,12 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImage_clicked()
         createCmd += "' /home/pi/kcb-config/images/alpha_logo.jpg";
         std::system(createCmd.toStdString().c_str());
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
-void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
+void CFrmAdminInfo::OnUtilActionDefaultBrandingImage()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     int nRC = QMessageBox::warning(this, tr("Verify Branding Image Reset"),
                                    tr("The branding image will be reset to the default.\nDo you want to continue?"),
                                    QMessageBox::Yes, QMessageBox::Cancel);
@@ -661,7 +673,7 @@ void CFrmAdminInfo::on_btnCopyFileBrandingImageReset_clicked()
         sync();
         std::system("cp /home/pi/kcb-config/images/alpha_logo_touch.jpg /home/pi/kcb-config/images/alpha_logo.jpg");
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::RunKeyboard(QString& text, bool numbersOnly)
@@ -726,14 +738,14 @@ void CFrmAdminInfo::updateTmpAdminRec()
 
 void CFrmAdminInfo::on_btnDone_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     kcb::TurnOnDisplay();
 
     // Update the Admin Info and close the dialog - syscontroller needs to switch
     updateTmpAdminRec();
     _bClose = true;
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
@@ -742,7 +754,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
     // Display to the ui
     if (adminInfo)
     {
-        KCB_DEBUG_TRACE("Admin Info received.");
+        // KCB_DEBUG_TRACE("Admin Info received.");
         _tmpAdminRec = *adminInfo;
 
         ui->lblName->setText(adminInfo->getAdminName());
@@ -771,10 +783,10 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
 void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if( bSuccess )
     {
-        KCB_DEBUG_TRACE("Succeeded in updating Current Admin Info");
+        // KCB_DEBUG_TRACE("Succeeded in updating Current Admin Info");
 
         /* Note: This is such an ugly hack.  I hate it. 
            I think the better way is to separate "Save and Close" so that
@@ -802,19 +814,15 @@ void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
         emit __OnRequestCurrentAdmin();
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _pcopymodel = 0;
-    qDebug() << device0;
-    qDebug() << device1;
     usbDevice0 = QString(device0);
     usbDevice1 = QString(device1);
-    qDebug() << usbDevice0;
-    qDebug() << usbDevice1;
 
     QStringList list;
 
@@ -828,7 +836,7 @@ void CFrmAdminInfo::OnFoundNewStorageDevice(QString device0, QString device1)
         list << QString("/media/pi/%1").arg(usbDevice1);
     }
 
-    KCB_DEBUG_TRACE("USBDevices" << list);
+    // KCB_DEBUG_TRACE("USBDevices" << list);
     m_report.OnNotifyUsbDrive(list);
     OnNotifyUsbDrive(list);    
 }
@@ -846,7 +854,6 @@ void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
     } 
     else 
     {
-        //TODO: reset the values...didn't save
         KCB_DEBUG_TRACE("unsuccessful code state update");
     }
     on_btnReadCodes_clicked();
@@ -854,44 +861,31 @@ void CFrmAdminInfo::OnUpdatedCodeState(bool bSuccess)
 
 void CFrmAdminInfo::on_cbInternetTime_clicked()
 {
-    // Internet time set checked
-    if(ui->cbInternetTime->isChecked())
+    bool is_checked = ui->cbInternetTime->isChecked();
+    ui->btnSetTime->setDisabled(is_checked);
+    ui->dtSystemTime->setDisabled(is_checked);
+    ui->cbTimeZone->setDisabled(is_checked);
+
+    if (ui->cbInternetTime->isChecked())
     {
-        //we check this flag in keycodeboxmain.cpp
-        std::system("touch /home/pi/run/internetTime.flag");
+        KeyCodeBoxSettings::EnableInternetTime();
 
+        kcb::EnableInternetTime();
         setTimeZone();
-        ui->dtSystemTime->setDisabled(true);
-        // update system time here
-        KCB_DEBUG_TRACE("ntp ON");
-        std::system("sudo /etc/init.d/ntp stop");
-
-        QCoreApplication::processEvents();
-        KCB_DEBUG_TRACE("ntpd -s");
-        std::system("sudo ntpd -s");
-        KCB_DEBUG_TRACE("ntp OFF");
-
-        QCoreApplication::processEvents();
-
-        std::system("sudo /etc/init.d/ntp start");
-        KCB_DEBUG_TRACE("setting datetime text");
-        ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
     }
     else
     {
-        std::system("rm -rf /home/pi/run/internetTime.flag");
-        ui->dtSystemTime->setDisabled(false);
-        ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
+        KeyCodeBoxSettings::DisableInternetTime();
+        kcb::DisableInternetTime();
     }
+
+    ui->dtSystemTime->setDateTime(QDateTime().currentDateTime());
 }
 
 void CFrmAdminInfo::on_btnSetTime_clicked()
 {
-    if( !isInternetTime() )
-    {
-        setTime();
-        setTimeZone();
-    }
+    setTime();
+    setTimeZone();
 }
 
 void CFrmAdminInfo::OnCloseAdmin() 
@@ -901,17 +895,18 @@ void CFrmAdminInfo::OnCloseAdmin()
 
 void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _pLocksStatus = locksStatus;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
 {
     Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
-    if (pSet != nullptr)
-    {
-        KCB_DEBUG_TRACE("Count" << pSet->getLockMap()->size());
-    }
+    // if (pSet != nullptr)
+    // {
+    //     KCB_DEBUG_TRACE("Count" << pSet->getLockMap()->size());
+    // }
 
     displayInTable(pSet);
     
@@ -920,7 +915,7 @@ void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
 
 void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
 
@@ -928,16 +923,16 @@ void CFrmAdminInfo::OnLockHistorySet(CLockHistorySet *pSet)
     
     pSet = nullptr;
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::createCodeTableHeader()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QTableWidget *table = ui->tblCodesList;
 
-    KCB_DEBUG_TRACE("table width" << table->horizontalHeader()->width());
+    // KCB_DEBUG_TRACE("table width" << table->horizontalHeader()->width());
 
     int hh_width = table->horizontalHeader()->width();
     int delta = hh_width / 20;
@@ -967,12 +962,26 @@ void CFrmAdminInfo::createCodeTableHeader()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
+}
+
+QStringList CFrmAdminInfo::FormatLocks(const QString& locks)
+{
+    QStringList formatted_locks;
+
+    foreach (const auto& lock, locks.split(','))
+    {
+        if (!lock.isEmpty())
+        {
+            formatted_locks.append(QString("%0").arg(lock, 3, QChar('0')));
+        }
+    }
+    return formatted_locks;
 }
 
 void CFrmAdminInfo::displayInTable(CLockSet *pSet)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     createCodeTableHeader();
 
@@ -991,39 +1000,101 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
     _pworkingSet = pSet;
     int nRow = 0;
     int nCol = 0;
-    QSet<int> lock_items;
+    QStringList lock_filter_items;
     QTableWidget *table = ui->tblCodesList;
+    bool code1mode = AutoCodeGeneratorStatic::IsCode1Mode();
+    bool code2mode = AutoCodeGeneratorStatic::IsCode2Mode();
 
     table->setRowCount(pSet->getLockMap()->size());
+
+    ui->tblCodesList->setSortingEnabled(false);
+
+    _codes1InUse.clear();
+    _codes2InUse.clear();
+
+    QStringList annotations;
 
     for(itor = pSet->begin(); itor != pSet->end(); itor++)
     {
         pState = itor.value();
 
-        // Locks can be single or comma-separated.
+        // pState->show();
+
         QString locks = pState->getLockNums();
-        QStringList sl = locks.split(',');
-        foreach (auto s, sl)
-        {
-            lock_items.insert(s.toInt());
-        }
+        QStringList sl = FormatLocks(locks);
+        // Note: lock items are collected during the iteration of the codes
+        // to populate the locks filter drop down (see after iteration loop)
+        lock_filter_items.append(sl);
 
         nCol = 0;
-        table->setItem(nRow, nCol++, new QTableWidgetItem(QVariant(nRow + 1).toString()));
-        table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getLockNums()));
+        QString row_value = QString("%0").arg(QVariant(nRow + 1).toString(), 3, QChar('0'));
+        table->setItem(nRow, nCol++, new QTableWidgetItem(row_value));
+        table->setItem(nRow, nCol++, new QTableWidgetItem(sl.join(',')));
         table->setItem(nRow, nCol++, new QTableWidgetItem(pState->getDescription()));
+
+
+        annotations.clear();
         QString code1 = pState->getCode1();
+        bool code1_duplicate = _codes1InUse.contains(code1);
+        _codes1InUse.append(code1);
+        if (code1_duplicate)
+        {
+            annotations.append("Dup");
+        }
+
         if (pState->getFingerprint1())
         {
-            code1 += tr(" (FP)");
+            annotations.append("FP");
         }
-        table->setItem(nRow, nCol++, new QTableWidgetItem(code1));
-        QString code2 = pState->getCode2();
-        if (pState->getAskQuestions())
+        else if (pState->getAutoCode())
         {
-            code2 += tr(" (Q)");
+            if (code1mode)
+            {
+                annotations.append("AC");
+            }
         }
-        table->setItem(nRow, nCol++, new QTableWidgetItem(code2));
+
+        if (annotations.count())
+        {
+            code1 += QString(" (%1)").arg(annotations.join(","));
+        }
+
+        auto code1_item = new QTableWidgetItem(code1);
+        table->setItem(nRow, nCol++, code1_item);
+
+        annotations.clear();
+        QString code2 = pState->getCode2();
+        bool code2_duplicate = false;
+        if (!code2.isEmpty())
+        {
+            code2_duplicate = _codes2InUse.contains(code2);
+            _codes2InUse.append(code2);
+            if (code2_duplicate)
+            {
+                annotations.append("Dup");
+            }
+
+            if (pState->getAutoCode())
+            {
+                if (code2mode)
+                {
+                    annotations.append("AC");
+                }
+            }
+
+            if (pState->getAskQuestions())
+            {
+                annotations.append("Q");
+            }
+        }
+
+        if (annotations.count())
+        {
+            code2 += QString(" (%1)").arg(annotations.join(","));
+        }
+
+        auto code2_item = new QTableWidgetItem(code2);
+        table->setItem(nRow, nCol++, code2_item);
 
         if (pState->getAccessType() == ACCESS_TYPE_ALWAYS)
         {
@@ -1041,56 +1112,67 @@ void CFrmAdminInfo::displayInTable(CLockSet *pSet)
             table->setItem(nRow, nCol++, new QTableWidgetItem(pState->isActive() ? tr("ACTIVE") : tr("DISABLED")));
         }
 
+        if (code1_duplicate || code2_duplicate)
+        {
+            for (int col = 0; col < table->columnCount(); ++col)
+            {
+                table->item(nRow, col)->setBackground(QColor(255,255,0));
+            }
+        }
+
         nRow++;
     }
 
+    ui->tblCodesList->setSortingEnabled(true);
+
     // Note: We want the entries in the combo box to be in numeric order
     // We gather the locks using a set to remove duplicates.  Unfortunately
-    // sets cannot be sorted, so we convert to a list, so and add to the
+    // sets cannot be sorted, so we convert to a list and add to the
     // combo box.
-    QList<int> lock_items_list(lock_items.toList());
-    qSort(lock_items_list.begin(), lock_items_list.end());
-    foreach (auto i, lock_items_list)
-    {
-        ui->cbLockNum->addItem(QString::number(i));
-    }
+    QSet<QString> unique_filter_items = QSet<QString>::fromList(lock_filter_items);
+    QList<QString> sorted_filter_items(unique_filter_items.toList());
+    qSort(sorted_filter_items.begin(), sorted_filter_items.end());
+    ui->cbLockNum->addItems(QStringList(sorted_filter_items));
 
-    _codesInUse.clear();
-    _psysController->getAllCodes1(_codesInUse);
 
     // KCB_DEBUG_EXIT();
 }
 
-void CFrmAdminInfo::setupCodeTableContextMenu() 
+void CFrmAdminInfo::updateCodeTableContextMenu()
 {
-    QTableWidget *table = ui->tblCodesList;
+    _pTableMenu->clear();
+    if (AutoCodeGeneratorStatic::IsCode1Mode())
+    {
+        _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
+    }
+    else if (AutoCodeGeneratorStatic::IsCode2Mode())
+    {
+        _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
+        _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
+        _pTableMenu->addAction(tr("Delete"), this, SLOT(codeDeleteSelection()));
+    }
+    else
+    {
+        _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
+        _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
+        _pTableMenu->addAction(tr("Delete"), this, SLOT(codeDeleteSelection()));
+    }
+}
 
-    /* Create a menu for adding, editing, and deleting codes */
-    _pTableMenu = new QMenu(table);
-
-    /* Find out what column we are and add an action for that specific column
-           e.g., If we select a cell in the Lock # column then the menu should
-           start with Edit Locks.  Selecting edit locks will bring up a dialog
-           of bank, link, and 32 buttons popuplated with the locks that are 
-           already selected.  User can choose the locks to be associated with 
-           this 'code' or authorization.
-
-           Note: Duplicate codes are not allowed.
-    */
-
-    _pTableMenu->addAction(tr("Edit Code"), this, SLOT(codeEditSelection()));
-    _pTableMenu->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
-    _pTableMenu->addAction(tr("Delete"), this, SLOT(codeDeleteSelection()));
-    connect(table,SIGNAL(cellClicked(int,int)),this,SLOT(OnRowSelected(int, int)));
-
-    /* Create a menu for adding codes and enabling 'limited use' access type codes */
-    _pTableMenuAdd = new QMenu(table);
-    connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnHeaderSelected(int)));
+void CFrmAdminInfo::setupCodeTableContextMenu()
+{
+    // KCB_DEBUG_ENTRY;
+    _pTableMenu = new QMenu(ui->tblCodesList);
+    connect(ui->tblCodesList, SIGNAL(cellClicked(int,int)), this, SLOT(OnRowSelected(int, int)));
+    updateCodeTableContextMenu();
+    _pTableMenuAdd = new QMenu(ui->tblCodesList);
+    connect(ui->tblCodesList->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnHeaderSelected(int)));
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     // KCB_DEBUG_TRACE(pSet);
 
     Q_ASSERT_X(pSet != nullptr, Q_FUNC_INFO, "pSet is null");
@@ -1142,8 +1224,11 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     CLockHistoryRec  *pState;
     QSet<int> lock_items;
     
+
     auto itor = _phistoryWorkingSet->getIterator();
 
+    table->setSortingEnabled(false);
+    
     while (itor.hasNext())
     {
         pState = itor.next();
@@ -1181,6 +1266,8 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
         nRow++;
     }
 
+    table->setSortingEnabled(true);
+
     // Note: We want the entries in the combo box to be in numeric order
     // We gather the locks using a set to remove duplicates.  Unfortunately
     // sets cannot be sorted, so we convert to a list, so and add to the
@@ -1191,7 +1278,8 @@ void CFrmAdminInfo::displayInHistoryTable(CLockHistorySet *pSet)
     {
         ui->cbLockNumHistory->addItem(QString::number(i));
     }
-    KCB_DEBUG_EXIT;
+
+    // KCB_DEBUG_EXIT;
     
 }
 
@@ -1209,13 +1297,6 @@ void CFrmAdminInfo::codeDeleteSelection()
     KCB_DEBUG_EXIT;
 }
 
-void CFrmAdminInfo::codeAddNew()
-{
-    KCB_DEBUG_ENTRY;
-    addCodeByRow();
-    KCB_DEBUG_EXIT;
-}
-
 void CFrmAdminInfo::codeInitNew()
 {
     KCB_DEBUG_ENTRY;
@@ -1225,7 +1306,7 @@ void CFrmAdminInfo::codeInitNew()
 
 void CFrmAdminInfo::codeEnableAll()
 {
-    KCB_DEBUG_TRACE("Enabling all Limited Use codes");
+    // KCB_DEBUG_TRACE("Enabling all Limited Use codes");
 
     /* Looping over all the codes in the working set
            if code access type is 'limited use' then
@@ -1235,7 +1316,7 @@ void CFrmAdminInfo::codeEnableAll()
     int nRow = 0;
     if (_pState)
     {
-        KCB_DEBUG_TRACE("Freeing _pState in CFrmAdminInfo::codeEnableAll");
+        // KCB_DEBUG_TRACE("Freeing _pState in CFrmAdminInfo::codeEnableAll");
         _pState = 0;
     }
 
@@ -1247,7 +1328,7 @@ void CFrmAdminInfo::codeEnableAll()
     on_btnReadCodes_clicked();
     displayInTable(_pworkingSet);
 
-    KCB_DEBUG_TRACE("before loop iterator cellClicked");
+    // KCB_DEBUG_TRACE("before loop iterator cellClicked");
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
@@ -1269,7 +1350,6 @@ void CFrmAdminInfo::codeEnableAll()
 
 void CFrmAdminInfo::codeEditSelection()
 {
-    KCB_DEBUG_TRACE(QVariant(_nRowSelected).toString());
     editCodeByRow(_nRowSelected);
 }
 
@@ -1298,18 +1378,27 @@ void CFrmAdminInfo::codeCellSelected( int row, int col)
 
 void CFrmAdminInfo::on_btnReadCodes_clicked()
 {
-    KCB_DEBUG_ENTRY;
-
     QDateTime dtStart = ui->dtStartCodeList->dateTime();
     QDateTime dtEnd = ui->dtEndCodeList->dateTime();
     QString locks = ui->cbLockNum->currentText();
-
-    KCB_DEBUG_TRACE(locks);
-
     if (locks == tr("All Locks"))
     {
         locks = "*";
     }
+    else if (locks.contains(QChar(',')))
+    {
+        QStringList sl;
+        foreach (const auto& l, locks.split(','))
+        {
+            sl.append(QString::number(l.toInt()));
+        }
+        locks = sl.join(',');
+    }
+    else
+    {
+        locks = QString::number(locks.toInt());
+    }
+
     emit __OnReadLockSet(locks, dtStart, dtEnd);
 }
 
@@ -1340,14 +1429,7 @@ void CFrmAdminInfo::OnNotifyGenerateReport()
 
 void CFrmAdminInfo::setTime()
 {
-    // setTime
-    QDateTime   dt = ui->dtSystemTime->dateTime();
-    QString updateTime = "sudo ntpq -p";
-    QString sDate = QString("sudo date ") + dt.toString("MMddhhmmyyyy.ss");
-    std::system(updateTime.toStdString().c_str());
-    std::system(sDate.toStdString().c_str());
-    KCB_DEBUG_TRACE("system time:" << sDate);
-    std::system("sudo hwclock --systohc");    // Set the hardware clock
+    kcb::SetDateTime(ui->dtSystemTime->dateTime());
 }
 
 void CFrmAdminInfo::OnCodeEditClose()
@@ -1365,14 +1447,15 @@ void CFrmAdminInfo::OnCodeEditReject()
 
 void CFrmAdminInfo::OnCodeEditAccept()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (_pFrmCodeEditMulti)
     {
+        _pState->setAutoCode(AutoCodeGeneratorStatic::IsCode1Mode() || AutoCodeGeneratorStatic::IsCode2Mode());
         _pFrmCodeEditMulti->getValues(_pState);
         _pFrmCodeEditMulti->hide();
         HandleCodeUpdate();
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::setPStateValues(QString lockNums, 
@@ -1382,7 +1465,7 @@ void CFrmAdminInfo::setPStateValues(QString lockNums,
                                     QDateTime dtStart, 
                                     QDateTime dtEnd, 
                                     bool fingerprint1, 
-								    bool fingerprint2,
+                                    bool fingerprint2,
                                     bool askQuestions, 
                                     QString question1, 
                                     QString question2, 
@@ -1431,17 +1514,17 @@ void CFrmAdminInfo::setPStateValues(QString lockNums,
 
 void CFrmAdminInfo::HandleCodeUpdate()
 {
-    _pState->show();
+    // _pState->show();
 
     if(_pState->isNew())
     {
-        KCB_DEBUG_TRACE("new _pState");
+        // KCB_DEBUG_TRACE("new _pState");
         if(_pworkingSet)
         {
-            KCB_DEBUG_TRACE("adding _pState to _pworkingSet");
+            // KCB_DEBUG_TRACE("adding _pState to _pworkingSet");
             _pworkingSet->addToSet(_pState);
         }
-        KCB_DEBUG_TRACE("emitting __OnUpdateCodeState");
+        // KCB_DEBUG_TRACE("emitting __OnUpdateCodeState");
         emit __OnUpdateCodeState(_pState);
     } 
     else 
@@ -1451,11 +1534,11 @@ void CFrmAdminInfo::HandleCodeUpdate()
         QTableWidgetItem *item;
         item = table->item(_nRowSelected, nCol++);
 
-        KCB_DEBUG_TRACE("Item Text:" << item->text());
+        // KCB_DEBUG_TRACE("Item Text:" << item->text());
 
 
         /* Note: The following code seems to assume dtStart/dtEnd will be datetime, but what about ALWAYS? */
-        KCB_DEBUG_TRACE("not new _pState");
+        // KCB_DEBUG_TRACE("not new _pState");
 
         QString locks = _pState->getLockNums();
 
@@ -1470,7 +1553,7 @@ void CFrmAdminInfo::HandleCodeUpdate()
             item->setText(_pState->getCode2());
             item = table->item(_nRowSelected, nCol++);
 
-            KCB_DEBUG_TRACE("start time" << _pState->getStartTime().toString() << "end time" << _pState->getEndTime().toString());
+            // KCB_DEBUG_TRACE("start time" << _pState->getStartTime().toString() << "end time" << _pState->getEndTime().toString());
 
             item->setText(_pState->getStartTime().toString("MMM dd yyyy hh:mm AP"));
             item = table->item(_nRowSelected, nCol++);
@@ -1520,7 +1603,7 @@ void CFrmAdminInfo::OnRowSelected(int row, int column)
 {
     Q_UNUSED(column);
     _nRowSelected = row;
-    KCB_DEBUG_TRACE(_nRowSelected);
+    updateCodeTableContextMenu();
     _pTableMenu->show();
 
     QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
@@ -1529,10 +1612,10 @@ void CFrmAdminInfo::OnRowSelected(int row, int column)
 
 bool CFrmAdminInfo::eventFilter(QObject *target, QEvent *event)
 {
-    KCB_DEBUG_TRACE("eventFilter. Event type:" << QVariant(event->type()).toString());
+    // KCB_DEBUG_TRACE("eventFilter. Event type:" << QVariant(event->type()).toString());
     if(event->type() == QEvent::TouchBegin )
     {
-        KCB_DEBUG_TRACE("TouchBegin");
+        // KCB_DEBUG_TRACE("TouchBegin");
         touchEvent(static_cast<QTouchEvent*>(event));
 
         if(ui->tblCodesList->rowCount() == 0 )
@@ -1546,18 +1629,18 @@ bool CFrmAdminInfo::eventFilter(QObject *target, QEvent *event)
 
 void CFrmAdminInfo::OnCodes(QString code1, QString code2)
 {
-    KCB_DEBUG_TRACE(code1 << code2);
+    // KCB_DEBUG_TRACE(code1 << code2);
     emit __OnAdminInfoCodes(code1, code2);
 }
 
 void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QList<QTouchEvent::TouchPoint>   lstPoints;
     switch (ev->type())
     {
     case QEvent::TouchBegin:
-        KCB_DEBUG_TRACE("TouchBegin rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
+        // KCB_DEBUG_TRACE("TouchBegin rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
         lstPoints = ev->touchPoints();
         _lastTouchPos = lstPoints.at(0).screenPos().toPoint();
 
@@ -1575,7 +1658,7 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
         break;
 
     case QEvent::TouchEnd:
-        KCB_DEBUG_TRACE("TouchEnd rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
+        // KCB_DEBUG_TRACE("TouchEnd rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
         if(ui->tblCodesList->rowCount() >= 0 )
         {
             _pTableMenuAdd->show();
@@ -1587,26 +1670,19 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
         break;
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
-{    
-    /* Originally, the actions were added in setupCodeTableContextMenu but when they were displayed
-       here, the menu was the size of the _pTableMenu.  I couldn't track down why, so I decided to
-       just clear the menu and add what was needed here.  I like the just-in-time approach better
-    */
-
-    _pTableMenuAdd->clear();
-    _pTableMenuAdd->addAction(tr("Add Code"), this, SLOT(codeInitNew()));
+{
     if (nHeader == 5)
     {
+        _pTableMenuAdd->clear();
         _pTableMenuAdd->addAction(tr("Enable All"), this, SLOT(codeEnableAll()));
+        _pTableMenuAdd->show();
+        QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
+        _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenuAdd->width(), _pTableMenuAdd->height());
     }
-    _pTableMenuAdd->show();
-
-    QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
-    _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenuAdd->width(), _pTableMenuAdd->height());
 }
 
 void CFrmAdminInfo::checkAndCreateCodeEditForm()
@@ -1617,12 +1693,13 @@ void CFrmAdminInfo::checkAndCreateCodeEditForm()
         connect(_pFrmCodeEditMulti, SIGNAL(rejected()), this, SLOT(OnCodeEditReject()));
         connect(_pFrmCodeEditMulti, SIGNAL(accepted()), this, SLOT(OnCodeEditAccept()));
         connect(this, SIGNAL(__OnAdminInfoCodes(QString,QString)), _pFrmCodeEditMulti, SIGNAL(__OnAdminInfoCodes(QString,QString)));
+        connect(this, &CFrmAdminInfo::__NotifyLockSelectionChanged, _pFrmCodeEditMulti, &FrmCodeEditMulti::OnLockSelectionChanged);
     }
 }
 
 void CFrmAdminInfo::addCodeByRow()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     checkAndCreateCodeEditForm();
 
     // Get line values
@@ -1639,52 +1716,65 @@ void CFrmAdminInfo::addCodeByRow()
         _pworkingSet = new CLockSet();
     }
 
-    _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
+    // _pState->show();
+
+    _pFrmCodeEditMulti->setValues(_pState, _codes1InUse, _codes2InUse);
     _pFrmCodeEditMulti->show();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
+}
+
+QString CFrmAdminInfo::StripAnnotations(const QString& text)
+{
+    // Code Annotations
+    //    xx...xx (...)
+    // Find the left parenthesis index
+    // Take the left N characters where N is index-1
+    int index = text.indexOf(QChar('('));
+    return text.left(index - 1);
 }
 
 void CFrmAdminInfo::editCodeByRow(int row)
 {
-    KCB_DEBUG_TRACE(row);
-    
     checkAndCreateCodeEditForm();
 
-    KCB_DEBUG_TRACE("Created CodeEditForm");
-
-    // Get line values
     CLockSet::Iterator itor;
     if (_pState)
     {
-        KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
-    int nRow = 0;
 
-    KCB_DEBUG_TRACE("before loop iterator cellClicked");
+    QTableWidgetItem* username_item = ui->tblCodesList->item(row, 2);
+    QTableWidgetItem* code1_item = ui->tblCodesList->item(row, 3);
+    QTableWidgetItem* code2_item = ui->tblCodesList->item(row, 4);
+
+    QString code1 = StripAnnotations(code1_item->text());
+    QString code2 = StripAnnotations(code2_item->text());
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
-        if(nRow == row)
+        _pState = itor.value();
+        if (_pState->getDescription() == username_item->text() &&
+            _pState->getCode1() == code1 &&
+            _pState->getCode2() == code2)
         {
-            // itor is our man!
-            _pState = itor.value();
             break;
         }
-        nRow++;
     }
 
     if(_pState)
     {
-        _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
+        _pFrmCodeEditMulti->setValues(_pState, _codes1InUse, _codes2InUse);
         _pFrmCodeEditMulti->show();
     }
     else
     {
+        // Q: Does this branch ever occurr?  How is it possible to edit a row for which
+        // there is no code entry?
+        KCB_WARNING_TRACE("Editing code that is not part of working set");
         _pState = createNewLockState();
         _pworkingSet->addToSet(_pState);
 
-        _pFrmCodeEditMulti->setValues(_pState, _codesInUse);
+        _pFrmCodeEditMulti->setValues(_pState, _codes1InUse, _codes2InUse);
         _pFrmCodeEditMulti->show();
     }
 }
@@ -1694,26 +1784,28 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
     KCB_DEBUG_ENTRY;
     checkAndCreateCodeEditForm();
 
-    // Get line values
     CLockSet::Iterator itor;
     if (_pState)
     {
-        KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
-    int nRow = 0;
 
-    KCB_DEBUG_TRACE("before loop iterator cellClicked");
+    QTableWidgetItem* username_item = ui->tblCodesList->item(row, 2);
+    QTableWidgetItem* code1_item = ui->tblCodesList->item(row, 3);
+    QTableWidgetItem* code2_item = ui->tblCodesList->item(row, 4);
+
+    QString code1 = StripAnnotations(code1_item->text());
+    QString code2 = StripAnnotations(code2_item->text());
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
-        if(nRow == row)
+        _pState = itor.value();
+        if (_pState->getDescription() == username_item->text() &&
+            _pState->getCode1() == code1 &&
+            _pState->getCode2() == code2)
         {
-            // itor is our man!
-            _pState = itor.value();
             break;
         }
-        nRow++;
     }
 
     if(_pState)
@@ -1722,7 +1814,7 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
 
         QString cmd = QString("%1%2").arg(QString(CMD_REMOVE_FP_FILE)).arg(_pState->getCode1());
 
-        KCB_DEBUG_TRACE("cmd: " << cmd);
+        // KCB_DEBUG_TRACE("cmd: " << cmd);
 
         if( QDir(QString("/home/pi/")).exists() )
         {
@@ -1730,19 +1822,17 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
         }
         emit __OnUpdateCodeState(_pState);
     }
-    KCB_DEBUG_EXIT;    
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::purgeCodes()
 {
-    // Removes all codes
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    // Get line values
     CLockSet::Iterator itor;
     if (_pState)
     {
-        KCB_DEBUG_TRACE("Freeing _pState");
+        // KCB_DEBUG_TRACE("Freeing _pState");
         _pState = 0;
     }
     int nRow = 0;
@@ -1755,11 +1845,10 @@ void CFrmAdminInfo::purgeCodes()
     on_btnReadCodes_clicked();
     displayInTable(_pworkingSet);
 
-    qDebug() << "before loop iterator cellClicked";
+    // KCB_DEBUG_TRACE("before loop iterator cellClicked");
 
     for(itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
     {
-        // itor is our man!
         _pState = itor.value();
 
         if(_pState)
@@ -1770,9 +1859,9 @@ void CFrmAdminInfo::purgeCodes()
         nRow++;
     }
 
-    KCB_DEBUG_TRACE(CMD_REMOVE_ALL_FP_FILES);
+    // KCB_DEBUG_TRACE(CMD_REMOVE_ALL_FP_FILES);
     std::system( CMD_REMOVE_ALL_FP_FILES );
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_btnRebootSystem_clicked()
@@ -1797,34 +1886,49 @@ void CFrmAdminInfo::on_btnRebootSystem_clicked()
 
 void CFrmAdminInfo::on_btnPurgeCodes_clicked()
 {
-    KCB_DEBUG_ENTRY;
-
-    on_btnReadCodes_clicked();
+    // KCB_DEBUG_ENTRY;
 
     int nRC = QMessageBox::warning(this, tr("Verify Remove All Codes"),
                                    tr("All access codes will be removed from the system\nDo you want to continue?"),
                                    QMessageBox::Ok, QMessageBox::Cancel);
     if(nRC == QMessageBox::Ok)
     {
-        KCB_DEBUG_TRACE("Ok Selected");
-        purgeCodes();
-        usleep(50000);
-
+        _psysController->clearAllCodes();
         on_btnReadCodes_clicked();
 
         nRC = QMessageBox::warning(this, tr("Code Removal Success"),
-                                   tr("Code Removal is successful!!\nPlease give the codes list a moment to update."),
+                                   tr("Code Removal was successful!!"
+                                   "\n\n"
+                                   "Please give the codes list a moment to update."),
                                    QMessageBox::Ok);
     }
 }
 
+void CFrmAdminInfo::UpdateAutoCodeDisplay()
+{
+    // KCB_DEBUG_ENTRY;
+    if (AutoCodeGeneratorStatic::IsCode1Mode())
+    {
+        // KCB_DEBUG_TRACE("updating code1");
+        QStringList codes;
+        _psysController->getAllCodes1(codes);
+        emit m_autocodegen.NotifyCodesUpdate(codes);
+    }
+    else if (AutoCodeGeneratorStatic::IsCode2Mode())
+    {
+        // KCB_DEBUG_TRACE("updating code2");
+        emit m_autocodegen.NotifyCodesUpdate(QStringList());
+    }
+    else
+    {
+        // Nothing else to do at this time
+        // KCB_DEBUG_TRACE("nothing to do");
+    }
+    // KCB_DEBUG_EXIT;
+}
+
 void CFrmAdminInfo::OnTabSelected(int index)
 {
-    static int last_index = 0;
-    // Note: Index is new selected tab
-
-    KCB_DEBUG_TRACE(last_index << index);
-
     if (index == CODES_TAB_INDEX)
     {
         QDateTime dt = QDateTime().currentDateTime();
@@ -1843,24 +1947,30 @@ void CFrmAdminInfo::OnTabSelected(int index)
     {
         SetCabinetInfo();
     }
+    else if (index == AUTOCODE_TAB_INDEX)
+    {
+        UpdateAutoCodeDisplay();
+    }
+    else if (index == DOORS_TAB_INDEX)
+    {
+    }
     else if (index == UTILITIES_TAB_INDEX)
     {
-        on_cbActionsSelect_currentIndexChanged(ACTION_INDEX_INSTALL_APP);
     }
 
-    if (last_index != REPORT_TAB_INDEX && index == REPORT_TAB_INDEX)
+    if (m_last_index != REPORT_TAB_INDEX && index == REPORT_TAB_INDEX)
     {
         // If we have selected the Report Tab, we want to populate with the latest information
         m_report.setValues(_tmpAdminRec);
     }
 
-    if (last_index == REPORT_TAB_INDEX && index != last_index)
+    if (m_last_index == REPORT_TAB_INDEX && index != m_last_index)
     {
         // If we are changing away from the Report Tab then we want to update to the latest values
         m_report.getValues(_tmpAdminRec);
     }
 
-    last_index = index;
+    m_last_index = index;
 }
 
 void CFrmAdminInfo::updateAdminForEmail(EMAIL_ADMIN_SELECT email_select)
@@ -1882,13 +1992,13 @@ void CFrmAdminInfo::updateAdminForEmail(EMAIL_ADMIN_SELECT email_select)
 
 void CFrmAdminInfo::on_btnTestEmail_clicked()
 {
-    KCB_DEBUG_TRACE("Testing admin send email");
+    // KCB_DEBUG_TRACE("Testing admin send email");
     updateAdminForEmail(EMAIL_ADMIN_SEND);
 }
 
 void CFrmAdminInfo::on_btnTestUserEmail_clicked()
 {
-    KCB_DEBUG_TRACE("Testing admin recv email");
+    // KCB_DEBUG_TRACE("Testing admin recv email");
     updateAdminForEmail(EMAIL_ADMIN_RECV);
 }
 
@@ -1954,7 +2064,7 @@ void CFrmAdminInfo::on_pbNetworkSettings_clicked()
 
 void CFrmAdminInfo::codeHistoryTableCellSelected(int row, int col)
 {
-    KCB_DEBUG_TRACE("row" << row << "col" << col);
+    // KCB_DEBUG_TRACE("row" << row << "col" << col);
 
     if (col == 5)
     {     
@@ -1964,7 +2074,7 @@ void CFrmAdminInfo::codeHistoryTableCellSelected(int row, int col)
         QByteArray ba = rec->getImage();
         QPixmap pm;
         pm.loadFromData(ba);
-        KCB_DEBUG_TRACE("pm size" << pm.size());
+        // KCB_DEBUG_TRACE("pm size" << pm.size());
         if (pm.size() != QSize(0, 0))
         {
             QMessageBox mb;
@@ -1978,7 +2088,7 @@ void CFrmAdminInfo::codeHistoryTableCellSelected(int row, int col)
 
 void CFrmAdminInfo::on_cbActionsSelect_currentIndexChanged(int index)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     ui->cbFileFormat->setDisabled(true);
     ui->cbSecurity->setDisabled(true);
     ui->btnActionExecute->setDisabled(true);
@@ -2026,13 +2136,13 @@ void CFrmAdminInfo::on_cbActionsSelect_currentIndexChanged(int index)
             break;        
 
         default:
-            KCB_DEBUG_TRACE("Unknown action index" << index);
+            // KCB_DEBUG_TRACE("Unknown action index" << index);
             break;
     }
 
     populateFileCopyWidget(ui->cbUsbDrives->currentText());
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_btnActionExecute_clicked()
@@ -2040,15 +2150,15 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
     switch (m_util_action)
     {
         case UTIL_ACTION_INSTALL_APP:
-            on_btnCopyFile_clicked();
+            OnUtilActionInstallApp();
             break;
 
         case UTIL_ACTION_SET_BRANDING_IMAGE:
-            on_btnCopyFileBrandingImage_clicked();
+            OnUtilActionSetBrandingImage();
             break;
 
         case UTIL_ACTION_DEFAULT_BRANDING_IMAGE:
-            on_btnCopyFileBrandingImageReset_clicked();
+            OnUtilActionDefaultBrandingImage();
             break;
 
         case UTIL_ACTION_IMPORT_CODES:
@@ -2140,7 +2250,7 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
                     bool result = QFile::copy(source, target);
                     if (!result)
                     {
-                        KCB_DEBUG_TRACE("failed to copy logs");
+                        // KCB_DEBUG_TRACE("failed to copy logs");
                     }
                 }
             }
@@ -2150,7 +2260,7 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
             KCB_DEBUG_TRACE("Unknown utility action" << m_util_action);
             break;
     }
-    KCB_DEBUG_EXIT;    
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnNotifyUsbDrive(QStringList list)
@@ -2178,28 +2288,28 @@ void CFrmAdminInfo::OnNotifyUsbDrive(QStringList list)
 
 void CFrmAdminInfo::on_cbUsbDrives_currentIndexChanged(const QString &arg1)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     populateFileCopyWidget(arg1);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_cbFileFormat_currentIndexChanged(const QString &arg1)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     
     bool is_import = ui->cbActionsSelect->currentText() == "Import Codes";
     bool is_export = ui->cbActionsSelect->currentText() == "Export Codes";
     bool is_csv = ui->cbFileFormat->currentText() == "CSV";
 
-    KCB_DEBUG_TRACE("export" << is_export << "import" << is_import << "csv" << is_csv);
+    // KCB_DEBUG_TRACE("export" << is_export << "import" << is_import << "csv" << is_csv);
     ui->cbSecurity->setEnabled(is_export || (is_import && is_csv));
 
     setFileFilterFromFormatSelection(arg1);
     populateFileCopyWidget(ui->cbUsbDrives->currentText());
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::setFileFilterFromFormatSelection(const QString filter)
@@ -2230,7 +2340,7 @@ void CFrmAdminInfo::setFileFilterFromFormatSelection(const QString filter)
 
 void CFrmAdminInfo::on_pbUtilUnmountDrive_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     // Set the model to null to disconnect the watcher signals
     ui->treeViewCopy->setModel(nullptr);
@@ -2244,10 +2354,10 @@ void CFrmAdminInfo::on_pbUtilUnmountDrive_clicked()
     }
 
     QString path = ui->cbUsbDrives->currentText();
-    KCB_DEBUG_TRACE("Unmounting" << path);
+    // KCB_DEBUG_TRACE("Unmounting" << path);
     kcb::UnmountUsb(path);
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_cbLogLevel_currentIndexChanged(const QString &arg1)
@@ -2311,15 +2421,15 @@ void CFrmAdminInfo::OnDiscoverHardwareProgressUpdate(int value)
 
 void CFrmAdminInfo::ClearCabinetInfo()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_model.removeRows(0, m_model.rowCount());
     ui->pbResetCabinetConfig->setDisabled(true);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::SetCabinetInfo()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     CABINET_VECTOR cabinets = KeyCodeBoxSettings::getCabinetsInfo();
 
     ClearCabinetInfo();
@@ -2337,12 +2447,11 @@ void CFrmAdminInfo::SetCabinetInfo()
     }
 
     ui->pbResetCabinetConfig->setEnabled(cabinets.count() > 0);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
 {
-
     int col = item->column();
     int row = item->row();
 
@@ -2382,7 +2491,7 @@ void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
 
 void CFrmAdminInfo::on_pbApplyChanges_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     ui->pbApplyChanges->setDisabled(true);
     KeyCodeBoxSettings::ClearCabinetConfig();
@@ -2396,7 +2505,7 @@ void CFrmAdminInfo::on_pbApplyChanges_clicked()
         QString addr = m_model.data(m_model.index(rr, 4)).toString();
         QString sw_version = m_model.data(m_model.index(rr, 5)).toString();
 
-        KCB_DEBUG_TRACE("model" << model << "first" << start << "last" << stop << "total" << num_locks << "addr" << addr << "sw" << sw_version);
+        // KCB_DEBUG_TRACE("model" << model << "first" << start << "last" << stop << "total" << num_locks << "addr" << addr << "sw" << sw_version);
         KeyCodeBoxSettings::AddCabinet({model, num_locks, start, stop, sw_version, addr});
     }
 
@@ -2408,7 +2517,7 @@ void CFrmAdminInfo::on_pbApplyChanges_clicked()
         _pFrmCodeEditMulti->updateCabinetConfig();
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_pbResetCabinetConfig_clicked()
@@ -2424,4 +2533,135 @@ void CFrmAdminInfo::on_pbResetCabinetConfig_clicked()
         _pFrmCodeEditMulti->updateCabinetConfig();
     }
     ui->pbDiscoverHardware->setEnabled(true);
+}
+
+void CFrmAdminInfo::on_cbAdminLockSelection_currentIndexChanged(int index)
+{
+    // KCB_DEBUG_TRACE("index" << index);
+    if (index == CODE_SELECTION_SINGLE_INDEX)
+    {
+        KeyCodeBoxSettings::SetLockSelectionSingle();
+        emit __NotifyLockSelectionChanged();
+    }
+    else if (index == CODE_SELECTION_MULTI_INDEX)
+    {
+        KeyCodeBoxSettings::SetLockSelectionMulti();
+        emit __NotifyLockSelectionChanged();
+    }
+    else
+    {
+        KCB_DEBUG_TRACE("invalid index" << index);
+        return;
+    }
+    // KCB_DEBUG_EXIT;
+}
+
+void CFrmAdminInfo::OnRequestCodes1(QStringList& codes)
+{
+    _psysController->getAllCodes1(codes);
+}
+
+void CFrmAdminInfo::setLockStateDefaults(CLockState& state)
+{
+    state.setLockNums("");
+    state.setCode1("");
+    state.setCode2("");
+    state.setDescription("");
+    state.setStartTime(DEFAULT_DATETIME);
+    state.setEndTime(DEFAULT_DATETIME);
+    state.clearFingerprint1();
+    state.clearFingerprint2();
+    state.setAskQuestions(false);
+    state.setQuestion1("");
+    state.setQuestion2("");
+    state.setQuestion3("");
+    state.setMaxAccess(-1); 
+    state.setAccessCount(0);
+    state.setAccessType(0);
+    state.setAutoCode(AutoCodeGeneratorStatic::IsCode1Mode() || AutoCodeGeneratorStatic::IsCode2Mode());
+}
+
+void CFrmAdminInfo::OnCommitCodes1(QMap<QString, QString> codes)
+{
+    // KCB_DEBUG_TRACE("OnCommitCodes1 called");
+
+    for (int ii = 0; ii < 10; ++ii)
+    {
+        QApplication::processEvents();
+    }
+    QProgressDialog progress("Committing codes ...", "", 1, codes.keys().count()+3, this);
+    progress.setCancelButton(nullptr);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setWindowTitle("AutoCode Commit");
+
+    int count = 1;
+    progress.setValue(count);
+    count++;
+    progress.show();
+    QApplication::processEvents();
+    progress.setValue(count);
+    count++;
+    _psysController->clearAllCodes();
+    QApplication::processEvents();
+    progress.setValue(count);
+    count++;
+
+    foreach (auto key, codes.keys())
+    {
+        progress.setValue(count);
+        count++;
+
+        CLockState state;
+        setLockStateDefaults(state);
+        state.setLockNums(key);
+        state.setCode1(codes[key]);
+        state.setAutoCode(true);
+
+        _psysController->addCode(state);
+
+    }
+    progress.setValue(codes.keys().count());
+}
+
+void CFrmAdminInfo::OnCommitCodes2(QMap<QString, QString> codes)
+{
+    Q_UNUSED(codes);
+    _psysController->clearLockAndCode2ForAllCodes();
+}
+
+void CFrmAdminInfo::OnNotifyDisableLockSelection()
+{
+    ui->cbAdminLockSelection->setDisabled(true);
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    else if (KeyCodeBoxSettings::IsLockSelectionMulti())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    emit __NotifyLockSelectionChanged();
+}
+
+void CFrmAdminInfo::OnNotifyEnableLockSelection()
+{
+    ui->cbAdminLockSelection->setEnabled(true);
+    if (KeyCodeBoxSettings::IsLockSelectionSingle())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    else if (KeyCodeBoxSettings::IsLockSelectionMulti())
+    {
+        ui->cbAdminLockSelection->setCurrentIndex(0);
+    }
+    emit __NotifyLockSelectionChanged();
+}
+
+void CFrmAdminInfo::OnUpdateCodes()
+{
+    // The code table has been updated.
+    //     - We need to read the codes for the code display
+    on_btnReadCodes_clicked();
+    //     - We need to read the codes to populate the autocode locks
+    m_autocodegen.UpdateCodes();
 }

@@ -85,7 +85,7 @@ namespace kcb
         }
     }
 
-    void GetRpiSerialNumber(QString& serial_number)
+    QString GetRpiSerialNumber()
     {
         QString program = "cat";
         QStringList arguments;
@@ -94,24 +94,53 @@ namespace kcb
         QString stdErr;
         int status;
 
-        serial_number = "Unknown";
-
         ExecuteCommand(program, arguments, stdOut, stdErr, status);
 
         /*
-            pi@raspberrypi:~$ cat /proc/cpuinfo
-            Processor       : ARMv6-compatible processor rev 7 (v6l)
-            BogoMIPS        : 697.95
-            Features        : swp half thumb fastmult vfp edsp java tls
+            $ cat /proc/cpuinfo
+            processor       : 0
+            model name      : ARMv7 Processor rev 4 (v7l)
+            BogoMIPS        : 38.40
+            Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
             CPU implementer : 0x41
             CPU architecture: 7
             CPU variant     : 0x0
-            CPU part        : 0xb76
-            CPU revision    : 7
+            CPU part        : 0xd03
+            CPU revision    : 4
 
-            Hardware        : BCM2708
-            Revision        : 1000002
-            Serial          : 000000000000000d
+            processor       : 1
+            model name      : ARMv7 Processor rev 4 (v7l)
+            BogoMIPS        : 38.40
+            Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
+            CPU implementer : 0x41
+            CPU architecture: 7
+            CPU variant     : 0x0
+            CPU part        : 0xd03
+            CPU revision    : 4
+
+            processor       : 2
+            model name      : ARMv7 Processor rev 4 (v7l)
+            BogoMIPS        : 38.40
+            Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
+            CPU implementer : 0x41
+            CPU architecture: 7
+            CPU variant     : 0x0
+            CPU part        : 0xd03
+            CPU revision    : 4
+
+            processor       : 3
+            model name      : ARMv7 Processor rev 4 (v7l)
+            BogoMIPS        : 38.40
+            Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm crc32
+            CPU implementer : 0x41
+            CPU architecture: 7
+            CPU variant     : 0x0
+            CPU part        : 0xd03
+            CPU revision    : 4
+
+            Hardware        : BCM2709
+            Revision        : a22082
+        >>>>Serial          : 00000000fb1e679a<<<<
          */
 
         if (!stdOut.isEmpty())
@@ -121,11 +150,16 @@ namespace kcb
             {
                 if (entry.contains("Serial"))
                 {
-                    serial_number = entry.split(":")[1].trimmed();
-                    break;
+                    // KCB_DEBUGEXIT;
+                    QString value = entry.split(":")[1].trimmed();
+                    return value.remove( QRegExp("^[0]*") );
+                    //return entry.split(":")[1].right(8).trimmed();
                 }
             }
         }
+
+        // KCB_DEBUGEXIT;
+        return QString("");
     }
 
     static QString MatchRegularExpression(QString text, int index, QString regexp)
@@ -259,7 +293,7 @@ namespace kcb
         QString stdErr;
         int status;
 
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
         ExecuteCommand(QString("cat"), 
                        QStringList() << 
                        QString("/etc/resolv.conf") << 
@@ -289,7 +323,7 @@ namespace kcb
             }
         }
 
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return result;
     }
 
@@ -332,7 +366,6 @@ namespace kcb
 
     static QString GetDynamicNetworkInfo(NETWORK_INFO_TYPE type)
     {
-        KCB_DEBUG_ENTRY;
         QString result("");
 
         if (type == GATEWAY_ADDRESS)
@@ -348,13 +381,11 @@ namespace kcb
             result = ParseNetworkInfo(type);
         }
 
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     static QString GetNetworkInfo(NETWORK_INFO_TYPE type)
     {
-        KCB_DEBUG_ENTRY;
         if (KeyCodeBoxSettings::StaticAddressingEnabled())
         {
             return GetStaticNetworkInfo(type);
@@ -362,99 +393,77 @@ namespace kcb
         else
         {
             return GetDynamicNetworkInfo(type);
-        }        
+        }
     }
 
     void SetHostAddress(QString const &value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.address = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetHostAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(HOST_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     void SetNetworkMask(QString const &value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.mask = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetNetworkMask()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(NETWORK_MASK);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     void SetBcastAddress(QString const &value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.broadcast = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetBcastAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(BCAST_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     void SetGatewayAddress(QString const &value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.gateway = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetGatewayAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(GATEWAY_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     void SetDnsAddress(QString const & value)
     {
-        KCB_DEBUG_ENTRY;
         NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
         ns.dns = value;
         KeyCodeBoxSettings::setNetworkingSettings(ns);
-        KCB_DEBUG_EXIT;
     }
 
     QString GetDnsAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(DNS_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
     QString GetMacAddress()
     {
-        KCB_DEBUG_ENTRY;
         QString result = GetNetworkInfo(MAC_ADDRESS);
-        KCB_DEBUG_EXIT;
         return result;
     }
 
@@ -486,16 +495,16 @@ namespace kcb
         // we want to preserve the filename because it has version information
         QFileInfo fi(filename_fq);
         QString filename = fi.fileName();
-        KCB_DEBUG_TRACE(filename);
+        // KCB_DEBUG_TRACE(filename);
         QRegularExpression validator("^alpha-v\\d+\\.\\d+\\.\\d+$");
         QRegularExpressionMatch match = validator.match(filename);
         bool result = match.hasMatch();
         if (result)
         {
             QString target = NEW_APP_TARGET.arg(APP_DIR).arg(filename);
-            KCB_DEBUG_TRACE("App target" << target);
+            // KCB_DEBUG_TRACE("App target" << target);
             QString cmd = NEW_APP_COPY_COMMAND.arg(filename_fq).arg(target);
-            KCB_DEBUG_TRACE("CMD" << cmd);
+            // KCB_DEBUG_TRACE("CMD" << cmd);
             std::system(cmd.toStdString().c_str());
         }
 
@@ -526,7 +535,7 @@ namespace kcb
             if (filename.isEmpty())
             {
                 filename = QString("temp_%1.jpg").arg(QDate::currentDate().toString("yyyy-MM-dd"));
-                KCB_DEBUG_TRACE("Taking/Storing image:" << filename);
+                // KCB_DEBUG_TRACE("Taking/Storing image:" << filename);
             }
 
             QString path = QString("%1/%2").arg(KCB_IMAGE_PATH).arg(filename);
@@ -576,7 +585,7 @@ namespace kcb
         {
             QString trimmed = stdOut.trimmed();
             bool equals = trimmed == "supported=1 detected=1";
-            KCB_DEBUG_TRACE(trimmed << equals);
+            // KCB_DEBUG_TRACE(trimmed << equals);
             if (trimmed == "supported=1 detected=1")
             {
                 return true;
@@ -599,12 +608,12 @@ namespace kcb
             name_filters << QString("temp_%1.jpg").arg(QDate::currentDate().toString("yyyy-MM-dd"));
             QFileInfoList fil = dir.entryInfoList(name_filters, QDir::NoDotAndDotDot|QDir::Files);
             fil = dir.entryInfoList(name_filters, QDir::NoDotAndDotDot|QDir::Files);
-            KCB_DEBUG_TRACE("num files" << fil.count());
+            // KCB_DEBUG_TRACE("num files" << fil.count());
 
             if (fil.count() > 0)
             {
                 filename = fil[0].fileName();
-                KCB_DEBUG_TRACE("filename" << filename);
+                // KCB_DEBUG_TRACE("filename" << filename);
             }
 			else
 			{
@@ -637,19 +646,19 @@ namespace kcb
 
     void BackupDatabase()
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
         (void) std::system("rm /home/pi/kcb-config/database/alpha-*.db.bak");
         QString backup_command = QString("cp /home/pi/run/Alpha.db /home/pi/kcb-config/database/alpha-%1.db.bak");
         backup_command = backup_command.arg(QDateTime::currentDateTime().toString(REPORT_FILE_FORMAT));
         (void) std::system(backup_command.toStdString().c_str());
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
     }
 
     static void SetDisplayPower(int value7inch, int value10inch)
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
 
-        KCB_DEBUG_TRACE("7 inch" << value7inch << "10 inch" << value10inch);
+        // KCB_DEBUG_TRACE("7 inch" << value7inch << "10 inch" << value10inch);
         // Note: Below are two commands for setting the power of the displays.  Only one display is installed
         // at a time, but they use completely different commands and do not conflict with each other.
         // Issuing both commands when only on display is present has no detrimental effects.
@@ -657,23 +666,23 @@ namespace kcb
         QString cmd10inch = QString("vcgencmd display_power %1").arg(value10inch);
         system(qPrintable(cmd7inch));
         system(qPrintable(cmd10inch));
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
     }
 
     void TurnOffDisplay()
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
         display_power_state = DISP_POWER_OFF;
         SetDisplayPower(DISPLAY_OFF_7_INCH, DISPLAY_OFF_10_INCH);
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
     }
 
     void TurnOnDisplay()
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
         display_power_state = DISP_POWER_ON;
         SetDisplayPower(DISPLAY_ON_7_INCH, DISPLAY_ON_10_INCH);
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
     }
 
     bool isDisplayPowerOn()
@@ -685,20 +694,20 @@ namespace kcb
     {
         QScreen* screen = QApplication::primaryScreen();
         QScreen* gui_screen = QGuiApplication::primaryScreen();
-        KCB_DEBUG_TRACE("available app screen" << screen->availableGeometry());
-        KCB_DEBUG_TRACE("available gui screen" << gui_screen->availableGeometry());
+        // KCB_DEBUG_TRACE("available app screen" << screen->availableGeometry());
+        // KCB_DEBUG_TRACE("available gui screen" << gui_screen->availableGeometry());
 
         width = screen->availableGeometry().right();
         height = screen->availableGeometry().bottom();
 
-        KCB_DEBUG_TRACE("Screen Dimensions:" << width << "x" << height);
+        // KCB_DEBUG_TRACE("Screen Dimensions:" << width << "x" << height);
     }
 
     void GetAvailableGeometry(QRect& rect)
     {
         QScreen* screen = QApplication::primaryScreen();
         rect = screen->availableGeometry();
-        KCB_DEBUG_TRACE("Available Geometry:" << rect);
+        // KCB_DEBUG_TRACE("Available Geometry:" << rect);
     }
 
     void SetWindowParams(QWidget* widget)
@@ -742,7 +751,7 @@ namespace kcb
 
             QString trimmed = stdOut.trimmed();
             QStringList splits = trimmed.split(" ");
-            KCB_DEBUG_TRACE("hdmi splits" << splits);
+            // KCB_DEBUG_TRACE("hdmi splits" << splits);
             QString tvservice_state = splits[1];
 
 
@@ -770,7 +779,7 @@ namespace kcb
         }
 
         QString command = QString("sudo cp %1/%2 %3").arg(KCBCONFIG_SETTINGS_PATH).arg(config_file).arg(BOOT_CONFIG_FILE);
-        KCB_DEBUG_TRACE(command);
+        // KCB_DEBUG_TRACE(command);
         int status = std::system(command.toStdString().c_str());
         if (status != 0)
         {
@@ -820,7 +829,7 @@ namespace kcb
         {
             strList = stdOut.trimmed().split("\n");
             
-            KCB_DEBUG_TRACE(strList);
+            // KCB_DEBUG_TRACE(strList);
 
         }
 
@@ -960,4 +969,46 @@ namespace kcb
         }
     }
 
+    QString GetSystemId()
+    {
+        return QString("keycodebox-%1").arg(GetRpiSerialNumber());
+    }
+
+    void EnableInternetTime()
+    {
+        // The following code works with init.d ntp service
+        std::system("sudo /etc/init.d/ntp stop");
+        std::system("sudo ntpd -s");
+        std::system("sudo /etc/init.d/ntp start");
+
+        // The following code works with systemd via timedatectl
+        // See this thread and kcb-config/scripts/kcb-ntpsetup.sh
+        // info on systemd configuration.
+        // When the image is updated to remove init.d and use only systemd
+        // this code can be incorporated.
+        // std::system("sudo timedatectl set-ntp true");
+    }
+
+    void DisableInternetTime()
+    {
+        std::system("sudo /etc/init.d/ntp stop");
+        // std::system("sudo timedatectl set-ntp false");
+    }
+
+    void SetDateTime(const QDateTime& datetime)
+    {
+        QString updateTime = "sudo ntpq -p";
+        QString sysDate("sudo date %1");
+        sysDate.arg(datetime.toString("MMddhhmmyyyy.ss"));
+        std::system(sysDate.toStdString().c_str());
+        std::system("sudo hwclock --systohc");
+    }
+
+    void SetTimeZone(const QString& timezone)
+    {
+        QString unlink = QString("sudo unlink /etc/localtime");
+        QString link = QString("sudo ln -s /usr/share/zoneinfo/%1 %2").arg(timezone).arg(QString(" /etc/localtime"));
+        std::system(unlink.toStdString().c_str());
+        std::system(link.toStdString().c_str());
+    }
 }

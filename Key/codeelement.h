@@ -22,14 +22,14 @@ class Code
         void setQuestion3(const QString& value) {m_question3 = value;}
         QString starttime() const {return m_starttime;}
         void setStartTime(const QString& value) {m_starttime = value;}
-        QString endtime() const {return m_endtime;}        
+        QString endtime() const {return m_endtime;}
         void setEndTime(const QString& value) {m_endtime = value;}
         int accesstype() const {return m_accesstype;}
         void setAccessType(const int& value) {m_accesstype = value;}
         bool askquestion() const {return m_ask_question;}
-        
+
         void print() const;
-        
+
     private:
         QString m_locks;
         QString m_code1;

@@ -4,9 +4,12 @@
 #include <QObject>
 #include <QString>
 #include <memory>
+#include <QPixmap>
+#include <QByteArray>
 
 namespace kcb
 {
+
     class ClassAllocation
     {
         public:
@@ -23,6 +26,12 @@ namespace kcb
     };
 
     unsigned int countSetBits(int n);
+    QPixmap CreateQrCode(const QByteArray& data);
+    QChar GetRandomChar();
+    QStringList CreateRandomValues(int num_values, int code_length);
+    QString JsonToString(const QJsonObject& json);
+    QJsonObject StringToJson(const QString& str);
+    QDateTime StringToDateTime(const QString& datetime);
 
 }
 #endif // KCBUTILS_H

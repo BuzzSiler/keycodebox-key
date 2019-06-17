@@ -37,6 +37,7 @@ class CFrmAdminInfo;
 
 class SelectLocksWidget;
 class ReportControlWidget;
+class AutoCodeGenWidget;
 
 
 class CFrmAdminInfo : public QDialog
@@ -80,6 +81,7 @@ class CFrmAdminInfo : public QDialog
         void __OnDisplayFingerprintButton(bool state);
         void __OnDisplayShowHideButton(bool state);
         void __OnDisplayTakeReturnButtons(bool state);
+        void __NotifyLockSelectionChanged();
 
     
     public slots:
@@ -106,12 +108,14 @@ class CFrmAdminInfo : public QDialog
         void OnDisplayTakeReturnButtons(bool);
         void OnDiscoverHardwareProgressUpdate(int);
 
+        void OnRequestCodes1(QStringList& codes);
+        void OnUpdateCodes();
+
     private slots:
         void OnCodes(QString code1, QString code2);
         void OnLockStatusUpdated(CLocksStatus *pLocksStatus);
 
         void codeDeleteSelection();
-        void codeAddNew();
         void codeInitNew();
         void codeEnableAll();
         void codeEditSelection();
@@ -146,10 +150,6 @@ class CFrmAdminInfo : public QDialog
         void on_treeViewCopy_clicked(const QModelIndex &index);
         void onCopyRootPathChanged(QString path);
         void onCopyModelDirectoryLoaded(QString path);
-        void on_btnCopyFile_clicked();
-
-        void on_btnCopyFileBrandingImage_clicked();
-        void on_btnCopyFileBrandingImageReset_clicked();
 
         void on_btnRebootSystem_clicked();
         void on_btnPurgeCodes_clicked();
@@ -162,7 +162,7 @@ class CFrmAdminInfo : public QDialog
         void OnCodeEditAccept();
 
         void on_pbNetworkSettings_clicked();
-		void codeHistoryTableCellSelected( int row, int col);
+        void codeHistoryTableCellSelected( int row, int col);
 
         void on_cbActionsSelect_currentIndexChanged(int index);
         void on_btnActionExecute_clicked();
@@ -179,7 +179,16 @@ class CFrmAdminInfo : public QDialog
 
         void on_pbResetCabinetConfig_clicked();
 
-private:
+        void on_cbAdminLockSelection_currentIndexChanged(int index);
+
+        void OnCommitCodes1(QMap<QString, QString>);
+        void OnCommitCodes2(QMap<QString, QString>);
+
+        void OnNotifyDisableLockSelection();
+        void OnNotifyEnableLockSelection();
+
+
+    private:
         Ui::CFrmAdminInfo   *ui;
         CSystemController   *_psysController;
         bool                _bClose;
@@ -212,7 +221,8 @@ private:
         EMAIL_ADMIN_SELECT  _testEmail;
 
         SelectLocksWidget&  m_select_locks;
-        QStringList         _codesInUse;
+        QStringList         _codes1InUse;
+        QStringList         _codes2InUse;
         ReportControlWidget& m_report;
         QStringList         m_file_filter;
 
@@ -226,6 +236,8 @@ private:
 
         UTIL_ACTION_TYPE    m_util_action;
         QStandardItemModel& m_model;
+        AutoCodeGenWidget& m_autocodegen;
+        int m_last_index;
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
 
@@ -271,7 +283,15 @@ private:
         void DiscoverHardware();
         void ClearCabinetInfo();
         void SetCabinetInfo();
-        
+        void setLockStateDefaults(CLockState& state);
+        void UpdateAutoCodeDisplay();
+        void OnUtilActionInstallApp();
+        void OnUtilActionSetBrandingImage();
+        void OnUtilActionDefaultBrandingImage();
+        QStringList FormatLocks(const QString& locks);
+        void updateCodeTableContextMenu();
+        QString StripAnnotations(const QString& text);
+
     protected:
         void touchEvent(QTouchEvent *ev);
         bool eventFilter(QObject *target, QEvent *event);

@@ -3,14 +3,15 @@
 
 #include <ctime>
 #include <string>
+
 #include <QObject>
 #include <QMap>
 #include <QDateTime>
 #include <QSqlQuery>
+
 #include "adminrec.h"
 
 class QSqlDatabase;
-class QJsonObject;
 class QString;
 class QStringList;
 
@@ -77,12 +78,11 @@ class CTblAdmin
                         int displayPowerDownTimeout,
                         QDateTime reportDeletion, bool showTakeReturn);
         bool updateAdmin(CAdminRec &rec);
-        bool updateAdmin(QJsonObject adminObj);
 
         time_t  getReportStartTime();
         time_t  getReportFrequency();
 
-        QString isAccessCode(QString code);     // Numeric
+        QString isAccessCode(QString code);
         bool isPassword(QString password, QString type);
 
         CAdminRec &getCurrentAdmin() { return _currentAdmin; }

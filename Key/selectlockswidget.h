@@ -15,7 +15,7 @@ class QStringList;
 
 class SelectLocksWidget : public QWidget
 {
-        Q_OBJECT
+    Q_OBJECT
 
 
     public:

@@ -19,6 +19,13 @@ class CModelSecurity : public QObject
         ~CModelSecurity();
         void getAllCodes1(QStringList& codes1);
         void readAllCodes(CLockSet **lockset, bool clear_or_encrypted);
+        void clearAllCodes();
+        void deleteAllCode1OnlyCodes();
+        void clearLockAndCode2ForAllCodes();
+        void clearAutoCodeForAllCodes();
+        void addCode(CLockState& state);
+        void updateCode1(const QString& lock, const QString& code);
+        void updateCode2(const QString& lock, const QString& code);
 
     signals:
         void __QuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3);

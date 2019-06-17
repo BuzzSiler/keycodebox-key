@@ -27,7 +27,7 @@ void DlgDownloadReports::setValues(const QString dir, const QStringList list, co
     m_selected_files = list;
     foreach (auto entry, drives)
     {
-        KCB_DEBUG_TRACE(entry);
+        // KCB_DEBUG_TRACE(entry);
         ui->lwUsbDrives->addItem(entry);
     }
     ui->pbStartDownload->setEnabled(false);
@@ -42,17 +42,17 @@ void DlgDownloadReports::on_pbStartDownload_clicked()
 
     QDir srcdir(m_dir);
     QDir tgtdir(ui->lwUsbDrives->currentItem()->text());
-    KCB_DEBUG_TRACE(m_selected_files.count());
+    // KCB_DEBUG_TRACE(m_selected_files.count());
     foreach (auto entry, m_selected_files)
     {
         // Copy the file to the USB drive
-        KCB_DEBUG_TRACE("Copying" << entry);
+        // KCB_DEBUG_TRACE("Copying" << entry);
 
         QFile::copy(srcdir.filePath(entry), tgtdir.filePath(entry));
 
         if (ui->cbDeleteAfterDownload->isChecked())
         {
-            KCB_DEBUG_TRACE("Deleting" << entry);
+            // KCB_DEBUG_TRACE("Deleting" << entry);
             QFile file(srcdir.filePath(entry));
             file.remove();
         }

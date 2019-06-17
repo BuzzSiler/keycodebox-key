@@ -18,7 +18,6 @@ DlgNumberPad::DlgNumberPad(QWidget *parent) :
     // Get a static list of the lock buttons on the widget
     m_buttons = this->findChildren<QPushButton *>(QRegularExpression("pb\\d"), Qt::FindChildrenRecursively);
 
-    qDebug() << "buttons size:" << m_buttons.length();
     // Map the click signal from the buttons to lockSelected slot via a mapper
     for (int ii = 0; ii < m_buttons.length(); ++ii)
     {
@@ -72,7 +71,6 @@ void DlgNumberPad::on_pbCancel_clicked()
 
 void DlgNumberPad::on_pbEnter_clicked()
 {
-    qDebug() << "on_pbEnter_clicked";
     emit NotifyAccepted();
     m_value = "";
 }

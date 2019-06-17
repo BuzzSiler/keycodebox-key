@@ -13,7 +13,7 @@ namespace fleetwave
         bool result;
 
         int lockNumTest = lock.toInt(&result, 10);
-        KCB_DEBUG_TRACE(lockNumTest);
+        // KCB_DEBUG_TRACE(lockNumTest);
         if (result)
         {
             if (lockNumTest >= 1 && lockNumTest <= 32)
@@ -27,7 +27,7 @@ namespace fleetwave
 
     FLEETWAVE_RETURN_TYPE SendTakeRequest(QString code, QString& lockNum)
     {
-        KCB_DEBUG_TRACE("Requesting code" << code);
+        // KCB_DEBUG_TRACE("Requesting code" << code);
 
         QString program("python");
         QStringList arguments;
@@ -59,14 +59,14 @@ namespace fleetwave
         }
 
         lockNum = stdOut;
-        KCB_DEBUG_TRACE("Received lock" << lockNum);
+        // KCB_DEBUG_TRACE("Received lock" << lockNum);
         
         return FLEETWAVE_OK;
     }
 
     FLEETWAVE_RETURN_TYPE SendTakeComplete(QString code, QString lockNum)
     {
-        KCB_DEBUG_TRACE("Completing code" << code << "Lock" << lockNum);
+        // KCB_DEBUG_TRACE("Completing code" << code << "Lock" << lockNum);
 
         QString program("python");
         QStringList arguments;
@@ -97,14 +97,14 @@ namespace fleetwave
             return FLEETWAVE_FAILED;
         }
 
-        KCB_DEBUG_TRACE("Received lock" << stdOut);
+        // KCB_DEBUG_TRACE("Received lock" << stdOut);
 
         return lockNum == stdOut ? FLEETWAVE_OK : FLEETWAVE_ERROR;
     }
 
     FLEETWAVE_RETURN_TYPE SendReturnRequest(QString code, QString& lockNum, QString& question1, QString& question2, QString& question3)
     {
-        KCB_DEBUG_TRACE("Requesting code" << code);
+        // KCB_DEBUG_TRACE("Requesting code" << code);
 
         QString program("python");
         QStringList arguments;
@@ -147,13 +147,13 @@ namespace fleetwave
         question2 = response[2];
         question3 = response[3];
 
-        KCB_DEBUG_TRACE("Received lock" << lockNum << "Questions" << question1 << question2 << question3);
+        // KCB_DEBUG_TRACE("Received lock" << lockNum << "Questions" << question1 << question2 << question3);
         return FLEETWAVE_OK;
     }
 
     FLEETWAVE_RETURN_TYPE SendReturnComplete(QString lockNum, QString answer1, QString answer2, QString answer3)
     {
-        KCB_DEBUG_TRACE("Completing lock" << lockNum << answer1 << answer2 << answer3);
+        // KCB_DEBUG_TRACE("Completing lock" << lockNum << answer1 << answer2 << answer3);
 
         QString program("python");
         QStringList arguments;
@@ -185,7 +185,7 @@ namespace fleetwave
             return FLEETWAVE_FAILED;
         }
 
-        KCB_DEBUG_TRACE("Received lock" << stdOut);
+        // KCB_DEBUG_TRACE("Received lock" << stdOut);
 
         return lockNum == stdOut ? FLEETWAVE_OK : FLEETWAVE_ERROR;
     }

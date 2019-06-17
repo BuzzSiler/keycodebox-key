@@ -13,7 +13,7 @@ class QWidget;
 namespace kcb
 {
     void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status);
-    void GetRpiSerialNumber(QString& serial_number);
+    QString GetRpiSerialNumber();
     void SetHostAddress(QString const &value);
     QString GetHostAddress();
     void SetNetworkMask(QString const &value);
@@ -49,7 +49,11 @@ namespace kcb
     void RemoveStaticAddressing();
     QString IpAddrSubnetMaskToCidr(QString ip_addr, QString subnet_mask);
     void GetIpAddressAndStatus(QString &ip_address, bool &can_ping, bool &can_multicast);
-
+    QString GetSystemId();
+    void EnableInternetTime();
+    void DisableInternetTime();
+    void SetDateTime(const QDateTime& datetime);
+    void SetTimeZone(const QString& timezone);
 
 }
 #endif // KCBSYSTEM_H
