@@ -1314,3 +1314,17 @@ void CSystemController::OnNotifyAutoCodeDisabled()
     _autoCodeTimer.stop();
     // KCB_DEBUG_EXIT;
 }
+
+void CSystemController::OnNotifyAdminRequested()
+{
+    // KCB_DEBUG_ENTRY;
+    _ptimer->stop();
+    // KCB_DEBUG_EXIT;
+}
+
+void CSystemController::OnNotifyAdminCancelled()
+{
+    // KCB_DEBUG_ENTRY;
+    _ptimer->start();
+    // KCB_DEBUG_EXIT;
+}

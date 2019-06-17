@@ -446,7 +446,10 @@ void CFrmUserCode::on_pbReturn_clicked()
 
 void CFrmUserCode::EnterAdminControl()
 {
+    KCB_DEBUG_ENTRY;
     QMessageBox msgbox;
+
+    emit NotifyAdminRequested();
 
     msgbox.setWindowTitle(tr("Administrator"));
     msgbox.setText(tr("You are accessing administrative features."));
@@ -468,4 +471,10 @@ void CFrmUserCode::EnterAdminControl()
         }
         emit __CodeEntered(mode);
     }
+    else
+    {
+        emit NotifyAdminCancelled();
+    }
+
+    KCB_DEBUG_EXIT;
 }

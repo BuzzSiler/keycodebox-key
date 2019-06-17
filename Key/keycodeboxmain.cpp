@@ -238,7 +238,8 @@ void MainWindow::OnDisplayCodeDialog(QObject *psysController)
         connect(psysController, SIGNAL(__OnCodeMessage(QString)), _pfUsercode, SLOT(OnNewCodeMessage(QString)));
 
         connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), psysController, SLOT(OnUserCodeCancel()));
-        //connect(_pfUsercode, SIGNAL(__OnUserCodeCancel()), this, SLOT(OnUserCodeCancel()));
+        connect(_pfUsercode, SIGNAL(NotifyAdminRequested()), psysController, SLOT(OnNotifyAdminRequested()));
+        connect(_pfUsercode, SIGNAL(NotifyAdminCancelled()), psysController, SLOT(OnNotifyAdminCancelled()));
         connect(this, SIGNAL(__onCode(QString)), _pfUsercode, SLOT(OnSwipeCode(QString)));
         connect(this, SIGNAL(__onFingerprintCode(QString)), psysController, SLOT(OnFingerprintCodeEntered(QString)));
 

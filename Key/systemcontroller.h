@@ -204,6 +204,9 @@ class CSystemController : public QObject
         void OnNotifyAutoCodeEnabled();
         void OnNotifyAutoCodeDisabled();
 
+        void OnNotifyAdminRequested();
+        void OnNotifyAdminCancelled();
+
 
     private slots:
         void OnCodeEntered(QString sCode);
