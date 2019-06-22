@@ -70,6 +70,7 @@ class FrmNetworkSettings : public QDialog
         IP_STATE ip_state;
         SMTP_STATE smtp_state;
         VNC_STATE vnc_state;
+        bool ip_addressing_changed;
 
         Ui::FrmNetworkSettings *ui;
         void RunKeyboard(QString& text, bool numbersOnly, bool ipAddress = false);
