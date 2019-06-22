@@ -361,5 +361,6 @@ void FrmNetworkSettings::on_bbNetworkingOkCancel_rejected()
 
 void FrmNetworkSettings::on_cbxSmtpSecurityValue_currentIndexChanged(int index)
 {
+    Q_UNUSED(index);
     updateUi();
 }

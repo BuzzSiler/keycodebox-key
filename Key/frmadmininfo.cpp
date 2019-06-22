@@ -227,10 +227,6 @@ void CFrmAdminInfo::initializeConnections()
     connect(_psysController, SIGNAL(__OnLockHistorySet(CLockHistorySet*)), this, SLOT(OnLockHistorySet(CLockHistorySet*)));
     connect(this, SIGNAL(__OnImmediateReportRequest(QDateTime,QDateTime)), _psysController, SLOT(OnImmediateReportRequest(QDateTime,QDateTime)));
 
-    connect(this, SIGNAL(__OnReadDoorLocksState()), _psysController, SLOT(OnReadLockStatus()));
-
-    connect(_psysController, SIGNAL(__OnLockStatusUpdated(CLocksStatus*)), this, SLOT(OnLockStatusUpdated(CLocksStatus*)));
-
     connect(this, SIGNAL(__OnUpdateCodeState(CLockState*)), _psysController, SLOT(OnUpdateCodeState(CLockState*)));
     connect(_psysController, SIGNAL(__OnUpdatedCodeState(bool)), this, SLOT(OnUpdatedCodeState(bool)));
 
@@ -273,7 +269,6 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
 
     initializeConnections();
     emit __OnRequestCurrentAdmin();
-    emit __OnReadDoorLocksState();
 }
 
 void CFrmAdminInfo::show()
@@ -893,13 +888,6 @@ void CFrmAdminInfo::on_btnSetTime_clicked()
 void CFrmAdminInfo::OnCloseAdmin() 
 {
     this->close();
-}
-
-void CFrmAdminInfo::OnLockStatusUpdated(CLocksStatus *locksStatus)
-{
-    // KCB_DEBUG_ENTRY;
-    _pLocksStatus = locksStatus;
-    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnLockSet(CLockSet *pSet)
@@ -2392,6 +2380,7 @@ void CFrmAdminInfo::on_cbLogLevel_currentIndexChanged(const QString &arg1)
 
 void CFrmAdminInfo::on_pbDiscoverHardware_clicked()
 {
+    // KCB_DEBUG_ENTRY;
     // signal the lockcontroller to start detecting the hardware
     // it would seem to be a good idea to do that in a separate thread so
     // the ui remains responsive, but should we allow the user to do anything
@@ -2414,11 +2403,14 @@ void CFrmAdminInfo::on_pbDiscoverHardware_clicked()
 
     ui->pbDiscoverHardware->setEnabled(true);
     ui->pgbDiscoverHardware->setVisible(false);
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnDiscoverHardwareProgressUpdate(int value)
 {
+    // KCB_DEBUG_ENTRY;
     ui->pgbDiscoverHardware->setValue(value);
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::ClearCabinetInfo()

@@ -92,7 +92,6 @@ class CSystemController : public QObject
 
         void __OnFoundNewStorageDevice(QString device0, QString device1);
 
-        void __OnLockStatusUpdated(CLocksStatus *locksStatus);
         void __OnDisplayFingerprintButton(bool);
         void __OnDisplayShowHideButton(bool);
         void __OnHideShowPassword(bool);
@@ -223,7 +222,6 @@ class CSystemController : public QObject
         void OnUserCodeCancel();
 
         void OnOpenLockRequest(QString lockNum);
-        void OnReadLockStatus();
 
         void OnTouchScreenTouched();
         void resetCodeMessage();

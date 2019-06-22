@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 
+#include <QDebug>
 #include <QProcess>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -16,6 +17,7 @@
 #include <QList>
 #include <QNetworkInterface>
 #include <QPair>
+
 #include "kcbcommon.h"
 #include "keycodeboxsettings.h"
 #include "kcbutils.h"
@@ -584,7 +586,7 @@ namespace kcb
         if (!stdOut.isEmpty())
         {
             QString trimmed = stdOut.trimmed();
-            bool equals = trimmed == "supported=1 detected=1";
+            // bool equals = trimmed == "supported=1 detected=1";
             // KCB_DEBUG_TRACE(trimmed << equals);
             if (trimmed == "supported=1 detected=1")
             {
@@ -693,8 +695,8 @@ namespace kcb
     void GetScreenDimensions(int&  width, int& height)
     {
         QScreen* screen = QApplication::primaryScreen();
-        QScreen* gui_screen = QGuiApplication::primaryScreen();
         // KCB_DEBUG_TRACE("available app screen" << screen->availableGeometry());
+        // QScreen* gui_screen = QGuiApplication::primaryScreen();
         // KCB_DEBUG_TRACE("available gui screen" << gui_screen->availableGeometry());
 
         width = screen->availableGeometry().right();

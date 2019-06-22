@@ -75,7 +75,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QDateTime currdt = QDateTime::currentDateTime();
     QDateTime dt = CEncryption::roundDateTime(10, currdt);
 
-    _psystemController = new CSystemController(/* moveToThread - DO NOT SET PARENT */);
+    // Note: This line is wrong according to Qt and results in this log entry:
+    // default  WARN QObject::moveToThread: Cannot move objects with a parent
+    // However, not passing 'this' to CSystemController results a threading failure
+    // There is much that is wrong with this architecture, but until we address the
+    // architecture, we are stuck passing 'this' in order to make things work.
+    _psystemController = new CSystemController(this);
 
 
     connect(_psystemController, SIGNAL(__OnDisplayCodeDialog(QObject*)), this, SLOT(OnDisplayCodeDialog(QObject*)));

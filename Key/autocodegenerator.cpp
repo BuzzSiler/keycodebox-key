@@ -13,6 +13,7 @@
 
 void DisplayParams(const AutoCodeParams& params)
 {
+    Q_UNUSED(params);
     // KCB_DEBUG_TRACE("params");
     // KCB_DEBUG_TRACE("\tcode_mode" << params.code_mode);
     // KCB_DEBUG_TRACE("\tnumcodes" << params.numcodes);
@@ -25,6 +26,7 @@ void DisplayParams(const AutoCodeParams& params)
 
 void DisplayJson(const QJsonObject& json)
 {
+    Q_UNUSED(json);
     // KCB_DEBUG_TRACE("json" << kcb::JsonToString(json));
 }
 

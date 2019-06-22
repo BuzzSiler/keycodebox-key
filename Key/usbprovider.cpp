@@ -7,8 +7,8 @@
 #include "logger.h"
 
 #define SP_BAUD_RATE (19200)
-#define SP_WRITE_TIMEOUT (500)
-#define SP_READ_TIMEOUT (750)
+#define SP_WRITE_TIMEOUT (1000)
+#define SP_READ_TIMEOUT (1000)
 
 // Lock Controller Strings
 static QString     _sFilterString0 = "USB-Serial.*ttyUSB";

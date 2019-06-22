@@ -142,6 +142,7 @@ QString LockCabinetWidget::getSelectedLocks()
 
 void LockCabinetWidget::setSelectedCabinet(const QString& cab, const QString& lock)
 {
+    // KCB_DEBUG_ENTRY;
     // Cabinet is a string representing the solenoid board model
     // Lock is a string representing the lock number (as a global number, i.e., 1 .. total num locks, as opposed to 1 .. 32 for a cabinet)
     // Compare both the cab (model) and the lock as only that combination is unique
@@ -165,10 +166,12 @@ void LockCabinetWidget::setSelectedCabinet(const QString& cab, const QString& lo
                Q_FUNC_INFO,
                "m_current_cab out of range");
     updateUi();
+    // KCB_DEBUG_EXIT;
 }
 
 void LockCabinetWidget::setSelectedLocks(QString locks)
 {
+    // KCB_DEBUG_ENTRY;
     Q_ASSERT_X(locks != "", Q_FUNC_INFO, "invalid locks (empty string)");
 
     if (!isConfigured())
@@ -195,10 +198,12 @@ void LockCabinetWidget::setSelectedLocks(QString locks)
     }
 
     updateUi();
+    // KCB_DEBUG_EXIT;
 }
 
 void LockCabinetWidget::clrAllLocks()
 {
+    // KCB_DEBUG_ENTRY;
     for (int ii = 0; ii < m_cabs.count(); ++ii)
     {
         clrLocksInCabinet(ii);
@@ -206,10 +211,12 @@ void LockCabinetWidget::clrAllLocks()
 
     m_selected_locks.clear();
     updateUi();
+    // KCB_DEBUG_EXIT;
 }
 
 void LockCabinetWidget::clrSelectedLocks(const QString& lock)
 {
+    // KCB_DEBUG_ENTRY;
     Q_ASSERT_X(lock != "", Q_FUNC_INFO, "empty string");
 
     int cab_index;
@@ -223,6 +230,7 @@ void LockCabinetWidget::clrSelectedLocks(const QString& lock)
     }
 
     updateUi();
+    // KCB_DEBUG_EXIT;
 }
 
 void LockCabinetWidget::setWarning()
@@ -427,8 +435,10 @@ QMap<QString, QString> LockCabinetWidget::getLockDisplay()
 
 void LockCabinetWidget::clearLockDisplay()
 {
+    // KCB_DEBUG_ENTRY;
     m_lock_names.clear();
     updateUi();
+    // KCB_DEBUG_EXIT;
 }
 
 // Private Methods --------------------------------------------------------------------------------
@@ -477,8 +487,10 @@ void LockCabinetWidget::updateUi()
 
 void LockCabinetWidget::selectClearAllLocks(bool select_clear)
 {
+    // KCB_DEBUG_ENTRY;
     if (m_current_cab < 0)
     {
+        KCB_WARNING_TRACE("invalid cabinet index");
         return;
     }
     
@@ -514,6 +526,7 @@ void LockCabinetWidget::selectClearAllLocks(bool select_clear)
     }
 
     updateUi();
+    // KCB_DEBUG_EXIT;
 }
 
 void LockCabinetWidget::enableDisableLocksInCabinet(qint8 cab_index, bool enable_disable)
@@ -523,7 +536,7 @@ void LockCabinetWidget::enableDisableLocksInCabinet(qint8 cab_index, bool enable
     Q_ASSERT_X(cab_index < m_num_cabs, Q_FUNC_INFO, "cab_index out of range");
     if (m_num_cabs < 0 || cab_index < 0 || cab_index > (m_num_cabs - 1))
     {
-        // KCB_DEBUG_EXIT;
+        KCB_WARNING_TRACE("Invalid cabinet index" << cab_index);
         return;
     }
     
@@ -684,6 +697,11 @@ void LockCabinetWidget::CalcLockCabIndecies(const QString lock, int &cab_index, 
 void LockCabinetWidget::OnNotifySingleLockSelection()
 {
     // KCB_DEBUG_ENTRY;
+    if (m_current_cab < 0)
+    {
+        // KCB_DEBUG_EXIT;
+        return;
+    }
     uncheckAllButtons();
     clrAllLocks();
     hideSelectClearAll();
@@ -696,6 +714,11 @@ void LockCabinetWidget::OnNotifySingleLockSelection()
 void LockCabinetWidget::OnNotifyMultiLockSelection()
 {
     // KCB_DEBUG_ENTRY;
+    if (m_current_cab < 0)
+    {
+        // KCB_DEBUG_EXIT;
+        return;
+    }
     uncheckAllButtons();
     clrAllLocks();
     showSelectClearAll();
@@ -708,6 +731,11 @@ void LockCabinetWidget::OnNotifyMultiLockSelection()
 void LockCabinetWidget::OnNotifyDisableLockSelection()
 {
     // KCB_DEBUG_ENTRY;
+    if (m_current_cab < 0)
+    {
+        // KCB_DEBUG_EXIT;
+        return;
+    }
     uncheckAllButtons();
     clrAllLocks();
     hideSelectClearAll();

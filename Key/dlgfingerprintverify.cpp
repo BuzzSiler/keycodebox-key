@@ -31,6 +31,7 @@ void CDlgFingerprintVerify::setMessage(QString message)
 
 void CDlgFingerprintVerify::OnUpdateVerifyFingerprintDialog(bool result, QString message)
 {
+    Q_UNUSED(result);
     // KCB_DEBUG_ENTRY;
     setMessage(message);
     // KCB_DEBUG_EXIT;
