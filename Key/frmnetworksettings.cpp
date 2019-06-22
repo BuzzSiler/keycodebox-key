@@ -18,6 +18,7 @@ FrmNetworkSettings::FrmNetworkSettings(QWidget *parent) :
     ip_state({false, "", "", "", "", "0.0.0.0"}),
     smtp_state({"", "", 0, "", ""}),
     vnc_state({"", ""}),
+    ip_addressing_changed(false),
     ui(new Ui::FrmNetworkSettings)
 {
     ui->setupUi(this);
@@ -265,7 +266,7 @@ void FrmNetworkSettings::updateUi()
     bool mask_change = ip_state.mask != ui->lblIpMaskValue->text();
     bool gateway_change = ip_state.gateway != ui->lblIpGatewayValue->text();
     bool dns_change = ip_state.dns != ui->lblIpDnsValue->text();
-    bool ip_change = (static_change || host_change || broadcast_change || mask_change || gateway_change || dns_change);
+    ip_addressing_changed = (static_change || host_change || broadcast_change || mask_change || gateway_change || dns_change);
 
     bool server_change = smtp_state.server != ui->lblSmtpServerValue->text();
     bool port_change = smtp_state.port != ui->lblSmtpPortValue->text();
@@ -278,7 +279,7 @@ void FrmNetworkSettings::updateUi()
     password_change = vnc_state.password != ui->lblVncPasswordValue->text();
     bool vnc_change = (port_change || password_change);
 
-    ui->bbNetworkingOkCancel->button(QDialogButtonBox::Ok)->setEnabled(smtp_change || vnc_change || ip_change);
+    ui->bbNetworkingOkCancel->button(QDialogButtonBox::Ok)->setEnabled(smtp_change || vnc_change || ip_addressing_changed);
     // KCB_DEBUG_EXIT;
 }
 
@@ -310,24 +311,27 @@ void FrmNetworkSettings::on_bbNetworkingOkCancel_accepted()
         kcb::RemoveStaticAddressing();
     }
 
-    int result = QMessageBox::warning(this,
-                                        tr("Network Addressing Changed"), 
-                                        tr("You have selected to change the network addressing. "
-                                            "Continuing will change the IP address and associated parameters, requiring the system to reboot.\n"
-                                            "If a VNC session is active, it will be terminated and must be restarted using the new IP address after the system reboots\n\n"
-                                            "Do you wish to continue?"),
-                                        QMessageBox::Ok, 
-                                        QMessageBox::Cancel);
-    if (result == QMessageBox::Ok)
+    if (ip_addressing_changed)
     {
-        kcb::RestartNetworkInterface();
-        kcb::Reboot();
-    }
-    else
-    {
-        // Network addressing has been modified
-        // We must revert the network addressing setting back to the initial setting
-        ip_state.is_static ? kcb::EnableStaticAddressing() : kcb::DisableStaticAddressing();
+        int result = QMessageBox::warning(this,
+                                            tr("Network Addressing Changed"), 
+                                            tr("You have selected to change the network addressing. "
+                                                "Continuing will change the IP address and associated parameters, requiring the system to reboot.\n"
+                                                "If a VNC session is active, it will be terminated and must be restarted using the new IP address after the system reboots\n\n"
+                                                "Do you wish to continue?"),
+                                            QMessageBox::Ok, 
+                                            QMessageBox::Cancel);
+        if (result == QMessageBox::Ok)
+        {
+            kcb::RestartNetworkInterface();
+            kcb::Reboot();
+        }
+        else
+        {
+            // Network addressing has been modified
+            // We must revert the network addressing setting back to the initial setting
+            ip_state.is_static ? kcb::EnableStaticAddressing() : kcb::DisableStaticAddressing();
+        }
     }
 
     // KCB_DEBUG_EXIT;

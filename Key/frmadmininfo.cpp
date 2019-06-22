@@ -181,6 +181,8 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     }
 
     ui->tblCodesList->setSortingEnabled(true);
+
+    emit __UpdateCurrentAdmin(&_tmpAdminRec);
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -750,11 +752,10 @@ void CFrmAdminInfo::on_btnDone_clicked()
 
 void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
-    // New Admin info to display...
-    // Display to the ui
+    // KCB_DEBUG_ENTRY;
     if (adminInfo)
     {
-        // KCB_DEBUG_TRACE("Admin Info received.");
+        KCB_DEBUG_TRACE("Admin Info received.");
         _tmpAdminRec = *adminInfo;
 
         ui->lblName->setText(adminInfo->getAdminName());
@@ -779,6 +780,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
     {
         KCB_DEBUG_TRACE("Admin Info received is blank.");
     }
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnUpdatedCurrentAdmin(bool bSuccess)
