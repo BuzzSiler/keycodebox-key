@@ -1,7 +1,8 @@
+#include "lockcontroller.h"
+
 #include <bitset>
 #include <unistd.h>
 #include <string>
-#include "lockcontroller.h"
 
 #include <QDebug>
 #include <QString>
@@ -10,8 +11,6 @@
 #include "serialport.h"
 #include "usbcontroller.h"
 #include "usbprovider.h"
-
-
 #include "kcbcommon.h"
 #include "keycodeboxsettings.h"
 
@@ -40,14 +39,6 @@ CLockController::CLockController(QObject *parent) : QObject(parent)
 
 void CLockController::initController()
 {
-    if( !_plockStatus )
-    {
-        _plockStatus = new CLocksStatus();
-    }
-
-    _plockStatus->setLockController(this);
-
-
     // Get the lock controller serial device
     _pport = UsbProvider::GetLockControllerDevice();
 
@@ -59,6 +50,23 @@ void CLockController::initController()
     {
         KCB_DEBUG_TRACE("USB->serial adapter not found");
     }
+
+    (void) inquireLockStatus();
+}
+
+uint16_t CLockController::ReadSoftwareVersion(uint16_t addr)
+{
+    #define SOFTWARE_VERSION_OFFSET (32)
+    return ReadEeprom(addr, SOFTWARE_VERSION_OFFSET);
+}
+
+QString CLockController::SoftwareVersionToString(uint16_t version)
+{
+    uint8_t major = (version & 0xFF00) >> 8;
+    uint8_t minor = (version & 0x00FF);
+    return QString("%1.%2").
+                    arg(major, 2, 10, QChar('0')).
+                    arg(minor, 2, 10, QChar('0'));
 }
 
 void CLockController::ReadBoardEeprom(uint16_t addr)
@@ -79,9 +87,7 @@ void CLockController::ReadBoardEeprom(uint16_t addr)
     uint16_t door_start_addr = SWAP_BYTES(value);
     value = ReadEeprom(addr, 2);
     uint16_t door_end_addr = SWAP_BYTES(value);
-    uint16_t software_version = ReadEeprom(addr, 32);
-    uint8_t major = (software_version & 0xFF00) >> 8;
-    uint8_t minor = (software_version & 0x00FF);
+    uint16_t software_version = ReadSoftwareVersion(addr);
     UpdateDetectProgress();
     value = ReadEeprom(addr, 36);
     uint16_t board_addr = SWAP_BYTES(value);
@@ -102,9 +108,7 @@ void CLockController::ReadBoardEeprom(uint16_t addr)
                                     num_locks,
                                     door_start_addr,
                                     door_end_addr,
-                                    QString("%1.%2").
-                                        arg(major, 2, 10, QChar('0')).
-                                        arg(minor, 2, 10, QChar('0')),
+                                    SoftwareVersionToString(software_version),
                                     QString("%1").arg(board_addr, 4, 16, QChar('0'))});
 
     // KCB_DEBUG_EXIT;
@@ -226,8 +230,10 @@ QByteArray CLockController::SendCommand(QByteArray &cmd)
     {
         SetSequenceNumber(cmd);
         SetChecksum(cmd);
+        // KCB_DEBUG_TRACE("command:" << qPrintable(cmd.toHex()));
         (void) _pport->WriteData(cmd);
         (void) _pport->ReadData(response);
+        // KCB_DEBUG_TRACE("response:" << qPrintable(response.toHex()));
     }
     // KCB_DEBUG_EXIT;
     return response;
@@ -554,22 +560,6 @@ void CLockController::openLocks(QString lockNums)
     // KCB_DEBUG_EXIT;
 }
 
-/**
- * @brief CLockController::readLockState
- * @param nLockNum
- * @return string read
- * Notes:
- *  0x5D = Command Start
- *  0x8A = Tx, Relay/Lock Status Inquiry
- *  <low addr> = Lock Address Low Byte
- *  <high addr> = Lock Address High Byte
- *  <seq #> = Sequence# & Ctrl (b0-2=rolling seq#, b3=0, b4= no-request msg ACK, b5= msg from MainApp,
- *        b6 = 1 Send msg on Reverse Loop, b7 = 1 Send msg on Forward Loop
- *  <Data 1> = Pulse Count (1 thru 250)
- *  <Data 2> = On Time * 10mS]
- *  <Data 3> = Off Time * 10mS
- *  <Check Sum> = Sum of Bytes 1 thru 7
- */
 void CLockController::readLockStateCmd(uint8_t nLockNum)
 {
     if(this->isConnected())
@@ -625,71 +615,44 @@ std::string CLockController::readCommandResponse()
 }
 
 
-uint64_t CLockController::inquireLockStatus(uint8_t unBanks)
+uint64_t CLockController::inquireLockStatus()
 {
-    uint64_t        un64Locks = 0;
-    uint64_t        un64ShiftValue = 0;
-    unsigned char   ucLocks[2];
-    std::string sResponse;
+    // KCB_DEBUG_ENTRY;
 
-    if( unBanks > 4 ) 
-    {
-        unBanks = 4;
-    }
+    // Get the cabinet info from the configuration
+    CABINET_VECTOR cabs = KeyCodeBoxSettings::getCabinetsInfo();
 
-    for(int i=0;i<unBanks;i++)
+    int success_count = 0;
+    for (int ii = 0; ii < cabs.count(); ++ii)
     {
-        readLockStateCmd(i*16+1);
-        try 
+        QString sw_version("");
+        bool ok;
+        int addr = cabs[ii].addr.toInt(&ok, 16);
+        if (ok)
         {
-            sResponse = this->readCommandResponse();
-        } 
-        catch (const std::runtime_error &e)
-        {
-            KCB_DEBUG_TRACE("runtime error" << e.what());
-            _un64LockLocks = 0xFFFFFFFFFFFFFFFF;
-            return _un64LockLocks;
+            uint16_t sw_version_bytes = ReadSoftwareVersion(addr);
+            sw_version = SoftwareVersionToString(sw_version_bytes);
         }
-        // for(uint j=0;j<sResponse.length();j++)
-        // {
-        //     qDebug() << QString("%1").arg(sResponse[j], 2, 16, QChar('0'));
-        // }
 
-        // qDebug() << "\n";
-
-        ucLocks[0] = (unsigned char)sResponse[6];
-        ucLocks[1] = (unsigned char)sResponse[7];
-
-        // Print out for test/check now
-        // qDebug() << "Locks[" << i*16+1 << "+]:";
-        // for(uint8_t n=0;n<8;n++) 
-        // {
-        //     qDebug() << ((ucLocks[0] & (0x01 << n)) != 0x00 ? '1' : '0');
-        // }
-        // qDebug() << ":";
-        // for(uint8_t n=0;n<8;n++) 
-        // {
-        //     qDebug() << ((ucLocks[1] & (0x01 << n)) != 0x00 ? '1' : '0');
-        // }
-        // qDebug() << "\n";
-
-        un64ShiftValue = ucLocks[0];
-        un64Locks = un64Locks | (un64ShiftValue << (i*2)*8);
-        un64ShiftValue = ucLocks[1];
-        un64Locks = un64Locks | (un64ShiftValue << (i*2+1)*8);
+        if (sw_version == cabs[ii].sw_version)
+        {
+            success_count++;
+        }
     }
-    _un64LockLocks = un64Locks;
-    _bLockStateRead = true;
-    _plockStatus->setLockState(_un64LockLocks);
-    //qDebug << "saved banks..." << QString::number(un64Locks) << "\n";
 
-    return un64Locks;
+    if (success_count == cabs.count())
+    {
+        KCB_DEBUG_TRACE("configured cabinets successfully queried");
+        return 0;
+    }
+    else
+    {
+        KCB_CRITICAL_TRACE("failure communicating with configured cabinets");
+        return 1;
+    }
+
 }
 
-void CLockController::OnLocksStatusRequest()
-{
-    emit __OnLocksStatus(*_plockStatus);
-}
 
 void CLockController::UpdateDetectProgress()
 {
@@ -699,10 +662,12 @@ void CLockController::UpdateDetectProgress()
 
 void CLockController::detectHardware()
 {
+    // KCB_DEBUG_ENTRY;
     update_status = 0;
     UpdateDetectProgress();
     LocateMaster();
     emit DiscoverHardwareProgressUpdate(100);
+    // KCB_DEBUG_EXIT;
 }
 
 void CLockController::setLockRanges()

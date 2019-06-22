@@ -66,6 +66,7 @@ namespace fleetwave
 
     FLEETWAVE_RETURN_TYPE SendTakeComplete(QString code, QString lockNum)
     {
+        Q_UNUSED(code);
         // KCB_DEBUG_TRACE("Completing code" << code << "Lock" << lockNum);
 
         QString program("python");

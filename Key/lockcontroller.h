@@ -1,19 +1,19 @@
 #ifndef CLOCKCONTROLLER_H
 #define CLOCKCONTROLLER_H
 
-#include <QObject>
 #include <stdio.h>
-#include "serialport.h"
-class SerialPort;
 
+#include <QObject>
+#include <QString>
+
+#include "serialport.h"
 
 #define MAX_PULSE_COUNT                     250
-#define MAX_PULSE_ON_TIME                   500     // milliseconds
+#define MAX_PULSE_ON_TIME                   500         // milliseconds
 #define VOLTAGE_DOUBLER_ACTIVATION_DELAY    1000        // milliseconds
 #define TO_HEX(i) (i <= 9 ? '0' + i : 'A' - 10 + i)
 
 class CUSBController;
-class CLocksStatus;
 
 class CLockController : public QObject
 {
@@ -30,9 +30,6 @@ class CLockController : public QObject
 
         void openLock(uint16_t nLockNum);
         void openLocks(QString lockNums);
-        uint64_t inquireLockStatus(uint8_t unBanks);  // Single bit per Lock up to 64.
-
-        CLocksStatus* getLockStatus() { return _plockStatus ? _plockStatus : 0;}
 
         void detectHardware();
         void setLockRanges();
@@ -40,9 +37,6 @@ class CLockController : public QObject
     signals:
         void __OnLocksStatus(QObject &locksStatus);
         void DiscoverHardwareProgressUpdate(int);
-
-    public slots:
-        void OnLocksStatusRequest();
 
     private:
         SerialPort* _pport;
@@ -56,15 +50,11 @@ class CLockController : public QObject
         bool        _bLockStateRead = false;    // False until read at least once
         uint64_t    _un64LockLocks = 0; // 1 bit for each up to 64
 
-    private: // Object Connections
-        CLocksStatus    *_plockStatus = 0;
 
         uint8_t     ENOT_CONNECTED = 0;
         uint8_t     ECONNECTED = 1;
         uint8_t __connectedState = ENOT_CONNECTED;
         int update_status = 0;
-
-    private: // methods
 
         void setStateConnected() {
             __connectedState = ECONNECTED;
@@ -76,6 +66,10 @@ class CLockController : public QObject
 
         std::string int_to_bin(uint16_t number);
         std::string to_hex(uint16_t to_convert);
+
+        uint16_t ReadSoftwareVersion(uint16_t addr);
+        QString SoftwareVersionToString(uint16_t version);
+        uint64_t inquireLockStatus();
 
     protected:
         enum class RESPONSE { OPEN_LOCK, READ_EEPROM };
@@ -103,28 +97,5 @@ class CLockController : public QObject
         void SetBoardLockStartStop(uint16_t addr, uint8_t start, uint8_t stop);
         void UpdateDetectProgress();
 };
-
-
-class CLocksStatus : public QObject
-{
-    Q_OBJECT
-
-private:
-    uint64_t            _un64LockLocks = 0;
-    CLockController     *_pLockController = 0;
-
-public:
-    explicit CLocksStatus() {}
-
-    void setLockController(CLockController *pLockController) { _pLockController = pLockController; }
-
-    void setLockState(uint64_t locks) { _un64LockLocks = locks; }
-
-    void openLocks(QString Locks) 
-    {
-        _pLockController->openLocks(Locks);
-    }
-};
-
 
 #endif // CLOCKCONTROLLER_H

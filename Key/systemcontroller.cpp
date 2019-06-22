@@ -418,8 +418,6 @@ void CSystemController::initializeSecurityConnections()
 void CSystemController::initializeLockController()
 {
     _LockController.initController();
-    
-    emit __OnLockStatusUpdated(_LockController.getLockStatus());
 }
 
 void CSystemController::OnIdentifiedFingerprint(QString sCode, QString sCode2)
@@ -575,13 +573,6 @@ void CSystemController::reportActivity(QString locknums)
 void CSystemController::OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd)
 {
     _ReportController.processImmediateReport(dtReportStart, dtReportEnd);
-}
-
-void CSystemController::OnReadLockStatus()
-{
-    _un64Locks = _LockController.inquireLockStatus(4);
-
-    emit __OnLockStatusUpdated(_LockController.getLockStatus());
 }
 
 void CSystemController::OnSecurityCheckSuccess(QString locks)
@@ -1225,7 +1216,9 @@ void CSystemController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted
 
 void CSystemController::DiscoverHardware()
 {
+    // KCB_DEBUG_ENTRY;
     _LockController.detectHardware();
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::UpdateLockRanges()
