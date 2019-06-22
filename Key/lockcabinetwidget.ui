@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -139,14 +139,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -173,14 +173,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -207,14 +207,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -241,14 +241,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -282,14 +282,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -316,14 +316,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -350,14 +350,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -384,14 +384,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -425,14 +425,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -459,14 +459,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -493,14 +493,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -527,14 +527,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -568,14 +568,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -602,14 +602,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -636,14 +636,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -670,14 +670,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -711,14 +711,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -745,14 +745,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -779,14 +779,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -813,14 +813,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -854,14 +854,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -888,14 +888,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -922,14 +922,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -956,14 +956,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -997,14 +997,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -1031,14 +1031,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -1065,14 +1065,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -1099,14 +1099,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -1140,14 +1140,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -1177,14 +1177,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -1211,14 +1211,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -1248,14 +1248,14 @@ QPushButton[checkable=true]:checked {
          </property>
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>65</width>
            <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>75</width>
-           <height>40</height>
+           <width>65</width>
+           <height>30</height>
           </size>
          </property>
          <property name="font">
@@ -1354,7 +1354,7 @@ QPushButton[checkable=true]:checked {
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>40</height>
+         <height>25</height>
         </size>
        </property>
       </spacer>

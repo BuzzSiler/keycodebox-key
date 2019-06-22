@@ -19,9 +19,9 @@ CDlgFingerprintVerify::~CDlgFingerprintVerify()
 
 void CDlgFingerprintVerify::on_bbClose_clicked()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     emit __onVerifyFingerprintDialogCancel();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CDlgFingerprintVerify::setMessage(QString message)
@@ -31,9 +31,7 @@ void CDlgFingerprintVerify::setMessage(QString message)
 
 void CDlgFingerprintVerify::OnUpdateVerifyFingerprintDialog(bool result, QString message)
 {
-    KCB_DEBUG_ENTRY;
-    qDebug() << result;
-    qDebug() << message;
+    // KCB_DEBUG_ENTRY;
     setMessage(message);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }

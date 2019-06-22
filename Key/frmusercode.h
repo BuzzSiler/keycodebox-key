@@ -60,6 +60,8 @@ class CFrmUserCode : public QDialog
         void __OnDisplayFingerprintButton(bool showFingerprint);
         void __OnDisplayShowHideButton(bool showShowHide);
         void __OnDisplayTakeReturnButtons(bool showTakeReturn);
+        void NotifyAdminRequested();
+        void NotifyAdminCancelled();
 
     public slots:
         void OnEnableKeyboard(bool bEnable);

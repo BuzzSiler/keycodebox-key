@@ -65,7 +65,7 @@ void Smtp::stateChanged(QTcpSocket::SocketState socketState)
         break;
     }
 
-    qDebug() << "stateChanged " << value;
+    // KCB_DEBUG_TRACE("stateChanged " << value);
 }
 
 void Smtp::errorReceived(QTcpSocket::SocketError socketError)
@@ -73,50 +73,46 @@ void Smtp::errorReceived(QTcpSocket::SocketError socketError)
     switch(socketError)
     {
     case QTcpSocket::SocketError::UnconnectedState:
-        qDebug() << "error UnconnectedState";
+        KCB_WARNING_TRACE("error UnconnectedState");
         break;
     case QTcpSocket::SocketError::HostLookupState:
-        qDebug() << "error HostLookupState";
+        KCB_WARNING_TRACE("error HostLookupState");
         break;
     case QTcpSocket::SocketError::ConnectingState:
-        qDebug() << "error ConnectingState";
+        KCB_WARNING_TRACE("error ConnectingState");
         break;
     case QTcpSocket::SocketError::ConnectedState:
-        qDebug() << "error ConnectedState";
+        KCB_WARNING_TRACE("error ConnectedState");
         break;
     case QTcpSocket::SocketError::BoundState:
-        qDebug() << "error BoundState";
+        KCB_WARNING_TRACE("error BoundState");
         break;
     case QTcpSocket::SocketError::ListeningState:
-        qDebug() << "error ListeningState";
+        KCB_WARNING_TRACE("error ListeningState");
         break;
     case QTcpSocket::SocketError::ClosingState:
-        qDebug() << "error ClosingState";
+        KCB_WARNING_TRACE("error ClosingState");
         break;
     };
 
-    qDebug() << "error " <<socketError;
+    KCB_WARNING_TRACE("error " <<socketError);
 }
 
 void Smtp::disconnected()
 {
-
-    qDebug() <<"disconnected";
-    qDebug() << "error "  << socket->errorString();
+    // KCB_DEBUG_ENTRY;
+    KCB_WARNING_TRACE("error "  << socket->errorString());
+    // KCB_DEBUG_EXIT;
 }
 
 void Smtp::connected()
 {
-//    output->append("connected");
-    qDebug() << "Connected ";
+    // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_EXIT;
 }
 
 void Smtp::readyRead()
 {
-
-     qDebug() <<"readyRead";
-    // SMTP is line-oriented
-
     QString responseLine;
     do
     {
@@ -182,8 +178,7 @@ void Smtp::readyRead()
     }
     else
     {
-        // something broke.
-        QMessageBox::warning( 0, tr( "Qt Mail Example" ), tr( "Unexpected reply from SMTP server:\n\n" ) + response );
+        QMessageBox::warning( 0, tr( "EMail Error" ), tr( "Unexpected reply from SMTP server:\n\n" ) + response );
         state = Close;
     }
     response = "";

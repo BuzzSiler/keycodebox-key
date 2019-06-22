@@ -19,8 +19,8 @@ class KcbKeyboardWidget : public QWidget
         explicit KcbKeyboardWidget(QWidget *parent = 0, bool for_password = false);
         ~KcbKeyboardWidget();
 
-        void setValue(const QString value,
-                      const QStringList codes_in_use);
+        void setValue(const QString& value,
+                      const QStringList& codes_in_use);
         QString getValue();
         void clear();
         void numbersOnly(bool state);

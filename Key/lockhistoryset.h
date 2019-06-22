@@ -2,9 +2,9 @@
 #define CLOCKHISTORYSET_H
 
 #include <QObject>
-//#include <QMap>
 #include <QVector>
 #include <QVectorIterator>
+
 #include "lockhistoryrec.h"
 
 
@@ -20,12 +20,6 @@ class CLockHistorySet : public QObject
         typedef QVectorIterator<CLockHistoryRec*> Iterator;
 
         void clearSet();
-
-        QJsonArray &jsonArraySet(QJsonObject &json);
-        QString jsonArrayAsStringObject();  // Object containing the array of CLockHistoryRec objects { "lock_set":[],[],.. }
-
-        bool setFromJsonObject(QJsonObject &jsonObj);    // Object containing array
-        bool setFromJsonString(QString strJson); // Stringified object containing array of CLockHistoryRec objects "{ }"
 
         const QVector<CLockHistoryRec*>*getLockHistoryMap() { return &_storage; }
 

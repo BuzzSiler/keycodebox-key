@@ -54,58 +54,12 @@ class CSystemController : public QObject
 
         void getAllCodes1(QStringList& codes1);
         void readAllCodes(CLockSet **lockset, bool clear_or_encrypted);
-
+        void clearAllCodes();
+        void deleteAllCode1OnlyCodes();
+        void clearLockAndCode2ForAllCodes();
+        void addCode(CLockState& state);
         void DiscoverHardware();
         void UpdateLockRanges();
-
-    private:
-        QThread                 *_pInitThread;
-        QThread                 _threadReport;
-        QThread                 _threadHID, _threadCardReader;
-        CSecurityController     _securityController;
-        CLCDGraphicsController  _LCDGraphicsController;
-        CLockController         _LockController;
-        CReportController       _ReportController;
-        QMainWindow             *_pmainWindow;
-        QString                 _adminType;
-
-        CMagTekCardReader       *_pmagTekReader = 0;
-        CHWKeyboardReader       *_phidReader = 0;
-        CFingerprintReader      *_fingerprintReader = 0;
-
-        int             _lockNum;
-        QString         _locks;
-        SystemState     _systemState;
-        SystemState     _systemStateDisplay;
-        bool            _bCurrentAdminRetrieved;
-        CAdminRec       *_padminInfo;
-
-        CFrmUserCode *_pfUsercode;
-        CDlgFingerprintVerify *_pdFingerprintVerify;
-
-        Omnikey5427CKReader* _omnikey5427CKReader;
-        
-
-
-        QTimer      *_ptimer;
-        uint64_t    _un64Locks;
-
-        QString _answer1;
-        QString _answer2;
-        QString _answer3;
-        bool _answers_provided;
-        
-
-        void initializeSecurityConnections();
-        void initializeLockController();
-
-        void initializeReportController();
-        void startTimeoutTimer(int duration);
-        void stopTimeoutTimer();
-        void initializeReaders();
-        QString getCodeToUse(QString code1, QString code2);
-        void sendEmailReport(QDateTime access, QString desc, QString lockNums);
-        
 
     signals:
         void __verifyUserAccess(QString sCode1);
@@ -170,8 +124,16 @@ class CSystemController : public QObject
 
         void DiscoverHardwareProgressUpdate(int);
 
-    public slots:
+        void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
+        void __OnLockHistorySet(CLockHistorySet *pLockSet);
 
+        void __RequestLastSuccessfulLogin(QString locknums);
+        void __RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3);
+        void __OnSendTestEmail(int select_type);
+        void __OnUpdateCodes();
+        void __OnAutoCodeEmail(const QString& key);
+        
+    public slots:
         void TrigQuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(lockNums, question1, question2, question3);}
 
         void TrigQuestionUser(QString lockNums, QString question1, QString question2, QString question3);
@@ -194,27 +156,14 @@ class CSystemController : public QObject
 
         void OnVerifyFingerprintDialog();
 
-
-    signals:
-        void __OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end);
-        void __OnLockHistorySet(CLockHistorySet *pLockSet);
-
-    public slots:
         void OnReadLockHistorySet(QString LockNums, QDateTime start, QDateTime end) { emit __OnReadLockHistorySet(LockNums, start, end); }
         void OnLockHistorySet(CLockHistorySet *pSet) { emit __OnLockHistorySet(pSet); }
 
         void OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd);
 
-    signals:
-        void __RequestLastSuccessfulLogin(QString locknums);
-        void __RequestLastSuccessfulLoginWithAnswers(QString locknums, QString answer1, QString answer2, QString answer3);
-        void __OnSendTestEmail(int select_type);
-        
-    public slots:
         void RequestLastSuccessfulLogin(QString locknums);
         void OnLastSuccessfulLoginRequest(CLockHistoryRec *pLockHistory);
 
-    public slots:
         void OnUpdateCurrentAdmin(CAdminRec *adminInfo) {emit __UpdateCurrentAdmin(adminInfo);}
         void OnUpdatedCurrentAdmin(bool bSuccess) { emit __OnUpdatedCurrentAdmin(bSuccess); }
         void OnBrightnessChanged(int nValue);
@@ -223,28 +172,6 @@ class CSystemController : public QObject
         void OnUpdatedCodeState(bool bSuccess) { emit __OnUpdatedCodeState(bSuccess); }
         void OnSendTestEmail(int select_type);
 
-    private slots:
-        void OnCodeEntered(QString sCode);
-
-        void OnFingerprintCodeEntered(QString sCode);
-        void OnFingerprintCodeEnteredTwo(QString sCode);
-
-        void OnCodeEnteredTwo(QString sCode);
-        void OnAdminPasswordEntered(QString sPW);
-        void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
-
-        void OnAdminDialogClosed();
-
-        void OnUserCodeCancel();
-
-        void OnOpenLockRequest(QString lockNum);
-        void OnReadLockStatus();
-
-        void OnTouchScreenTouched();
-        void resetCodeMessage();
-        void OnCardSwipe(QString sCode1, QString sCode2);
-        void OnFingerSwipe(QString sCode1, QString sCode2);
-    public slots:
         void OnHIDCard(QString sCode1, QString sCode2);
         void DisplayUserCodeDialog()
         {
@@ -273,6 +200,92 @@ class CSystemController : public QObject
 
         void start();
         void OnAdminPasswordCancel();
+
+        void OnNotifyAutoCodeEnabled();
+        void OnNotifyAutoCodeDisabled();
+
+        void OnNotifyAdminRequested();
+        void OnNotifyAdminCancelled();
+
+
+    private slots:
+        void OnCodeEntered(QString sCode);
+
+        void OnFingerprintCodeEntered(QString sCode);
+        void OnFingerprintCodeEnteredTwo(QString sCode);
+
+        void OnCodeEnteredTwo(QString sCode);
+        void OnAdminPasswordEntered(QString sPW);
+        void OnRequestedCurrentAdmin(CAdminRec *adminInfo);
+
+        void OnAdminDialogClosed();
+
+        void OnUserCodeCancel();
+
+        void OnOpenLockRequest(QString lockNum);
+        void OnReadLockStatus();
+
+        void OnTouchScreenTouched();
+        void resetCodeMessage();
+        void OnCardSwipe(QString sCode1, QString sCode2);
+        void OnFingerSwipe(QString sCode1, QString sCode2);
+        void OnAutoCodeTimeout();
+        void OnAutoCodeEmail(const QString& key);
+
+    private:
+        struct EmailParts
+        {
+            QString subject;
+            QString body;
+        };
+
+
+        QThread                 *_pInitThread;
+        QThread                 _threadReport;
+        QThread                 _threadHID, _threadCardReader;
+        CSecurityController     _securityController;
+        CLCDGraphicsController  _LCDGraphicsController;
+        CLockController         _LockController;
+        CReportController       _ReportController;
+        QMainWindow             *_pmainWindow;
+        QString                 _adminType;
+
+        CMagTekCardReader       *_pmagTekReader = 0;
+        CHWKeyboardReader       *_phidReader = 0;
+        CFingerprintReader      *_fingerprintReader = 0;
+
+        int             _lockNum;
+        QString         _locks;
+        SystemState     _systemState;
+        SystemState     _systemStateDisplay;
+        bool            _bCurrentAdminRetrieved;
+        CAdminRec       *_padminInfo;
+
+        CFrmUserCode *_pfUsercode;
+        CDlgFingerprintVerify *_pdFingerprintVerify;
+
+        Omnikey5427CKReader* _omnikey5427CKReader;
+
+        QTimer      *_ptimer;
+        uint64_t    _un64Locks;
+
+        QString _answer1;
+        QString _answer2;
+        QString _answer3;
+        bool _answers_provided;
+        QTimer& _autoCodeTimer;
+
+        void initializeSecurityConnections();
+        void initializeLockController();
+
+        void initializeReportController();
+        void startTimeoutTimer(int duration);
+        void stopTimeoutTimer();
+        void initializeReaders();
+        QString getCodeToUse(QString code1, QString code2);
+        void sendEmail(const QString& subject, const QString& body);
+        EmailParts CreateReportEmail(QDateTime access, QString desc, QString lockNums);
+        EmailParts CreateAutoCodeEmail(const QString& key);
 };
 
 #endif // CSYSTEMCONTROLLER_H

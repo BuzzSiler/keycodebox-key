@@ -12,8 +12,8 @@ void CClickableGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CClickableGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     QGraphicsView::mousePressEvent(event);
     clickedFunc();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }

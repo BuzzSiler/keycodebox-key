@@ -1,11 +1,13 @@
 #include "selectlockswidget.h"
 #include "ui_selectlockswidget.h"
+
 #include <QDebug>
 #include <QList>
 #include <QAbstractButton>
 #include <QSignalMapper>
 #include <QVector>
 #include <QTimer>
+
 #include "lockcabinetwidget.h"
 #include "kcbutils.h"
 #include "kcbcommon.h"
@@ -39,6 +41,8 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
     connect(&m_timer, &QTimer::timeout, this, &SelectLocksWidget::update);
     m_timer.setSingleShot(true);
 
+    m_lock_cab.OnNotifyMultiLockSelection();
+    ui->gbSelectedLocks->setVisible(true);
 }
 
 SelectLocksWidget::~SelectLocksWidget()
@@ -49,14 +53,14 @@ SelectLocksWidget::~SelectLocksWidget()
 
 void SelectLocksWidget::updateCabinetConfig()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_lock_cab.updateCabinetConfig();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void SelectLocksWidget::setLocks(QString locks)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     Q_ASSERT(m_role == USER);
     Q_ASSERT(locks != "");
 
@@ -66,21 +70,21 @@ void SelectLocksWidget::setLocks(QString locks)
         return;
     }
 
-    KCB_DEBUG_TRACE("Locks:" << locks);
+    // KCB_DEBUG_TRACE("Locks:" << locks);
 
     m_lock_cab.disableAllLocks();
     m_lock_cab.setEnabledLocks(locks);
 
-    KCB_DEBUG_TRACE("after disable/enable locks");
+    // KCB_DEBUG_TRACE("after disable/enable locks");
 
     ui->lstSelectedLocks->clear();
     ui->btnOpenSelected->setEnabled(false);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 QString SelectLocksWidget::getLocks()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (!m_lock_cab.isConfigured())
     {
         KCB_DEBUG_TRACE("Lock Cabinet is not configured");
@@ -101,7 +105,7 @@ QString SelectLocksWidget::getLocks()
         locks.append(QString::number(lock.toInt()));
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return locks.join(",");
 }
 

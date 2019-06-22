@@ -1,9 +1,12 @@
 #include "reportcontroller.h"
+
 #include <exception>
+#include <unistd.h>
+
 #include <QDir>
 #include <QTextStream>
+
 #include "encryption.h"
-#include "unistd.h"
 #include "kcbcommon.h"
 
 #define REPORT_FILE "KeyCodeBox_%1.txt"
@@ -24,20 +27,21 @@ void CReportController::setCodeHistoryTable(CTblCodeHistory *pTable)
 
 void CReportController::start()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _reportCheckTimer.setInterval(60000);
 
     connect(&_reportCheckTimer, SIGNAL(timeout()), this, SLOT(OnCheckIfReportingTimeEvent()));
     _reportCheckTimer.start();
+    // KCB_DEBUG_EXIT;
 }
 
 
 void CReportController::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _padminInfo = adminInfo;
     _bCurrentAdminRetrieved = true;
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 QString CReportController::createNewFileName()
@@ -47,7 +51,7 @@ QString CReportController::createNewFileName()
 
 void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdminRec *adminInfo, QFile **ppFile)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     CLockHistoryRec *plockHistoryRec;
     QString         strFileName = createNewFileName();
@@ -63,7 +67,7 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
 
     if((*ppFile)->open(QIODevice::ReadWrite))
     {
-        KCB_DEBUG_TRACE("file open:" << dir.absoluteFilePath(strFileName));
+        // KCB_DEBUG_TRACE("file open:" << dir.absoluteFilePath(strFileName));
 
         QDateTime dtAccess;
         QString sDesc;
@@ -117,7 +121,7 @@ void CReportController::buildReportFile(CLockHistorySet *pLockHistorySet, CAdmin
         delete *ppFile;
         *ppFile = NULL;
     }
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 }
 
 void CReportController::processEveryActivityReport(QDateTime dtFreq)
@@ -131,13 +135,14 @@ void CReportController::processEveryActivityReport(QDateTime dtFreq)
 
 void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTime dtReportEnd)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     requestCurrentAdminRecord();
 
     int nCount = 0;
 
-    // 3 seconds to get Admin rec?
+    // This is odd code, it seems to be waiting for 30 seconds (3000000 useconds)
+    // to get the current admin.  In the words of the Ferengi, "Ugly, Very Ugly"
     while(!_bCurrentAdminRetrieved && nCount++ < 30)
     {
         usleep(100000);
@@ -152,35 +157,35 @@ void CReportController::processImmediateReport(QDateTime dtReportStart, QDateTim
             delete pFile;
         }
     }
-    KCB_DEBUG_EXIT;
-    
+    // KCB_DEBUG_EXIT;
 }
 
 void CReportController::processLockCodeHistoryReport(QFile *pFile, 
                                                      QDateTime dtReportStart, 
                                                      QDateTime dtReportEnd)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     _pFile = pFile;
     _dtReportStart = dtReportStart;
     _dtReportEnd = dtReportEnd;
 
     assembleAndSendCodeRecordsForReportDate(dtReportStart, dtReportEnd);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 
 void CReportController::assembleAndSendCodeRecordsForReportDate(QDateTime dtStart, QDateTime dtEnd)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_TRACE("sending report from" << dtStart << dtEnd);
     emit __RequestCodeHistoryForDateRange(dtStart, dtEnd);
-    KCB_DEBUG_EXIT;    
+    // KCB_DEBUG_EXIT;
 }
 
 void CReportController::OnCodeHistoryForDateRange(CLockHistorySet *pLockHistorySet)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     Q_ASSERT_X(pLockHistorySet != nullptr, Q_FUNC_INFO, "LockHistorySet Pointer is null");
 
@@ -210,32 +215,27 @@ void CReportController::OnCodeHistoryForDateRange(CLockHistorySet *pLockHistoryS
             }
         }
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CReportController::requestCurrentAdminRecord()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _bCurrentAdminRetrieved = false;
     emit __OnRequestCurrentAdmin();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart, QDateTime &dtReportEnd)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QDateTime dtFreq = _padminInfo->getDefaultReportFreq();
-
-    // Note: It appears that 'every activity' is not generating a report
-    // Is 'every activity' handled elsewhere?
-    // Yes, here -> void CSystemController::reportActivity(QString locknums)
-
 
     if (dtFreq == QDateTime(QDate(), QTime(0,0)) ||
         dtFreq == QDateTime(QDate(1,1,1), QTime(0,0)))
     {
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return false;
     }
 
@@ -243,11 +243,11 @@ bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart
     QFile       *pFile = NULL;
 
     qint64 numSecsSinceLastReport = _dtLastReportDate.secsTo(now);
-    KCB_DEBUG_TRACE("Seconds since last report" << numSecsSinceLastReport);
+    // KCB_DEBUG_TRACE("Seconds since last report" << numSecsSinceLastReport);
 
     if (IS_HOURLY(dtFreq))
     {
-        KCB_DEBUG_TRACE("Report hourly");
+        // KCB_DEBUG_TRACE("Report hourly");
         if (numSecsSinceLastReport >= SECS_IN_HOUR)
         {
             dtReportStart = _dtLastReportDate;
@@ -258,7 +258,7 @@ bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart
     } 
     else if (IS_EVERY_12_HOURS(dtFreq))
     {
-        KCB_DEBUG_TRACE("Report every 12 hours");
+        // KCB_DEBUG_TRACE("Report every 12 hours");
         if (numSecsSinceLastReport >= SECS_IN_12_HOURS)
         {
             dtReportStart = _dtLastReportDate;
@@ -269,7 +269,7 @@ bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart
     } 
     else if (IS_DAILY(dtFreq))
     {
-        KCB_DEBUG_TRACE("Report daily");
+        // KCB_DEBUG_TRACE("Report daily");
         if (numSecsSinceLastReport >= SECS_IN_DAY)
         {
             dtReportStart = _dtLastReportDate;
@@ -280,7 +280,7 @@ bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart
     } 
     else if (IS_WEEKLY(dtFreq))
     {
-        KCB_DEBUG_TRACE("Report weekly");
+        // KCB_DEBUG_TRACE("Report weekly");
         if (numSecsSinceLastReport >= SECS_IN_WEEK)
         {
             dtReportStart = _dtLastReportDate;
@@ -291,7 +291,7 @@ bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart
     } 
     else if (IS_MONTHLY(dtFreq))
     {
-        KCB_DEBUG_TRACE("Report monthly");
+        // KCB_DEBUG_TRACE("Report monthly");
         qint64 numSecsInMonth = _dtLastReportDate.secsTo(_dtLastReportDate.addMonths(1));
         if (numSecsSinceLastReport >= numSecsInMonth)
         {
@@ -305,33 +305,33 @@ bool CReportController::timetoSendReport(QDateTime now, QDateTime &dtReportStart
     if (pFile) 
     {
         delete pFile;
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return true;
     }
     else 
     {
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return false;
     }
     
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 bool CReportController::timetoDeleteOldReports(QDateTime dtNow, QDateTime& dtDelete)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QDateTime dtFreq = _padminInfo->getDefaultReportDeleteFreq();
     quint64 numDays = _dtLastDeleteDate.daysTo(dtNow);
-    KCB_DEBUG_TRACE(QString("%1 days since last deletion").arg(QString::number(numDays)));
+    // KCB_DEBUG_TRACE(QString("%1 days since last deletion").arg(QString::number(numDays)));
 
     if (IS_DAILY(dtFreq))
     {
         if (((int)numDays) > DAYS_IN_DAY)
         {
-            KCB_DEBUG_TRACE("Deleting reports older than 1 day");
+            // KCB_DEBUG_TRACE("Deleting reports older than 1 day");
             dtDelete = dtNow;
-            KCB_DEBUG_EXIT;
+            // KCB_DEBUG_EXIT;
             return true;
         }
     }
@@ -339,9 +339,9 @@ bool CReportController::timetoDeleteOldReports(QDateTime dtNow, QDateTime& dtDel
     {
         if (((int) numDays) > DAYS_IN_WEEK)
         {
-            KCB_DEBUG_TRACE("Deleting reports older than 1 week");
+            // KCB_DEBUG_TRACE("Deleting reports older than 1 week");
             dtDelete = dtNow;
-            KCB_DEBUG_EXIT;
+            // KCB_DEBUG_EXIT;
             return true;
         }
     }
@@ -349,9 +349,9 @@ bool CReportController::timetoDeleteOldReports(QDateTime dtNow, QDateTime& dtDel
     {
         if (((int)numDays) > DAYS_IN_TWOWEEKS)
         {
-            KCB_DEBUG_TRACE("Deleting reports older than 2 weeks");
+            // KCB_DEBUG_TRACE("Deleting reports older than 2 weeks");
             dtDelete = dtNow;
-            KCB_DEBUG_EXIT;
+            // KCB_DEBUG_EXIT;
             return true;
         }
     }
@@ -359,9 +359,9 @@ bool CReportController::timetoDeleteOldReports(QDateTime dtNow, QDateTime& dtDel
     {
         if (((int)numDays) > DAYS_IN_MONTH(dtNow.date()))
         {
-            KCB_DEBUG_TRACE("Deleting reports older than 1 month");
+            // KCB_DEBUG_TRACE("Deleting reports older than 1 month");
             dtDelete = dtNow;
-            KCB_DEBUG_EXIT;
+            // KCB_DEBUG_EXIT;
             return true;
         }
     }
@@ -370,17 +370,16 @@ bool CReportController::timetoDeleteOldReports(QDateTime dtNow, QDateTime& dtDel
         KCB_DEBUG_TRACE("No matching delete frequency");
     }
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
     return false;
 }
 
 void CReportController::RemoveOldReports(QDateTime dtDelete)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     KCB_DEBUG_TRACE("Deleting files older than" << dtDelete);
 
-    Q_ASSERT_X(_padminInfo != nullptr, Q_FUNC_INFO, "admin is null");
-    if (_padminInfo)
+    if (_bCurrentAdminRetrieved)
     {
         //   Get a list of reports from the report directory sorted by date/time
         QDir dir(_padminInfo->getReportDirectory());
@@ -400,32 +399,37 @@ void CReportController::RemoveOldReports(QDateTime dtDelete)
             }
         }
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 
 void CReportController::OnCheckIfReportingTimeEvent()
 {
-    KCB_DEBUG_ENTRY;
-    QDateTime   dtNow = QDateTime::currentDateTime();
-    QDateTime dtReportStart, dtReportEnd, dtDelete;
-    
-    if(timetoSendReport(dtNow, dtReportStart, dtReportEnd)) 
+    // KCB_DEBUG_ENTRY;
+
+    if (_bCurrentAdminRetrieved)
     {
-        _dtLastReportDate = QDateTime::currentDateTime();
-        assembleAndSendCodeRecordsForReportDate(dtReportStart, dtReportEnd);
+        QDateTime   dtNow = QDateTime::currentDateTime();
+        QDateTime dtReportStart, dtReportEnd, dtDelete;
+        
+        if(timetoSendReport(dtNow, dtReportStart, dtReportEnd)) 
+        {
+            _dtLastReportDate = QDateTime::currentDateTime();
+            assembleAndSendCodeRecordsForReportDate(dtReportStart, dtReportEnd);
+        }
+        else if (timetoDeleteOldReports(dtNow, dtDelete))
+        {
+            _dtLastDeleteDate = QDateTime::currentDateTime();
+            RemoveOldReports(dtDelete);
+        }
     }
-    else if (timetoDeleteOldReports(dtNow, dtDelete))
-    {
-        _dtLastDeleteDate = QDateTime::currentDateTime();
-        RemoveOldReports(dtDelete);
-    }
-    KCB_DEBUG_EXIT;
+
+    // KCB_DEBUG_EXIT;
 }
 
 void CReportController::PrepareToSendEmail(CAdminRec *admin, QFile *pFile)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
     QString SMTPSvr = admin->getSMTPServer();
     int SMTPPort = admin->getSMTPPort();
@@ -442,7 +446,7 @@ void CReportController::PrepareToSendEmail(CAdminRec *admin, QFile *pFile)
 
     OnSendEmail(SMTPSvr, SMTPPort, SMTPType, SMTPUser, SMTPPW, from, to, subject, body, pFile );
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPort, const int &SMTPType,
@@ -472,50 +476,27 @@ void CReportController::OnSendEmail(const QString SMTPServer, const int &SMTPPor
         nConnType = (SmtpClient::ConnectionType)SMTPType;
     }
 
-    // qDebug() << "SmtpClient smtp";
     SmtpClient smtp(SMTPServer, SMTPPort, nConnType);
 
     try 
     {
-        // We need to set the username (your email address) and the password
-        // for smtp authentification.
-
-        // qDebug() << "SmtpClient setUser";
         smtp.setUser(SMTPUsername);
-        // qDebug() << "SmtpClient setPassword";
         smtp.setPassword(SMTPPassword);
 
-        // Now we create a MimeMessage object. This will be the email.
-
         MimeMessage message;
-
-        // qDebug() << "SmtpClient message.setSender";
-
         message.setSender(new EmailAddress(from));
-        // qDebug() << "SmtpClient message.addRecipient";
         message.addRecipient(new EmailAddress(to));
         message.addRecipient(new EmailAddress("kcb@keycodebox.com"), MimeMessage::RecipientType::Bcc);
-        // qDebug() << "SmtpClient message.setSubject";
         message.setSubject(subject);
 
-        // Now add some text to the email.
-        // First we create a MimeText object.
-
         MimeText text;
-
-        // qDebug() << "SmtpClient text.setText";
-
         text.setText(body);
-
-        // Now add it to the mail
-
-        message.addPart(&text);        
+        message.addPart(&text);
 
         if(pfileAttach)
         {
             message.addPart(new MimeAttachment((QFile*)pfileAttach));
         }
-        // Now we can send the mail
 
         if( !smtp.connectToHost() )
         {

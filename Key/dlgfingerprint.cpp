@@ -62,8 +62,6 @@ void CDlgFingerprint::setMessage(QString message)
 
 void CDlgFingerprint::OnUpdateEnrollFingerprintDialog(int current, int total, QString message)
 {
-    qDebug() << "CDlgFingerprint::OnUpdateEnrollFingerprintDialog(), stage " << QString::number(current) << " of " << QString::number(total) << " message: " << message;
-
     if( current > 1 )
     {
         ui->lblFPrintStageNumber->setText(QString::number(current));

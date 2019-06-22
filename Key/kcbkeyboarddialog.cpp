@@ -37,9 +37,9 @@ KcbKeyboardDialog::~KcbKeyboardDialog()
 void KcbKeyboardDialog::setValue(const QString value,
                                  const QStringList codes_in_use)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_keyboard.setValue(value, codes_in_use);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KcbKeyboardDialog::setValue(const QString value)
@@ -64,14 +64,14 @@ void KcbKeyboardDialog::ipAddress(bool state)
 
 void KcbKeyboardDialog::ClearText()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     m_keyboard.clear();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KcbKeyboardDialog::Accept()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     if (m_for_password)
     {
         QString value = m_keyboard.getValue();
@@ -80,7 +80,7 @@ void KcbKeyboardDialog::Accept()
 
     accept();
 
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void KcbKeyboardDialog::resetPassword()

@@ -16,8 +16,8 @@ SerialPort::SerialPort(const QString& portName, int baudRate, int writeTimeout, 
 
     if (!m_port.open(QIODevice::ReadWrite)) 
     {
-        qCritical() << QString("Can't open %1, error code %2").arg(portName).arg(m_port.error());
-    }        
+        KCB_CRITICAL_TRACE(QString("Can't open %1, error code %2").arg(portName).arg(m_port.error()));
+    }
 }
 
 SerialPort::~SerialPort()
@@ -26,18 +26,17 @@ SerialPort::~SerialPort()
 
 int SerialPort::WriteData(const QByteArray &request)
 {
-    // write request
-    qDebug() << "WriteData:" << qPrintable(request.toHex());
+    // KCB_DEBUG_TRACE("WriteData:" << qPrintable(request.toHex()));
 
     qint16 num_bytes = m_port.write(request);
     if (m_port.waitForBytesWritten(m_writeTimeout)) 
     {
-        qDebug() << "WriteData:" << num_bytes << "written to serial port";
+        // KCB_DEBUG_TRACE("WriteData:" << num_bytes << "written to serial port");
     }
     else
     {
-        qCritical() << "Timeout occurred while writing to serial port";
-    }        
+        KCB_CRITICAL_TRACE("Serial port timeout");
+    }
     
     return (int) num_bytes;
 }
@@ -53,13 +52,13 @@ int SerialPort::ReadData(QByteArray& response)
             response += m_port.readAll();
         }
 
-        qDebug() << "ReadData:" << response.toHex();
+        // KCB_DEBUG_TRACE("ReadData:" << response.toHex());
     }
     else
     {
-        qCritical() << "Timeout occurred while reading from serial port";
+        KCB_CRITICAL_TRACE("Serial port timeout");
     }
     
-    KCB_DEBUG_TRACE("ReadData size: " << response.size());
+    // KCB_DEBUG_TRACE("ReadData size: " << response.size());
     return response.size();
 }

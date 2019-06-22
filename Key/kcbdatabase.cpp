@@ -17,7 +17,7 @@ namespace kcb
           m_table(table),
           m_last_inserted_id(-1)
     {
-        KCB_DEBUG_TRACE("Instantiating: " << m_tablename);
+        // KCB_DEBUG_TRACE("Instantiating: " << m_tablename);
     }
 
     Database::~Database()
@@ -31,11 +31,11 @@ namespace kcb
     //---------------------------------------------------------------------------------------------
     QSqlQuery Database::createQuery(QStringList column_list, QString condition)
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
 
         bool is_open = m_database.isOpen();
 
-        KCB_DEBUG_TRACE("database is open" << is_open);
+        // KCB_DEBUG_TRACE("database is open" << is_open);
         Q_ASSERT_X(is_open, Q_FUNC_INFO, "database is not open");
 
         if (!is_open)
@@ -48,8 +48,8 @@ namespace kcb
         
         query.setForwardOnly(true);
 
-        KCB_DEBUG_TRACE("column list count" << column_list.count());
-        KCB_DEBUG_TRACE("condition is empty" << condition.isEmpty());
+        // KCB_DEBUG_TRACE("column list count" << column_list.count());
+        // KCB_DEBUG_TRACE("condition is empty" << condition.isEmpty());
 
         auto select = QString("SELECT *");
         if (column_list.count() > 0)
@@ -65,14 +65,14 @@ namespace kcb
             sql += QString(" %1").arg(where);
         }
 
-        KCB_DEBUG_TRACE("SQL:" << sql);
+        // KCB_DEBUG_TRACE("SQL:" << sql);
 
         if( !query.prepare(sql) )
         {
             KCB_WARNING_TRACE("prepare failed" << query.lastError());
         }
 
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
 
         return query;
     }
@@ -84,13 +84,13 @@ namespace kcb
         if (qry.exec())
         {
             auto rec = qry.record();
-            KCB_DEBUG_TRACE("Number of columns: " << rec.count());
+            // KCB_DEBUG_TRACE("Number of columns: " << rec.count());
             for (int ii = 0; ii < rec.count(); ++ii)
             {
                 fields.append(rec.fieldName(ii));
             }
 
-            KCB_DEBUG_TRACE("Field Names: " << fields);
+            // KCB_DEBUG_TRACE("Field Names: " << fields);
         }
 
         return fields;
@@ -98,7 +98,7 @@ namespace kcb
 
     bool Database::tableExists()
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
 
         bool is_open = m_database.isOpen();
 
@@ -109,7 +109,7 @@ namespace kcb
             return false;
         }
 
-        KCB_DEBUG_TRACE(m_tablename);
+        // KCB_DEBUG_TRACE(m_tablename);
 
         QStringList tables = m_database.tables();
 
@@ -117,18 +117,18 @@ namespace kcb
         {
             if (table == m_tablename)
             {
-                KCB_DEBUG_EXIT;
+                // KCB_DEBUG_EXIT;
                 return true;
             }
         }
 
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return false;
     }
 
     void Database::createTable(TABLE_DICT_TYPE table)
     {
-        KCB_DEBUG_ENTRY;
+        // KCB_DEBUG_ENTRY;
 
         bool is_open = m_database.isOpen();
 
@@ -136,11 +136,11 @@ namespace kcb
         
         if( !is_open ) 
         {
-            KCB_DEBUG_TRACE("database is not open");
+            // KCB_DEBUG_TRACE("database is not open");
             return;
         }
 
-        KCB_DEBUG_TRACE("Creating table" << m_tablename);
+        // KCB_DEBUG_TRACE("Creating table" << m_tablename);
 
         QSqlQuery query(m_database);
 
@@ -154,7 +154,7 @@ namespace kcb
         QString sql;
         sql += QString("%1 %2 (%3)").arg(CREATE_TABLE_CMD).arg(m_tablename).arg(columns.join(","));
 
-        KCB_DEBUG_TRACE("SQL:" << sql);
+        // KCB_DEBUG_TRACE("SQL:" << sql);
 
         if( !query.prepare(sql) )
         {
@@ -166,7 +166,7 @@ namespace kcb
             KCB_WARNING_TRACE("exec failed" << query.lastError());
         }
 
-        KCB_DEBUG_TRACE("Table successfully created!");
+        // KCB_DEBUG_TRACE("Table successfully created!");
     }
 
     bool Database::updateRequired()
@@ -184,7 +184,7 @@ namespace kcb
 
             diff_fields = fields_set.count() > 0;
 
-            KCB_DEBUG_TRACE(fields_set);
+            // KCB_DEBUG_TRACE(fields_set);
 
             QSet<QString> types_set = m_table.values().toSet().subtract(types.toSet());
 
@@ -193,13 +193,13 @@ namespace kcb
             if (types_set.count() > 0 && !types_set.contains("integer primary key unique"))
             {
                 diff_types = true;
-                KCB_DEBUG_TRACE(types_set);
+                // KCB_DEBUG_TRACE(types_set);
             }
         }
 
-        KCB_DEBUG_TRACE("Diff Counts" << !same_num_fields);
-        KCB_DEBUG_TRACE("Diff Fields" << diff_fields);
-        KCB_DEBUG_TRACE("Diff Types" << diff_types);
+        // KCB_DEBUG_TRACE("Diff Counts" << !same_num_fields);
+        // KCB_DEBUG_TRACE("Diff Fields" << diff_fields);
+        // KCB_DEBUG_TRACE("Diff Types" << diff_types);
 
         return !same_num_fields || diff_fields || diff_types;
     }
@@ -212,12 +212,12 @@ namespace kcb
         {
             if (field == column)
             {
-                KCB_DEBUG_TRACE(column << "exists");
+                // KCB_DEBUG_TRACE(column << "exists");
                 return true;
             }
         }
 
-        KCB_DEBUG_TRACE(column << "does not exist");
+        // KCB_DEBUG_TRACE(column << "does not exist");
         return false;
     }
 
@@ -241,7 +241,7 @@ namespace kcb
         while (query.next())
         {
             // Returns: column id, column name, data type, whether or not the column can be NULL, default value for the column, is primary key
-            KCB_DEBUG_TRACE(query.value(2).toString());
+            // KCB_DEBUGTRACE(query.value(2).toString());
             types << query.value(2).toString();
         }
 
@@ -254,7 +254,7 @@ namespace kcb
 
         QString sql(QString("ALTER TABLE %1 ADD %2 %3").arg(m_tablename, column, fieldType));
 
-        KCB_DEBUG_TRACE("SQL:" << sql);
+        // KCB_DEBUGTRACE("SQL:" << sql);
 
         if (!query.prepare( sql ))
         {
@@ -266,7 +266,7 @@ namespace kcb
             KCB_DEBUG_TRACE("exec failed" << query.lastError());
         }
 
-        KCB_DEBUG_TRACE("Table successfully altered!");
+        // KCB_DEBUGTRACE("Table successfully altered!");
     }
 
     bool Database::insertInto(QStringList columns, QList<QVariant> values)
@@ -276,7 +276,7 @@ namespace kcb
         
         QString sql(QString("INSERT INTO %1 (%2) VALUES (%3)").arg(m_tablename).arg(columns.join(',')).arg(QStringList(placeholders.toList()).join(',')));
 
-        KCB_DEBUG_TRACE("SQL:" << sql);
+        // KCB_DEBUGTRACE("SQL:" << sql);
 
         QSqlQuery query(m_database);
         query.prepare(sql);
@@ -291,7 +291,7 @@ namespace kcb
 
         if (result)
         {
-            KCB_DEBUG_TRACE("data inserted");
+            // KCB_DEBUGTRACE("data inserted");
             return true;
         }
 
@@ -309,7 +309,7 @@ namespace kcb
         }
 
         QString sql(QString("INSERT INTO %1 (%2) VALUES (%3)").arg(m_tablename).arg(QStringList(row.keys()).join(',')).arg(values.join(',')));
-        KCB_DEBUG_TRACE("SQL:" << sql);
+        // KCB_DEBUGTRACE("SQL:" << sql);
 
         QSqlQuery query(m_database);
 
@@ -325,7 +325,7 @@ namespace kcb
 
         if (result)
         {
-            KCB_DEBUG_TRACE("data inserted");
+            // KCB_DEBUGTRACE("data inserted");
             return true;
         }
 
@@ -343,7 +343,7 @@ namespace kcb
         Q_ASSERT_X(columns.count() == values.count(), Q_FUNC_INFO, "column/value mismatch");
         if (columns.count() != values.count())
         {
-            KCB_DEBUG_TRACE("Col: " << columns.count() << "Val: " << values.count());
+            // KCB_DEBUGTRACE("Col: " << columns.count() << "Val: " << values.count());
             return false;
         }
 
@@ -382,7 +382,7 @@ namespace kcb
         // Fill in the SQL text
         QString sql(QString("UPDATE %1 SET %2 %3").arg(m_tablename).arg(placeholders.join(',')).arg(where));
 
-        KCB_DEBUG_TRACE("SQL:" << sql);
+        // KCB_DEBUGTRACE("SQL:" << sql);
 
         if (!query.prepare(sql))
         {
@@ -408,7 +408,7 @@ namespace kcb
             return false;
         }
 
-        KCB_DEBUG_TRACE("exec succeeded (active:" << query.isActive() << ")");
+        // KCB_DEBUGTRACE("exec succeeded (active:" << query.isActive() << ")");
         return true;
     }
 
@@ -444,7 +444,7 @@ namespace kcb
 
         // Create the SQL string
         QString sql(QString("UPDATE %1 SET %2 %3").arg(m_tablename).arg(colname_list.join(',')).arg(where));
-        KCB_DEBUG_TRACE("SQL:" << sql);
+        // KCB_DEBUGTRACE("SQL:" << sql);
 
         // Create the query
         QSqlQuery query(m_database);
@@ -475,7 +475,7 @@ namespace kcb
 
         if (result)
         {
-            KCB_DEBUG_TRACE("data inserted");
+            // KCB_DEBUGTRACE("data inserted");
             return true;
         }
 
@@ -513,7 +513,7 @@ namespace kcb
 
         if ( query.exec() ) 
         {
-            KCB_DEBUG_TRACE("field incremented");
+            // KCB_DEBUGTRACE("field incremented");
             return true;
         }
 
@@ -531,7 +531,7 @@ namespace kcb
         query.addBindValue(ids);
         if( query.exec()) 
         {
-            KCB_DEBUG_TRACE("delete succeeded");
+            // KCB_DEBUGTRACE("delete succeeded");
             return true;
         } 
         else 

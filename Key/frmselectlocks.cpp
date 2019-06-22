@@ -34,13 +34,13 @@ CFrmSelectLocks::~CFrmSelectLocks()
 
 void CFrmSelectLocks::setLocks(QString locks)
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
 
-    KCB_DEBUG_TRACE(locks);
+    // KCB_DEBUG_TRACE(locks);
     m_select_locks.setTimer(30);
     m_select_locks.setLocks(locks);
     m_select_locks.startTimer();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 QString CFrmSelectLocks::getLocks()

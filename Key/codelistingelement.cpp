@@ -9,7 +9,7 @@ void CodeListing::addCode(Code* code)
 
 void CodeListing::print()
 {
-    KCB_DEBUG_TRACE("Encrypted" << m_encrypted);
+    // KCB_DEBUG_TRACE("Encrypted" << m_encrypted);
     foreach(Code* code, m_codes)
     {
         code->print();

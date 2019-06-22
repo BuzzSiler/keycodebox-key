@@ -23,6 +23,7 @@ QWidget *CabinetRowDelegate::createEditor(QWidget *parent,
     if (index.column() == TOTAL_LOCKS_COL)
     {
         QComboBox *editor = new QComboBox(parent);
+        connect(editor, SIGNAL(currentIndexChanged(int)), this, SLOT(commitAndCloseEditor(int)));
         editor->addItems(QStringList() << "8" << "16" << "32");
         return editor;
     }
@@ -39,7 +40,6 @@ void CabinetRowDelegate::setEditorData(QWidget *editor,
         QComboBox *comboBox = static_cast<QComboBox*>(editor);
         comboBox->setCurrentText(QString::number(value));
     }
-
 }
 
 void CabinetRowDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
@@ -58,4 +58,12 @@ void CabinetRowDelegate::updateEditorGeometry(QWidget *editor,
 {
     Q_UNUSED(index);
     editor->setGeometry(option.rect);
+}
+
+void CabinetRowDelegate::commitAndCloseEditor(int index)
+{
+    Q_UNUSED(index);
+     QComboBox *editor = qobject_cast<QComboBox *>(sender());
+     emit commitData(editor);
+     emit closeEditor(editor);
 }
