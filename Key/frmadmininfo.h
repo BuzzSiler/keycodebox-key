@@ -287,6 +287,7 @@ class CFrmAdminInfo : public QDialog
         QStringList FormatLocks(const QString& locks);
         void updateCodeTableContextMenu();
         QString StripAnnotations(const QString& text);
+        void invokeUpdateCabinetConfig();
 
     protected:
         void touchEvent(QTouchEvent *ev);

@@ -17,8 +17,8 @@ class AutoCodeGenWidget : public QWidget
 {
     Q_OBJECT
     public:
-    explicit AutoCodeGenWidget(QWidget *parent = 0);
-    ~AutoCodeGenWidget();
+        explicit AutoCodeGenWidget(QWidget *parent = 0);
+        ~AutoCodeGenWidget();
 
     signals:
         void RequestCodes1(QStringList& codes);
@@ -31,6 +31,7 @@ class AutoCodeGenWidget : public QWidget
         void NotifyAutoCodeDisabled();
         void NotifyCodesUpdate(const QStringList& codes = QStringList());
         void NotifyAutoCodeEmailUpdate(const QString& key);
+        void NotifyUpdateCabinetConfig();
 
     public slots:
         void OnLockSelectionChanged();
@@ -48,6 +49,7 @@ class AutoCodeGenWidget : public QWidget
         void on_cbAutoCodePeriodUnits_currentIndexChanged(int index);
         void on_cbAutoCodeEmailKey_clicked();
         void on_pbAutoCodeRandomPassword_clicked();
+        void OnNotifyUpdateCabinetConfig();
 
     private:
         LockCabinetWidget& m_lock_cabinet;

@@ -278,8 +278,6 @@ void CSystemController::initializeReaders()
     connect(this, SIGNAL(__onQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserAnswers(QString,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserCancel()), &_securityController, SLOT(OnQuestionUserCancel()));
-
-    connect(&_LockController, &CLockController::DiscoverHardwareProgressUpdate, this, &CSystemController::DiscoverHardwareProgressUpdate);
 }
 
 void CSystemController::OnVerifyFingerprintDialog()
@@ -417,6 +415,7 @@ void CSystemController::initializeSecurityConnections()
 
 void CSystemController::initializeLockController()
 {
+    connect(&_LockController, &CLockController::DiscoverHardwareProgressUpdate, this, &CSystemController::DiscoverHardwareProgressUpdate);
     _LockController.initController();
 }
 
@@ -1217,6 +1216,7 @@ void CSystemController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted
 void CSystemController::DiscoverHardware()
 {
     // KCB_DEBUG_ENTRY;
+    KCB_WARNING_TRACE("Detecting cabinet hardware");
     _LockController.detectHardware();
     // KCB_DEBUG_EXIT;
 }

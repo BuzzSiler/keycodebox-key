@@ -247,8 +247,6 @@ void CFrmAdminInfo::initializeConnections()
     connect( ui->tblHistory, SIGNAL( cellClicked(int, int) ), this, SLOT( codeHistoryTableCellSelected( int, int ) ) );
     connect( ui->cbUsbDrives, SIGNAL(currentIndexChanged(QString) ), this, SLOT(on_cbUsbDrives_currentIndexChanged(QString) ) );
 
-    connect(_psysController, SIGNAL(DiscoverHardwareProgressUpdate(int)), this, SLOT(OnDiscoverHardwareProgressUpdate(int)));
-
     connect(&m_autocodegen, &AutoCodeGenWidget::RequestCodes1, this, &CFrmAdminInfo::OnRequestCodes1);
 
     connect(&m_autocodegen, &AutoCodeGenWidget::CommitCodes1, this, &CFrmAdminInfo::OnCommitCodes1);
@@ -256,6 +254,8 @@ void CFrmAdminInfo::initializeConnections()
 
     connect(&m_autocodegen, &AutoCodeGenWidget::NotifyDisableLockSelection, this, &CFrmAdminInfo::OnNotifyDisableLockSelection);
     connect(&m_autocodegen, &AutoCodeGenWidget::NotifyEnableLockSelection, this, &CFrmAdminInfo::OnNotifyEnableLockSelection);
+
+    connect(_psysController, SIGNAL(DiscoverHardwareProgressUpdate(int)), this, SLOT(OnDiscoverHardwareProgressUpdate(int)));
 
 }
 
@@ -266,6 +266,7 @@ void CFrmAdminInfo::setSystemController(CSystemController *psysController)
     connect(&m_autocodegen, &AutoCodeGenWidget::NotifyAutoCodeEnabled, _psysController, &CSystemController::OnNotifyAutoCodeEnabled);
     connect(&m_autocodegen, &AutoCodeGenWidget::NotifyAutoCodeDisabled, _psysController, &CSystemController::OnNotifyAutoCodeDisabled);
     connect(&m_autocodegen, &AutoCodeGenWidget::NotifyAutoCodeEmailUpdate, _psysController, &CSystemController::__OnAutoCodeEmail);
+
 
     initializeConnections();
     emit __OnRequestCurrentAdmin();
@@ -2378,6 +2379,18 @@ void CFrmAdminInfo::on_cbLogLevel_currentIndexChanged(const QString &arg1)
     kcb::Logger::setLevel(level);
 }
 
+void CFrmAdminInfo::invokeUpdateCabinetConfig()
+{
+    // KCB_DEBUG_ENTRY;
+    m_select_locks.updateCabinetConfig();
+    if (_pFrmCodeEditMulti)
+    {
+        _pFrmCodeEditMulti->updateCabinetConfig();
+    }
+    emit m_autocodegen.NotifyUpdateCabinetConfig();
+    // KCB_DEBUG_EXIT;
+}
+
 void CFrmAdminInfo::on_pbDiscoverHardware_clicked()
 {
     // KCB_DEBUG_ENTRY;
@@ -2394,12 +2407,7 @@ void CFrmAdminInfo::on_pbDiscoverHardware_clicked()
     ui->pgbDiscoverHardware->setValue(100);
 
     SetCabinetInfo();
-
-    m_select_locks.updateCabinetConfig();
-    if (_pFrmCodeEditMulti)
-    {
-        _pFrmCodeEditMulti->updateCabinetConfig();
-    }
+    invokeUpdateCabinetConfig();
 
     ui->pbDiscoverHardware->setEnabled(true);
     ui->pgbDiscoverHardware->setVisible(false);
@@ -2409,7 +2417,14 @@ void CFrmAdminInfo::on_pbDiscoverHardware_clicked()
 void CFrmAdminInfo::OnDiscoverHardwareProgressUpdate(int value)
 {
     // KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_TRACE("tracking" << value);
     ui->pgbDiscoverHardware->setValue(value);
+
+    if (value == 100)
+    {
+        // KCB_DEBUG_TRACE("100 reached");
+        invokeUpdateCabinetConfig();
+    }
     // KCB_DEBUG_EXIT;
 }
 
@@ -2485,7 +2500,7 @@ void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
 
 void CFrmAdminInfo::on_pbApplyChanges_clicked()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
 
     ui->pbApplyChanges->setDisabled(true);
     KeyCodeBoxSettings::ClearCabinetConfig();
@@ -2504,14 +2519,9 @@ void CFrmAdminInfo::on_pbApplyChanges_clicked()
     }
 
     _psysController->UpdateLockRanges();
+    invokeUpdateCabinetConfig();
 
-    m_select_locks.updateCabinetConfig();
-    if (_pFrmCodeEditMulti)
-    {
-        _pFrmCodeEditMulti->updateCabinetConfig();
-    }
-
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::on_pbResetCabinetConfig_clicked()
@@ -2521,11 +2531,7 @@ void CFrmAdminInfo::on_pbResetCabinetConfig_clicked()
     ui->pbDiscoverHardware->setDisabled(true);
     ClearCabinetInfo();
     KeyCodeBoxSettings::ClearCabinetConfig();
-    m_select_locks.updateCabinetConfig();
-    if (_pFrmCodeEditMulti)
-    {
-        _pFrmCodeEditMulti->updateCabinetConfig();
-    }
+    invokeUpdateCabinetConfig();
     ui->pbDiscoverHardware->setEnabled(true);
 }
 

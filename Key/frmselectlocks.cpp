@@ -14,6 +14,7 @@ CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
     m_select_locks(* new SelectLocksWidget(this, SelectLocksWidget::USER)),
     ui(new Ui::CFrmSelectLocks)
 {
+    // KCB_DEBUG_ENTRY;
     ui->setupUi(this);
 
     kcb::SetWindowParams(this);
@@ -24,6 +25,7 @@ CFrmSelectLocks::CFrmSelectLocks(QWidget *parent) :
     connect(&m_select_locks, &SelectLocksWidget::NotifyClose, this, &CFrmSelectLocks::reject);
     connect(&m_select_locks, &SelectLocksWidget::NotifyOpen, this, &CFrmSelectLocks::accept);
     connect(&m_select_locks, &SelectLocksWidget::NotifyTimeout, this, &CFrmSelectLocks::reject);
+    // KCB_DEBUG_EXIT;
 }
 
 CFrmSelectLocks::~CFrmSelectLocks()

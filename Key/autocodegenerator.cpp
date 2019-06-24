@@ -14,20 +14,20 @@
 void DisplayParams(const AutoCodeParams& params)
 {
     Q_UNUSED(params);
-    // KCB_DEBUG_TRACE("params");
-    // KCB_DEBUG_TRACE("\tcode_mode" << params.code_mode);
-    // KCB_DEBUG_TRACE("\tnumcodes" << params.numcodes);
-    // KCB_DEBUG_TRACE("\tcodelength" << params.codelength);
-    // KCB_DEBUG_TRACE("\tperiod" << params.period);
-    // KCB_DEBUG_TRACE("\tunits" << params.units);
-    // KCB_DEBUG_TRACE("\tstartofday" << params.startofday);
-    // KCB_DEBUG_TRACE("\tid" << params.id);
+    KCB_DEBUG_TRACE("params");
+    KCB_DEBUG_TRACE("\tcode_mode" << params.code_mode);
+    KCB_DEBUG_TRACE("\tnumcodes" << params.numcodes);
+    KCB_DEBUG_TRACE("\tcodelength" << params.codelength);
+    KCB_DEBUG_TRACE("\tperiod" << params.period);
+    KCB_DEBUG_TRACE("\tunits" << params.units);
+    KCB_DEBUG_TRACE("\tstartofday" << params.startofday);
+    KCB_DEBUG_TRACE("\tid" << params.id);
 }
 
 void DisplayJson(const QJsonObject& json)
 {
     Q_UNUSED(json);
-    // KCB_DEBUG_TRACE("json" << kcb::JsonToString(json));
+    KCB_DEBUG_TRACE("json" << kcb::JsonToString(json));
 }
 
 AutoCodeGenerator::AutoCodeGenerator(const AutoCodeParams& params) :
@@ -389,8 +389,11 @@ AutoCodeParams AutoCodeGenerator::ParamsFromSecureKey(const QByteArray& key, con
 
 QPair<AutoCodeGenerator::CodeMap, QDateTime> AutoCodeGenerator::CreateCodeMap(const AutoCodeParams& params)
 {
+    // KCB_DEBUG_ENTRY;
+    // DisplayParams(params);
     AutoCodeGenerator acg(params);
     QStringList codes = acg.Generate();
+    // KCB_DEBUG_TRACE("codes" << codes);
     QDateTime dt = acg.NextGenDateTime();
 
     CodeMap map;
@@ -399,6 +402,7 @@ QPair<AutoCodeGenerator::CodeMap, QDateTime> AutoCodeGenerator::CreateCodeMap(co
         map[QString::number(ii + 1)] = codes[ii];
     }
 
+    // KCB_DEBUG_EXIT;
     return QPair<AutoCodeGenerator::CodeMap, QDateTime>(map, dt);
 }
 

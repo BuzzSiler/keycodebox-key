@@ -110,6 +110,8 @@ AutoCodeGenWidget::AutoCodeGenWidget(QWidget *parent) :
 
     InitControls();
 
+    connect(this, &AutoCodeGenWidget::NotifyUpdateCabinetConfig, this, &AutoCodeGenWidget::OnNotifyUpdateCabinetConfig);
+
     m_init = false;
     // KCB_DEBUG_EXIT;
 }
@@ -319,7 +321,7 @@ void AutoCodeGenWidget::UpdateAutoCodeParams()
 
 void AutoCodeGenWidget::on_pbAutoCodeGenerate_clicked()
 {
-    DisplayParams(m_params);
+    // DisplayParams(m_params);
     if (ui->leAutoCodePassword->text().isEmpty())
     {
         (void) QMessageBox::warning(this,
@@ -666,5 +668,12 @@ void AutoCodeGenWidget::UpdateCodes()
     {
         KCB_DEBUG_TRACE("Invalid code mode settings");
     }
+    // KCB_DEBUG_EXIT;
+}
+
+void AutoCodeGenWidget::OnNotifyUpdateCabinetConfig()
+{
+    // KCB_DEBUG_ENTRY;
+    m_lock_cabinet.updateCabinetConfig();
     // KCB_DEBUG_EXIT;
 }
