@@ -653,11 +653,10 @@ uint64_t CLockController::inquireLockStatus()
 
 }
 
-
 void CLockController::UpdateDetectProgress()
 {
     emit DiscoverHardwareProgressUpdate(update_status);
-    update_status += 10;
+    update_status += 7;
 }
 
 void CLockController::detectHardware()

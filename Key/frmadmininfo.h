@@ -185,7 +185,6 @@ class CFrmAdminInfo : public QDialog
         void OnNotifyDisableLockSelection();
         void OnNotifyEnableLockSelection();
 
-
     private:
         Ui::CFrmAdminInfo   *ui;
         CSystemController   *_psysController;

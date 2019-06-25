@@ -1591,7 +1591,6 @@ void CFrmAdminInfo::setTableMenuLocation(QMenu *pmenu)
 
 void CFrmAdminInfo::OnRowSelected(int row, int column) 
 {
-    Q_UNUSED(column);
     _nRowSelected = row;
     updateCodeTableContextMenu();
     _pTableMenu->show();
@@ -1602,10 +1601,10 @@ void CFrmAdminInfo::OnRowSelected(int row, int column)
 
 bool CFrmAdminInfo::eventFilter(QObject *target, QEvent *event)
 {
-    // KCB_DEBUG_TRACE("eventFilter. Event type:" << QVariant(event->type()).toString());
+    //KCB_DEBUG_TRACE("eventFilter. Event type:" << QVariant(event->type()).toString());
     if(event->type() == QEvent::TouchBegin )
     {
-        // KCB_DEBUG_TRACE("TouchBegin");
+        KCB_DEBUG_TRACE("TouchBegin");
         touchEvent(static_cast<QTouchEvent*>(event));
 
         if(ui->tblCodesList->rowCount() == 0 )
@@ -1625,12 +1624,12 @@ void CFrmAdminInfo::OnCodes(QString code1, QString code2)
 
 void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
     QList<QTouchEvent::TouchPoint>   lstPoints;
     switch (ev->type())
     {
     case QEvent::TouchBegin:
-        // KCB_DEBUG_TRACE("TouchBegin rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
+        KCB_DEBUG_TRACE("TouchBegin rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
         lstPoints = ev->touchPoints();
         _lastTouchPos = lstPoints.at(0).screenPos().toPoint();
 
@@ -1648,7 +1647,7 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
         break;
 
     case QEvent::TouchEnd:
-        // KCB_DEBUG_TRACE("TouchEnd rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
+        KCB_DEBUG_TRACE("TouchEnd rowcount:" << QVariant(ui->tblCodesList->rowCount()).toString());
         if(ui->tblCodesList->rowCount() >= 0 )
         {
             _pTableMenuAdd->show();
@@ -1660,7 +1659,7 @@ void CFrmAdminInfo::touchEvent(QTouchEvent *ev)
         break;
     }
 
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnHeaderSelected(int nHeader) 
@@ -1672,6 +1671,17 @@ void CFrmAdminInfo::OnHeaderSelected(int nHeader)
         _pTableMenuAdd->show();
         QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
         _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenuAdd->width(), _pTableMenuAdd->height());
+    }
+    else
+    {
+        if (ui->tblCodesList->rowCount() == 0)
+        {
+            _pTableMenuAdd->clear();
+            _pTableMenuAdd->addAction(tr("Add"), this, SLOT(codeInitNew()));
+            _pTableMenuAdd->show();
+            QPoint widgetPoint = QWidget::mapFromGlobal(QCursor::pos());
+            _pTableMenuAdd->setGeometry(widgetPoint.x(), widgetPoint.y(), _pTableMenuAdd->width(), _pTableMenuAdd->height());
+        }
     }
 }
 

@@ -45,6 +45,8 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     ui->vloLockCabinet->addWidget(&m_lock_cab);
 
     ui->edCode1->setText("");
+    ui->pbCode1Random->setEnabled(true);
+    ui->spCode1RandomCodeLength->setEnabled(true);
     ui->cbFingerprint->setDisabled(true);
     ui->edCode2->setText("");
     ui->edCode2->setDisabled(true);
@@ -546,8 +548,8 @@ void FrmCodeEditMulti::updateUi()
                              );
 
     ui->edCode1->setEnabled(!autocode_enabled);
-    ui->pbCode1Random->setEnabled(!autocode_enabled && code1_is_specified);
-    ui->spCode1RandomCodeLength->setEnabled(!autocode_enabled && code1_is_specified);
+    ui->pbCode1Random->setEnabled(!autocode_enabled);
+    ui->spCode1RandomCodeLength->setEnabled(!autocode_enabled);
     ui->pbClearCode1->setEnabled(code1_is_specified);
     ui->cbFingerprint->setEnabled(code1_is_specified);
     ui->cbEnableCode2->setEnabled(!fp_is_required && code1_is_specified);
