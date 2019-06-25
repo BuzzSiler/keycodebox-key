@@ -30,7 +30,6 @@ MainWindow      *gpmainWindow;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _psystemController(new CSystemController(this)),
     kkd(*new KcbKeyboardDialog(this, true))
 {
     ui->setupUi(this);
@@ -81,7 +80,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // There is much that is wrong with this architecture, but until we address the
     // architecture, we are stuck passing 'this' in order to make things work.
     _psystemController = new CSystemController(this);
-
 
     connect(_psystemController, SIGNAL(__OnDisplayCodeDialog(QObject*)), this, SLOT(OnDisplayCodeDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayUserCodeTwoDialog(QObject*)), this, SLOT(OnDisplayUserCodeTwoDialog(QObject*)));

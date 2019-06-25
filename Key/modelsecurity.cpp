@@ -38,9 +38,11 @@ void CModelSecurity::openDatabase()
 
 CModelSecurity::CModelSecurity(QObject *parent) : QObject(parent)
 {
+    // KCB_DEBUG_ENTRY;
     initialize();
     KCB_DEBUG_TRACE( "Connected!" );
     fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
+    // KCB_DEBUG_EXIT;
 }
 
 CModelSecurity::~CModelSecurity()
@@ -109,6 +111,7 @@ void CModelSecurity::OnUpdateCodeState(CLockState *rec)
 
 void CModelSecurity::initialize()
 {
+    // KCB_DEBUG_ENTRY;
     _ptblCodes = 0;
     _ptblCodeHistory = 0;
     _ptblAdmin = 0;
@@ -116,10 +119,12 @@ void CModelSecurity::initialize()
     openDatabase();
     setupTimer();
     setupTables();
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::removeCreatedObjects()
 {
+    // KCB_DEBUG_ENTRY;
     QSqlDatabase::removeDatabase("SQLITE");
 
     if(_ptblCodes) 
@@ -134,6 +139,7 @@ void CModelSecurity::removeCreatedObjects()
     {
         delete _ptblAdmin;
     }
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnTimeout()
@@ -161,12 +167,14 @@ void CModelSecurity::setupTimer()
 
 void CModelSecurity::setupTables()
 {
+    // KCB_DEBUG_ENTRY;
     if(_DB.isOpen())
     {
         _ptblCodes = new CTblCodes(&_DB);
         _ptblCodeHistory = new CTblCodeHistory(&_DB);
         _ptblAdmin = new CTblAdmin(&_DB);
     }
+    // KCB_DEBUG_EXIT;
 }
 
 void CModelSecurity::OnVerifyCodeOne(QString code)

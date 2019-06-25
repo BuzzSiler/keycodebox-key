@@ -8,10 +8,12 @@
 CSecurityController::CSecurityController(QObject *parent) : QObject(parent),
     _pSecurityUser(0)
 {
+    // KCB_DEBUG_ENTRY;
     initializeSignals();
 
     _modelSecurity.moveToThread(&_securityControlThread);
     _securityControlThread.start();
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::initializeSignals()

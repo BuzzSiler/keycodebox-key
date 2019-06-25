@@ -46,9 +46,9 @@ CSystemController::CSystemController(QObject *parent) :
     _ptimer(0),
     _autoCodeTimer(* new QTimer(this))
 {
-    Q_UNUSED(parent);
-
+    // KCB_DEBUG_ENTRY;
     fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
+    // KCB_DEBUG_EXIT;
 }
 
 CSystemController::~CSystemController()
@@ -69,6 +69,7 @@ CSystemController::~CSystemController()
 
 void CSystemController::initialize(QThread *pthread)
 {
+    // KCB_DEBUG_ENTRY;
     _pInitThread = pthread;
 
     if( _LCDGraphicsController.isLCDAttached() ) 
@@ -90,7 +91,7 @@ void CSystemController::initialize(QThread *pthread)
     _autoCodeTimer.setSingleShot(true);
     connect(&_autoCodeTimer, &QTimer::timeout, this, &CSystemController::OnAutoCodeTimeout);
     _autoCodeTimer.start(1000);
-
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::TrigEnrollFingerprint(QString sCode)
