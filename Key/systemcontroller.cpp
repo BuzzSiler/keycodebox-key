@@ -280,7 +280,6 @@ void CSystemController::initializeReaders()
     connect(this, SIGNAL(__onQuestionUserAnswers(QString,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserCancel()), &_securityController, SLOT(OnQuestionUserCancel()));
 
-    connect(&_LockController, &CLockController::DiscoverHardwareProgressUpdate, this, &CSystemController::DiscoverHardwareProgressUpdate);
 }
 
 void CSystemController::OnVerifyFingerprintDialog()
@@ -418,7 +417,12 @@ void CSystemController::initializeSecurityConnections()
 
 void CSystemController::initializeLockController()
 {
+    // KCB_DEBUG_ENTRY;
+    connect(&_LockController, &CLockController::DiscoverHardwareProgressUpdate, this, &CSystemController::DiscoverHardwareProgressUpdate);
     _LockController.initController();
+    _LockController.detectHardware();
+    emit __OnNotifyDetectHardwareComplete();
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::OnIdentifiedFingerprint(QString sCode, QString sCode2)
@@ -544,10 +548,13 @@ void CSystemController::OnUserCodeCancel()
     // KCB_DEBUG_EXIT;
 }
 
-void CSystemController::OnOpenLockRequest(QString lockNum)
+void CSystemController::OnOpenLockRequest(QString lockNum, bool takePicture)
 {
     KCB_DEBUG_TRACE(lockNum);
-    kcb::TakeAndStorePicture();
+    if (takePicture)
+    {
+        kcb::TakeAndStorePicture();
+    }
     _LockController.openLocks(lockNum);
 }
 
@@ -581,6 +588,8 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
     // KCB_DEBUG_ENTRY;
     KCB_DEBUG_TRACE(locks);
 
+    bool take_picture = true;
+
     if (_pdFingerprintVerify)
     {
         _pdFingerprintVerify->hide();
@@ -603,7 +612,7 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
 
             foreach (auto s, sl)
             {
-                OnOpenLockRequest(s);
+                OnOpenLockRequest(s, take_picture);
             }
         }
         else
@@ -616,7 +625,7 @@ void CSystemController::OnSecurityCheckSuccess(QString locks)
     {
         // KCB_DEBUG_TRACE("Single Lock");
         _locks = locks;
-        OnOpenLockRequest(locks);
+        OnOpenLockRequest(locks, take_picture);
     }
 
     reportActivity(_locks);
@@ -1217,9 +1226,9 @@ void CSystemController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted
 
 void CSystemController::DiscoverHardware()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
     _LockController.detectHardware();
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void CSystemController::UpdateLockRanges()

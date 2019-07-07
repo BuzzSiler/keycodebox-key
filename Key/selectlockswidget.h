@@ -31,7 +31,7 @@ class SelectLocksWidget : public QWidget
         void updateCabinetConfig();
 
     signals:
-        void NotifyRequestLockOpen(QString lockNum, bool is_user);
+        void NotifyRequestLockOpen(QString lockNum, bool takePicture);
 
         void NotifyClose();
         void NotifyOpen();

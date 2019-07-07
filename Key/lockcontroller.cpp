@@ -50,8 +50,6 @@ void CLockController::initController()
     {
         KCB_DEBUG_TRACE("USB->serial adapter not found");
     }
-
-    (void) inquireLockStatus();
 }
 
 uint16_t CLockController::ReadSoftwareVersion(uint16_t addr)
@@ -661,12 +659,12 @@ void CLockController::UpdateDetectProgress()
 
 void CLockController::detectHardware()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
     update_status = 0;
     UpdateDetectProgress();
     LocateMaster();
     emit DiscoverHardwareProgressUpdate(100);
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void CLockController::setLockRanges()

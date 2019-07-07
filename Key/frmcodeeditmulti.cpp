@@ -32,6 +32,7 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     m_access_state_label(*new QLabel(this)),
     m_warn_no_locks_selected(true)
 {
+    // KCB_DEBUG_ENTRY;
     ui->setupUi(this);
 
     kcb::SetWindowParams(this);
@@ -77,6 +78,7 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     OnLockSelectionChanged();
 
     updateUi();
+    // KCB_DEBUG_EXIT;
 }
 
 FrmCodeEditMulti::~FrmCodeEditMulti()
@@ -88,6 +90,7 @@ FrmCodeEditMulti::~FrmCodeEditMulti()
 void FrmCodeEditMulti::updateCabinetConfig()
 {
     // KCB_DEBUG_ENTRY;
+    m_lock_cab.setLockDisplay();
     m_lock_cab.updateCabinetConfig();
     // KCB_DEBUG_EXIT;
 }
@@ -699,7 +702,7 @@ void FrmCodeEditMulti::on_pbCode2Random_clicked()
 
 void FrmCodeEditMulti::OnLockSelectionChanged()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
 
     if (KeyCodeBoxSettings::IsLockSelectionSingle())
     {
@@ -713,7 +716,7 @@ void FrmCodeEditMulti::OnLockSelectionChanged()
     {
         m_lock_cab.OnNotifyDisableLockSelection();
     }
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 void FrmCodeEditMulti::warn_no_locks_selected()

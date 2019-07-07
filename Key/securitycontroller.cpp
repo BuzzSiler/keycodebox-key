@@ -216,8 +216,10 @@ void CSecurityController::OnRequestCurrentAdmin()
 
 void CSecurityController::OnRequestedCurrentAdmin(CAdminRec *admin)
 {
+    // KCB_DEBUG_ENTRY;
     _pAdminRec = admin;
     emit __OnRequestedCurrentAdmin(admin);
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::getAllCodes1(QStringList& codes1)

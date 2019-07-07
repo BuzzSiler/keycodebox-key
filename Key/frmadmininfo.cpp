@@ -131,6 +131,7 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     m_autocodegen(* new AutoCodeGenWidget(this)),
     m_last_index(0)
 {
+    // KCB_DEBUG_ENTRY;
     ui->setupUi(this);
 
     setAttribute(Qt::WA_AcceptTouchEvents, true);
@@ -183,6 +184,7 @@ CFrmAdminInfo::CFrmAdminInfo(QWidget *parent) :
     ui->tblCodesList->setSortingEnabled(true);
 
     emit __UpdateCurrentAdmin(&_tmpAdminRec);
+    // KCB_DEBUG_EXIT;
 }
 
 CFrmAdminInfo::~CFrmAdminInfo()
@@ -211,6 +213,7 @@ CFrmAdminInfo::~CFrmAdminInfo()
 
 void CFrmAdminInfo::initializeConnections()
 {
+    // KCB_DEBUG_ENTRY;
     connect(this, SIGNAL(__OnRequestCurrentAdmin()), _psysController, SLOT(OnRequestCurrentAdmin()));
 
     connect(_psysController, SIGNAL(__OnRequestedCurrentAdmin(CAdminRec*)), this, SLOT(OnRequestedCurrentAdmin(CAdminRec*)));
@@ -257,6 +260,7 @@ void CFrmAdminInfo::initializeConnections()
     connect(&m_autocodegen, &AutoCodeGenWidget::NotifyDisableLockSelection, this, &CFrmAdminInfo::OnNotifyDisableLockSelection);
     connect(&m_autocodegen, &AutoCodeGenWidget::NotifyEnableLockSelection, this, &CFrmAdminInfo::OnNotifyEnableLockSelection);
 
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::setSystemController(CSystemController *psysController)
@@ -748,6 +752,7 @@ void CFrmAdminInfo::on_btnDone_clicked()
 void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 {
     // KCB_DEBUG_ENTRY;
+
     if (adminInfo)
     {
         KCB_DEBUG_TRACE("Admin Info received.");
@@ -770,6 +775,7 @@ void CFrmAdminInfo::OnRequestedCurrentAdmin(CAdminRec *adminInfo)
 
         // KCB_DEBUG_TRACE("Setting Current Index to 0");
         // ui->tabWidget->setCurrentIndex(0);
+
     }
     else
     {
@@ -2017,13 +2023,9 @@ void CFrmAdminInfo::OnDisplayTakeReturnButtons(bool state)
     ui->chkDisplayTakeReturnButtons->setChecked(state);
 }
 
-void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool is_user)
+void CFrmAdminInfo::OnOpenLockRequest(QString lock, bool take_picture)
 {
-    Q_UNUSED(is_user);
-    // Only allow this path if we are admin, i.e., not user
-    // Note: It should never be the case that we are not admin
-    Q_ASSERT_X(is_user == false, Q_FUNC_INFO, "We are not admin");
-    emit __OnOpenLockRequest(lock);
+    emit __OnOpenLockRequest(lock, take_picture);
 }
 
 void CFrmAdminInfo::on_pbNetworkSettings_clicked()
@@ -2405,11 +2407,7 @@ void CFrmAdminInfo::on_pbDiscoverHardware_clicked()
 
     SetCabinetInfo();
 
-    m_select_locks.updateCabinetConfig();
-    if (_pFrmCodeEditMulti)
-    {
-        _pFrmCodeEditMulti->updateCabinetConfig();
-    }
+    invokeUpdateCabinetConfig();
 
     ui->pbDiscoverHardware->setEnabled(true);
     ui->pgbDiscoverHardware->setVisible(false);
@@ -2493,6 +2491,18 @@ void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
 
 }
 
+void CFrmAdminInfo::invokeUpdateCabinetConfig()
+{
+    // KCB_DEBUG_ENTRY;
+    m_select_locks.updateCabinetConfig();
+    if (_pFrmCodeEditMulti)
+    {
+        _pFrmCodeEditMulti->updateCabinetConfig();
+    }
+    m_autocodegen.updateCabinetConfig();
+    // KCB_DEBUG_EXIT;
+}
+
 void CFrmAdminInfo::on_pbApplyChanges_clicked()
 {
     // KCB_DEBUG_ENTRY;
@@ -2515,11 +2525,7 @@ void CFrmAdminInfo::on_pbApplyChanges_clicked()
 
     _psysController->UpdateLockRanges();
 
-    m_select_locks.updateCabinetConfig();
-    if (_pFrmCodeEditMulti)
-    {
-        _pFrmCodeEditMulti->updateCabinetConfig();
-    }
+    invokeUpdateCabinetConfig();
 
     // KCB_DEBUG_EXIT;
 }
@@ -2531,11 +2537,7 @@ void CFrmAdminInfo::on_pbResetCabinetConfig_clicked()
     ui->pbDiscoverHardware->setDisabled(true);
     ClearCabinetInfo();
     KeyCodeBoxSettings::ClearCabinetConfig();
-    m_select_locks.updateCabinetConfig();
-    if (_pFrmCodeEditMulti)
-    {
-        _pFrmCodeEditMulti->updateCabinetConfig();
-    }
+    invokeUpdateCabinetConfig();
     ui->pbDiscoverHardware->setEnabled(true);
 }
 
@@ -2635,6 +2637,7 @@ void CFrmAdminInfo::OnCommitCodes2(QMap<QString, QString> codes)
 
 void CFrmAdminInfo::OnNotifyDisableLockSelection()
 {
+    // KCB_DEBUG_ENTRY;
     ui->cbAdminLockSelection->setDisabled(true);
     if (KeyCodeBoxSettings::IsLockSelectionSingle())
     {
@@ -2645,6 +2648,7 @@ void CFrmAdminInfo::OnNotifyDisableLockSelection()
         ui->cbAdminLockSelection->setCurrentIndex(0);
     }
     emit __NotifyLockSelectionChanged();
+    // KCB_DEBUG_EXIT;
 }
 
 void CFrmAdminInfo::OnNotifyEnableLockSelection()
@@ -2668,4 +2672,11 @@ void CFrmAdminInfo::OnUpdateCodes()
     on_btnReadCodes_clicked();
     //     - We need to read the codes to populate the autocode locks
     m_autocodegen.UpdateCodes();
+}
+
+void CFrmAdminInfo::OnNotifyUpdateCabinetConfig()
+{
+    // KCB_DEBUG_ENTRY;
+    invokeUpdateCabinetConfig();
+    // KCB_DEBUG_EXIT;
 }

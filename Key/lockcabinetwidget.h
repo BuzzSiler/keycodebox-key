@@ -25,7 +25,7 @@ class LockCabinetWidget : public QWidget
         void updateCabinetConfig();
         QString getSelectedLocks();
         void setSelectedLocks(QString locks);
-        void setLockDisplay(const QMap<QString, QString>& map);
+        void setLockDisplay(const QMap<QString, QString>& map = QMap<QString, QString>());
         QMap<QString, QString> getLockDisplay();
         void clearLockDisplay();
         void clrAllLocks();
@@ -39,6 +39,8 @@ class LockCabinetWidget : public QWidget
         void clrWarning();
         bool isConfigured();
         void hideSelectClearAll();
+        void setSingleLockSelection();
+        void setMultiLockSelection();
 
     public slots:
         void OnNotifySingleLockSelection();
@@ -63,6 +65,8 @@ class LockCabinetWidget : public QWidget
             QVector<bool> enabled;
         } CAB_STATE;
 
+        enum class LockSelection { SINGLE, MULTI };
+
         CABINET_VECTOR m_cabinet_info;
         qint8 m_num_cabs;
         QVector<QString> m_selected_locks;
@@ -77,6 +81,7 @@ class LockCabinetWidget : public QWidget
         int m_last_state_selected;
         QMap<QString, QString> m_lock_names;
         bool m_dont_ask_no_lock_msgbox;
+        LockSelection m_lock_selection;
 
         Ui::LockCabinetWidget *ui;
 

@@ -66,7 +66,7 @@ class CFrmAdminInfo : public QDialog
         void __OnRequestCurrentAdmin();
         void __UpdateCurrentAdmin(CAdminRec *adminInfo);
         void __OnUpdatedCurrentAdmin(bool bSuccess);
-        void __OnOpenLockRequest(QString LockNums);
+        void __OnOpenLockRequest(QString LockNums, bool TakePicture);
         void __OnBrightnessChanged(int nValue);
         void __OnImmediateReportRequest(QDateTime dtReportStart, QDateTime dtReportEnd);
         void __OnAdminInfoCodes(QString code1, QString code2);
@@ -102,13 +102,14 @@ class CFrmAdminInfo : public QDialog
         void OnTabSelected(int index);
         void OnDisplayFingerprintButton(bool);
         void OnDisplayShowHideButton(bool);
-        void OnOpenLockRequest(QString lock, bool is_user);
+        void OnOpenLockRequest(QString lock, bool take_picture = false);
         void OnNotifyGenerateReport();    
         void OnDisplayTakeReturnButtons(bool);
         void OnDiscoverHardwareProgressUpdate(int);
 
         void OnRequestCodes1(QStringList& codes);
         void OnUpdateCodes();
+        void OnNotifyUpdateCabinetConfig();
 
     private slots:
         void OnCodes(QString code1, QString code2);
@@ -286,6 +287,7 @@ class CFrmAdminInfo : public QDialog
         QStringList FormatLocks(const QString& locks);
         void updateCodeTableContextMenu();
         QString StripAnnotations(const QString& text);
+        void invokeUpdateCabinetConfig();
 
     protected:
         void touchEvent(QTouchEvent *ev);

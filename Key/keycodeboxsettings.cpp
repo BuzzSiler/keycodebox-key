@@ -145,6 +145,7 @@ int KeyCodeBoxSettings::getLocksPerCabinet(int cab_index)
 
 int KeyCodeBoxSettings::getTotalLocks()
 {
+    // KCB_DEBUG_ENTRY;
     int total = 0;
     getCabinetsInfo();
     if (m_cabinet_info.count() > 0)
@@ -155,6 +156,7 @@ int KeyCodeBoxSettings::getTotalLocks()
         }
     }
 
+    // KCB_DEBUG_EXIT;
     return total;
 }
 
