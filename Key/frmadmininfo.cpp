@@ -2443,18 +2443,6 @@ void CFrmAdminInfo::on_cbLogLevel_currentIndexChanged(const QString &arg1)
     kcb::Logger::setLevel(level);
 }
 
-void CFrmAdminInfo::invokeUpdateCabinetConfig()
-{
-    // KCB_DEBUG_ENTRY;
-    m_select_locks.updateCabinetConfig();
-    if (_pFrmCodeEditMulti)
-    {
-        _pFrmCodeEditMulti->updateCabinetConfig();
-    }
-    emit m_autocodegen.NotifyUpdateCabinetConfig();
-    // KCB_DEBUG_EXIT;
-}
-
 void CFrmAdminInfo::on_pbDiscoverHardware_clicked()
 {
     // KCB_DEBUG_ENTRY;

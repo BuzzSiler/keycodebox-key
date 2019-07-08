@@ -279,10 +279,6 @@ void CSystemController::initializeReaders()
     connect(this, SIGNAL(__onQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserAnswers(QString,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserCancel()), &_securityController, SLOT(OnQuestionUserCancel()));
-<<<<<<< HEAD
-=======
-
->>>>>>> hotfix-1.19.2
 }
 
 void CSystemController::OnVerifyFingerprintDialog()

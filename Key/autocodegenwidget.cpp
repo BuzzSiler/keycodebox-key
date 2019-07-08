@@ -95,8 +95,6 @@ AutoCodeGenWidget::AutoCodeGenWidget(QWidget *parent) :
     InitAutoCode();
     InitControls();
 
-    connect(this, &AutoCodeGenWidget::NotifyUpdateCabinetConfig, this, &AutoCodeGenWidget::OnNotifyUpdateCabinetConfig);
-
     m_init = false;
     // KCB_DEBUG_EXIT;
 }
