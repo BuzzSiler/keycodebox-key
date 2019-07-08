@@ -17,8 +17,10 @@ class AutoCodeGenWidget : public QWidget
 {
     Q_OBJECT
     public:
-    explicit AutoCodeGenWidget(QWidget *parent = 0);
-    ~AutoCodeGenWidget();
+        explicit AutoCodeGenWidget(QWidget *parent = 0);
+        ~AutoCodeGenWidget();
+
+        void updateCabinetConfig();
 
     signals:
         void RequestCodes1(QStringList& codes);
@@ -59,6 +61,7 @@ class AutoCodeGenWidget : public QWidget
         void EnableAutoCode();
         void DisableAutoCode();
         void InitLockCabinet();
+        void InitAutoCode();
         void InitControls();
         void updateUi();
         void LoadAutoCodeSettings();

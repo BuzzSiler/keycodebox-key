@@ -145,6 +145,7 @@ int KeyCodeBoxSettings::getLocksPerCabinet(int cab_index)
 
 int KeyCodeBoxSettings::getTotalLocks()
 {
+    // KCB_DEBUG_ENTRY;
     int total = 0;
     getCabinetsInfo();
     if (m_cabinet_info.count() > 0)
@@ -155,6 +156,7 @@ int KeyCodeBoxSettings::getTotalLocks()
         }
     }
 
+    // KCB_DEBUG_EXIT;
     return total;
 }
 
@@ -676,4 +678,57 @@ void KeyCodeBoxSettings::EnableInternetTime()
 void KeyCodeBoxSettings::DisableInternetTime()
 {
     SetInternetTimeSetting(false);
+}
+
+bool KeyCodeBoxSettings::GetApplyAccessTypeToAllCodesSettings()
+{
+    // KCB_DEBUG_ENTRY;
+    JsonFromFile();
+
+    bool result = false;
+    
+    if (m_json_obj.contains("applyAccessTypeToAllCodes"))
+    {
+        result = m_json_obj["applyAccessTypeToAllCodes"].toBool();
+    }
+    else
+    {
+        SetApplyAccessTypeToAllCodesSettings(result);
+    }
+
+    // KCB_DEBUG_EXIT;
+    return result;
+}
+
+void KeyCodeBoxSettings::SetApplyAccessTypeToAllCodesSettings(bool value)
+{
+    // KCB_DEBUG_ENTRY;
+    JsonFromFile();
+
+    if (m_json_obj.contains("applyAccessTypeToAllCodes"))
+    {
+        m_json_obj["applyAccessTypeToAllCodes"] = QJsonValue(value);
+    }
+    else
+    {
+        m_json_obj.insert(QString("applyAccessTypeToAllCodes"), QJsonValue(value));
+    }
+    
+    JsonToFile();
+    // KCB_DEBUG_EXIT;
+}
+
+bool KeyCodeBoxSettings::IsApplyAccessTypeToAllCodes()
+{
+    return GetApplyAccessTypeToAllCodesSettings();
+}
+
+void KeyCodeBoxSettings::EnableApplyAccessTypeToAllCodes()
+{
+    SetApplyAccessTypeToAllCodesSettings(true);
+}
+
+void KeyCodeBoxSettings::DisableApplyAccessTypeToAllCodes()
+{
+    SetApplyAccessTypeToAllCodesSettings(false);
 }

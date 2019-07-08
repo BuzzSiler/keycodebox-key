@@ -118,9 +118,11 @@ bool CTblAdmin::createTable()
         }
         else 
         {
+            // KCB_DEBUG_TRACE("create successful");
             return true;
         }
     }
+    // KCB_DEBUG_TRACE("create failed");
     return false;
 }
 
@@ -159,7 +161,7 @@ bool CTblAdmin::createAdminDefault()
                             "32, "
                             ":smtp_server, :smtp_port, :smtp_type, :smtp_username, :smtp_password, "
                             "1, 0, '', "
-                            "5901, ':vnc_password', 0, :deletion,"
+                            "5901, :vnc_password, 0, :deletion,"
                             ":version)");
     qry.prepare(sql);
 
@@ -197,7 +199,7 @@ bool CTblAdmin::createAdminDefault()
 
     if( !qry.exec() ) 
     {
-        // KCB_DEBUG_TRACE(qry.lastError());
+        KCB_DEBUG_TRACE(qry.lastError());
         return false;
     }
     else 
@@ -253,7 +255,6 @@ bool CTblAdmin::readAdmin()
 
         if (query.next())
         {
-            // it exists
             _currentAdmin.setAdminName(query.value(fldAdmin_name).toString());
             _currentAdmin.setAdminEmail(query.value(fldAdmin_email).toString());
             _currentAdmin.setAdminPhone(query.value(fldAdmin_phone).toString());
@@ -297,10 +298,11 @@ bool CTblAdmin::readAdmin()
             _currentAdmin.setDefaultReportDeleteFreq( QDateTime::fromString(query.value(fldReportDeletion).toDateTime().toString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss"));
             
 
-
+            // KCB_DEBUG_EXIT;
             return true;
         }
     }
+    // KCB_DEBUG_EXIT;
     return false;
 }
 
@@ -642,17 +644,19 @@ bool CTblAdmin::getVersion()
 
 void CTblAdmin::populateAdminWithDefaults()
 {
+    // KCB_DEBUG_ENTRY;
     if (!readAdmin()) 
     {
-        KCB_DEBUG_TRACE("Failed to read admin table, creating defaults");
+        // KCB_DEBUG_TRACE("Failed to read admin table, creating defaults");
         if( createAdminDefault() ) 
         {
-            KCB_DEBUG_TRACE("Defaults created, reading admin");
+            // KCB_DEBUG_TRACE("Defaults created, reading admin");
             bool result = readAdmin();
             Q_UNUSED(result);
             // KCB_DEBUG_TRACE("readAdmin returned" << result);
         }
     }
+    // KCB_DEBUG_EXIT;
 }
 
 void CTblAdmin::updateAdminFromCommonFields(const QMap<QString, QString>& fieldValues)
@@ -790,6 +794,7 @@ QStringList CTblAdmin::getCommonFields()
 
 QMap<QString, QString> CTblAdmin::mergeCommonFields(const QStringList& fields)
 {
+    // KCB_DEBUG_ENTRY;
     QMap<QString, QString> commonFieldValues;
 
     // KCB_DEBUG_TRACE("Found" << fields.count() << "common fields");
@@ -804,6 +809,7 @@ QMap<QString, QString> CTblAdmin::mergeCommonFields(const QStringList& fields)
         createTable();
     }
 
+    // KCB_DEBUG_EXIT;
     return commonFieldValues;
 }
 
@@ -831,7 +837,7 @@ void CTblAdmin::initialize()
         }
         else
         {
-            // KCB_DEBUG_TRACE("Handling non-version table migration");
+            KCB_DEBUG_TRACE("Handling non-version table migration");
 
             QStringList commonFields = getCommonFields(); 
             QMap<QString, QString> commonFieldValues = mergeCommonFields(commonFields);           
@@ -845,4 +851,5 @@ void CTblAdmin::initialize()
         createTable();
         populateAdminWithDefaults();
     }
+    // KCB_DEBUG_EXIT;
 }

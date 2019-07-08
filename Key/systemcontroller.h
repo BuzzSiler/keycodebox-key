@@ -60,6 +60,7 @@ class CSystemController : public QObject
         void addCode(CLockState& state);
         void DiscoverHardware();
         void UpdateLockRanges();
+        void updateCodeSet(CLockSet& codeSet);
 
     signals:
         void __verifyUserAccess(QString sCode1);
@@ -131,6 +132,7 @@ class CSystemController : public QObject
         void __OnSendTestEmail(int select_type);
         void __OnUpdateCodes();
         void __OnAutoCodeEmail(const QString& key);
+        void __OnNotifyDetectHardwareComplete();
         
     public slots:
         void TrigQuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3) { emit __onQuestionUserDialog(lockNums, question1, question2, question3);}
@@ -221,7 +223,7 @@ class CSystemController : public QObject
 
         void OnUserCodeCancel();
 
-        void OnOpenLockRequest(QString lockNum);
+        void OnOpenLockRequest(QString lockNum, bool takePicture = false);
 
         void OnTouchScreenTouched();
         void resetCodeMessage();

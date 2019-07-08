@@ -1089,12 +1089,12 @@ bool CTblCodes::updateCode(CLockState *prec)
     
     if(prec->isMarkedForDeletion()) 
     {
-        KCB_DEBUG_TRACE("marked for deletion");
+        // KCB_DEBUG_TRACE("marked for deletion");
         return deleteCode(*prec);
     } 
     else if (prec->isMarkedForReset())
     {
-        KCB_DEBUG_TRACE("reset limited use");
+        // KCB_DEBUG_TRACE("reset limited use");
         return resetCodeLimitedUse(*prec);
     }
     else 
@@ -1125,7 +1125,7 @@ bool CTblCodes::updateCode(CLockState *prec)
         {
             if (prec->isModified())
             {
-                KCB_DEBUG_TRACE("update record");
+                // KCB_DEBUG_TRACE("update record");
                 updateRecord(*prec);
             }
         }
@@ -1135,7 +1135,7 @@ bool CTblCodes::updateCode(CLockState *prec)
     return true;
 }
 
-bool CTblCodes::updateCodeSet(CLockSet &codeSet)
+void CTblCodes::updateCodeSet(CLockSet &codeSet)
 {
     bool    bRC = true;
 
@@ -1147,7 +1147,7 @@ bool CTblCodes::updateCodeSet(CLockSet &codeSet)
     {
         int nRC = updateCode(itor.value());
         if(nRC == -1) 
-		{
+        {
             bRC = false;
         }
     }
@@ -1164,7 +1164,6 @@ bool CTblCodes::updateCodeSet(CLockSet &codeSet)
             // KCB_DEBUG_TRACE("committed successfully.");
         }
     }
-    return bRC;
 }
 
 bool CTblCodes::incrementAccessCount(int fids)

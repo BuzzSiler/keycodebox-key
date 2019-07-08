@@ -537,6 +537,26 @@
           </item>
          </widget>
         </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cbAccessTypeAllCodes">
+          <property name="text">
+           <string>Apply To All Codes</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>

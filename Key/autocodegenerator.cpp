@@ -358,6 +358,7 @@ QByteArray AutoCodeGenerator::SecureKeyFromJson(const QJsonObject& json, const Q
 
 QJsonObject AutoCodeGenerator::JsonFromSecureKey(const QByteArray& key, const QString& password)
 {
+    // KCB_DEBUG_ENTRY;
     QByteArray decoded_key = QByteArray::fromBase64(key);
     QByteArray hash = decoded_key.right(32);
     QByteArray cipher = decoded_key.left(decoded_key.count() - hash.count());
@@ -366,8 +367,10 @@ QJsonObject AutoCodeGenerator::JsonFromSecureKey(const QByteArray& key, const QS
     if (valid_hash)
     {
         QByteArray data = CEncryption::decryptWithKey(cipher, enckey);
+        // KCB_DEBUG_EXIT;
         return kcb::StringToJson(QString(data));
     }
+    // KCB_DEBUG_EXIT;
     return QJsonObject();
 }
 
