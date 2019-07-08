@@ -1441,15 +1441,68 @@ void CFrmAdminInfo::OnCodeEditReject()
     }
 }
 
+void CFrmAdminInfo::ApplyAccessTypeToAllCodes()
+{
+    // KCB_DEBUG_ENTRY;
+
+    int access_count = _pState->getAccessCount();
+    int retry_count = _pState->getRetryCount();
+    int max_access = _pState->getMaxAccess();
+    int max_retry = _pState->getMaxRetry();
+    int access_type = _pState->getAccessType();
+    QDateTime start_time = _pState->getStartTime();
+    QDateTime end_time = _pState->getEndTime();
+
+    CLockSet::Iterator itor;
+    CLockSet set;
+    set.clearSet();
+    CLockState *pstate;
+    for (itor = _pworkingSet->begin(); itor != _pworkingSet->end(); itor++)
+    {
+        pstate = itor.value();
+
+        //pstate->show();
+
+        if (pstate)
+        {
+            pstate->setAccessCount(access_count);
+            pstate->setRetryCount(retry_count);
+            pstate->setMaxAccess(max_access);
+            pstate->setMaxRetry(max_retry);
+            pstate->setAccessType(access_type);
+            pstate->setStartTime(start_time);
+            pstate->setEndTime(end_time);
+            pstate->setModified();
+
+            set.addToSet(pstate);
+        }
+    }
+
+    _psysController->updateCodeSet(set);
+
+    // KCB_DEBUG_EXIT;
+}
+
 void CFrmAdminInfo::OnCodeEditAccept()
 {
     // KCB_DEBUG_ENTRY;
     if (_pFrmCodeEditMulti)
     {
+        bool apply_access_to_all_codes;
         _pState->setAutoCode(AutoCodeGeneratorStatic::IsCode1Mode() || AutoCodeGeneratorStatic::IsCode2Mode());
-        _pFrmCodeEditMulti->getValues(_pState);
+        _pFrmCodeEditMulti->getValues(_pState, apply_access_to_all_codes);
         _pFrmCodeEditMulti->hide();
-        HandleCodeUpdate();
+
+        if (apply_access_to_all_codes)
+        {
+            ApplyAccessTypeToAllCodes();
+            on_btnReadCodes_clicked();
+        }
+        else
+        {
+            HandleCodeUpdate();
+        }
+        
     }
     // KCB_DEBUG_EXIT;
 }

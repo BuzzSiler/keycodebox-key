@@ -60,6 +60,7 @@ class CSystemController : public QObject
         void addCode(CLockState& state);
         void DiscoverHardware();
         void UpdateLockRanges();
+        void updateCodeSet(CLockSet& codeSet);
 
     signals:
         void __verifyUserAccess(QString sCode1);

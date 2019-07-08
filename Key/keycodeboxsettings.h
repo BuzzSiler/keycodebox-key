@@ -88,7 +88,9 @@ class KeyCodeBoxSettings : public QObject
         static bool IsInternetTimeEnabled();
         static void EnableInternetTime();
         static void DisableInternetTime();
-
+        static void EnableApplyAccessTypeToAllCodes();
+        static void DisableApplyAccessTypeToAllCodes();
+        static bool IsApplyAccessTypeToAllCodes();
 
     private:
         static QJsonObject m_json_obj;
@@ -106,6 +108,8 @@ class KeyCodeBoxSettings : public QObject
         static SelectionType GetLockSelectionType();
         static void SetInternetTimeSetting(bool value);
         static bool GetInternetTimeSetting();
+        static void SetApplyAccessTypeToAllCodesSettings(bool value);
+        static bool GetApplyAccessTypeToAllCodesSettings();
 
 };
 

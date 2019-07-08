@@ -267,3 +267,8 @@ void CSecurityController::updateCode2(const QString& lock, const QString& code)
 {
     _modelSecurity.updateCode2(lock, code);
 }
+
+void CSecurityController::updateCodeSet(CLockSet& codeSet)
+{
+    _modelSecurity.updateCodeSet(codeSet);
+}

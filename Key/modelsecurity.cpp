@@ -762,3 +762,8 @@ void CModelSecurity::updateCode2(const QString& lock, const QString& code)
 {
      _ptblCodes->updateCode2(lock, code);
 }
+
+void CModelSecurity::updateCodeSet(CLockSet& codeSet)
+{
+    _ptblCodes->updateCodeSet(codeSet);
+}

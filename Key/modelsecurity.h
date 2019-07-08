@@ -26,6 +26,7 @@ class CModelSecurity : public QObject
         void addCode(CLockState& state);
         void updateCode1(const QString& lock, const QString& code);
         void updateCode2(const QString& lock, const QString& code);
+        void updateCodeSet(CLockSet& codeSet);
 
     signals:
         void __QuestionUserDialog(QString lockNums, QString question1, QString question2, QString question3);

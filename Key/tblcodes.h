@@ -80,7 +80,7 @@ class CTblCodes
         void currentTimeFormat(QString format, QString strBuffer, int nExpectedLength);
 
         bool updateCode(CLockState *prec);
-        bool updateCodeSet(CLockSet &codeSet);
+        void updateCodeSet(CLockSet &codeSet);
 
         bool updateRecord(CLockState &rec);
         bool updateLockboxState(int fids, bool lockstate);

@@ -1331,3 +1331,9 @@ void CSystemController::OnNotifyAdminCancelled()
     _ptimer->start();
     // KCB_DEBUG_EXIT;
 }
+
+
+void CSystemController::updateCodeSet(CLockSet& codeSet)
+{
+    _securityController.updateCodeSet(codeSet);
+}

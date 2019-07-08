@@ -77,6 +77,8 @@ FrmCodeEditMulti::FrmCodeEditMulti(QWidget *parent) :
     updateCabinetConfig();
     OnLockSelectionChanged();
 
+    ui->cbAccessTypeAllCodes->setChecked(KeyCodeBoxSettings::IsApplyAccessTypeToAllCodes());
+
     updateUi();
     // KCB_DEBUG_EXIT;
 }
@@ -130,6 +132,7 @@ void FrmCodeEditMulti::setValues(CLockState * const state, const QStringList& co
     m_code_state.question2 = state->getQuestion2();
     m_code_state.question3 = state->getQuestion3();
     m_code_state.autocode = state->getAutoCode();
+    m_code_state.apply_to_all = KeyCodeBoxSettings::IsApplyAccessTypeToAllCodes();
 
     // Set up the UI based on current Lock State
     ui->edCode1->setText(m_code_state.code1);
@@ -168,7 +171,7 @@ void FrmCodeEditMulti::setValues(CLockState * const state, const QStringList& co
     // KCB_DEBUG_EXIT;
 }
 
-void FrmCodeEditMulti::getValues(CLockState * const state)
+void FrmCodeEditMulti::getValues(CLockState * const state, bool& apply_access_type_to_all)
 {
     state->setCode1(ui->edCode1->text());
     state->setCode2(ui->edCode2->text());
@@ -194,6 +197,8 @@ void FrmCodeEditMulti::getValues(CLockState * const state)
     m_initialized = false;
     m_codes1_in_use.clear();
     m_codes2_in_use.clear();
+
+    apply_access_type_to_all = ui->cbAccessTypeAllCodes->isChecked();
 }
 
 void FrmCodeEditMulti::updateAccessType(int index)
@@ -484,6 +489,7 @@ bool FrmCodeEditMulti::isModified()
                              m_code_state.question1 != m_questions[0] ||
                              m_code_state.question2 != m_questions[1] ||
                              m_code_state.question3 != m_questions[2];
+    bool apply_to_all_changed = m_code_state.apply_to_all != ui->cbAccessTypeAllCodes->isChecked();
 
     // KCB_DEBUG_TRACE("Code1 Changed" << code1_changed);
     // KCB_DEBUG_TRACE("FP Changed" << fp_changed);
@@ -496,7 +502,7 @@ bool FrmCodeEditMulti::isModified()
 
     return code1_changed || fp_changed || code2_changed || username_changed ||
            accesstype_changed || locks_changed || questions_changed ||
-           datetime_changed;
+           datetime_changed || apply_to_all_changed;
 }
 
 void FrmCodeEditMulti::disableCode2()
@@ -517,7 +523,7 @@ void FrmCodeEditMulti::disableQuestions()
 }
 
 void FrmCodeEditMulti::updateUi()
-{        
+{
     // Update exit condition
     // Rules:
     //    At minimum, Code 1 must specified and 1 or more locks must be selected
@@ -702,8 +708,7 @@ void FrmCodeEditMulti::on_pbCode2Random_clicked()
 
 void FrmCodeEditMulti::OnLockSelectionChanged()
 {
-    KCB_DEBUG_ENTRY;
-
+    // KCB_DEBUG_ENTRY;
     if (KeyCodeBoxSettings::IsLockSelectionSingle())
     {
         m_lock_cab.OnNotifySingleLockSelection();
@@ -716,7 +721,7 @@ void FrmCodeEditMulti::OnLockSelectionChanged()
     {
         m_lock_cab.OnNotifyDisableLockSelection();
     }
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void FrmCodeEditMulti::warn_no_locks_selected()
@@ -742,4 +747,16 @@ void FrmCodeEditMulti::warn_no_locks_selected()
             m_warn_no_locks_selected = !cb->isChecked();
         }
     }
+}
+void FrmCodeEditMulti::on_cbAccessTypeAllCodes_clicked()
+{
+    if (ui->cbAccessTypeAllCodes->isChecked())
+    {
+        KeyCodeBoxSettings::EnableApplyAccessTypeToAllCodes();
+    }
+    else
+    {
+        KeyCodeBoxSettings::DisableApplyAccessTypeToAllCodes();
+    }
+    updateUi();
 }
