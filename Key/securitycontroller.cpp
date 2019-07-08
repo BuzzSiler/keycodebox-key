@@ -8,10 +8,12 @@
 CSecurityController::CSecurityController(QObject *parent) : QObject(parent),
     _pSecurityUser(0)
 {
+    // KCB_DEBUG_ENTRY;
     initializeSignals();
 
     _modelSecurity.moveToThread(&_securityControlThread);
     _securityControlThread.start();
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::initializeSignals()
@@ -214,8 +216,10 @@ void CSecurityController::OnRequestCurrentAdmin()
 
 void CSecurityController::OnRequestedCurrentAdmin(CAdminRec *admin)
 {
+    // KCB_DEBUG_ENTRY;
     _pAdminRec = admin;
     emit __OnRequestedCurrentAdmin(admin);
+    // KCB_DEBUG_EXIT;
 }
 
 void CSecurityController::getAllCodes1(QStringList& codes1)
@@ -262,4 +266,9 @@ void CSecurityController::updateCode1(const QString& lock, const QString& code)
 void CSecurityController::updateCode2(const QString& lock, const QString& code)
 {
     _modelSecurity.updateCode2(lock, code);
+}
+
+void CSecurityController::updateCodeSet(CLockSet& codeSet)
+{
+    _modelSecurity.updateCodeSet(codeSet);
 }

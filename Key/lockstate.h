@@ -17,31 +17,31 @@ class CLockState : public QObject
 
         virtual int getID() { return _ids; }
         virtual void setID(int id) { _ids = id; }
-        virtual QString getSequence() { return _sequence; }    
+        virtual QString getSequence() { return _sequence; }
         virtual void setSequence(QString seq) { _sequence = seq; }
-        virtual int getSequenceOrder() { return _sequence_order; } 
+        virtual int getSequenceOrder() { return _sequence_order; }
         virtual void setSequenceOrder(int seqOrder) { _sequence_order = seqOrder; }
-        virtual QString getLockNums() { return _lock_nums; }    
+        virtual QString getLockNums() { return _lock_nums; }
         virtual void setLockNums(QString locks) { _lock_nums = locks; }
-        virtual QString getDescription() { return _description; }   
+        virtual QString getDescription() { return _description; }
         virtual void setDescription(QString desc) { _description = desc; }
-        virtual QString getCode1() { return _code1; }  
+        virtual QString getCode1() { return _code1; }
         virtual void setCode1(QString code) { _code1 = code; }
-        virtual QString getCode2() { return _code2; }  
+        virtual QString getCode2() { return _code2; }
         virtual void setCode2(QString code) { _code2 = code; }
-        virtual QDateTime getStartTime() { return _starttime; }   
+        virtual QDateTime getStartTime() { return _starttime; }
         virtual void setStartTime(QDateTime dt) { _starttime = dt; }
-        virtual QDateTime getEndTime() { return _endtime; } 
+        virtual QDateTime getEndTime() { return _endtime; }
         virtual void setEndTime(QDateTime dt) { _endtime = dt; }
-        virtual QString getStatus() { return _status; } 
+        virtual QString getStatus() { return _status; }
         virtual void setStatus(QString stat) { _status = stat; }
-        virtual int getAccessCount() { return _access_count; }   
+        virtual int getAccessCount() { return _access_count; }
         virtual void setAccessCount(int accessCount) { _access_count = accessCount; }
-        virtual int getRetryCount() { return _retry_count; } 
+        virtual int getRetryCount() { return _retry_count; }
         virtual void setRetryCount(int count) { _retry_count = count; }
-        virtual int getMaxAccess() { return _max_access; } 
+        virtual int getMaxAccess() { return _max_access; }
         virtual void setMaxAccess(int max) { _max_access = max; }
-        virtual int getMaxRetry() { return _max_retry; }  
+        virtual int getMaxRetry() { return _max_retry; }
         virtual void setMaxRetry(int max) { _max_retry = max; }
 
         virtual bool isNew() { return _bIsNew; }

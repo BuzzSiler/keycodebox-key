@@ -92,22 +92,7 @@ AutoCodeGenWidget::AutoCodeGenWidget(QWidget *parent) :
     ui->pgbAutoCodeCommit->setVisible(false);
 
     InitLockCabinet();
-
-    if (AutoCodeGeneratorStatic::IsEnabled())
-    {
-        EnableAutoCode();
-
-        AutoCodeGenerator::CodeMap map;
-        map = ProcessCommittedAutoCodeSettings(map);
-        map = ProcessEnabledAutoCodeSettings(map);
-        
-        m_lock_cabinet.setLockDisplay(map);
-    }
-    else
-    {
-        DisableAutoCode();
-    }
-
+    InitAutoCode();
     InitControls();
 
     connect(this, &AutoCodeGenWidget::NotifyUpdateCabinetConfig, this, &AutoCodeGenWidget::OnNotifyUpdateCabinetConfig);
@@ -194,11 +179,32 @@ void AutoCodeGenWidget::ShowQrCode(const QString& data)
 
 void AutoCodeGenWidget::InitLockCabinet()
 {
+    // KCB_DEBUG_ENTRY;
     m_lock_cabinet.OnNotifyDisableLockSelection();
+    // KCB_DEBUG_EXIT;
+}
+
+void AutoCodeGenWidget::InitAutoCode()
+{
+    if (AutoCodeGeneratorStatic::IsEnabled())
+    {
+        EnableAutoCode();
+
+        AutoCodeGenerator::CodeMap map;
+        map = ProcessCommittedAutoCodeSettings(map);
+        map = ProcessEnabledAutoCodeSettings(map);
+        
+        m_lock_cabinet.setLockDisplay(map);
+    }
+    else
+    {
+        DisableAutoCode();
+    }
 }
 
 void AutoCodeGenWidget::InitControls()
 {
+    m_lock_cabinet.disableAllLocks();
     ui->vloAutoCodeActiveCodes->addWidget(&m_lock_cabinet);
     ui->pbAutoCodeGenerate->setDisabled(true);
     ui->pbAutoCodeCommit->setDisabled(true);
@@ -235,6 +241,7 @@ void AutoCodeGenWidget::on_cbAutoCodeMode_currentIndexChanged(int index)
 
 void AutoCodeGenWidget::EnableAutoCode()
 {
+    // KCB_DEBUG_ENTRY;
     KeyCodeBoxSettings::EnableAutoCode();
     LoadAutoCodeSettings();
     ui->gbAutoCodeEnableDisable->setTitle("Enabled");
@@ -244,6 +251,7 @@ void AutoCodeGenWidget::EnableAutoCode()
     ui->cbAutoCodeMode->setEnabled(true);
     emit NotifyDisableLockSelection();
     emit NotifyAutoCodeEnabled();
+    // KCB_DEBUG_EXIT;
 }
 
 void AutoCodeGenWidget::DisableAutoCode()
@@ -440,10 +448,12 @@ void AutoCodeGenWidget::on_pbAutoCodeCommit_clicked()
 
 void AutoCodeGenWidget::OnLockSelectionChanged()
 {
+    // KCB_DEBUG_ENTRY;
     if (AutoCodeGeneratorStatic::IsEnabled())
     {
         m_lock_cabinet.OnNotifyDisableLockSelection();
     }
+    // KCB_DEBUG_EXIT;
 }
 
 bool AutoCodeGenWidget::WarnAutoCodeEnable()
@@ -671,9 +681,11 @@ void AutoCodeGenWidget::UpdateCodes()
     // KCB_DEBUG_EXIT;
 }
 
-void AutoCodeGenWidget::OnNotifyUpdateCabinetConfig()
+void AutoCodeGenWidget::updateCabinetConfig()
 {
     // KCB_DEBUG_ENTRY;
+    InitAutoCode();
     m_lock_cabinet.updateCabinetConfig();
+    m_lock_cabinet.disableAllLocks();
     // KCB_DEBUG_EXIT;
 }

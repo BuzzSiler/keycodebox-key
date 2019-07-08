@@ -25,7 +25,7 @@ class FrmCodeEditMulti : public QDialog
         ~FrmCodeEditMulti();
 
         void setValues(CLockState * const state, const QStringList& codes1_in_use, const QStringList& codes2_in_use);
-        void getValues(CLockState * const state);
+        void getValues(CLockState * const state, bool& apply_access_type_to_all);
         void updateCabinetConfig();
         
     signals:
@@ -55,7 +55,9 @@ class FrmCodeEditMulti : public QDialog
         void on_pbCode1Random_clicked();
         void on_pbCode2Random_clicked();
 
-    private:
+        void on_cbAccessTypeAllCodes_clicked();
+
+private:
         typedef struct _tag_code_state
         {
             QString code1;
@@ -73,6 +75,7 @@ class FrmCodeEditMulti : public QDialog
             quint8 access_type;
             QString locks;
             bool autocode;
+            bool apply_to_all;
         } CODE_STATE;
 
         QVector<QString> m_questions;

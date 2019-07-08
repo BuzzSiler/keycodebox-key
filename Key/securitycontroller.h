@@ -35,6 +35,7 @@ class CSecurityController : public QObject
         void addCode(CLockState& state);
         void updateCode1(const QString& lock, const QString& code);
         void updateCode2(const QString& lock, const QString& code);
+        void updateCodeSet(CLockSet& codeSet);
 
         QString getLastCodeOne() { return _sCode1; }
         QString getLastCodeTwo() { return _sCode2; }

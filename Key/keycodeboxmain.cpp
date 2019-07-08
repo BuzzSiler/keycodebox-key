@@ -30,7 +30,6 @@ MainWindow      *gpmainWindow;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _psystemController(new CSystemController(this)),
     kkd(*new KcbKeyboardDialog(this, true))
 {
     ui->setupUi(this);
@@ -82,7 +81,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // architecture, we are stuck passing 'this' in order to make things work.
     _psystemController = new CSystemController(this);
 
-
     connect(_psystemController, SIGNAL(__OnDisplayCodeDialog(QObject*)), this, SLOT(OnDisplayCodeDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayUserCodeTwoDialog(QObject*)), this, SLOT(OnDisplayUserCodeTwoDialog(QObject*)));
     connect(_psystemController, SIGNAL(__OnDisplayAdminPasswordDialog(QObject*)), this, SLOT(OnDisplayAdminPasswordDialog(QObject*)));
@@ -114,8 +112,8 @@ MainWindow::MainWindow(QWidget *parent) :
     gpmainWindow = this;
 
     _psystemController->moveToThread(&_sysControlThread);
-    SetupAdmin(_psystemController);
     _sysControlThread.start();
+    SetupAdmin(_psystemController);
 
     kcb::TurnOnDisplay();
 }
@@ -129,13 +127,14 @@ void MainWindow::SetupAdmin(QObject *psysController)
         _pfAdminInfo->hide();
         _pfAdminInfo->setSystemController((CSystemController*)psysController);
     }
-    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(QString)), _psystemController, SLOT(OnOpenLockRequest(QString)));
+    connect(_pfAdminInfo, SIGNAL(__OnOpenLockRequest(QString, bool)), _psystemController, SLOT(OnOpenLockRequest(QString, bool)));
     connect(_psystemController, SIGNAL(__onUserCodes(QString,QString)), _pfAdminInfo, SLOT(OnCodes(QString, QString)));
     connect(_pfAdminInfo, SIGNAL(__OnSendTestEmail(int)), _psystemController, SLOT(OnSendTestEmail(int)));
     connect(_psystemController, SIGNAL(__OnDisplayFingerprintButton(bool)), _pfAdminInfo, SLOT(OnDisplayFingerprintButton(bool)));
     connect(_psystemController, SIGNAL(__OnDisplayShowHideButton(bool)), _pfAdminInfo, SLOT(OnDisplayShowHideButton(bool)));
     connect(_psystemController, SIGNAL(__OnDisplayTakeReturnButtons(bool)), _pfAdminInfo, SLOT(OnDisplayTakeReturnButtons(bool)));
     connect(_psystemController, SIGNAL(__OnUpdateCodes()), _pfAdminInfo, SLOT(OnUpdateCodes()));
+    connect(_psystemController, SIGNAL(__OnNotifyDetectHardwareComplete()), _pfAdminInfo, SLOT(OnNotifyUpdateCabinetConfig()));
     // KCB_DEBUG_EXIT;
 }
 

@@ -24,6 +24,7 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
     m_timer(* new QTimer(this)),
     ui(new Ui::SelectLocksWidget)
 {
+    // KCB_DEBUG_ENTRY;
     ui->setupUi(this);
 
     ui->lblTimeRemaining->setVisible(false);
@@ -43,6 +44,7 @@ SelectLocksWidget::SelectLocksWidget(QWidget *parent, Role role) :
 
     m_lock_cab.OnNotifyMultiLockSelection();
     ui->gbSelectedLocks->setVisible(true);
+    // KCB_DEBUG_EXIT;
 }
 
 SelectLocksWidget::~SelectLocksWidget()
@@ -54,7 +56,9 @@ SelectLocksWidget::~SelectLocksWidget()
 void SelectLocksWidget::updateCabinetConfig()
 {
     // KCB_DEBUG_ENTRY;
+    m_lock_cab.setLockDisplay();
     m_lock_cab.updateCabinetConfig();
+    m_lock_cab.OnNotifyMultiLockSelection();
     // KCB_DEBUG_EXIT;
 }
 
@@ -266,7 +270,6 @@ void SelectLocksWidget::update()
     if (m_timeout == 0)
     {
         ui->lblTimeRemaining->setStyleSheet("color: black");
-        //ui->lblTimeRemaining->setText(QString::number(30));
         emit NotifyTimeout();
     }
 
