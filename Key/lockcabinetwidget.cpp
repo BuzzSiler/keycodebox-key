@@ -199,34 +199,37 @@ void LockCabinetWidget::setSelectedLocks(QString locks)
     }
 
     QVector<QString> locks_vtr;
-    int  cab_index;
+    int cab_index;
     int lock_index;
 
     clrAllLocks();
     StringToVector(locks, locks_vtr);
 
-    int first_cabinet = -1;
-    foreach (auto lock, locks_vtr)
+    int first_cabinet = 0;
+    if (locks_vtr.count() > 0)
     {
-        CalcLockCabIndecies(lock, cab_index, lock_index);
-        if (cab_index >= 0 && lock_index >= 0)
+        foreach (auto lock, locks_vtr)
         {
-            m_cabs[cab_index].states[lock_index] = true;
-            AddLockToSelected(lock);
-            if (first_cabinet < 0)
+            CalcLockCabIndecies(lock, cab_index, lock_index);
+            if (cab_index >= 0 && lock_index >= 0)
             {
-                first_cabinet = cab_index;
+                m_cabs[cab_index].states[lock_index] = true;
+                AddLockToSelected(lock);
             }
-            else
-            {
-                first_cabinet = qMin(first_cabinet, cab_index);
-            }
-            
         }
+
+        // Convert QVector<QString> -> QVector<int>
+        QVector<int> locks_vtr_int;
+        foreach (auto l, locks_vtr)
+        {
+            locks_vtr_int.append(l.toInt());
+        }
+
+        int first_lock = *std::min_element(locks_vtr_int.begin(), locks_vtr_int.end());
+        CalcLockCabIndecies(QString::number(first_lock), first_cabinet, lock_index);
     }
 
     ui->cbSelectedCabinet->setCurrentIndex(first_cabinet);
-
     updateUi();
     // KCB_DEBUG_EXIT;
 }
