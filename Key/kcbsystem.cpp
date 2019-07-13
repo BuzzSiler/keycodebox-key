@@ -982,6 +982,7 @@ namespace kcb
         std::system("sudo /etc/init.d/ntp stop");
         std::system("sudo ntpd -s");
         std::system("sudo /etc/init.d/ntp start");
+        KCB_DEBUG_TRACE("Internet time enabled");
 
         // The following code works with systemd via timedatectl
         // See this thread and kcb-config/scripts/kcb-ntpsetup.sh
@@ -995,15 +996,16 @@ namespace kcb
     {
         std::system("sudo /etc/init.d/ntp stop");
         // std::system("sudo timedatectl set-ntp false");
+        KCB_DEBUG_TRACE("Internet time disabled");
     }
 
     void SetDateTime(const QDateTime& datetime)
     {
-        QString updateTime = "sudo ntpq -p";
-        QString sysDate("sudo date %1");
-        sysDate.arg(datetime.toString("MMddhhmmyyyy.ss"));
+        QString sysDate("sudo date " + datetime.toString("MMddhhmmyyyy.ss"));
+        KCB_DEBUG_TRACE("Date/Time Update" << sysDate);
         std::system(sysDate.toStdString().c_str());
         std::system("sudo hwclock --systohc");
+        KCB_DEBUG_TRACE("Date/Time committed to RTC");
     }
 
     void SetTimeZone(const QString& timezone)
@@ -1012,5 +1014,6 @@ namespace kcb
         QString link = QString("sudo ln -s /usr/share/zoneinfo/%1 %2").arg(timezone).arg(QString(" /etc/localtime"));
         std::system(unlink.toStdString().c_str());
         std::system(link.toStdString().c_str());
+        KCB_DEBUG_TRACE("Timezone set");
     }
 }
