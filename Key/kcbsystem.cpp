@@ -55,6 +55,7 @@ namespace kcb
 
     static QString const BASE_DHCPCD_SETTINGS("hostname\n"
                                 "persistent\n"
+                                "clientid\n"
                                 "option rapid_commit\n"
                                 "option domain_name_servers, domain_name, domain_search, host_name\n"
                                 "option classless_static_routes\n"
