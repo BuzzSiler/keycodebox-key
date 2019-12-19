@@ -89,6 +89,51 @@ bool KeyCodeBoxSettings::isFleetwaveEnabled()
     return value;
 }
 
+uint16_t KeyCodeBoxSettings::validateNumLocks(int value)
+{
+    // The minimum number of locks per cabinet is 8
+    // Note: It has been observed that the number of locks settings was corrupted to be -8
+    // 8 was the correct value.  On the off chance there is a corrupt force a negative number
+    // we'll try to just remove the sign bit by negating if less than zero.
+    // Ultimately, the min check will force any large number to be 32 or less.  While that may
+    // cause start/stop to be incorrect, it should eliminate catestrophic errors upstream.
+    uint16_t num_locks = 8;
+    if (value < 0)
+    {
+        value = -value;
+        KCB_WARNING_TRACE("Invalid valid number of locks detected, compensating");
+    }
+    num_locks = static_cast<uint16_t>(value);
+    return qMin(num_locks, static_cast<uint16_t>(MAX_NUM_LOCKS_PER_CABINET));
+}
+
+QPair<uint16_t, uint16_t> KeyCodeBoxSettings::validateStartStop(int start, int stop, uint16_t num_locks, uint16_t total_locks)
+{
+    // start and stop must be positive
+    if (start < 0)
+    {
+        start = -start;
+        KCB_WARNING_TRACE("Invalid valid lock start detected, compensating");
+    }
+    if (stop < 0)
+    {
+        stop = -stop;
+        KCB_WARNING_TRACE("Invalid valid lock stop detected, compensating");
+    }
+    // start/stop are no longer negative but they may be too large
+    uint16_t start_value = qMin(total_locks, static_cast<uint16_t>(start));
+    uint16_t stop_value = qMin(total_locks, static_cast<uint16_t>(stop));
+    bool invalid_start_stop = (stop_value - start_value + 1) != num_locks;
+    if (invalid_start_stop)
+    {
+        start_value = 1;
+        stop_value = num_locks;
+        KCB_WARNING_TRACE("Invalid valid lock start/stop detected, compensating");
+    }
+
+    return QPair<uint16_t, uint16_t>(start_value, stop_value);
+}
+
 CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
 {
     // KCB_DEBUG_ENTRY;
@@ -98,17 +143,21 @@ CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
 
     //KCB_DEBUG_TRACE("cabArray count" << cabArray.count());
 
-    #define NULL_CABINET_INFO { "", 0, -1, -1, "", 0}
     m_cabinet_info.clear();
+    uint16_t total_num_locks = 0;
 
     foreach (auto elem, cabArray)
     {
         QJsonObject obj = elem.toObject();
 
-        CABINET_INFO cab_info = { obj["model"].toString(), 
-                                  obj["num_locks"].toInt(), 
-                                  obj["start"].toInt(), 
-                                  obj["stop"].toInt(),
+        uint16_t num_locks = validateNumLocks(obj["num_locks"].toInt());
+        total_num_locks += num_locks;
+        auto start_stop = validateStartStop(obj["start"].toInt(), obj["stop"].toInt(), num_locks, total_num_locks);
+
+        CABINET_INFO cab_info = { obj["model"].toString(),
+                                  num_locks,
+                                  start_stop.first,
+                                  start_stop.second,
                                   obj["sw_version"].toString(),
                                   obj["addr"].toString() };
         //KCB_DEBUG_TRACE(cab_info.model << cab_info.num_locks << cab_info.start << cab_info.stop << cab_info.sw_version << cab_info.addr);
@@ -179,10 +228,23 @@ void KeyCodeBoxSettings::AddCabinet(CABINET_INFO const &cab)
 {
     // KCB_DEBUG_ENTRY;
     QJsonObject cabinet;
+
+    bool invalid_start_stop = (cab.stop - cab.start + 1) != cab.num_locks;
+    bool invalid_num_locks = cab.num_locks > MAX_NUM_LOCKS_PER_CABINET;
+    uint16_t start = cab.start;
+    uint16_t stop = cab.stop;
+    uint16_t num_locks = cab.num_locks;
+    if (invalid_start_stop || invalid_num_locks)
+    {
+        start = 1;
+        stop = static_cast<uint16_t>(MAX_NUM_LOCKS_PER_CABINET);
+        num_locks = static_cast<uint16_t>(MAX_NUM_LOCKS_PER_CABINET);
+    }
+
     cabinet.insert(QString("model"), QJsonValue(cab.model));
-    cabinet.insert(QString("num_locks"), QJsonValue(cab.num_locks));
-    cabinet.insert(QString("start"), QJsonValue(cab.start));
-    cabinet.insert(QString("stop"), QJsonValue(cab.stop));
+    cabinet.insert(QString("num_locks"), QJsonValue(num_locks));
+    cabinet.insert(QString("start"), QJsonValue(start));
+    cabinet.insert(QString("stop"), QJsonValue(stop));
     cabinet.insert(QString("sw_version"), QJsonValue(cab.sw_version));
     cabinet.insert(QString("addr"), QJsonValue(cab.addr));
 

@@ -110,6 +110,8 @@ class KeyCodeBoxSettings : public QObject
         static bool GetInternetTimeSetting();
         static void SetApplyAccessTypeToAllCodesSettings(bool value);
         static bool GetApplyAccessTypeToAllCodesSettings();
+        static uint16_t validateNumLocks(int value);
+        static QPair<uint16_t, uint16_t> validateStartStop(int start, int stop, uint16_t num_locks, uint16_t total_locks);
 
 };
 
