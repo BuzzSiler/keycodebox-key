@@ -1650,6 +1650,7 @@ void CFrmAdminInfo::setTableMenuLocation(QMenu *pmenu)
 
 void CFrmAdminInfo::OnRowSelected(int row, int column) 
 {
+    Q_UNUSED(column);
     _nRowSelected = row;
     updateCodeTableContextMenu();
     _pTableMenu->show();
