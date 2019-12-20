@@ -63,11 +63,22 @@ const QString USER_CODE_FLEETWAVE_PROMPT = QString("<%1>").arg(QObject::tr("Plea
 const QString USER_CODE_PROMPT = QString("<%1 #1>").arg(QObject::tr("Please Enter Code"));
 const QString USER_CODE_CODE2_PROMPT = QString("<%1>").arg(QObject::tr("Please Enter Second Code"));
 
-const QString KCB_IMAGE_PATH = QString("/home/pi/kcb-config/images");
 
 #define REPORT_FILE_FORMAT "yyyy-MM-dd-HH_mm_ss"
 
 
 typedef enum { EMAIL_ADMIN_RECV, EMAIL_ADMIN_SEND, EMAIL_INVALID } EMAIL_ADMIN_SELECT;
+
+QString const KCB_HOME_ROOT("/home/pi");
+QString const KCB_CONFIG_ROOT(KCB_HOME_ROOT+"/kcb-config");
+QString const KCB_IMAGE_PATH(KCB_CONFIG_ROOT + "/images");
+QString const KCB_BRANDING_IMAGE(KCB_IMAGE_PATH + "/kcbbranding.jpg");
+QString const KCB_DEFAULT_IMAGE(KCB_IMAGE_PATH + "/kcbdefault.jpg");
+QString const KCB_INIT_IMAGE(KCB_IMAGE_PATH + "/kcbinit.jpg");
+QString const KCB_LOGS_PATH(KCB_CONFIG_ROOT + "/logs");
+
+QString const KCBCONFIG_LOGS_PATH = KCB_CONFIG_ROOT+"/logs";
+QString const KCBCONFIG_SCRIPTS_PATH = KCB_CONFIG_ROOT+"/scripts";
+
 
 #endif

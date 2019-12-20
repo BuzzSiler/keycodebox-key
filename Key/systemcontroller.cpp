@@ -419,8 +419,6 @@ void CSystemController::initializeLockController()
     // KCB_DEBUG_ENTRY;
     connect(&_LockController, &CLockController::DiscoverHardwareProgressUpdate, this, &CSystemController::DiscoverHardwareProgressUpdate);
     _LockController.initController();
-    _LockController.detectHardware();
-    emit __OnNotifyDetectHardwareComplete();
     // KCB_DEBUG_EXIT;
 }
 
