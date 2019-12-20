@@ -279,7 +279,6 @@ void CSystemController::initializeReaders()
     connect(this, SIGNAL(__onQuestionUser(QString,QString,QString,QString)), this, SLOT(TrigQuestionUserDialog(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserAnswers(QString,QString,QString,QString)), &_securityController, SLOT(OnQuestionUserAnswers(QString,QString,QString,QString)));
     connect(this, SIGNAL(__onQuestionUserCancel()), &_securityController, SLOT(OnQuestionUserCancel()));
-
 }
 
 void CSystemController::OnVerifyFingerprintDialog()
@@ -1332,8 +1331,8 @@ void CSystemController::OnNotifyAdminCancelled()
     // KCB_DEBUG_EXIT;
 }
 
-
 void CSystemController::updateCodeSet(CLockSet& codeSet)
 {
     _securityController.updateCodeSet(codeSet);
 }
+
