@@ -47,18 +47,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _pscene = new QGraphicsScene(this);
     ui->graphicsView->setScene(_pscene);
-    _pPixmap = new QPixmap("/home/pi/kcb-config/images/alpha_logo.jpg");
 
-    if( _pPixmap->isNull() )
-    {
-        KCB_DEBUG_TRACE("Loading default branding image");
+    _pPixmap = new QPixmap(KCB_BRANDING_IMAGE);
 
-        _pPixmap = new QPixmap("/home/pi/kcb-config/images/alpha_logo_touch.jpg");
-        if(_pPixmap->isNull()) 
-        {
-            KCB_DEBUG_TRACE("Failed to load default branding image");
-        }
-    }
 
     // Scale the image...
     _pPixmapItem = new CClickableGraphicsItem(_pPixmap->scaled(ag.width(), ag.height()));
