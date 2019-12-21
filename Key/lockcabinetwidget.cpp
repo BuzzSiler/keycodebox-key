@@ -102,9 +102,8 @@ void LockCabinetWidget::updateCabinetConfig()
 
     // Note: Clearing the contents of a combo box has side effect which sets m_current_cab = -1 (invalid index)
     ui->cbSelectedCabinet->clear();
-    ui->cbSelectedCabinet->setEnabled(true);
+    ui->cbSelectedCabinet->setEnabled(false);
 
-    m_num_cabs = m_cabinet_info.size();
     m_cabs.resize(m_num_cabs);
 
     for (int ii = 0; ii < m_cabs.length(); ++ii)
@@ -509,9 +508,9 @@ void LockCabinetWidget::InitLockNameMap()
 void LockCabinetWidget::updateUi()
 {
     // KCB_DEBUG_ENTRY;
-    if (m_current_cab < 0)
+    if (!m_is_configured)
     {
-        KCB_DEBUG_TRACE("invalid cabinet index");
+        KCB_DEBUG_TRACE("cabinet configuration not ready");
         return;
     }
     
@@ -544,9 +543,9 @@ void LockCabinetWidget::updateUi()
 void LockCabinetWidget::selectClearAllLocks(bool select_clear)
 {
     // KCB_DEBUG_ENTRY;
-    if (m_current_cab < 0)
+    if (!m_is_configured)
     {
-        KCB_WARNING_TRACE("invalid cabinet index");
+        KCB_DEBUG_TRACE("cabinet configuration not ready");
         return;
     }
     

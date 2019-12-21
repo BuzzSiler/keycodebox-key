@@ -1223,9 +1223,9 @@ void CSystemController::readAllCodes(CLockSet **lockset, bool clear_or_encrypted
 
 void CSystemController::DiscoverHardware()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     _LockController.detectHardware();
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CSystemController::UpdateLockRanges()

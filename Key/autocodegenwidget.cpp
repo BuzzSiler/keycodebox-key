@@ -327,7 +327,7 @@ void AutoCodeGenWidget::UpdateAutoCodeParams()
 
 void AutoCodeGenWidget::on_pbAutoCodeGenerate_clicked()
 {
-    DisplayParams(m_params);
+    // DisplayParams(m_params);
     if (ui->leAutoCodePassword->text().isEmpty())
     {
         (void) QMessageBox::warning(this,

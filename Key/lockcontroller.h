@@ -69,7 +69,7 @@ class CLockController : public QObject
 
         uint16_t ReadSoftwareVersion(uint16_t addr);
         QString SoftwareVersionToString(uint16_t version);
-        uint64_t inquireLockStatus();
+        void inquireLockStatus();
 
     protected:
         enum class RESPONSE { OPEN_LOCK, READ_EEPROM };

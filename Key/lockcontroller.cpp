@@ -217,7 +217,6 @@ void CLockController::LocateMaster()
         stop += 32;
     }
     UpdateDetectProgress();
-
 }
 
 QByteArray CLockController::SendCommand(QByteArray &cmd)
@@ -514,7 +513,7 @@ uint16_t CLockController::ReadEeprom(uint16_t addr, uint16_t offset)
         return value;
     }
 
-    KCB_DEBUG_TRACE("Invalid response");
+    KCB_DEBUG_TRACE("Invalid response" << command.toHex() << response.toHex());
     return 0;
 
     // KCB_DEBUG_EXIT;
@@ -613,11 +612,10 @@ std::string CLockController::readCommandResponse()
 }
 
 
-uint64_t CLockController::inquireLockStatus()
+void CLockController::inquireLockStatus()
 {
     // KCB_DEBUG_ENTRY;
 
-    // Get the cabinet info from the configuration
     CABINET_VECTOR cabs = KeyCodeBoxSettings::getCabinetsInfo();
 
     int success_count = 0;
@@ -641,20 +639,19 @@ uint64_t CLockController::inquireLockStatus()
     if (success_count == cabs.count())
     {
         KCB_DEBUG_TRACE("configured cabinets successfully queried");
-        return 0;
     }
     else
     {
         KCB_CRITICAL_TRACE("failure communicating with configured cabinets");
-        return 1;
     }
-
 }
 
 void CLockController::UpdateDetectProgress()
 {
+    // KCB_DEBUG_ENTRY;
     emit DiscoverHardwareProgressUpdate(update_status);
     update_status += 7;
+    // KCB_DEBUG_EXIT;
 }
 
 void CLockController::detectHardware()

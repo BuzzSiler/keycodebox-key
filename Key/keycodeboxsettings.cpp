@@ -197,11 +197,13 @@ int KeyCodeBoxSettings::getTotalLocks()
     // KCB_DEBUG_ENTRY;
     int total = 0;
     getCabinetsInfo();
+    // KCB_DEBUG_TRACE("cab count" << m_cabinet_info.count());
     if (m_cabinet_info.count() > 0)
     {
         foreach (const auto cab, m_cabinet_info)
         {
             total += cab.num_locks;
+            // KCB_DEBUG_TRACE("lock count" << total);
         }
     }
 
