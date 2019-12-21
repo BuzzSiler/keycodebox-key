@@ -644,6 +644,8 @@ void CLockController::inquireLockStatus()
     {
         KCB_CRITICAL_TRACE("failure communicating with configured cabinets");
     }
+
+    // KCB_DEBUG_EXIT;
 }
 
 void CLockController::UpdateDetectProgress()

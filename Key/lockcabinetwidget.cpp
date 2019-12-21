@@ -90,13 +90,13 @@ void LockCabinetWidget::updateCabinetConfig()
         KCB_DEBUG_TRACE("No cabinet info found, clearing display");
         clrAllLocks();
         disableAllLocks();
-        m_num_cabs = m_cabinet_info.size();
-        m_cabs.resize(m_num_cabs);
+        m_num_cabs = 0;
+        m_cabs.empty();
         m_current_cab = -1;
         ui->cbSelectedCabinet->setEnabled(false);
         // Note: Clearing the contents of a combo box has side effect which sets m_current_cab = -1 (invalid index)
         ui->cbSelectedCabinet->clear();
-        // KCB_DEBUG_EXIT;
+        KCB_DEBUG_EXIT;
         return;
     }
 
@@ -104,6 +104,7 @@ void LockCabinetWidget::updateCabinetConfig()
     ui->cbSelectedCabinet->clear();
     ui->cbSelectedCabinet->setEnabled(false);
 
+    m_num_cabs = m_cabinet_info.count();
     m_cabs.resize(m_num_cabs);
 
     for (int ii = 0; ii < m_cabs.length(); ++ii)
