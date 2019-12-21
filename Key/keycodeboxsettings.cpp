@@ -141,7 +141,7 @@ CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
 
     QJsonArray cabArray = m_json_obj["cabinets"].toArray();
 
-    //KCB_DEBUG_TRACE("cabArray count" << cabArray.count());
+    // KCB_DEBUG_TRACE("cabArray count" << cabArray.count());
 
     m_cabinet_info.clear();
     uint16_t total_num_locks = 0;
@@ -160,7 +160,7 @@ CABINET_VECTOR KeyCodeBoxSettings::getCabinetsInfo()
                                   start_stop.second,
                                   obj["sw_version"].toString(),
                                   obj["addr"].toString() };
-        //KCB_DEBUG_TRACE(cab_info.model << cab_info.num_locks << cab_info.start << cab_info.stop << cab_info.sw_version << cab_info.addr);
+        // KCB_DEBUG_TRACE(cab_info.model << cab_info.num_locks << cab_info.start << cab_info.stop << cab_info.sw_version << cab_info.addr);
 
         m_cabinet_info.append(cab_info);
     }
@@ -698,7 +698,7 @@ bool KeyCodeBoxSettings::GetInternetTimeSetting()
     JsonFromFile();
 
     bool result = false;
-    
+
     if (m_json_obj.contains("internetTime"))
     {
         result = m_json_obj["internetTime"].toBool();
@@ -748,7 +748,7 @@ bool KeyCodeBoxSettings::GetApplyAccessTypeToAllCodesSettings()
     JsonFromFile();
 
     bool result = false;
-    
+
     if (m_json_obj.contains("applyAccessTypeToAllCodes"))
     {
         result = m_json_obj["applyAccessTypeToAllCodes"].toBool();
@@ -775,7 +775,7 @@ void KeyCodeBoxSettings::SetApplyAccessTypeToAllCodesSettings(bool value)
     {
         m_json_obj.insert(QString("applyAccessTypeToAllCodes"), QJsonValue(value));
     }
-    
+
     JsonToFile();
     // KCB_DEBUG_EXIT;
 }

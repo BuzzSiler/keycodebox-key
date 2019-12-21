@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include "autocodegenerator.h"
 
 #include <random>
