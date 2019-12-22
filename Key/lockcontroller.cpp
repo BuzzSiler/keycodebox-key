@@ -21,6 +21,8 @@
 #define SEND_MSG_ON_REVERSE_LOOP 0x40
 #define SEND_MSG_ON_FORWARD_LOOP 0x80
 
+
+
 union inttohex_t {
     struct {
         unsigned char byte_low;
