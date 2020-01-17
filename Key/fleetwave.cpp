@@ -2,11 +2,9 @@
 #include "kcbcommon.h"
 #include "kcbsystem.h"
 
-#include <QProcess>
-
 namespace fleetwave
 {
-    static const QString CHEVIN_SCRIPT = QString("/home/pi/kcb-config/scripts/chevin.py");
+    static const QString CHEVIN_SCRIPT = QString(KCB_SCRIPTS_PATH+"/chevin.py");
 
     static bool isValidLock(QString lock)
     {
@@ -35,30 +33,28 @@ namespace fleetwave
         arguments << QString("take");
         arguments << QString("request");
         arguments << QString("%1").arg(code);
-        QString stdOut;
-        QString stdErr;
-        int status;
         bool result;
 
-        kcb::ExecuteCommand(program, arguments, stdOut, stdErr, status);
-        if (stdOut == "failed" || status == QProcess::CrashExit)
+        auto status = kcb::ExecuteCommand(program, arguments);
+        if (status.stdOut == "failed" || status.exitCode < 0)
         {
             return FLEETWAVE_FAILED;
         }
 
-        if (stdOut == "error")
+        // if (stdOut == "error")
+        if (status.stdOut == "error")
         {
             return FLEETWAVE_ERROR;
         }
 
-        result = isValidLock(stdOut);
+        result = isValidLock(status.stdOut);
         if (!result)
         {
-            KCB_DEBUG_TRACE("Invalid lock" << stdOut);
+            KCB_DEBUG_TRACE("Invalid lock" << status.stdOut);
             return FLEETWAVE_FAILED;
         }
 
-        lockNum = stdOut;
+        lockNum = status.stdOut;
         // KCB_DEBUG_TRACE("Received lock" << lockNum);
         
         return FLEETWAVE_OK;
@@ -75,32 +71,29 @@ namespace fleetwave
         arguments << QString("take");
         arguments << QString("complete");
         arguments << QString("%1").arg(lockNum);
-        QString stdOut;
-        QString stdErr;
-        int status;
         bool result;
 
-        kcb::ExecuteCommand(program, arguments, stdOut, stdErr, status);
-        if (stdOut == "failed" || status == QProcess::CrashExit)
+        auto status = kcb::ExecuteCommand(program, arguments);
+        if (status.stdOut == "failed" || status.exitCode < 0)
         {
             return FLEETWAVE_FAILED;
         }
 
-        if (stdOut == "error")
+        if (status.stdOut == "error")
         {
             return FLEETWAVE_ERROR;
         }
 
-        result = isValidLock(stdOut);
+        result = isValidLock(status.stdOut);
         if (!result)
         {
-            KCB_DEBUG_TRACE("Invalid lock" << stdOut);
+            KCB_DEBUG_TRACE("Invalid lock" <<status. stdOut);
             return FLEETWAVE_FAILED;
         }
 
-        // KCB_DEBUG_TRACE("Received lock" << stdOut);
+        // KCB_DEBUG_TRACE("Received lock" << status.stdOut);
 
-        return lockNum == stdOut ? FLEETWAVE_OK : FLEETWAVE_ERROR;
+        return lockNum == status.stdOut ? FLEETWAVE_OK : FLEETWAVE_ERROR;
     }
 
     FLEETWAVE_RETURN_TYPE SendReturnRequest(QString code, QString& lockNum, QString& question1, QString& question2, QString& question3)
@@ -113,33 +106,30 @@ namespace fleetwave
         arguments << QString("return");
         arguments << QString("request");
         arguments << QString("%1").arg(code);
-        QString stdOut;
-        QString stdErr;
-        int status;
         bool result;
 
-        kcb::ExecuteCommand(program, arguments, stdOut, stdErr, status);
-        if (stdOut == "failed" || status == QProcess::CrashExit)
+        auto status = kcb::ExecuteCommand(program, arguments);
+        if (status.stdOut == "failed" || status.exitCode < 0)
         {
             return FLEETWAVE_FAILED;
         }
 
-        if (stdOut == "error")
+        if (status.stdOut == "error")
         {
             return FLEETWAVE_ERROR;
         }
 
-        QStringList response = stdOut.split(',');
+        QStringList response = status.stdOut.split(',');
         if (response.count() != 4)
         {
-            KCB_DEBUG_TRACE("Incorrect number of response parameters: " << response.count() << stdOut);
+            KCB_DEBUG_TRACE("Incorrect number of response parameters: " << response.count() << status.stdOut);
             return FLEETWAVE_FAILED;
         }
 
         result = isValidLock(response[0]);
         if (!result)
         {
-            KCB_DEBUG_TRACE("Invalid lock" << stdOut);
+            KCB_DEBUG_TRACE("Invalid lock" << status.stdOut);
             return FLEETWAVE_FAILED;
         }
 
@@ -163,32 +153,29 @@ namespace fleetwave
         arguments << QString("complete");
 
         arguments << QString("%1,%2,%3,%4").arg(lockNum).arg(answer1).arg(answer2).arg(answer3);
-        QString stdOut;
-        QString stdErr;
-        int status;
         bool result;
 
-        kcb::ExecuteCommand(program, arguments, stdOut, stdErr, status);
-        if (stdOut == "failed" || status == QProcess::CrashExit)
+        auto status = kcb::ExecuteCommand(program, arguments);
+        if (status.stdOut == "failed" || status.exitCode < 0)
         {
             return FLEETWAVE_FAILED;
         }
 
-        if (stdOut == "error")
+        if (status.stdOut == "error")
         {
             return FLEETWAVE_ERROR;
         }
 
-        result = isValidLock(stdOut);
+        result = isValidLock(status.stdOut);
         if (!result)
         {
-            KCB_DEBUG_TRACE("Invalid lock" << stdOut);
+            KCB_DEBUG_TRACE("Invalid lock" << status.stdOut);
             return FLEETWAVE_FAILED;
         }
 
-        // KCB_DEBUG_TRACE("Received lock" << stdOut);
+        // KCB_DEBUG_TRACE("Received lock" << status.stdOut);
 
-        return lockNum == stdOut ? FLEETWAVE_OK : FLEETWAVE_ERROR;
+        return lockNum == status.stdOut ? FLEETWAVE_OK : FLEETWAVE_ERROR;
     }
 
 }

@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _pscene = new QGraphicsScene(this);
     ui->graphicsView->setScene(_pscene);
 
-    _pPixmap = new QPixmap(KCB_BRANDING_IMAGE);
+    _pPixmap = new QPixmap(KeyCodeBoxSettings::GetBrandingImageFilename());
 
 
     // Scale the image...
@@ -350,7 +350,7 @@ void MainWindow::hideFormsExcept(QDialog * pfrm)
 void MainWindow::OnDisplayAdminPasswordDialog(QObject *psysController)
 {
     // KCB_DEBUG_ENTRY;
-    bool result = kcb::isVncConnectionActive();
+    bool result = kcb::isVncConnectionActive(KeyCodeBoxSettings::GetVncPort());
     if (result)
     {
         kcb::TurnOffDisplay();

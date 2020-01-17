@@ -15,7 +15,6 @@
 #include <QApplication>
 #include <QWidget>
 #include <QList>
-#include <QNetworkInterface>
 #include <QPair>
 
 #include "kcbcommon.h"
@@ -38,15 +37,13 @@ namespace kcb
     static DISP_POWER_STATE display_power_state = DISP_POWER_ON;
 
     static QString const NEW_APP_COPY_COMMAND = "sudo cp %1 %2";
-    static QString const APP_DIR = "/home/pi/kcb-config/bin";
+    static QString const APP_DIR = KCB_BIN_PATH;
     static QString const NEW_APP_TARGET = "%1/%2_NEW";
 
-    static QString const KCBCONFIG_SETTINGS_PATH("/home/pi/kcb-config/settings");
+    static QString const KCBCONFIG_SETTINGS_PATH(KCB_CONFIG_PATH);
     static QString const KCBCONFIG_WAVESHARE_DISPLAY_CONFIG_FILE("config.waveshare.txt");
     static QString const KCBCONFIG_OFFICIAL_DISPLAY_CONFIG_FILE("config.official.txt");
     static QString const BOOT_CONFIG_FILE("/boot/config.txt");
-
-    typedef enum { HOST_ADDRESS, BCAST_ADDRESS, NETWORK_MASK, GATEWAY_ADDRESS, DNS_ADDRESS, MAC_ADDRESS } NETWORK_INFO_TYPE;
 
     QString const IP_COMPONENTS_REGEXP = "^inet addr:(.*)  Bcast:(.*)  Mask:(.*)$";
     QString const MAC_ADDRESS_REGEXP = "^.*HWaddr (.*)$";
@@ -64,13 +61,9 @@ namespace kcb
                                 "slaac private\n"
                                 "nohook lookup-hostname\n\n");
 
-
-    void ExecuteCommand(QString program, QStringList arguments, QString& stdOut, QString& stdErr, int& status)
+    kcb::ExecuteCommandStatus ExecuteCommand(QString program, QStringList arguments)
     {
         QProcess proc;
-
-        stdOut = "";
-        stdErr = "";
 
         //KCB_DEBUG_TRACE(program << arguments);
 
@@ -78,14 +71,13 @@ namespace kcb
         (void) proc.waitForStarted();
         (void) proc.waitForFinished();
 
-        stdOut = proc.readAllStandardOutput();
-        stdErr = proc.readAllStandardError();
-        status = proc.exitStatus();
-
-        if (status == QProcess::CrashExit)
+        if (proc.exitStatus() == QProcess::CrashExit)
         {
             KCB_DEBUG_TRACE(QString("%1 crashed").arg(program));
+            return kcb::ExecuteCommandStatus{QString(""), QString(""), -1};
         }
+
+        return kcb::ExecuteCommandStatus{proc.readAllStandardOutput(), proc.readAllStandardError(), proc.exitCode()};
     }
 
     QString GetRpiSerialNumber()
@@ -93,11 +85,11 @@ namespace kcb
         QString program = "cat";
         QStringList arguments;
         arguments << "/proc/cpuinfo";
-        QString stdOut;
-        QString stdErr;
-        int status;
+        // QString stdOut;
+        // QString stdErr;
+        // int status;
 
-        ExecuteCommand(program, arguments, stdOut, stdErr, status);
+        auto status = ExecuteCommand(program, arguments);
 
         /*
             $ cat /proc/cpuinfo
@@ -146,9 +138,9 @@ namespace kcb
         >>>>Serial          : 00000000fb1e679a<<<<
          */
 
-        if (!stdOut.isEmpty())
+        if (!status.stdOut.isEmpty())
         {
-            QStringList strList = stdOut.split("\n");
+            QStringList strList = status.stdOut.split("\n");
             foreach (auto entry, strList)
             {
                 if (entry.contains("Serial"))
@@ -206,7 +198,7 @@ namespace kcb
         return MatchRegularExpression(text, index, regexp);
     }
 
-    static QString ParseNetworkInfo(NETWORK_INFO_TYPE type)
+    QString ParseNetworkInfo(NETWORK_INFO_TYPE type)
     {
         /*
         eth0      Link encap:Ethernet  HWaddr b8:27:eb:1e:67:9a
@@ -218,15 +210,15 @@ namespace kcb
                 collisions:0 txqueuelen:1000
                 RX bytes:112912688 (107.6 MiB)  TX bytes:332918432 (317.4 MiB)
         */    
-        QString stdOut;
-        QString stdErr;
-        int status;
+        // QString stdOut;
+        // QString stdErr;
+        // int status;
 
-        ExecuteCommand(QString("ifconfig"), QStringList() << QString("eth0"), stdOut, stdErr, status);
+        auto status = ExecuteCommand(QString("ifconfig"), QStringList() << QString("eth0"));
 
-        if (!stdOut.isEmpty())
+        if (!status.stdOut.isEmpty())
         {
-            QStringList strList = stdOut.split("\n");
+            QStringList strList = status.stdOut.split("\n");
             QString text = strList[INET_ADDR_TEXT];
             if (type == MAC_ADDRESS)
             {
@@ -239,7 +231,7 @@ namespace kcb
         return QString("");
     }
 
-    static QString ParseGatewayAddress()
+    QString ParseGatewayAddress()
     {
         /*
             Command:
@@ -250,18 +242,18 @@ namespace kcb
                 192.168.1.0/24 dev eth0  proto kernel  scope link  src 192.168.1.144  metric 202
                 192.168.63.0/24 dev usb0  proto kernel  scope link  src 192.168.63.100  metric 204
         */
-        QString stdOut;
-        QString stdErr;
-        int status;
+        // QString stdOut;
+        // QString stdErr;
+        // int status;
 
-        ExecuteCommand(QString("ip"), QStringList() << QString("route") << QString("show"), stdOut, stdErr, status);
+        auto status = ExecuteCommand(QString("ip"), QStringList() << QString("route") << QString("show"));
 
         QString result("");
-        if (!stdOut.isEmpty())
+        if (!status.stdOut.isEmpty())
         {
             /* Take the 3rd field of the first line */
 
-            QStringList lines = stdOut.split('\n');
+            QStringList lines = status.stdOut.split('\n');
 
             if (lines.count() >= 1)
             {
@@ -282,7 +274,7 @@ namespace kcb
         return result;
     }
 
-    static QString ParseDnsAddress()
+    QString ParseDnsAddress()
     {
         /*
             # Generated by resolvconf
@@ -292,22 +284,19 @@ namespace kcb
             nameserver 192.168.5.1
         */
         
-        QString stdOut;
-        QString stdErr;
-        int status;
 
         // KCB_DEBUG_ENTRY;
-        ExecuteCommand(QString("cat"), 
+        auto status = ExecuteCommand(QString("cat"), 
                        QStringList() << 
                        QString("/etc/resolv.conf") << 
                        QString("|") << 
                        QString("grep") << 
-                       QString("nameserver"), stdOut, stdErr, status);
+                       QString("nameserver"));
 
         QString result("");
-        if (!stdOut.isEmpty())
+        if (!status.stdOut.isEmpty())
         {
-            QStringList strList = stdOut.split("\n");
+            QStringList strList = status.stdOut.split("\n");
             foreach (auto str, strList)
             {
                 if (str.contains("nameserver"))
@@ -330,160 +319,7 @@ namespace kcb
         return result;
     }
 
-    static QString GetStaticNetworkInfo(NETWORK_INFO_TYPE type)
-    {
-        QString result("");
-        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
 
-        if (type == HOST_ADDRESS)
-        {
-            result = ns.address;
-        }
-        else if (type == BCAST_ADDRESS)
-        {
-            result = ns.broadcast;
-        }
-        else if (type == NETWORK_MASK)
-        {
-            result = ns.mask;
-        }
-        else if (type == GATEWAY_ADDRESS)
-        {
-            result = ns.gateway;
-        }
-        else if (type == DNS_ADDRESS)
-        {
-            result = ns.dns;
-        }
-        else if (type == MAC_ADDRESS)
-        {
-            result = ParseNetworkInfo(type);
-        }
-        else
-        {
-            result = "0.0.0.0";
-        }
-
-        return result;
-    }
-
-    static QString GetDynamicNetworkInfo(NETWORK_INFO_TYPE type)
-    {
-        QString result("");
-
-        if (type == GATEWAY_ADDRESS)
-        {
-            result = ParseGatewayAddress();
-        }
-        else if (type == DNS_ADDRESS)
-        {
-            result = ParseDnsAddress();
-        }
-        else
-        {
-            result = ParseNetworkInfo(type);
-        }
-
-        return result;
-    }
-
-    static QString GetNetworkInfo(NETWORK_INFO_TYPE type)
-    {
-        if (KeyCodeBoxSettings::StaticAddressingEnabled())
-        {
-            return GetStaticNetworkInfo(type);
-        }
-        else
-        {
-            return GetDynamicNetworkInfo(type);
-        }
-    }
-
-    void SetHostAddress(QString const &value)
-    {
-        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
-        ns.address = value;
-        KeyCodeBoxSettings::setNetworkingSettings(ns);
-    }
-
-    QString GetHostAddress()
-    {
-        QString result = GetNetworkInfo(HOST_ADDRESS);
-        return result;
-    }
-
-    void SetNetworkMask(QString const &value)
-    {
-        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
-        ns.mask = value;
-        KeyCodeBoxSettings::setNetworkingSettings(ns);
-    }
-
-    QString GetNetworkMask()
-    {
-        QString result = GetNetworkInfo(NETWORK_MASK);
-        return result;
-    }
-
-    void SetBcastAddress(QString const &value)
-    {
-        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
-        ns.broadcast = value;
-        KeyCodeBoxSettings::setNetworkingSettings(ns);
-    }
-
-    QString GetBcastAddress()
-    {
-        QString result = GetNetworkInfo(BCAST_ADDRESS);
-        return result;
-    }
-
-    void SetGatewayAddress(QString const &value)
-    {
-        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
-        ns.gateway = value;
-        KeyCodeBoxSettings::setNetworkingSettings(ns);
-    }
-
-    QString GetGatewayAddress()
-    {
-        QString result = GetNetworkInfo(GATEWAY_ADDRESS);
-        return result;
-    }
-
-    void SetDnsAddress(QString const & value)
-    {
-        NETWORK_SETTINGS ns = KeyCodeBoxSettings::getNetworkingSettings();
-        ns.dns = value;
-        KeyCodeBoxSettings::setNetworkingSettings(ns);
-    }
-
-    QString GetDnsAddress()
-    {
-        QString result = GetNetworkInfo(DNS_ADDRESS);
-        return result;
-    }
-
-    QString GetMacAddress()
-    {
-        QString result = GetNetworkInfo(MAC_ADDRESS);
-        return result;
-    }
-
-    void EnableStaticAddressing()
-    {
-        KeyCodeBoxSettings::EnableStaticAddressing();
-    }
-
-    void DisableStaticAddressing()
-    {
-        KeyCodeBoxSettings::DisableStaticAddressing();
-    }
-
-    bool StaticAddressingEnabled()
-    {
-        return KeyCodeBoxSettings::StaticAddressingEnabled();
-    }
 
     bool FPingAddress(QString address)
     {
@@ -531,6 +367,12 @@ namespace kcb
         std::system("sudo shutdown -r now");
     }
 
+    void Shutdown()
+    {
+        sync();
+        std::system("sudo shutdown now");
+    }
+
     void TakeAndStorePicture(QString filename)
     {
         if (HasCamera())
@@ -542,18 +384,18 @@ namespace kcb
             }
 
             QString path = QString("%1/%2").arg(KCB_IMAGE_PATH).arg(filename);
-			if (QFile::exists(path))
-			{
-				KCB_DEBUG_TRACE(path << "exists" << "no picture taken");
-				return;
-			}
-			
+            if (QFile::exists(path))
+            {
+                KCB_DEBUG_TRACE(path << "exists" << "no picture taken");
+                return;
+            }
+            
             // Issue the command to take a picture: raspistill
             // raspistill -n -w 320 -h 240 -q 50 -o <path to image files> 
             // -n no preview
-			// -t timeout 1 second
-			//     Note: the help says timeout is in milliseconds, but timeing tests
-			//           show that it is seconds.  The default timeout is 5 seconds.
+            // -t timeout 1 second
+            //     Note: the help says timeout is in milliseconds, but timeing tests
+            //           show that it is seconds.  The default timeout is 5 seconds.
             // -w image width
             // -h image height
             // -q jpeg quality (0 .. 100)
@@ -573,20 +415,15 @@ namespace kcb
         // There should not be any case where the camera is conected but not configured or not connected and configured;
         // however, such occurrences will be logged
 
-        QString stdOut;
-        QString stdErr;
-        int status;
+        // QString stdOut;
+        // QString stdErr;
+        // int status;
 
-        ExecuteCommand(QString("vcgencmd"), QStringList() << QString("get_camera"), stdOut, stdErr, status);
+        auto status = ExecuteCommand(QString("vcgencmd"), QStringList() << QString("get_camera"));
 
-        if (status == QProcess::CrashExit)
+        if (!status.stdOut.isEmpty())
         {
-            return false;
-        }
-
-        if (!stdOut.isEmpty())
-        {
-            QString trimmed = stdOut.trimmed();
+            QString trimmed = status.stdOut.trimmed();
             // bool equals = trimmed == "supported=1 detected=1";
             // KCB_DEBUG_TRACE(trimmed << equals);
             if (trimmed == "supported=1 detected=1")
@@ -618,12 +455,12 @@ namespace kcb
                 filename = fil[0].fileName();
                 // KCB_DEBUG_TRACE("filename" << filename);
             }
-			else
-			{
-				KCB_DEBUG_TRACE("failed to locate image file");
-				// Consider using a default image
-				return QByteArray();
-			}
+            else
+            {
+                KCB_DEBUG_TRACE("failed to locate image file");
+                // Consider using a default image
+                return QByteArray();
+            }
         }
 
         path = QString("%1/%2").arg(KCB_IMAGE_PATH).arg(filename);
@@ -650,9 +487,10 @@ namespace kcb
     void BackupDatabase()
     {
         // KCB_DEBUG_ENTRY;
-        (void) std::system("rm /home/pi/kcb-config/database/alpha-*.db.bak");
-        QString backup_command = QString("cp /home/pi/run/Alpha.db /home/pi/kcb-config/database/alpha-%1.db.bak");
-        backup_command = backup_command.arg(QDateTime::currentDateTime().toString(REPORT_FILE_FORMAT));
+        QString rm_command = QString("rm %0/alpha-*.db.bak").arg(KCB_DATABASE_PATH);
+        (void) std::system(rm_command.toStdString().c_str());
+        QString date_time = QDateTime::currentDateTime().toString(REPORT_FILE_FORMAT);
+        QString backup_command = QString("cp %0/Alpha.db %1/alpha-%2.db.bak").arg(KCB_RUN_PATH).arg(KCB_DATABASE_PATH).arg(date_time);
         (void) std::system(backup_command.toStdString().c_str());
         // KCB_DEBUG_EXIT;
     }
@@ -665,7 +503,7 @@ namespace kcb
         // Note: Below are two commands for setting the power of the displays.  Only one display is installed
         // at a time, but they use completely different commands and do not conflict with each other.
         // Issuing both commands when only on display is present has no detrimental effects.
-        QString cmd7inch = QString("sudo /home/pi/kcb-config/scripts/displayonoff.sh %1").arg(value7inch);
+        QString cmd7inch = QString("sudo %0/displayonoff.sh %1").arg(KCB_SCRIPTS_PATH).arg(value7inch);
         QString cmd10inch = QString("vcgencmd display_power %1").arg(value10inch);
         system(qPrintable(cmd7inch));
         system(qPrintable(cmd10inch));
@@ -730,19 +568,14 @@ namespace kcb
 
     bool IsHdmiConnected()
     {
-        QString stdOut;
-        QString stdErr;
-        int status;
+        // QString stdOut;
+        // QString stdErr;
+        // int status;
         bool is_connected = false;
 
-        ExecuteCommand(QString("tvservice"), QStringList() << QString("-s"), stdOut, stdErr, status);
+        auto status = ExecuteCommand(QString("tvservice"), QStringList() << QString("-s"));
 
-        if (status == QProcess::CrashExit)
-        {
-            return false;
-        }
-
-        if (!stdOut.isEmpty())
+        if (!status.stdOut.isEmpty())
         {
             // HDMI cable disconnected
             // ~ $ tvservice -s
@@ -752,7 +585,7 @@ namespace kcb
             // ~ $ tvservice -s
             // state 0x12000a [HDMI DMT (87) RGB full 16:9], 848x480 @ 60.00Hz, progressive
 
-            QString trimmed = stdOut.trimmed();
+            QString trimmed = status.stdOut.trimmed();
             QStringList splits = trimmed.split(" ");
             // KCB_DEBUG_TRACE("hdmi splits" << splits);
             QString tvservice_state = splits[1];
@@ -764,13 +597,8 @@ namespace kcb
         return is_connected;
     }
 
-    void SetupDisplay()
+    void updateDisplayConfig()
     {
-        if (KeyCodeBoxSettings::isDisplaySet())
-        {
-            return;
-        }
-
         QString config_file;
         if (IsHdmiConnected())
         {
@@ -788,10 +616,6 @@ namespace kcb
         {
             KCB_DEBUG_TRACE("system command failure:" << status);
         }
-
-        KeyCodeBoxSettings::setDisplay();
-        KCB_DEBUG_TRACE("Rebooting");
-        Reboot();
     }
 
     void RestartNetworkInterface()
@@ -799,7 +623,7 @@ namespace kcb
         std::system(QString("ip link set eth0 down && ip link set eth0 up").toStdString().c_str());
     }
 
-    bool isVncConnectionActive()
+    bool isVncConnectionActive(QString const & vncPort)
     {
         /* 
         This command:
@@ -813,24 +637,13 @@ namespace kcb
         and one entry in the string list when VNC is not active.
         */
 
-        QString stdOut;
-        QString stdErr;
-        int status;
-
-        QString vncPort = KeyCodeBoxSettings::GetVncPort();
-
-        ExecuteCommand(QString("ss"), QStringList() << QString("sport = :%1").arg(vncPort), stdOut, stdErr, status);
-
-        if (status == QProcess::CrashExit)
-        {
-            return false;
-        }
+        auto status = ExecuteCommand(QString("ss"), QStringList() << QString("sport = :%1").arg(vncPort));
 
         QStringList strList;
 
-        if (!stdOut.isEmpty())
+        if (!status.stdOut.isEmpty())
         {
-            strList = stdOut.trimmed().split("\n");
+            strList = status.stdOut.trimmed().split("\n");
             
             // KCB_DEBUG_TRACE(strList);
 
@@ -885,12 +698,12 @@ namespace kcb
         }
 
         // Count the bits set in the number
-        unsigned int num_bits = countSetBits(mask_int);
+        unsigned int num_bits = kcb::Utils::countSetBits(mask_int);
 
         return QString("%1/%2").arg(ip_addr).arg(QString::number(num_bits));
     }
 
-    static QList<QNetworkInterface> GetQualifiedInterfaces()
+    QList<QNetworkInterface> GetQualifiedInterfaces()
     {        
         QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
 
@@ -917,59 +730,6 @@ namespace kcb
         }
 
         return qualified_ifaces;
-    }
-
-    static QList< QPair<QString, unsigned int> > GetPossibleMatches(QList<QNetworkInterface> qualified_ifaces)
-    {
-        QList< QPair<QString, unsigned int> > possibleMatches;
-
-        foreach (auto iface, qualified_ifaces)
-        {
-            QList<QNetworkAddressEntry> addresses = iface.addressEntries();
-
-            foreach (auto addrEntry, addresses)
-            {
-                QHostAddress addr = addrEntry.ip();
-
-                bool ignore_local_host = addr == QHostAddress::LocalHost;
-                bool ignore_nonipv4_address = !addr.toIPv4Address();
-                bool ignore_null_address = addr.toString().isEmpty();
-                
-                if ( ignore_local_host || ignore_nonipv4_address || ignore_null_address)
-                {
-                    continue;
-                }
-
-                possibleMatches.append(QPair<QString, unsigned int>(addr.toString(), iface.flags()));
-            }
-        }
-
-        return possibleMatches;
-    }
-
-    void GetIpAddressAndStatus(QString &ip_address, bool &can_ping, bool &can_multicast)
-    {
-        QList<QNetworkInterface> qualified_ifaces = GetQualifiedInterfaces();
-        QList< QPair<QString, unsigned int> > possibleMatches = GetPossibleMatches(qualified_ifaces);
-
-        bool is_match = possibleMatches.length() == 1;
-        bool interface_isup = false;
-        can_multicast = false;
-        can_ping = false;
-        ip_address = "";
-
-        if (is_match)
-        {    
-            QPair<QString, unsigned int>ip_display(possibleMatches[0]);
-            interface_isup = ip_display.second & QNetworkInterface::IsUp;
-            can_multicast = ip_display.second & QNetworkInterface::CanMulticast;
-            if (interface_isup)
-            {
-                QString gateway = kcb::GetGatewayAddress();
-                can_ping = kcb::FPingAddress(gateway);
-                ip_address = ip_display.first;
-            }
-        }
     }
 
     QString GetSystemId()
@@ -1017,4 +777,68 @@ namespace kcb
         std::system(link.toStdString().c_str());
         KCB_DEBUG_TRACE("Timezone set");
     }
+
+    bool IsStorageMounted(QString const &mountPoint)
+    {
+        auto status = ExecuteCommand(QString("mountpoint"), QStringList() << mountPoint);
+
+        KCB_DEBUG_TRACE(status.stdOut);
+
+        return status.exitCode == 0;
+    }
+
+    bool FileExists(QString const &fullpath)
+    {
+        return QFile(fullpath).exists();
+    }
+
+    bool DirExists(QString const &path)
+    {
+        return QDir(path).exists();
+    }
+
+    void setVncEnabled()
+    {
+        std::system("rm -f .xsessionrc");
+        auto command = QString("cp -f %0/xsessionrc-vncenable %1/.xsessionrc").arg(KCB_SYSTEM_CONFIG_PATH).arg(KCB_SYSTEM_PATH);
+        std::system(command.toStdString().c_str());
+    }
+
+    void setVncDisabled()
+    {
+        std::system("rm -f .xsessionrc");
+        auto command = QString("cp -f %0/xsessionrc-vncdisable %1/.xsessionrc").arg(KCB_SYSTEM_CONFIG_PATH).arg(KCB_SYSTEM_PATH);
+        std::system(command.toStdString().c_str());
+    }
+
+    static void setVncPort(QString const & port)
+    {
+        KCB_DEBUG_ENTRY;
+        auto port_command = QString("echo %0 > %1/vncport.txt").arg(port).arg(KCB_USER_CONFIG_ROOT);
+        KCB_DEBUG_TRACE("port command" << port_command);
+        std::system(port_command.toStdString().c_str());
+        KCB_DEBUG_EXIT;
+    }
+
+    static void setVncPassword(QString const & password)
+    {
+        KCB_DEBUG_ENTRY;
+        auto checked_password = password;
+        if (password.isEmpty())
+        {
+            checked_password = "\"\"";
+        }
+        auto config_path = QString("%0/x11vnc.cfg").arg(KCB_USER_CONFIG_ROOT);
+        auto password_command = QString("x11vnc -storepasswd %0 %1 &").arg(checked_password).arg(config_path);
+        KCB_DEBUG_TRACE("password command" << password_command);
+        std::system(password_command.toStdString().c_str());
+        KCB_DEBUG_EXIT;
+    }
+
+    void setVncCredentials(QString const & port, QString const & password)
+    {
+        setVncPort(port);
+        setVncPassword(password);
+    }
+
 }

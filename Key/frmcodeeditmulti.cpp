@@ -19,7 +19,6 @@
 #include "keycodeboxsettings.h"
 #include "autocodegenstatic.h"
 
-static const QString FP_HOME_DIR = "/home/pi/run/prints/";
 static const QString css_warn = "color: black; background-color: red";
 static const QString css_none = "";
 
@@ -668,7 +667,7 @@ void FrmCodeEditMulti::on_cbFingerprint_clicked()
     {
         if (!ui->edCode1->text().isEmpty())
         {
-            QString printDirectory = FP_HOME_DIR + ui->edCode1->text();
+            QString printDirectory = KCB_FPRINT_PATH + ui->edCode1->text();
             if( QDir(printDirectory).exists() )
             {
                 QString title = tr("Verify Fingerprint Scan Removal");
@@ -694,14 +693,14 @@ void FrmCodeEditMulti::on_cbFingerprint_clicked()
 
 void FrmCodeEditMulti::on_pbCode1Random_clicked()
 {
-    QStringList values = kcb::CreateRandomValues(1, ui->spCode1RandomCodeLength->value());
+    QStringList values = kcb::Utils::CreateRandomValues(1, ui->spCode1RandomCodeLength->value());
     ui->edCode1->setText(values[0]);
     updateUi();
 }
 
 void FrmCodeEditMulti::on_pbCode2Random_clicked()
 {
-    QStringList values = kcb::CreateRandomValues(1, ui->spCode2RandomCodeLength->value());
+    QStringList values = kcb::Utils::CreateRandomValues(1, ui->spCode2RandomCodeLength->value());
     ui->edCode2->setText(values[0]);
     updateUi();
 }

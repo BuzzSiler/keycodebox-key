@@ -27,7 +27,7 @@ void CardReader::Scan()
 
     while (1)
     {
-        m_proc.start(QString("python3"), QStringList() << "/home/pi/kcb-config/scripts/hudson.py" << "2>&1");
+        m_proc.start(QString("python3"), QStringList() << KCB_SCRIPTS_PATH+"/hudson.py" << "2>&1");
         (void) m_proc.waitForFinished();
     }
 }

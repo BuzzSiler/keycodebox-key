@@ -3,21 +3,29 @@
 
 #include <QPushButton>
 #include <QMessageBox>
+#include <QList>
+#include <QNetworkInterface>
+#include <QPair>
 
 #include "kcbcommon.h"
 #include "kcbkeyboarddialog.h"
 #include "kcbsystem.h"
 #include "kcbutils.h"
+#include "keycodeboxsettings.h"
 
 
 static const int IP_ADDRESSING_STATIC_IP = 0;
 static const int IP_ADDRESSING_DHCP = 1;
 
+static QString const VNC_WARN_DIALOG_TITLE = QString(QObject::tr("Virtual Network Computing (VNC) Change"));
+static QString const IP_WARN_DIALOG_TITLE = QString(QObject::tr("Network Addressing Changed"));
+
+
 FrmNetworkSettings::FrmNetworkSettings(QWidget *parent) :
     QDialog(parent),
     ip_state({false, "", "", "", "", "0.0.0.0"}),
     smtp_state({"", "", 0, "", ""}),
-    vnc_state({"", ""}),
+    vnc_state({"", "", false}),
     ip_addressing_changed(false),
     ui(new Ui::FrmNetworkSettings)
 {
@@ -33,25 +41,26 @@ FrmNetworkSettings::FrmNetworkSettings(QWidget *parent) :
 
 FrmNetworkSettings::~FrmNetworkSettings()
 {
+    // kcb::ClassAllocation::DestructorMsg(this);
     delete ui;
 }
 
-void FrmNetworkSettings::setValues(int vncPort, QString vncPassword, QString smtpServer, int smtpPort, int smtpType, QString smtpUsername, QString smtpPassword)
+void FrmNetworkSettings::setValues(QString vncPort, QString vncPassword, bool vncEnable, QString smtpServer, int smtpPort, int smtpType, QString smtpUsername, QString smtpPassword)
 {
     // IP Network Values
-    ip_state.is_static = kcb::StaticAddressingEnabled();
-    ip_state.host = kcb::GetHostAddress();
-    ip_state.broadcast = kcb::GetBcastAddress();
-    ip_state.mask = kcb::GetNetworkMask();
-    ip_state.gateway = kcb::GetGatewayAddress();
-    ip_state.dns = kcb::GetDnsAddress();
+    ip_state.is_static = KeyCodeBoxSettings::StaticAddressingEnabled();
+    ip_state.host = KeyCodeBoxSettings::GetHostAddress();
+    ip_state.broadcast = KeyCodeBoxSettings::GetBcastAddress();
+    ip_state.mask = KeyCodeBoxSettings::GetNetworkMask();
+    ip_state.gateway = KeyCodeBoxSettings::GetGatewayAddress();
+    ip_state.dns = KeyCodeBoxSettings::GetDnsAddress();
 
     ui->lblIpAddressValue->setText(ip_state.host);
     ui->lblIpBroadcastValue->setText(ip_state.broadcast);
     ui->lblIpMaskValue->setText(ip_state.mask);
     ui->lblIpGatewayValue->setText(ip_state.gateway);
     ui->lblIpDnsValue->setText(ip_state.dns);
-    ui->lblMacAddressValue->setText(kcb::GetMacAddress());
+    ui->lblMacAddressValue->setText(KeyCodeBoxSettings::GetMacAddress());
 
     // KCB_DEBUG_TRACE("is static" << ip_state.is_static);
     ui->cbAddressingType->setCurrentIndex(ip_state.is_static ? IP_ADDRESSING_STATIC_IP : IP_ADDRESSING_DHCP);
@@ -74,19 +83,23 @@ void FrmNetworkSettings::setValues(int vncPort, QString vncPassword, QString smt
     ui->lblSmtpPasswordValue->setText(smtp_state.password);
 
     // VNC Values
-    vnc_state.port = QString::number(vncPort);
+    vnc_state.port = vncPort;
     vnc_state.password = vncPassword;
+    vnc_state.enable = vncEnable;
 
     ui->lblVncPortValue->setText(vnc_state.port);
     ui->lblVncPasswordValue->setText(vnc_state.password);
+    ui->cbVncEnable->setChecked(vnc_state.enable);
+    ui->cbVncEnable->setText(vnc_state.enable ? "VNC Enabled" : "VNC Disabled");
 
     updateUi();
 }
 
-void FrmNetworkSettings::getValues(int& vncPort, QString& vncPassword, QString& smtpServer, int& smtpPort, int& smtpType, QString& smtpUsername, QString& smtpPassword)
+void FrmNetworkSettings::getValues(QString& vncPort, QString& vncPassword, bool& vncEnable, QString& smtpServer, int& smtpPort, int& smtpType, QString& smtpUsername, QString& smtpPassword)
 {
-    vncPort = ui->lblVncPortValue->text().toInt();
+    vncPort = ui->lblVncPortValue->text();
     vncPassword = ui->lblVncPasswordValue->text();
+    vncEnable = ui->cbVncEnable->isChecked();
 
     smtpServer = ui->lblSmtpServerValue->text();
     smtpPort = ui->lblSmtpPortValue->text().toInt();
@@ -99,6 +112,7 @@ void FrmNetworkSettings::RunKeyboard(QString& text, bool numbersOnly, bool ipAdd
 {
     KcbKeyboardDialog kkd;
 
+    KCB_DEBUG_TRACE("text" << text << ", numbers" << numbersOnly << ", ip" << ipAddress);
     kkd.numbersOnly(numbersOnly);
     kkd.ipAddress(ipAddress);
     kkd.setValue(text);
@@ -110,18 +124,44 @@ void FrmNetworkSettings::RunKeyboard(QString& text, bool numbersOnly, bool ipAdd
 
 void FrmNetworkSettings::on_lblVncPortValue_clicked()
 {
-    QString text = ui->lblVncPortValue->text();
-    RunKeyboard(text, true);
-    ui->lblVncPortValue->setText(text);
+    KcbKeyboardDialog kkd;
+
+    kkd.numbersOnly(true);
+    kkd.setValue(ui->lblVncPortValue->text());
+    if (kkd.exec())
+    {
+        ui->lblVncPortValue->setText(kkd.getValue());
+    }
 
     updateUi();
 }
 
+void FrmNetworkSettings::invalidPassword()
+{
+    (void) QMessageBox::critical(this,
+                                 tr("Invalid Password"),
+                                 tr("The password must be 6 or more characters.\n"
+                                    "Please re-enter the password."),
+                                 QMessageBox::Close);
+}
+
 void FrmNetworkSettings::on_lblVncPasswordValue_clicked()
 {
-    QString text = ui->lblVncPasswordValue->text();
-    RunKeyboard(text, false);
-    ui->lblVncPasswordValue->setText(text);
+    KcbKeyboardDialog kkd;
+
+    kkd.setValue(ui->lblVncPasswordValue->text());
+    if (kkd.exec())
+    {
+        QString password = kkd.getValue();
+        if (password.isEmpty() || password.length() < 6)
+        {
+            invalidPassword();
+        }
+        else
+        {
+            ui->lblVncPasswordValue->setText(password);
+        }
+    }
 
     updateUi();
 }
@@ -199,18 +239,18 @@ void FrmNetworkSettings::on_cbAddressingType_currentIndexChanged(int index)
 
         if (enable_static)
         {
-            kcb::EnableStaticAddressing();
+            KeyCodeBoxSettings::EnableStaticAddressing();
         }
     }
     else
     {
-        kcb::DisableStaticAddressing();
+        KeyCodeBoxSettings::DisableStaticAddressing();
 
-        ui->lblIpAddressValue->setText(kcb::GetHostAddress());
-        ui->lblIpBroadcastValue->setText(kcb::GetBcastAddress());
-        ui->lblIpMaskValue->setText(kcb::GetNetworkMask());
-        ui->lblIpGatewayValue->setText(kcb::GetGatewayAddress());
-        ui->lblIpDnsValue->setText(kcb::GetDnsAddress());
+        ui->lblIpAddressValue->setText(KeyCodeBoxSettings::GetHostAddress());
+        ui->lblIpBroadcastValue->setText(KeyCodeBoxSettings::GetBcastAddress());
+        ui->lblIpMaskValue->setText(KeyCodeBoxSettings::GetNetworkMask());
+        ui->lblIpGatewayValue->setText(KeyCodeBoxSettings::GetGatewayAddress());
+        ui->lblIpDnsValue->setText(KeyCodeBoxSettings::GetDnsAddress());
     }
 
     updateUi();
@@ -247,7 +287,7 @@ void FrmNetworkSettings::on_lblIpDnsValue_clicked()
 
 void FrmNetworkSettings::HandleIpSettingClick(CClickableLabel& label)
 {
-    if (kcb::StaticAddressingEnabled())
+    if (KeyCodeBoxSettings::StaticAddressingEnabled())
     {
         QString text = label.text();
         RunKeyboard(text, true, true);
@@ -260,7 +300,7 @@ void FrmNetworkSettings::HandleIpSettingClick(CClickableLabel& label)
 void FrmNetworkSettings::updateUi()
 {
     // KCB_DEBUG_ENTRY;
-    bool static_change = ip_state.is_static != kcb::StaticAddressingEnabled();
+    bool static_change = ip_state.is_static != KeyCodeBoxSettings::StaticAddressingEnabled();
     bool host_change = ip_state.host != ui->lblIpAddressValue->text();
     bool broadcast_change = ip_state.broadcast != ui->lblIpBroadcastValue->text();
     bool mask_change = ip_state.mask != ui->lblIpMaskValue->text();
@@ -269,18 +309,24 @@ void FrmNetworkSettings::updateUi()
     ip_addressing_changed = (static_change || host_change || broadcast_change || mask_change || gateway_change || dns_change);
 
     bool server_change = smtp_state.server != ui->lblSmtpServerValue->text();
-    bool port_change = smtp_state.port != ui->lblSmtpPortValue->text();
+    bool smtp_port_change = smtp_state.port != ui->lblSmtpPortValue->text();
     bool type_change = smtp_state.type != ui->cbxSmtpSecurityValue->currentIndex();
     bool username_change = smtp_state.username != ui->lblSmtpUsernameValue->text();
-    bool password_change = smtp_state.password != ui->lblSmtpPasswordValue->text();
-    bool smtp_change = (server_change || port_change || type_change || username_change || password_change);
+    bool smtp_password_change = smtp_state.password != ui->lblSmtpPasswordValue->text();
+    bool smtp_change = (server_change || smtp_port_change || type_change || username_change || smtp_password_change);
 
-    port_change = vnc_state.port != ui->lblVncPortValue->text();
-    password_change = vnc_state.password != ui->lblVncPasswordValue->text();
-    bool vnc_change = (port_change || password_change);
+    vnc_port_change = vnc_state.port != ui->lblVncPortValue->text();
+    vnc_password_change = vnc_state.password != ui->lblVncPasswordValue->text();
+    vnc_enable_change = vnc_state.enable != ui->cbVncEnable->isChecked();
 
-    ui->bbNetworkingOkCancel->button(QDialogButtonBox::Ok)->setEnabled(smtp_change || vnc_change || ip_addressing_changed);
-    // KCB_DEBUG_EXIT;
+    bool vnc_changed = (vnc_port_change || vnc_password_change || vnc_enable_change);
+
+    ui->bbNetworkingOkCancel->button(QDialogButtonBox::Ok)->setEnabled(smtp_change || vnc_changed || ip_addressing_changed);
+}
+
+int FrmNetworkSettings::warnOnChange(QString const & title, QString const & body, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton)
+{
+    return QMessageBox::warning(this, title, body, buttons, defaultButton);
 }
 
 void FrmNetworkSettings::on_bbNetworkingOkCancel_accepted()
@@ -289,11 +335,11 @@ void FrmNetworkSettings::on_bbNetworkingOkCancel_accepted()
 
     if (ui->cbAddressingType->currentIndex() == IP_ADDRESSING_STATIC_IP)
     {
-        kcb::SetHostAddress(ui->lblIpAddressValue->text());
-        kcb::SetBcastAddress(ui->lblIpBroadcastValue->text());
-        kcb::SetNetworkMask(ui->lblIpMaskValue->text());
-        kcb::SetGatewayAddress(ui->lblIpGatewayValue->text());
-        kcb::SetDnsAddress(ui->lblIpDnsValue->text());
+        KeyCodeBoxSettings::SetHostAddress(ui->lblIpAddressValue->text());
+        KeyCodeBoxSettings::SetBcastAddress(ui->lblIpBroadcastValue->text());
+        KeyCodeBoxSettings::SetNetworkMask(ui->lblIpMaskValue->text());
+        KeyCodeBoxSettings::SetGatewayAddress(ui->lblIpGatewayValue->text());
+        KeyCodeBoxSettings::SetDnsAddress(ui->lblIpDnsValue->text());
 
         QString cidr_address = kcb::IpAddrSubnetMaskToCidr(ui->lblIpAddressValue->text(), ui->lblIpMaskValue->text());
 
@@ -313,33 +359,88 @@ void FrmNetworkSettings::on_bbNetworkingOkCancel_accepted()
 
     if (ip_addressing_changed)
     {
-        int result = QMessageBox::warning(this,
-                                            tr("Network Addressing Changed"), 
-                                            tr("You have selected to change the network addressing. "
-                                                "Continuing will change the IP address and associated parameters, requiring the system to reboot.\n"
-                                                "If a VNC session is active, it will be terminated and must be restarted using the new IP address after the system reboots\n\n"
-                                                "Do you wish to continue?"),
-                                            QMessageBox::Ok, 
-                                            QMessageBox::Cancel);
+        QString body(tr("You have selected to change the network addressing. "
+                        "Continuing will change the IP address and associated parameters, requiring the system to restart.\n"
+                        "If a VNC session is active, it will be terminated and must be restarted using the new IP address after the system restarts\n\n"
+                        "Do you wish to continue?"));
+        int result = warnOnChange(IP_WARN_DIALOG_TITLE, body, QMessageBox::Ok, QMessageBox::Cancel);
         if (result == QMessageBox::Ok)
         {
             kcb::RestartNetworkInterface();
-            kcb::Reboot();
+            pending_reboot_ = true;
         }
         else
         {
             // Network addressing has been modified
             // We must revert the network addressing setting back to the initial setting
-            ip_state.is_static ? kcb::EnableStaticAddressing() : kcb::DisableStaticAddressing();
+            ip_state.is_static ? KeyCodeBoxSettings::EnableStaticAddressing() : KeyCodeBoxSettings::DisableStaticAddressing();
         }
     }
 
-    // KCB_DEBUG_EXIT;
+    if (vnc_enable_change)
+    {
+        bool enable_disable = ui->cbVncEnable->isChecked();
+        QString body(tr("VNC has been %0. "
+                        "Continuing requires the system to restart.\n\n"
+                        "Do you wish to continue?").arg(enable_disable ? "enabled" : "disabled"));
+        int result = warnOnChange(VNC_WARN_DIALOG_TITLE, body, QMessageBox::Ok, QMessageBox::Cancel);
+        if (result == QMessageBox::Ok)
+        {
+            if (enable_disable)
+            {
+                kcb::setVncEnabled();
+            }
+            else
+            {
+                kcb::setVncDisabled();
+            }
+            pending_reboot_ = true;
+        }
+        else
+        {
+            ui->cbVncEnable->setChecked(vnc_state.enable);
+            ui->cbVncEnable->setText(vnc_state.enable ? "VNC Enabled" : "VNC Disabled");
+            ui->lblVncPortValue->setText(vnc_state.port);
+            ui->lblVncPasswordValue->setText(vnc_state.password);
+        }
+        
+    }
+    else if (vnc_port_change)
+    {
+        QString body(tr("The VNC port has been changed. "
+                        "Continuing requires the system to restart.\n\n"
+                        "Do you wish to continue?"));
+        int result = warnOnChange(VNC_WARN_DIALOG_TITLE, body, QMessageBox::Ok, QMessageBox::Cancel);
+        if (result == QMessageBox::Ok)
+        {
+            pending_reboot_ = true;
+        }
+        else
+        {
+            ui->lblVncPortValue->setText(vnc_state.port);
+        }
+    }
+    else if (vnc_password_change)
+    {
+        QString body(tr("The VNC password has been changed. "
+                        "Continuing requires the system to restart.\n\n"
+                        "Do you wish to continue?"));
+        int result = warnOnChange(VNC_WARN_DIALOG_TITLE, body, QMessageBox::Ok, QMessageBox::Cancel);
+        if (result == QMessageBox::Ok)
+        {
+            pending_reboot_ = true;
+        }
+        else
+        {
+            ui->lblVncPasswordValue->setText(vnc_state.password);
+        }
+    }
+
 }
 
 void FrmNetworkSettings::on_bbNetworkingOkCancel_rejected()
 {
-    ip_state.is_static ? kcb::EnableStaticAddressing() : kcb::DisableStaticAddressing();
+    ip_state.is_static ? KeyCodeBoxSettings::EnableStaticAddressing() : KeyCodeBoxSettings::DisableStaticAddressing();
 
     ui->lblSmtpServerValue->setText(smtp_state.server);
     ui->lblSmtpPortValue->setText(smtp_state.port);
@@ -356,11 +457,64 @@ void FrmNetworkSettings::on_bbNetworkingOkCancel_rejected()
 
     ui->lblVncPortValue->setText(vnc_state.port);
     ui->lblVncPasswordValue->setText(vnc_state.password);
+    ui->cbVncEnable->setChecked(vnc_state.enable);
 
 }
 
 void FrmNetworkSettings::on_cbxSmtpSecurityValue_currentIndexChanged(int index)
 {
     Q_UNUSED(index);
+    updateUi();
+}
+
+bool FrmNetworkSettings::pendingReboot()
+{
+    bool active = pending_reboot_;
+    pending_reboot_ = false;
+    return active;
+}
+
+void FrmNetworkSettings::on_cbVncEnable_clicked()
+{
+    bool enable = false;
+    QString port = "5901";
+    QString password = "keycodebox";
+    QString enable_text = "VNC Enabled";
+    QString disable_text = "VNC Disabled";
+    QString cb_text = disable_text;
+
+    if (ui->cbVncEnable->isChecked())
+    {
+        KCB_DEBUG_TRACE(enable_text);
+        enable = true;
+        cb_text = enable_text;
+        VncSettings vs = KeyCodeBoxSettings::getVncSettings();
+        if (!vs.port.isEmpty())
+        {
+            port = vs.port;
+        }
+
+        if (!vs.password.isEmpty())
+        {
+            password = vs.password;
+        }
+    }
+    else
+    {
+        KCB_DEBUG_TRACE(disable_text);
+        enable = false;
+        cb_text = disable_text;
+        port = "";
+        password = "";
+    }
+
+    ui->lblVncPortValue->setText(port);
+    ui->lblVncPasswordValue->setText(password);
+    ui->cbVncEnable->setText(cb_text);
+    ui->lblVncPortValue->setEnabled(enable);
+    ui->lblVncPort->setEnabled(enable);
+    ui->lblVncPasswordValue->setEnabled(enable);
+    ui->lblVncPassword->setEnabled(enable);
+
     updateUi();
 }

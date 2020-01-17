@@ -27,7 +27,7 @@ void DisplayParams(const AutoCodeParams& params)
 void DisplayJson(const QJsonObject& json)
 {
     Q_UNUSED(json);
-    // KCB_DEBUG_TRACE("json" << kcb::JsonToString(json));
+    // KCB_DEBUG_TRACE("json" << kcb::Utils::JsonToString(json));
 }
 
 AutoCodeGenerator::AutoCodeGenerator(const AutoCodeParams& params) :
@@ -215,7 +215,7 @@ void AutoCodeGenerator::InitCodeSequence()
     bool valid;
 
     QJsonObject json = ParamsToJson(params_);
-    QString json_str = kcb::JsonToString(json);
+    QString json_str = kcb::Utils::JsonToString(json);
     QByteArray hash = QCryptographicHash::hash(json_str.toUtf8(), QCryptographicHash::Sha256);
 
     QByteArray upper_bytes = hash.toHex().left(8);
@@ -347,7 +347,7 @@ quint64 AutoCodeGenerator::PasswordToEncryptionKey(const QString& password)
 QByteArray AutoCodeGenerator::SecureKeyFromJson(const QJsonObject& json, const QString& password)
 {
     quint64 enckey = AutoCodeGenerator::PasswordToEncryptionKey(password);
-    QString json_str = kcb::JsonToString(json);
+    QString json_str = kcb::Utils::JsonToString(json);
     QByteArray cipher = CEncryption::encryptWithKey(json_str.toUtf8(), enckey);
     QByteArray hash = QCryptographicHash::hash(QByteArray::number(enckey) + cipher, QCryptographicHash::Sha256);
     QByteArray key;
@@ -368,7 +368,7 @@ QJsonObject AutoCodeGenerator::JsonFromSecureKey(const QByteArray& key, const QS
     {
         QByteArray data = CEncryption::decryptWithKey(cipher, enckey);
         // KCB_DEBUG_EXIT;
-        return kcb::StringToJson(QString(data));
+        return kcb::Utils::StringToJson(QString(data));
     }
     // KCB_DEBUG_EXIT;
     return QJsonObject();

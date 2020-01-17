@@ -5,7 +5,9 @@
 #include <QVector>
 #include <QMap>
 #include <QString>
+
 #include "keycodeboxsettings.h"
+#include "cabinet_type.h"
 
 namespace Ui {
     class LockCabinetWidget;
@@ -67,7 +69,7 @@ class LockCabinetWidget : public QWidget
 
         enum class LockSelection { SINGLE, MULTI };
 
-        CABINET_VECTOR m_cabinet_info;
+        kcb::CABINET_COLLECTION m_cabinet_info;
         qint8 m_num_cabs;
         QVector<QString> m_selected_locks;
         QVector<CAB_STATE> m_cabs;

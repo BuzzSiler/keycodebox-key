@@ -35,7 +35,7 @@ CFrmUserCode::CFrmUserCode(QWidget *parent) :
 
     initialize();
 
-    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
+    fleetwave_enabled = false;
 }
 
 CFrmUserCode::~CFrmUserCode()

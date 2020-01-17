@@ -7,11 +7,15 @@
 #include <QString>
 
 #include "serialport.h"
+#include "cabinet_type.h"
+
 
 #define MAX_PULSE_COUNT                     250
 #define MAX_PULSE_ON_TIME                   500         // milliseconds
 #define VOLTAGE_DOUBLER_ACTIVATION_DELAY    1000        // milliseconds
 #define TO_HEX(i) (i <= 9 ? '0' + i : 'A' - 10 + i)
+
+typedef QVector<uint16_t> BOARD_ADDRESSES;
 
 class CUSBController;
 
@@ -88,9 +92,12 @@ class CLockController : public QObject
         bool ValidateResponse(RESPONSE type, QByteArray const &command, QByteArray const &response);
         uint16_t GetEepromResponseValue(RESPONSE type, QByteArray const &response);
         bool IsResponse(uint8_t control);
-        void ReadBoardEeprom(uint16_t addr);
+        kcb::CABINET_INFO ReadBoardEeprom(uint16_t addr);
         QByteArray CreateSearchNetworkCommand(uint16_t addr);
-        void LocateMaster();
+        BOARD_ADDRESSES getBoardAddresses();
+        kcb::CABINET_INFO getCabinetInfo(uint16_t addr);
+        kcb::CABINET_COLLECTION getCabinetCollection(BOARD_ADDRESSES const &addresses);
+        void UpdateCabinetInfo(kcb::CABINET_COLLECTION const &cabinets);
         uint16_t SearchNetwork(uint16_t addr);
         bool IsErrorResponse(QByteArray const &response);
         void ProcessErrorResponse(QByteArray const &response);

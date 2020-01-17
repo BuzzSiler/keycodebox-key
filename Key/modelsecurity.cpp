@@ -21,10 +21,10 @@ static bool fleetwave_enabled;
 
 void CModelSecurity::openDatabase()
 {
-    // KCB_DEBUG_ENTRY;
+    KCB_DEBUG_ENTRY;
     QSqlDatabase::removeDatabase("SQLITE");
     _DB = QSqlDatabase::addDatabase( "QSQLITE", "SQLITE" );
-    QString sPath = "/home/pi/run/Alpha.db";
+    QString sPath = KCB_DATABASE_PATH + "/Alpha.db";
     _DB.setDatabaseName(sPath);
 
     if( !_DB.open() )
@@ -33,7 +33,7 @@ void CModelSecurity::openDatabase()
         qFatal( "Failed to connect." );
     }
 
-    // KCB_DEBUG_EXIT;
+    KCB_DEBUG_EXIT;
 }
 
 CModelSecurity::CModelSecurity(QObject *parent) : QObject(parent)
@@ -41,7 +41,7 @@ CModelSecurity::CModelSecurity(QObject *parent) : QObject(parent)
     // KCB_DEBUG_ENTRY;
     initialize();
     KCB_DEBUG_TRACE( "Connected!" );
-    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
+    fleetwave_enabled = false;
     // KCB_DEBUG_EXIT;
 }
 
@@ -190,78 +190,78 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
     {
         if (fleetwave_enabled)
         {
-            // We have received a code.  We need to send it to Chevin and get authorization
-            if ( kcb::Application::isTakeSelection() )
-            {
-                QString lockNum;
-                KCB_DEBUG_TRACE("(CHEVIN) Requesting authorization ...");
-                fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendTakeRequest(code, lockNum);
-                if (result == fleetwave::FLEETWAVE_OK)
-                {
-                    emit __OnSecurityCheckSuccess(lockNum);
+            // // We have received a code.  We need to send it to Chevin and get authorization
+            // if ( kcb::Application::isTakeSelection() )
+            // {
+            //     QString lockNum;
+            //     KCB_DEBUG_TRACE("(CHEVIN) Requesting authorization ...");
+            //     fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendTakeRequest(code, lockNum);
+            //     if (result == fleetwave::FLEETWAVE_OK)
+            //     {
+            //         emit __OnSecurityCheckSuccess(lockNum);
 
-                    result = fleetwave::SendTakeComplete(code, lockNum);
-                    if (result == fleetwave::FLEETWAVE_OK)
-                    {
-                    }
-                }
+            //         result = fleetwave::SendTakeComplete(code, lockNum);
+            //         if (result == fleetwave::FLEETWAVE_OK)
+            //         {
+            //         }
+            //     }
 
-                if (result == fleetwave::FLEETWAVE_ERROR)
-                {
-                    // Error means we communicated but got the wrong results.
-                    // The best we can say is that the code was wrong
-                    KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
-                    emit __OnSecurityCheckedFailed();
-                }
-                else if (result == fleetwave::FLEETWAVE_FAILED)
-                {
-                    KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
-                    // We don't have a path for handling this
-                    emit __OnSecurityCheckedFailed();
-                }
-                else
-                {
-                    KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
-                }
-            }
-            else if ( kcb::Application::isReturnSelection() )
-            {
-                QString lockNum;
-                QString question1;
-                QString question2;
-                QString question3;
+            //     if (result == fleetwave::FLEETWAVE_ERROR)
+            //     {
+            //         // Error means we communicated but got the wrong results.
+            //         // The best we can say is that the code was wrong
+            //         KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
+            //         emit __OnSecurityCheckedFailed();
+            //     }
+            //     else if (result == fleetwave::FLEETWAVE_FAILED)
+            //     {
+            //         KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
+            //         // We don't have a path for handling this
+            //         emit __OnSecurityCheckedFailed();
+            //     }
+            //     else
+            //     {
+            //         KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
+            //     }
+            // }
+            // else if ( kcb::Application::isReturnSelection() )
+            // {
+            //     QString lockNum;
+            //     QString question1;
+            //     QString question2;
+            //     QString question3;
 
-                KCB_DEBUG_TRACE("(CHEVIN) Requesting Chevin to authorize ...");
-                fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendReturnRequest(code, lockNum, question1, question2, question3);
-                if (result == fleetwave::FLEETWAVE_OK)
-                {
-                    emit __QuestionUserDialog(lockNum,
-                                            question1,
-                                            question2,
-                                            question3);
-                }
-                else if (result == fleetwave::FLEETWAVE_ERROR)
-                {
-                    // Error means we communicated but got the wrong results.
-                    // The best we can say is that the code was wrong
-                    KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
-                    emit __OnSecurityCheckedFailed();
-                }
-                else if (result == fleetwave::FLEETWAVE_FAILED)
-                {
-                    KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
-                    // We don't have a path for handling this
-                    emit __OnSecurityCheckedFailed();
-                }
-                else
-                {
-                    KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
-                }
-            }
-            else
-            {
-                KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
-            }
+            //     KCB_DEBUG_TRACE("(CHEVIN) Requesting Chevin to authorize ...");
+            //     fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendReturnRequest(code, lockNum, question1, question2, question3);
+            //     if (result == fleetwave::FLEETWAVE_OK)
+            //     {
+            //         emit __QuestionUserDialog(lockNum,
+            //                                 question1,
+            //                                 question2,
+            //                                 question3);
+            //     }
+            //     else if (result == fleetwave::FLEETWAVE_ERROR)
+            //     {
+            //         // Error means we communicated but got the wrong results.
+            //         // The best we can say is that the code was wrong
+            //         KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
+            //         emit __OnSecurityCheckedFailed();
+            //     }
+            //     else if (result == fleetwave::FLEETWAVE_FAILED)
+            //     {
+            //         KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
+            //         // We don't have a path for handling this
+            //         emit __OnSecurityCheckedFailed();
+            //     }
+            //     else
+            //     {
+            //         KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
+            //     }
+            // }
+            // else
+            // {
+            //     KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
+            // }
         }
         else
         {
@@ -302,7 +302,7 @@ void CModelSecurity::OnVerifyCodeOne(QString code)
                     {
                         //we need to check if a fingerprint directory already exists,
                         // if they do, do not attempt enrollment
-                        if( !QDir("/home/pi/run/prints/" + code).exists() )
+                        if( !QDir(KCB_FPRINT_PATH + "/" + code).exists() )
                         {
                             emit __EnrollFingerprintDialog(code);
                             emit __EnrollFingerprint(code);
@@ -428,7 +428,7 @@ void CModelSecurity::OnVerifyCodeTwo(QString code)
                 // single code are of course stored like:
                 //   /home/pi/run/prints/<codeOne>/<codeOne>
 
-                if ( !QDir( QString("%1%2.%3").arg("/home/pi/run/prints/").arg(codeOne).arg(code) ).exists() )
+                if ( !QDir( QString("%1%2.%3").arg(KCB_FPRINT_PATH + "/").arg(codeOne).arg(code) ).exists() )
                 {
                     emit __EnrollFingerprintDialog(codeOne + "." + code);
                     emit __EnrollFingerprint(codeOne + "." + code);
@@ -468,29 +468,29 @@ void CModelSecurity::OnSuccessfulQuestionUsersAnswers(QString lockNums, QString 
     
     emit __OnSecurityCheckSuccessWithAnswers(lockNums, answer1, answer2, answer3);
 
-    if (fleetwave_enabled)
-    {
-        fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendReturnComplete(lockNums, answer1, answer2, answer3);
-        if (result == fleetwave::FLEETWAVE_OK)
-        {
-            // KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Return Complete");
-        }
-        else if (result == fleetwave::FLEETWAVE_ERROR)
-        {
-            // Error means we communicated but got the wrong results.
-            // The best we can say is that the code was wrong
-            KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
-        }
-        else if (result == fleetwave::FLEETWAVE_FAILED)
-        {
-            KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
-            // We don't have a path for handling this
-        }
-        else
-        {
-            KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
-        }
-    }
+    // if (fleetwave_enabled)
+    // {
+    //     fleetwave::FLEETWAVE_RETURN_TYPE result = fleetwave::SendReturnComplete(lockNums, answer1, answer2, answer3);
+    //     if (result == fleetwave::FLEETWAVE_OK)
+    //     {
+    //         // KCB_DEBUG_TRACE("(CHEVIN) Successfully sent Return Complete");
+    //     }
+    //     else if (result == fleetwave::FLEETWAVE_ERROR)
+    //     {
+    //         // Error means we communicated but got the wrong results.
+    //         // The best we can say is that the code was wrong
+    //         KCB_DEBUG_TRACE("(CHEVIN) Take Request Error");
+    //     }
+    //     else if (result == fleetwave::FLEETWAVE_FAILED)
+    //     {
+    //         KCB_DEBUG_TRACE("(CHEVIN) Take Request Failed");
+    //         // We don't have a path for handling this
+    //     }
+    //     else
+    //     {
+    //         KCB_DEBUG_TRACE("(CHEVIN) Unknown error");
+    //     }
+    // }
     
     // KCB_DEBUG_EXIT;
 }

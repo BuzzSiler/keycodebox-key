@@ -7,7 +7,9 @@
 #include <QObject>
 #include "logger.h"
 
-#define MAX_NUM_LOCKS_PER_CABINET 32
+#define MAX_NUM_LOCKS_PER_CABINET 64
+#define MAX_NUM_LOCKS_PER_BANK    32
+#define MIN_NUM_LOCKS_PER_CABINET 8
 
 
 #define KCB_FAILED (-1)
@@ -69,16 +71,32 @@ const QString USER_CODE_CODE2_PROMPT = QString("<%1>").arg(QObject::tr("Please E
 
 typedef enum { EMAIL_ADMIN_RECV, EMAIL_ADMIN_SEND, EMAIL_INVALID } EMAIL_ADMIN_SELECT;
 
-QString const KCB_HOME_ROOT("/home/pi");
-QString const KCB_CONFIG_ROOT(KCB_HOME_ROOT+"/kcb-config");
-QString const KCB_IMAGE_PATH(KCB_CONFIG_ROOT + "/images");
-QString const KCB_BRANDING_IMAGE(KCB_IMAGE_PATH + "/kcbbranding.jpg");
-QString const KCB_DEFAULT_IMAGE(KCB_IMAGE_PATH + "/kcbdefault.jpg");
-QString const KCB_INIT_IMAGE(KCB_IMAGE_PATH + "/kcbinit.jpg");
-QString const KCB_LOGS_PATH(KCB_CONFIG_ROOT + "/logs");
+QString const KCB_SYSTEM_PATH("/home/pi");
+QString const KCB_SYSTEM_CONFIG_ROOT(KCB_SYSTEM_PATH + "/kcb-config");
 
-QString const KCBCONFIG_LOGS_PATH = KCB_CONFIG_ROOT+"/logs";
-QString const KCBCONFIG_SCRIPTS_PATH = KCB_CONFIG_ROOT+"/scripts";
+QString const KCB_SCRIPTS_PATH(KCB_SYSTEM_CONFIG_ROOT + "/scripts");
+QString const KCB_BIN_PATH(KCB_SYSTEM_CONFIG_ROOT + "/bin");
+QString const KCB_RUN_PATH(KCB_SYSTEM_CONFIG_ROOT + "/run");
+QString const KCB_SYSTEM_IMAGE_PATH(KCB_SYSTEM_CONFIG_ROOT + "/images");
+QString const KCB_SYSTEM_CONFIG_PATH(KCB_SYSTEM_CONFIG_ROOT + "/config");
+QString const KCB_SYSTEM_SETTINGS_PATH(KCB_SYSTEM_CONFIG_ROOT + "/settings");
+QString const KCB_LOGS_PATH(KCB_SYSTEM_CONFIG_ROOT + "/logs");
+
+QString const KCB_STORAGE_PATH("/mnt/storage");
+QString const KCB_USER_CONFIG_ROOT(KCB_STORAGE_PATH + "/config");
+QString const KCB_IMAGE_PATH(KCB_USER_CONFIG_ROOT + "/images");
+QString const KCB_CONFIG_PATH(KCB_USER_CONFIG_ROOT + "/config");
+QString const KCB_FPRINT_PATH(KCB_USER_CONFIG_ROOT + "/prints");
+QString const KCB_SETTINGS_PATH(KCB_USER_CONFIG_ROOT + "/settings");
+QString const KCB_DATA_PATH(KCB_USER_CONFIG_ROOT + "/data");
+QString const KCB_REPORTS_PATH(KCB_USER_CONFIG_ROOT + "/reports");
+QString const KCB_DATABASE_PATH(KCB_USER_CONFIG_ROOT + "/database");
+
+
+// QString const KCB_BRANDING_IMAGE(KCB_IMAGE_PATH + "/kcbbranding.jpg");
+QString const KCB_DEFAULT_IMAGE(KCB_SYSTEM_IMAGE_PATH + "/kcbdefault.jpg");
+QString const KCB_INIT_IMAGE(KCB_SYSTEM_IMAGE_PATH + "/kcbinit.jpg");
+
 
 
 #endif

@@ -11,7 +11,7 @@
 #include "dlgdownloadreports.h"
 #include "kcbsystem.h"
 
-static const QString DEFAULT_REPORT_DIRECTORY = QString("/home/pi/kcb-config/reports");
+static const QString DEFAULT_REPORT_DIRECTORY = KCB_REPORTS_PATH;
 
 ReportControlWidget::ReportControlWidget(QWidget *parent) :
     QWidget(parent),

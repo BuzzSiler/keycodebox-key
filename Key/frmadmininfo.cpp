@@ -5,8 +5,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <exception>
+#include <unistd.h>
 
-#include "kcbcommon.h"
 #include <QtGlobal>
 #include <QDebug>
 #include <QVariant>
@@ -29,17 +30,17 @@
 #include <QProgressDialog>
 #include <QColor>
 
+#include "kcbcommon.h"
+
+#include "kcbsystem.h"
+#include "keycodeboxsettings.h"
 #include "lockset.h"
 #include "lockstate.h"
 #include "menupushbutton.h"
-#include <exception>
 #include "encryption.h"
-#include <unistd.h>
 #include "selectlockswidget.h"
 #include "kcbkeyboarddialog.h"
 #include "reportcontrolwidget.h"
-#include "kcbsystem.h"
-#include "keycodeboxsettings.h"
 #include "frmnetworksettings.h"
 
 #include "xmlcodelistingreader.h"
@@ -83,10 +84,9 @@ static const QStringList IMPORT_CODES_JSON_FILTER = {"*.json"};
 static const QStringList IMPORT_CODES_CSV_FILTER = {"*.csv"};
 static const QStringList IMPORT_CODES_SQL_FILTER = {"*.sql"};
 
-static const char CMD_REMOVE_ALL_FP_FILES[] = "sudo rm -rf /home/pi/run/prints/*";
-static const char CMD_LIST_SYSTEM_FLAGS[] = "ls /home/pi/run/* | grep 'flag'";
+static QString const CMD_REMOVE_ALL_FP_FILES = "sudo rm -rf " + KCB_FPRINT_PATH + "/*";
 static const char CMD_READ_TIME_ZONE[] = "readlink /etc/localtime";
-static const QString CMD_REMOVE_FP_FILE = "sudo rm -rf /home/pi/run/prints/\%1";
+static const QString CMD_REMOVE_FP_FILE = QString("sudo rm -rf " + KCB_FPRINT_PATH + "/\%1");
 
 static const QString red("color: rgb(255, 0, 0);");
 static const QString blue("color: rgb(0, 0, 255);");
@@ -96,6 +96,11 @@ static const QString white("color: rgb(255, 255, 255);");
 static const QString CAN_MULTICAST_STYLESHEET = QString("QLabel { background-color : rgb(60,179,113); color : blue; }");
 static const QString CANNOT_MULTICAST_STYLESHEET = QString("QLabel { background-color : rgb(60,179,113): color : white; }");
 static const QString IP_ADDRESS_ERROR = red;
+
+static const int COL_MAX_LOCKS = 6;
+static const int COL_USED_LOCKS = 3;
+static const int COL_LAST_LOCK = 2;
+static const int COL_FIRST_LOCK = 1;
 
 static const int DISPLAY_POWER_DOWN_TIMEOUT[] = {
      0,             // None
@@ -365,6 +370,59 @@ QString CFrmAdminInfo::GetIpStylesheet(bool can_ping, bool can_multicast)
     return stylesheet;
 }
 
+QList< QPair<QString, unsigned int> > GetPossibleMatches(QList<QNetworkInterface> qualified_ifaces)
+{
+    QList< QPair<QString, unsigned int> > possibleMatches;
+
+    foreach (auto iface, qualified_ifaces)
+    {
+        QList<QNetworkAddressEntry> addresses = iface.addressEntries();
+
+        foreach (auto addrEntry, addresses)
+        {
+            QHostAddress addr = addrEntry.ip();
+
+            bool ignore_local_host = addr == QHostAddress::LocalHost;
+            bool ignore_nonipv4_address = !addr.toIPv4Address();
+            bool ignore_null_address = addr.toString().isEmpty();
+            
+            if ( ignore_local_host || ignore_nonipv4_address || ignore_null_address)
+            {
+                continue;
+            }
+
+            possibleMatches.append(QPair<QString, unsigned int>(addr.toString(), iface.flags()));
+        }
+    }
+
+    return possibleMatches;
+}
+
+void CFrmAdminInfo::GetIpAddressAndStatus(QString &ip_address, bool &can_ping, bool &can_multicast)
+{
+    QList<QNetworkInterface> qualified_ifaces = kcb::GetQualifiedInterfaces();
+    QList< QPair<QString, unsigned int> > possibleMatches = GetPossibleMatches(qualified_ifaces);
+
+    bool is_match = possibleMatches.length() == 1;
+    bool interface_isup = false;
+    can_multicast = false;
+    can_ping = false;
+    ip_address = "";
+
+    if (is_match)
+    {    
+        QPair<QString, unsigned int>ip_display(possibleMatches[0]);
+        interface_isup = ip_display.second & QNetworkInterface::IsUp;
+        can_multicast = ip_display.second & QNetworkInterface::CanMulticast;
+        if (interface_isup)
+        {
+            QString gateway = KeyCodeBoxSettings::GetGatewayAddress();
+            can_ping = kcb::FPingAddress(gateway);
+            ip_address = ip_display.first;
+        }
+    }
+}
+
 void CFrmAdminInfo::SetSystemIPAddressAndStatus()
 {
     QString display_text("No Connection");
@@ -372,7 +430,7 @@ void CFrmAdminInfo::SetSystemIPAddressAndStatus()
     bool can_ping = false;
     bool can_multicast = false;
     
-    kcb::GetIpAddressAndStatus(ip_address, can_ping, can_multicast);
+    GetIpAddressAndStatus(ip_address, can_ping, can_multicast);
 
     if (!ip_address.isEmpty())
     {
@@ -650,15 +708,14 @@ void CFrmAdminInfo::OnUtilActionSetBrandingImage()
 {
     // KCB_DEBUG_ENTRY;
 
-    QString createCmd = " cp '";
     int nRC = QMessageBox::warning(this, tr("Set New Branding Image"),
                                    tr("The new branding image will be set to the selected file and scaled to 760x390.\nDo you want to continue?"),
                                    QMessageBox::Yes, QMessageBox::Cancel);
-    if(nRC == QMessageBox::Yes) {
-        sync();
-        createCmd += _copyDirectory;
-        createCmd += "' /home/pi/kcb-config/images/alpha_logo.jpg";
-        std::system(createCmd.toStdString().c_str());
+    if(nRC == QMessageBox::Yes) 
+    {
+        KeyCodeBoxSettings::OverrideBrandingImage(_copyDirectory);
+        // sync();
+        // std::system(QString("cp %0 %1").arg(_copyDirectory).arg(KeyCodeBoxSettings::GetBrandingImageFilename()).toStdString().c_str());
     }
     // KCB_DEBUG_EXIT;
 }
@@ -671,8 +728,9 @@ void CFrmAdminInfo::OnUtilActionDefaultBrandingImage()
                                    QMessageBox::Yes, QMessageBox::Cancel);
     if(nRC == QMessageBox::Yes) 
     {
-        sync();
-        std::system("cp /home/pi/kcb-config/images/alpha_logo_touch.jpg /home/pi/kcb-config/images/alpha_logo.jpg");
+        KeyCodeBoxSettings::RestoreDefaultBrandingImage();
+        // sync();
+        // std::system(QString("cp %0 %1").arg(KeyCodeBoxSettings::GetDefaultBrandingImageFilename()).arg(KeyCodeBoxSettings::GetBrandingImageFilename()).toStdString().c_str());
     }
     // KCB_DEBUG_EXIT;
 }
@@ -1876,7 +1934,7 @@ void CFrmAdminInfo::deleteCodeByRow(int row)
 
         // KCB_DEBUG_TRACE("cmd: " << cmd);
 
-        if( QDir(QString("/home/pi/")).exists() )
+        if( QDir(QString(KCB_FPRINT_PATH)).exists() )
         {
             std::system( cmd.toStdString().c_str() );
         }
@@ -1920,7 +1978,7 @@ void CFrmAdminInfo::purgeCodes()
     }
 
     // KCB_DEBUG_TRACE(CMD_REMOVE_ALL_FP_FILES);
-    std::system( CMD_REMOVE_ALL_FP_FILES );
+    std::system( CMD_REMOVE_ALL_FP_FILES.toStdString().c_str() );
     // KCB_DEBUG_EXIT;
 }
 
@@ -2086,35 +2144,32 @@ void CFrmAdminInfo::on_pbNetworkSettings_clicked()
 {
     FrmNetworkSettings ns;
 
-    ns.setValues(_tmpAdminRec.getVNCPort(), _tmpAdminRec.getVNCPassword(),
-                 _tmpAdminRec.getSMTPServer(), _tmpAdminRec.getSMTPPort(), _tmpAdminRec.getSMTPType(), 
-                 _tmpAdminRec.getSMTPUsername(), _tmpAdminRec.getSMTPPassword()
-                 );
+    VncSettings vs = KeyCodeBoxSettings::getVncSettings();
+    SmtpSettings ss = KeyCodeBoxSettings::getSmtpSettings();
+
+    ns.setValues(vs.port, vs.password, vs.enable, ss.server, ss.port, ss.type, ss.username, ss.password);
     if (ns.exec())
     {
-        int vncPort;
+        QString vncPort;
         QString vncPassword;
+        bool vncEnable;
         QString smtpServer;
         int smtpPort;
         int smtpType;
         QString smtpUsername;
         QString smtpPassword;
 
-        ns.getValues(vncPort, vncPassword,
+        ns.getValues(vncPort, vncPassword, vncEnable,
                      smtpServer, smtpPort, smtpType, smtpUsername, smtpPassword);
+        // Update VNC Settings
+        auto vs = VncSettings(vncPort, vncPassword, vncEnable);
+        KeyCodeBoxSettings::setVncSettings(vs);
+        kcb::setVncCredentials(vs.port, vs.password);
 
-        _tmpAdminRec.setVNCPort(vncPort);
-        _tmpAdminRec.setVNCPassword(vncPassword);
-        _tmpAdminRec.setSMTPServer(smtpServer);
-        _tmpAdminRec.setSMTPPort(smtpPort);
-        _tmpAdminRec.setSMTPType(smtpType);
-        _tmpAdminRec.setSMTPUsername(smtpUsername);
-        _tmpAdminRec.setSMTPPassword(smtpPassword);
+        // Update SMTP Settings
+        KeyCodeBoxSettings::setSmtpSettings(SmtpSettings(smtpServer, smtpPort, smtpType, smtpUsername, smtpPassword));
 
-        // Notify the world about the changes
-        emit __UpdateCurrentAdmin(&_tmpAdminRec);
-
-        KeyCodeBoxSettings::SetVncCredentials(QString::number(vncPort), vncPassword);
+        pending_reboot_ = ns.pendingReboot();
     }
 }
 
@@ -2293,15 +2348,14 @@ void CFrmAdminInfo::on_btnActionExecute_clicked()
 
         case UTIL_ACTION_EXPORT_LOGS:
             {
-                // Copy the log file from /home/pi/kcb-config/logs/messages.log to USB drive
                 QStringList nameFilter;
                 nameFilter << "messages*.log" << "stderr.log";
-                QDir dir("/home/pi/kcb-config/logs");
+                QDir dir(KCB_LOGS_PATH);
                 QStringList log_list = dir.entryList(nameFilter, QDir::Files); 
 
                 foreach (auto entry, log_list)
                 {
-                    QString source = QString("%1/%2").arg("/home/pi/kcb-config/logs").arg(entry);
+                    QString source = QString("%1/%2").arg(KCB_LOGS_PATH).arg(entry);
                     QString target = QString("%1/%2").arg(ui->cbUsbDrives->currentText()).arg(entry);
                     bool result = QFile::copy(source, target);
                     if (!result)
@@ -2492,19 +2546,21 @@ void CFrmAdminInfo::ClearCabinetInfo()
 void CFrmAdminInfo::SetCabinetInfo()
 {
     // KCB_DEBUG_ENTRY;
-    CABINET_VECTOR cabinets = KeyCodeBoxSettings::getCabinetsInfo();
+    kcb::CABINET_COLLECTION cabinets = KeyCodeBoxSettings::getCabinetsInfo();
 
     ClearCabinetInfo();
 
     foreach (auto cab, cabinets)
     {
+        // KCB_DEBUG_TRACE(cab.model << cab.num_locks << cab.start << cab.stop << cab.sw_version << cab.addr << cab.max_locks);
         m_model.insertRow(m_model.rowCount(),
                           QList<QStandardItem *>() << new QStandardItem(cab.model)
                                                    << new QStandardItem(QString::number(cab.start))
                                                    << new QStandardItem(QString::number(cab.stop))
                                                    << new QStandardItem(QString::number(cab.num_locks))
                                                    << new QStandardItem(cab.addr)
-                                                   << new QStandardItem(cab.sw_version));
+                                                   << new QStandardItem(cab.sw_version)
+                                                   << new QStandardItem(QString::number(cab.max_locks)));
         ui->tvCabinets->setItemDelegateForRow(m_model.rowCount() - 1, new CabinetRowDelegate(this));
     }
 
@@ -2517,7 +2573,7 @@ void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
     int col = item->column();
     int row = item->row();
 
-    ui->pbApplyChanges->setEnabled(col == 3 || col == 2 || col == 1);
+    ui->pbApplyChanges->setEnabled(col == COL_MAX_LOCKS || col == COL_USED_LOCKS || col == COL_LAST_LOCK || col == COL_FIRST_LOCK);
 
     // Note: This code works in a cascading fashion.  By changing the total locks column,
     // this code will be called to notify there was a change.  Each time this function
@@ -2525,14 +2581,22 @@ void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
     // which will in turn force this function to be called again.  Each time, a single change is
     // made to the model.
 
-    if (col == 3)
+    if (col == COL_MAX_LOCKS)
+    {
+        QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tvCabinets->model());
+        int max = model->data(model->index(row, col)).toInt();
+        int used = model->data(model->index(row, col-3)).toInt();
+        int max_used = qMin(used, max);
+        model->setData(model->index(row, col-3), max_used);
+    }
+    else if (col == COL_USED_LOCKS)
     {
         QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tvCabinets->model());
         int total = model->data(model->index(row, col)).toInt();
         int first = model->data(model->index(row, col-2)).toInt();
         model->setData(model->index(row, col-1), first + total - 1);
     }
-    else if (col == 2)
+    else if (col == COL_LAST_LOCK)
     {
         QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tvCabinets->model());
         if (model->rowCount() > (row + 1))
@@ -2541,7 +2605,7 @@ void CFrmAdminInfo::OnItemChanged(QStandardItem* item)
             model->setData(model->index(row+1, col-1), last + 1);
         }
     }
-    else if (col == 1)
+    else if (col == COL_FIRST_LOCK)
     {
         QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tvCabinets->model());
         int first = model->data(model->index(row, col)).toInt();

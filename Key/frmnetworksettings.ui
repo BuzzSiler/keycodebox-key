@@ -332,6 +332,9 @@
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
           <widget class="QGroupBox" name="gbEmailSettings">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="title">
             <string>Email Settings</string>
            </property>
@@ -709,6 +712,16 @@
               </item>
              </layout>
             </item>
+            <item>
+             <widget class="QCheckBox" name="cbVncEnable">
+              <property name="text">
+               <string>VNC Disabled</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
@@ -793,7 +806,7 @@
   <customwidget>
    <class>CClickableLabel</class>
    <extends>QLabel</extends>
-   <header location="global">clickablelabel.h</header>
+   <header>clickablelabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

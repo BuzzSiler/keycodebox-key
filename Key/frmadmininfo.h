@@ -236,6 +236,8 @@ class CFrmAdminInfo : public QDialog
         int m_last_index;
 
         void ExtractCommandOutput(FILE *pf, std::string &rtnStr);
+        bool pending_shutdown_{false};
+        bool pending_reboot_{false};
 
         void initialize();
         bool isInternetTime();
@@ -289,6 +291,8 @@ class CFrmAdminInfo : public QDialog
         QString StripAnnotations(const QString& text);
         void invokeUpdateCabinetConfig();
         void ApplyAccessTypeToAllCodes();
+        QList< QPair<QString, unsigned int> > GetPossibleMatches(QList<QNetworkInterface> qualified_ifaces);
+        void GetIpAddressAndStatus(QString &ip_address, bool &can_ping, bool &can_multicast);
 
     protected:
         void touchEvent(QTouchEvent *ev);

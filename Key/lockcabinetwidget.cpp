@@ -44,7 +44,8 @@ LockCabinetWidget::LockCabinetWidget(QWidget *parent) :
     ui->setupUi(this);
 
     // Get a static list of the lock buttons on the widget
-    m_lock_buttons = this->findChildren<QPushButton *>(QRegularExpression("pbLock.."), Qt::FindChildrenRecursively);
+    m_lock_buttons = this->findChildren<QPushButton *>(QRegularExpression("pbBankALock.."), Qt::FindChildrenRecursively) +
+                     this->findChildren<QPushButton *>(QRegularExpression("pbBankBLock.."), Qt::FindChildrenRecursively);
 
     // Map the click signal from the buttons to lockSelected slot via a mapper
     for (int ii = 0; ii < m_lock_buttons.length(); ++ii)
@@ -90,33 +91,36 @@ void LockCabinetWidget::updateCabinetConfig()
         KCB_DEBUG_TRACE("No cabinet info found, clearing display");
         clrAllLocks();
         disableAllLocks();
-        m_num_cabs = 0;
-        m_cabs.empty();
+        m_num_cabs = m_cabinet_info.size();
+        m_cabs.resize(m_num_cabs);
         m_current_cab = -1;
         ui->cbSelectedCabinet->setEnabled(false);
         // Note: Clearing the contents of a combo box has side effect which sets m_current_cab = -1 (invalid index)
         ui->cbSelectedCabinet->clear();
-        KCB_DEBUG_EXIT;
+        // KCB_DEBUG_EXIT;
         return;
     }
 
     // Note: Clearing the contents of a combo box has side effect which sets m_current_cab = -1 (invalid index)
     ui->cbSelectedCabinet->clear();
-    ui->cbSelectedCabinet->setEnabled(false);
+    ui->cbSelectedCabinet->setEnabled(true);
 
-    m_num_cabs = m_cabinet_info.count();
+    m_num_cabs = m_cabinet_info.size();
     m_cabs.resize(m_num_cabs);
 
     for (int ii = 0; ii < m_cabs.length(); ++ii)
     {
-        quint8 start = m_cabinet_info[ii].start;
-        quint8 stop = m_cabinet_info[ii].stop;
-        quint8 size = m_cabinet_info[ii].num_locks;
-
         m_cabs[ii].states = QVector<bool>(m_lock_buttons.length(), false);
         m_cabs[ii].enabled = QVector<bool>(m_lock_buttons.length(), false);
 
-        for (int jj = 0; jj < size; ++jj)
+        uint16_t start = m_cabinet_info[ii].start;
+        uint16_t stop = m_cabinet_info[ii].stop;
+        uint16_t num_locks = m_cabinet_info[ii].num_locks;
+
+        // uint16_t max_locks = m_cabinet_info[ii].max_locks;
+        // KCB_DEBUG_TRACE("start" << start << "stop" << stop << "size" << size << "num locks" << num_locks << "max locks" << max_locks << "num buttons" << m_lock_buttons.length());
+
+        for (int jj = 0; jj < num_locks; ++jj)
         {
             m_cabs[ii].enabled[jj] = true;
         }
@@ -127,9 +131,27 @@ void LockCabinetWidget::updateCabinetConfig()
                     arg(m_cabinet_info[ii].model).
                     arg(start, 3, 10, QChar('0')).
                     arg(stop, 3, 10, QChar('0')));
+
+        // How tabs do we have?
+        bool enough_for_banka = num_locks <= MAX_NUM_LOCKS_PER_BANK;
+        bool enough_for_bankb = num_locks > MAX_NUM_LOCKS_PER_BANK && num_locks <= MAX_NUM_LOCKS_PER_CABINET;
+        bool banka_enabled = enough_for_banka || enough_for_bankb;
+        bool bankb_enabled = enough_for_bankb;
+        ui->twLockBanks->setTabEnabled(0, banka_enabled);
+        ui->twLockBanks->setTabEnabled(1, bankb_enabled);
+        if (bankb_enabled)
+        {
+            ui->twLockBanks->setTabText(1, tr("Locks 33 - %0").arg(QString::number(num_locks)));
+        }
+        else
+        {
+            ui->twLockBanks->setTabText(1, "");
+            ui->twLockBanks->setTabEnabled(1, false);
+        }
     };
 
     ui->cbSelectedCabinet->setCurrentIndex(0);
+    ui->twLockBanks->setCurrentIndex(0);
 
     m_is_configured = true;
 
@@ -409,6 +431,8 @@ void LockCabinetWidget::lockSelected(int lock_index)
         return;
     }
 
+    // KCB_DEBUG_TRACE("lock_index" << lock_index);
+
     if (m_lock_selection == LockSelection::SINGLE)
     {
         // KCB_DEBUG_TRACE("Single selection enabled" << m_last_cab_selected << m_last_state_selected);
@@ -509,16 +533,25 @@ void LockCabinetWidget::InitLockNameMap()
 void LockCabinetWidget::updateUi()
 {
     // KCB_DEBUG_ENTRY;
-    if (!m_is_configured)
+    if (m_current_cab < 0)
     {
-        KCB_DEBUG_TRACE("cabinet configuration not ready");
+        KCB_DEBUG_TRACE("invalid cabinet index");
+        return;
+    }
+
+    if (m_lock_names.count() == 0)
+    {
+        KCB_DEBUG_TRACE("invalid lock names");
         return;
     }
     
     CAB_STATE* p_cab = &m_cabs[m_current_cab];
-    quint8 start = m_cabinet_info[m_current_cab].start;
-    quint8 stop = m_cabinet_info[m_current_cab].stop;
-    // KCB_DEBUG_TRACE("start" << start << "stop" << stop);
+    uint16_t start = m_cabinet_info[m_current_cab].start;
+    uint16_t stop = m_cabinet_info[m_current_cab].stop;
+    // uint16_t num_locks = m_cabinet_info[m_current_cab].num_locks;
+    // uint16_t max_locks = m_cabinet_info[m_current_cab].max_locks;
+    // KCB_DEBUG_TRACE("start" << start << "stop" << stop << "num locks" << num_locks << "max locks" << max_locks << "lock names" << m_lock_names);
+
     for (int ii = 0; ii < MAX_NUM_LOCKS_PER_CABINET; ++ii)
     {
         m_lock_buttons[ii]->setText("");
@@ -544,9 +577,9 @@ void LockCabinetWidget::updateUi()
 void LockCabinetWidget::selectClearAllLocks(bool select_clear)
 {
     // KCB_DEBUG_ENTRY;
-    if (!m_is_configured)
+    if (m_current_cab < 0)
     {
-        KCB_DEBUG_TRACE("cabinet configuration not ready");
+        KCB_WARNING_TRACE("invalid cabinet index");
         return;
     }
     

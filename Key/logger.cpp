@@ -6,16 +6,17 @@
 #include <QTextStream>
 #include <QDateTime>
 
+#include "kcbcommon.h"
+
 namespace kcb
 {
-    static const QString LOG_PATH = "/home/pi/kcb-config/logs";
-    static const QString LOG_FILENAME = LOG_PATH + "/messages.log";
+    static const QString LOG_FILENAME = KCB_LOGS_PATH + "/messages.log";
 
     static const int NUM_LOGS = 10;
 
     static Logger::LOG_LEVEL log_level = Logger::LEVEL_INFO;
 
-    static QString newFilename(QString const path = LOG_PATH)
+    static QString newFilename(QString const path = KCB_LOGS_PATH)
     {
         static int counter = 1;
 

@@ -47,7 +47,7 @@ CSystemController::CSystemController(QObject *parent) :
     _autoCodeTimer(* new QTimer(this))
 {
     // KCB_DEBUG_ENTRY;
-    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
+    fleetwave_enabled = false;
     // KCB_DEBUG_EXIT;
 }
 

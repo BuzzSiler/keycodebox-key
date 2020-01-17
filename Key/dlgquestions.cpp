@@ -28,7 +28,7 @@ CDlgQuestions::CDlgQuestions(QWidget *parent) :
 
     raise();
 
-    fleetwave_enabled = KeyCodeBoxSettings::isFleetwaveEnabled();
+    fleetwave_enabled = false;
 
     ui->rbAnswer1No->setVisible(fleetwave_enabled);
     ui->rbAnswer1Yes->setVisible(fleetwave_enabled);

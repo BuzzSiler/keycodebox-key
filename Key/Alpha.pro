@@ -6,6 +6,8 @@
 
 QT       += core gui serialport sql network
 
+CONFIG += c++11
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Alpha
@@ -16,8 +18,15 @@ TEMPLATE = app
 INCLUDEPATH += /usr/include
 INCLUDEPATH += /usr/local/include
 INCLUDEPATH += /usr/include/libusb-1.0
+INCLUDEPATH += /usr/include/arm-linux-gnueabihf/qt5
+INCLUDEPATH += /usr/include/libxml2
 
-LIBS += -L/usr/lib/arm-linux-gnueabihf -lhidapi-hidraw
+LIBS += -L/usr/lib/qt5
+LIBS += -L/usr/lib/arm-linux-gnueabihf/qt5
+LIBS += -lhidapi-hidraw 
+LIBS += -lsqlite3
+LIBS += -lfprint
+LIBS += -lxml2
 
 SOURCES += main.cpp\
     keycodeboxmain.cpp \
@@ -83,7 +92,6 @@ SOURCES += main.cpp\
     dlgdownloadreports.cpp \
     kcbsystem.cpp \
     kcbapplication.cpp \
-    fleetwave.cpp \
     omnikey5427ckreader.cpp \
     keycodeboxsettings.cpp \
     frmnetworksettings.cpp \
@@ -101,6 +109,8 @@ SOURCES += main.cpp\
     autocodegenwidget.cpp \
     autocodegenerator.cpp \
     autocodegenstatic.cpp \
+    kcbstartup.cpp \
+    cabinet_type.cpp \
 
 HEADERS  += keycodeboxmain.h \
     usbdrivecontroller.h \
@@ -169,7 +179,6 @@ HEADERS  += keycodeboxmain.h \
     dlgdownloadreports.h \
     kcbsystem.h \
     kcbapplication.h \
-    fleetwave.h \
     omnikey5427ckreader.h \
     keycodeboxsettings.h \
     frmnetworksettings.h \
@@ -187,6 +196,8 @@ HEADERS  += keycodeboxmain.h \
     autocodegenwidget.h \
     autocodegenerator.h \
     autocodegenstatic.h \
+    kcbstartup.h \
+    cabinet_type.h \
 
 FORMS    += mainwindow.ui \
     frmusercode.ui \
@@ -207,19 +218,9 @@ FORMS    += mainwindow.ui \
     frmnetworksettings.ui \
     autocodegenwidget.ui
     
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/release/ -lqsqlite
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../raspberry-rootfs/tools/opt/qt5pi/plugins/sqldrivers/debug/ -lqsqlite
-else:unix: LIBS += -L/usr/lib/arm-linux-gnueabihf/qt5/plugins/sqldrivers/ -lqsqlite 
 
-INCLUDEPATH += /usr/lib/arm-linux-gnueabihf/qt5/plugins/sqldrivers
-DEPENDPATH += /usr/lib/arm-linux-gnueabihf/qt5/plugins/sqldrivers
 
-unix:!macx: LIBS += -I/usr/include/libxml2/ -L/usr/lib/arm-linux-gnueabihf/ -lsqlite3  -lfprint -lxml2
-unix:!macx: LIBS += -L/usr/lib/arm-linux-gnueabihf/ -lusb-1.0
 
-INCLUDEPATH += /usr/lib/arm-linux-gnueabihf
-DEPENDPATH += /usr/lib/arm-linux-gnueabihf
-DEFINES += SQLITE_CORE
 
 CONFIG += c++11
 TRANSLATIONS = trans_fr.ts trans_sp.ts

@@ -21,8 +21,6 @@
 #define SEND_MSG_ON_REVERSE_LOOP 0x40
 #define SEND_MSG_ON_FORWARD_LOOP 0x80
 
-
-
 union inttohex_t {
     struct {
         unsigned char byte_low;
@@ -69,7 +67,7 @@ QString CLockController::SoftwareVersionToString(uint16_t version)
                     arg(minor, 2, 10, QChar('0'));
 }
 
-void CLockController::ReadBoardEeprom(uint16_t addr)
+kcb::CABINET_INFO CLockController::ReadBoardEeprom(uint16_t addr)
 {
     // KCB_DEBUG_ENTRY;
     // Read Board Data
@@ -92,7 +90,7 @@ void CLockController::ReadBoardEeprom(uint16_t addr)
     value = ReadEeprom(addr, 36);
     uint16_t board_addr = SWAP_BYTES(value);
 
-    // value = ReadEeprom(addr, 38);
+    value = ReadEeprom(addr, 38);
     // uint16_t broadcast_addr = SWAP_BYTES(value);
     // uint16_t fixed_data = ReadEeprom(addr, 44);
     // KCB_DEBUG_TRACE("Door Start Address" << door_start_addr);
@@ -102,16 +100,16 @@ void CLockController::ReadBoardEeprom(uint16_t addr)
     // KCB_DEBUG_TRACE("Broadcast Addr" << hex << broadcast_addr);
     // KCB_DEBUG_TRACE("Fixed Data" << hex << fixed_data);
 
-    int num_locks = (door_end_addr - door_start_addr) + 1;
-
-    KeyCodeBoxSettings::AddCabinet({"KCB32",
-                                    num_locks,
-                                    door_start_addr,
-                                    door_end_addr,
-                                    SoftwareVersionToString(software_version),
-                                    QString("%1").arg(board_addr, 4, 16, QChar('0'))});
+    uint16_t num_locks = (door_end_addr - door_start_addr) + 1;
 
     // KCB_DEBUG_EXIT;
+    return kcb::CABINET_INFO{"KCB32",
+                        num_locks,
+                        door_start_addr,
+                        door_end_addr,
+                        SoftwareVersionToString(software_version),
+                        QString("%1").arg(board_addr, 4, 16, QChar('0')),
+                        MAX_NUM_LOCKS_PER_BANK};
 }
 
 QByteArray CLockController::CreateSearchNetworkCommand(uint16_t addr)
@@ -144,6 +142,7 @@ uint16_t CLockController::SearchNetwork(uint16_t addr)
 
 void CLockController::SetBoardLockStartStop(uint16_t addr, uint8_t start, uint8_t stop)
 {
+    // KCB_DEBUG_ENTRY;
     // Read EEPROM to set the upper address byte
     (void) ReadEeprom(addr, 0);
 
@@ -169,10 +168,12 @@ void CLockController::SetBoardLockStartStop(uint16_t addr, uint8_t start, uint8_
     command[7] = 0x00;
 
     response = SendCommand(command);
+    // KCB_DEBUG_EXIT;
 }
 
-void CLockController::LocateMaster()
+BOARD_ADDRESSES CLockController::getBoardAddresses()
 {
+    // KCB_DEBUG_ENTRY;
     // The maximum number of boxes that can exist is 4, each containing 64 locks, for a total of 256
 
     // 1. Send network search message to A000 -> Get board address
@@ -180,7 +181,7 @@ void CLockController::LocateMaster()
     // 3. Send network search message to A002 -> Get new board address (if same board address as first, then there are two boards in the system)
     // 4. Send network search message to A003 -> Get new board address (if same board address as first, then there are three boards in the system)
     // 5. Send network search message to A004 -> Get new board address (if same board address as first, then there are four boards in the system)
-    QVector<uint16_t> addresses;
+    BOARD_ADDRESSES addresses;
     uint16_t addr;
     uint16_t global_addr = GLOBAL_ADDRESS;
     addr = SearchNetwork(global_addr);
@@ -205,20 +206,36 @@ void CLockController::LocateMaster()
     }
 
     UpdateDetectProgress();
-    KeyCodeBoxSettings::ClearCabinetConfig();
 
-    // KCB_DEBUG_TRACE("board address" << addresses);
-    int start = 1;
-    int stop = 32;
+    return addresses;
+}
+
+kcb::CABINET_INFO CLockController::getCabinetInfo(uint16_t addr)
+{
+    // KCB_DEBUG_TRACE("board address" << addr);
+    UpdateDetectProgress();
+    auto ci = ReadBoardEeprom(addr);
+    UpdateDetectProgress();
+    // KCB_DEBUG_EXIT;
+
+    return ci;
+}
+
+kcb::CABINET_COLLECTION CLockController::getCabinetCollection(BOARD_ADDRESSES const &addresses)
+{
+    // KCB_DEBUG_ENTRY;
+    kcb::CABINET_COLLECTION cabinets;
+
+    UpdateDetectProgress();
     foreach (auto ba, addresses)
     {
-        UpdateDetectProgress();
-        ReadBoardEeprom(ba);
-        UpdateDetectProgress();
-        start += 32;
-        stop += 32;
+        auto ci = getCabinetInfo(ba);
+        cabinets.append(ci);
     }
     UpdateDetectProgress();
+
+    // KCB_DEBUG_EXIT;
+    return cabinets;
 }
 
 QByteArray CLockController::SendCommand(QByteArray &cmd)
@@ -618,7 +635,8 @@ void CLockController::inquireLockStatus()
 {
     // KCB_DEBUG_ENTRY;
 
-    CABINET_VECTOR cabs = KeyCodeBoxSettings::getCabinetsInfo();
+    // Get the cabinet info from the configuration
+    kcb::CABINET_COLLECTION cabs = KeyCodeBoxSettings::getCabinetsInfo();
 
     int success_count = 0;
     for (int ii = 0; ii < cabs.count(); ++ii)
@@ -654,24 +672,67 @@ void CLockController::UpdateDetectProgress()
 {
     // KCB_DEBUG_ENTRY;
     emit DiscoverHardwareProgressUpdate(update_status);
-    update_status += 7;
+    update_status += 10;
+    // KCB_DEBUG_EXIT;
+}
+
+void CLockController::UpdateCabinetInfo(kcb::CABINET_COLLECTION const &cabinets)
+{
+    // KCB_DEBUG_ENTRY;
+
+    auto config_cabinets = KeyCodeBoxSettings::getCabinetsInfo();
+
+    int num_matches = 0;
+    foreach (auto const& discovered, cabinets)
+    {
+        foreach (auto const& configured, config_cabinets)
+        {
+            if (discovered == configured)
+            {
+                num_matches++;
+            }
+        }
+    }
+
+    // When there is a 'real' (non-zero match) and it is the same length as the configuration, then don't make any changes
+
+    bool same_matches = config_cabinets.length() > 0 && num_matches == config_cabinets.length();
+
+    if (same_matches)
+    {
+        // KCB_DEBUG_EXIT;
+        return;
+    }
+    else
+    {
+        KCB_DEBUG_TRACE("Discovered and configuration are different");
+        KeyCodeBoxSettings::ClearCabinetConfig();
+        foreach (auto const &cabinet, cabinets)
+        {
+            KeyCodeBoxSettings::AddCabinet(cabinet);
+        }
+    }
+
     // KCB_DEBUG_EXIT;
 }
 
 void CLockController::detectHardware()
 {
-    KCB_DEBUG_ENTRY;
+    // KCB_DEBUG_ENTRY;
     update_status = 0;
     UpdateDetectProgress();
-    LocateMaster();
+    auto addresses = getBoardAddresses();
+    auto cabinets = getCabinetCollection(addresses);
+    UpdateCabinetInfo(cabinets);
+
     emit DiscoverHardwareProgressUpdate(100);
-    KCB_DEBUG_EXIT;
+    // KCB_DEBUG_EXIT;
 }
 
 void CLockController::setLockRanges()
 {
     // KCB_DEBUG_ENTRY;
-    CABINET_VECTOR cabinets = KeyCodeBoxSettings::getCabinetsInfo();
+    kcb::CABINET_COLLECTION cabinets = KeyCodeBoxSettings::getCabinetsInfo();
 
     foreach (auto cab, cabinets)
     {

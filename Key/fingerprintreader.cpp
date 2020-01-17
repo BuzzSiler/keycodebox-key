@@ -11,6 +11,7 @@
 #include <QDebug>
 
 #include "logger.h"
+#include "kcbcommon.h"
 
 struct fp_dev *fpdev = NULL;
 struct fp_dscv_print **fp_dscv_prints = NULL;
@@ -188,7 +189,7 @@ void CFingerprintReader::enrollStageCb(struct fp_dev *dev, int result,
             unsigned char *buf;
             size_t len;
 
-            prependPath = "/home/pi/run/prints/";
+            prependPath = KCB_FPRINT_PATH;
 
             if( !QDir(prependPath).exists() )
                 QDir().mkdir(prependPath);
@@ -348,7 +349,7 @@ void CFingerprintReader::identifyCb(struct fp_dev *dev, int result, size_t match
 
 const char *CFingerprintReader::buildSavePath(QString sCode)
 {
-    QString prependPath = "/home/pi/run/prints/";
+    QString prependPath = KCB_FPRINT_PATH;
 
     access_code = sCode;
 
@@ -389,7 +390,7 @@ bool CFingerprintReader::loadEnrollData(QString sCode)
 
 bool CFingerprintReader::initVerify()
 {
-    QDirIterator it("/home/pi/run/prints/", QStringList() << "*", QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator it(KCB_FPRINT_PATH, QStringList() << "*", QDir::Files, QDirIterator::Subdirectories);
     int count = 0;
     QString currentDir;
     QString loadPath;

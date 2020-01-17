@@ -5,7 +5,7 @@
 #include <QThread>
 
 #include "logger.h"
-#include "kcbsystem.h"
+#include "kcbstartup.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,10 +14,12 @@ int main(int argc, char *argv[])
 
     kcb::Logger::installHandler();
     kcb::Logger::setLevel(kcb::Logger::LEVEL_INFO);
-    kcb::BackupDatabase();
 
-    // Note: This function may invoke a reboot
-    kcb::SetupDisplay();
+    if (!kcb::Startup())
+    {
+        KCB_DEBUG_TRACE("Failed startup");
+        return -1;
+    }
     
     MainWindow w;
     return a.exec();

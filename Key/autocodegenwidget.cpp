@@ -168,7 +168,7 @@ void AutoCodeGenWidget::ShowQrCode(const QString& data)
     {
         QByteArray ba;
         ba.append(data);
-        QPixmap pm = kcb::CreateQrCode(ba);
+        QPixmap pm = kcb::Utils::CreateQrCode(ba);
         ui->lblQrCode->setPixmap(pm.scaled(120, 120, Qt::KeepAspectRatio));
         ui->lblQrCode->setMask(pm.mask());
         ui->lblQrCode->show();
@@ -643,7 +643,7 @@ void AutoCodeGenWidget::on_pbAutoCodeRandomPassword_clicked()
     QString password;
     for (int ii = 0; ii < count; ++ii)
     {
-        password += QString(kcb::GetRandomChar());
+        password += QString(kcb::Utils::GetRandomChar());
     }
 
     QString hashed_password = GetHashedPassword(password);
